@@ -4,10 +4,6 @@
     "named": true,
     "subtypes": [
       {
-        "type": "application_expression",
-        "named": true
-      },
-      {
         "type": "array_expression",
         "named": true
       },
@@ -360,21 +356,6 @@
     }
   },
   {
-    "type": "application_expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "argument_name_spec",
     "named": true,
     "fields": {},
@@ -441,10 +422,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "array_close",
+          "named": true
+        },
+        {
+          "type": "array_open",
           "named": true
         },
         {
@@ -616,7 +605,7 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -625,6 +614,14 @@
         },
         {
           "type": "object_expression",
+          "named": true
+        },
+        {
+          "type": "record_close",
+          "named": true
+        },
+        {
+          "type": "record_open",
           "named": true
         },
         {
@@ -688,6 +685,14 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "record_close",
+          "named": true
+        },
+        {
+          "type": "record_open",
           "named": true
         },
         {
@@ -1768,10 +1773,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "list_close",
+          "named": true
+        },
+        {
+          "type": "list_open",
           "named": true
         },
         {
@@ -2378,7 +2391,15 @@
       "required": true,
       "types": [
         {
+          "type": "record_close",
+          "named": true
+        },
+        {
           "type": "record_fields",
+          "named": true
+        },
+        {
+          "type": "record_open",
           "named": true
         },
         {
@@ -3511,6 +3532,14 @@
     "named": false
   },
   {
+    "type": "array_close",
+    "named": true
+  },
+  {
+    "type": "array_open",
+    "named": true
+  },
+  {
     "type": "as",
     "named": false
   },
@@ -3675,6 +3704,14 @@
     "named": true
   },
   {
+    "type": "list_close",
+    "named": true
+  },
+  {
+    "type": "list_open",
+    "named": true
+  },
+  {
     "type": "match",
     "named": false
   },
@@ -3753,6 +3790,14 @@
   {
     "type": "rec",
     "named": false
+  },
+  {
+    "type": "record_close",
+    "named": true
+  },
+  {
+    "type": "record_open",
+    "named": true
   },
   {
     "type": "return",

@@ -14,6 +14,14 @@ enum TokenType {
   VIRTUAL_OPEN_SECTION,
   VIRTUAL_END_SECTION,
   BLOCK_COMMENT_CONTENT,
+  LIST_OPEN,
+  ARRAY_OPEN,
+  RECORD_OPEN,
+  ANON_RECORD_OPEN,
+  LIST_CLOSE,
+  ARRAY_CLOSE,
+  RECORD_CLOSE,
+  ANON_RECORD_CLOSE,
 };
 
 bool in_error_recovery(const bool *valid_symbols) {
@@ -163,13 +171,77 @@ struct Scanner {
 
     // Check if we have newlines and how much indentation
     bool has_newline = false;
+    bool has_list_open = false;
+    bool has_array_open = false;
+    bool has_record_open = false;
+    bool has_anon_record_open = false;
+    bool has_list_close = false;
+    bool has_array_close = false;
+    bool has_record_close = false;
+    bool has_anon_record_close = false;
+    bool found_any = valid_symbols[VIRTUAL_OPEN_SECTION] || valid_symbols[VIRTUAL_END_SECTION];
+    bool found_close = false;
     bool can_call_mark_end = true;
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == ' ') {
           skip(lexer);
       }
-      else if (lexer->lookahead == '\n') {
+      else if (!found_any && (valid_symbols[LIST_OPEN] || valid_symbols[ARRAY_OPEN]) && lexer->lookahead == '[') {
+        advance(lexer);
+        if (lexer->lookahead == '|') {
+          has_array_open = true;
+        } else {
+          has_list_open = true;
+        }
+        advance(lexer);
+        lexer->mark_end(lexer);
+        found_any = true;
+      }
+      else if (!found_any && (valid_symbols[RECORD_OPEN] || valid_symbols[ANON_RECORD_OPEN]) && lexer->lookahead == '{') {
+        advance(lexer);
+        if (lexer->lookahead == '|') {
+          has_anon_record_open = true;
+        } else {
+          has_record_open = true;
+        }
+        advance(lexer);
+        lexer->mark_end(lexer);
+        found_any = true;
+      }
+      else if (!found_any && (valid_symbols[ARRAY_CLOSE] || valid_symbols[ANON_RECORD_CLOSE]) && lexer->lookahead == '|') {
+        advance(lexer);
+        if (lexer->lookahead == ']') {
+          has_array_close = true;
+          advance(lexer);
+          lexer->mark_end(lexer);
+          found_any = true;
+          found_close = true;
+        } else if (lexer->lookahead == '}') {
+          has_anon_record_close = true;
+          advance(lexer);
+          lexer->mark_end(lexer);
+          found_any = true;
+          found_close = true;
+        } else {
+          return false;
+        }
+      }
+      else if (!found_any && valid_symbols[LIST_CLOSE] && lexer->lookahead == ']') {
+        advance(lexer);
+        has_list_close = true;
+        lexer->mark_end(lexer);
+        found_any = true;
+        found_close = true;
+      }
+      else if (!found_any && valid_symbols[RECORD_CLOSE] && lexer->lookahead == '}') {
+        advance(lexer);
+        has_record_close = true;
+        lexer->mark_end(lexer);
+        found_any = true;
+        found_close = true;
+      }
+      else if (!found_close && lexer->lookahead == '\n') {
           skip(lexer);
           has_newline = true;
           while (true)
@@ -185,10 +257,10 @@ struct Scanner {
               }
             }
       }
-      else if (lexer->lookahead == '\r') {
+      else if (!found_close && lexer->lookahead == '\r') {
           skip(lexer);
       }
-      else if (lexer->eof(lexer)) {
+      else if (!found_close && lexer->eof(lexer)) {
           if (valid_symbols[VIRTUAL_END_SECTION])
           {
             lexer->result_symbol = VIRTUAL_END_SECTION;
@@ -202,7 +274,27 @@ struct Scanner {
     }
 
     // Open section if the grammar lets us but only push to indent stack if we go further down in the stack
-    if (valid_symbols[VIRTUAL_OPEN_SECTION] && !lexer->eof(lexer)) {
+    if (has_list_open && valid_symbols[LIST_OPEN]) {
+      indent_length_stack.push_back(lexer->get_column(lexer));
+      lexer->result_symbol = LIST_OPEN;
+      return true;
+    }
+    else if (has_array_open && valid_symbols[ARRAY_OPEN]) {
+      indent_length_stack.push_back(lexer->get_column(lexer));
+      lexer->result_symbol = ARRAY_OPEN;
+      return true;
+    }
+    else if (has_record_open && valid_symbols[RECORD_OPEN]) {
+      indent_length_stack.push_back(lexer->get_column(lexer));
+      lexer->result_symbol = RECORD_OPEN;
+      return true;
+    }
+    else if (has_anon_record_open && valid_symbols[ANON_RECORD_OPEN]) {
+      indent_length_stack.push_back(lexer->get_column(lexer));
+      lexer->result_symbol = ANON_RECORD_OPEN;
+      return true;
+    }
+    else if (valid_symbols[VIRTUAL_OPEN_SECTION] && !lexer->eof(lexer)) {
       indent_length_stack.push_back(lexer->get_column(lexer));
       lexer->result_symbol = VIRTUAL_OPEN_SECTION;
       return true;
@@ -263,10 +355,50 @@ struct Scanner {
         lexer->result_symbol = VIRTUAL_END_SECTION;
         return true;
       }
+      else if (!runback.empty() && runback.back() == 1 && has_list_close && valid_symbols[LIST_CLOSE]) {
+        runback.pop_back();
+        lexer->result_symbol = LIST_CLOSE;
+        return true;
+      }
+      else if (!runback.empty() && runback.back() == 1 && has_array_close && valid_symbols[ARRAY_CLOSE]) {
+        runback.pop_back();
+        lexer->result_symbol = ARRAY_CLOSE;
+        return true;
+      }
+      else if (!runback.empty() && runback.back() == 1 && has_record_close && valid_symbols[RECORD_CLOSE]) {
+        runback.pop_back();
+        lexer->result_symbol = RECORD_CLOSE;
+        return true;
+      }
+      else if (!runback.empty() && runback.back() == 1 && has_anon_record_open && valid_symbols[ANON_RECORD_CLOSE]) {
+        runback.pop_back();
+        lexer->result_symbol = ANON_RECORD_CLOSE;
+        return true;
+      }
       else if (lexer->eof(lexer) && valid_symbols[VIRTUAL_END_SECTION]) {
         lexer->result_symbol = VIRTUAL_END_SECTION;
         return true;
       }
+    }
+    else if (has_list_close && valid_symbols[LIST_CLOSE]) {
+      lexer->result_symbol = LIST_CLOSE;
+      indent_length_stack.pop_back();
+      return true;
+    }
+    else if (has_array_close && valid_symbols[ARRAY_CLOSE]) {
+      lexer->result_symbol = ARRAY_CLOSE;
+      indent_length_stack.pop_back();
+      return true;
+    }
+    else if (has_record_close && valid_symbols[RECORD_CLOSE]) {
+      lexer->result_symbol = RECORD_CLOSE;
+      indent_length_stack.pop_back();
+      return true;
+    }
+    else if (has_anon_record_close && valid_symbols[ANON_RECORD_CLOSE]) {
+      lexer->result_symbol = ANON_RECORD_CLOSE;
+      indent_length_stack.pop_back();
+      return true;
     }
 
     return false;

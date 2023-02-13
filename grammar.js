@@ -19,7 +19,6 @@ const PREC = {
   ELSE_EXPR: 12,
   INTERFACE: 13,
   LARROW: 14,
-  TUPLE_EXPR: 15,
   COMMA: 16,
   DOTDOT: 17,
   SPECIAL_INFIX: 18,
@@ -43,6 +42,14 @@ module.exports = grammar({
     $._virtual_open_section,
     $._virtual_end_section,
     $._block_comment_content,
+    $.list_open,
+    $.array_open,
+    $.record_open,
+    $.anon_record_open,
+    $.list_close,
+    $.array_close,
+    $.record_close,
+    $.anon_record_close,
   ],
 
   extras: $ => [
@@ -61,7 +68,7 @@ module.exports = grammar({
 
   words: $ => $.identifier,
 
-  inline: $ => [ $._module_elem, $._infix_or_prefix_op, $._base_call, $.access_modifier, $._quote_op_left, $._quote_op_right, $._inner_literal_expression, ],
+  inline: $ => [ $._module_elem, $._infix_or_prefix_op, $._base_call, $.access_modifier, $._quote_op_left, $._quote_op_right, $._inner_literal_expression, $._comp_or_range_expression ],
 
   supertypes: $ => [ $._module_elem, $._pattern, $._expression ],
 
@@ -363,7 +370,7 @@ module.exports = grammar({
         $.sequence_expression,
         $.call_expression,
         $.tuple_expression,
-        $.application_expression,
+        // $.application_expression,
         $.return_expression,
         $.yield_expression,
         // (static-typars : (member-sig) expr)
@@ -381,7 +388,7 @@ module.exports = grammar({
         prec.right(PREC.SEQ_EXPR,
         seq(
           $._expression,
-          repeat1(prec.right(PREC.SEQ_EXPR, seq(choice(";", $._newline), $._expression))),
+          repeat1(prec.right(PREC.SEQ_EXPR, seq(optional(";"), $._expression))),
         )),
 
     call_expression: $ =>
@@ -395,25 +402,23 @@ module.exports = grammar({
       ),
 
     tuple_expression: $ =>
-      prec.left(
+      prec.left(PREC.COMMA,
       seq(
         $._expression,
-        repeat1(prec.left(PREC.TUPLE_EXPR, seq(",", $._expression))),
+        repeat1(prec.left(PREC.COMMA, seq(",", $._expression))),
       )
       ),
 
     brace_expression: $ =>
       prec(PREC.PAREN_EXPR,
       seq(
-        "{",
-          $._virtual_open_section,
+        $.record_open,
           choice(
             $.with_field_expression,
             $.field_expression,
             $.object_expression,
           ),
-          $._virtual_end_section,
-        "}",
+        $.record_close,
       )),
 
     with_field_expression: $ =>
@@ -469,11 +474,9 @@ module.exports = grammar({
       prec(PREC.CE_EXPR,
       seq(
         $._expression,
-        "{",
-        $._virtual_open_section,
+        $.record_open,
         $._comp_or_range_expression,
-        $._virtual_end_section,
-        "}",
+        $.record_close,
       )),
 
     infix_expression: $ =>
@@ -484,18 +487,11 @@ module.exports = grammar({
         $._expression,
       )),
 
-    _inner_literal_expression: $ =>
-      seq(
-        $._virtual_open_section,
-        $._expression,
-        $._virtual_end_section,
-      ),
-
     literal_expression: $ =>
       prec(PREC.PAREN_EXPR,
       choice(
-        seq("<@", $._inner_literal_expression, "@>"),
-        seq("<@@", $._inner_literal_expression, "@@>"),
+        seq("<@", $._expression, "@>"),
+        seq("<@@", $._expression, "@@>"),
       )),
 
     typecast_expression: $ =>
@@ -513,7 +509,7 @@ module.exports = grammar({
 
     begin_end_expression: $ => prec(PREC.PAREN_EXPR, seq("begin", $._expression, "end")),
 
-    paren_expression: $ => prec(PREC.PAREN_EXPR, seq("(", $._virtual_open_section, $._expression, $._virtual_end_section, ")")),
+    paren_expression: $ => prec(PREC.PAREN_EXPR, seq("(", $._expression, ")")),
 
     for_expression: $ =>
       prec.left(
@@ -596,7 +592,11 @@ module.exports = grammar({
         $._expression,
         $._virtual_end_section,
         choice(
-          seq("with", $.rules),
+          seq("with",
+              $._virtual_open_section,
+              $.rules,
+              $._virtual_end_section,
+            ),
           seq("finally", $._virtual_open_section, $._expression, $._virtual_end_section),
         ),
       )),
@@ -663,9 +663,7 @@ module.exports = grammar({
       seq(
         $._expression,
         imm("<"),
-        $._virtual_open_section,
         optional($.types),
-        $._virtual_end_section,
         ">",
       )),
 
@@ -690,45 +688,18 @@ module.exports = grammar({
         $._virtual_end_section,
       )),
 
-    _list_elements_env: $ =>
-      prec.right(PREC.COMMA,
-        seq(
-          $._expression,
-          repeat(prec.right(PREC.COMMA, seq(optional(";"), $._expression))),
-        ),
-      ),
-
-    _list_elements_basic: $ =>
-      prec.right(PREC.COMMA,
-        seq(
-          $._expression,
-          repeat(prec.right(PREC.COMMA, seq(";", $._expression))),
-        )
-      ),
-
-    _list_elements: $ =>
-      choice($._list_elements_env, $._list_elements_env),
-
     list_expression: $ =>
       seq(
-        "[",
-        choice(
-          optional($._list_elements),
-          $._comp_or_range_expression,
-        ),
-        "]",
+        $.list_open,
+        $._comp_or_range_expression,
+        $.list_close,
       ),
 
     array_expression: $ =>
       seq(
-        "[|",
-        $._virtual_open_section,
-        choice(
-          optional($._list_elements),
-          $._comp_or_range_expression,
-        ),
-        "|]",
-        $._virtual_end_section,
+        $.array_open,
+        $._comp_or_range_expression,
+        $.array_close,
       ),
 
     range_expression: $ =>
@@ -761,11 +732,9 @@ module.exports = grammar({
     rules: $ =>
       prec.right(PREC.MATCH_EXPR,
       seq(
-      $._virtual_open_section,
         optional("|"),
         $.rule,
         repeat(seq("|", $.rule)),
-        $._virtual_end_section,
       )),
 
     //
@@ -1215,16 +1184,16 @@ module.exports = grammar({
       seq(
         $.type_name,
         "=",
-        "{",
+        $.record_open,
         $.record_fields,
-        "}",
+        $.record_close,
         optional($.type_extension_elements)
       ),
 
     record_fields: $ =>
       seq(
         $.record_field,
-        repeat(seq(choice(";", $._newline), $.record_field)),
+        repeat(seq(optional(";"), $.record_field)),
         optional(";"),
       ),
 
