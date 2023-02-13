@@ -4,6 +4,10 @@
     "named": true,
     "subtypes": [
       {
+        "type": "application_expression",
+        "named": true
+      },
+      {
         "type": "array_expression",
         "named": true
       },
@@ -100,10 +104,6 @@
         "named": true
       },
       {
-        "type": "return_expression",
-        "named": true
-      },
-      {
         "type": "sequence_expression",
         "named": true
       },
@@ -125,10 +125,6 @@
       },
       {
         "type": "while_expression",
-        "named": true
-      },
-      {
-        "type": "yield_expression",
         "named": true
       }
     ]
@@ -350,6 +346,21 @@
         },
         {
           "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "application_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
           "named": true
         }
       ]
@@ -2429,21 +2440,6 @@
     }
   },
   {
-    "type": "return_expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "rule",
     "named": true,
     "fields": {},
@@ -3271,21 +3267,6 @@
     "type": "xint",
     "named": true,
     "fields": {}
-  },
-  {
-    "type": "yield_expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
-    }
   },
   {
     "type": "",

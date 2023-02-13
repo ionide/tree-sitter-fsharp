@@ -22,6 +22,7 @@ enum TokenType {
   ARRAY_CLOSE,
   RECORD_CLOSE,
   ANON_RECORD_CLOSE,
+  APP_EXPR,
 };
 
 bool in_error_recovery(const bool *valid_symbols) {
@@ -274,7 +275,11 @@ struct Scanner {
     }
 
     // Open section if the grammar lets us but only push to indent stack if we go further down in the stack
-    if (has_list_open && valid_symbols[LIST_OPEN]) {
+    if (!found_any && !has_newline && valid_symbols[APP_EXPR]) {
+      lexer->result_symbol = APP_EXPR;
+      return true;
+    }
+    else if (has_list_open && valid_symbols[LIST_OPEN]) {
       indent_length_stack.push_back(lexer->get_column(lexer));
       lexer->result_symbol = LIST_OPEN;
       return true;

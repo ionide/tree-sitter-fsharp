@@ -15,16 +15,15 @@ const PREC = {
   MATCH_EXPR: 8,
   MATCH_DECL: 9,
   DO_DECL: 10,
+  SPECIAL_INFIX: 10,
   IF_EXPR: 11,
   ELSE_EXPR: 12,
   INTERFACE: 13,
   LARROW: 14,
   COMMA: 16,
   DOTDOT: 17,
-  SPECIAL_INFIX: 18,
-  APP_EXPR: 19,
-  CE_EXPR: 19,
-  PREFIX_EXPR: 19,
+  PREFIX_EXPR: 17,
+  CE_EXPR: 18,
   DO_EXPR: 19,
   NEW_OBJ: 20,
   DOT: 21,
@@ -33,6 +32,7 @@ const PREC = {
   TYPED_EXPR: 24,
   PAREN_EXPR: 23,
   DOTDOT_SLICE: 24,
+  APP_EXPR: 25,
 }
 
 module.exports = grammar({
@@ -50,6 +50,7 @@ module.exports = grammar({
     $.array_close,
     $.record_close,
     $.anon_record_close,
+    $._app_expr,
   ],
 
   extras: $ => [
@@ -353,8 +354,6 @@ module.exports = grammar({
         $.ce_expression,
         $.prefixed_expression,
         $.brace_expression,
-        // [ comp_or_range_expr ]
-        // [| comp_or_range_expr |]
         "null",
         $.typecast_expression,
         $.declaration_expression,
@@ -370,25 +369,21 @@ module.exports = grammar({
         $.sequence_expression,
         $.call_expression,
         $.tuple_expression,
-        // $.application_expression,
-        $.return_expression,
-        $.yield_expression,
+        $.application_expression,
+        // $.return_expression,
+        // $.yield_expression,
         // (static-typars : (member-sig) expr)
       ),
 
     application_expression: $ =>
       prec.left(PREC.APP_EXPR,
-        seq(
-          $._expression,
-          $._expression,
-        )
-      ),
+        seq($._expression, $._app_expr, $._expression,)),
 
     sequence_expression: $ =>
-        prec.right(PREC.SEQ_EXPR,
+        prec.left(PREC.SEQ_EXPR,
         seq(
           $._expression,
-          repeat1(prec.right(PREC.SEQ_EXPR, seq(optional(";"), $._expression))),
+          repeat1(seq(optional(";"), $._expression)),
         )),
 
     call_expression: $ =>
@@ -402,10 +397,10 @@ module.exports = grammar({
       ),
 
     tuple_expression: $ =>
-      prec.left(PREC.COMMA,
+      prec.left(PREC.COMMA + 3,
       seq(
         $._expression,
-        repeat1(prec.left(PREC.COMMA, seq(",", $._expression))),
+        repeat1(seq(",", $._expression)),
       )
       ),
 
@@ -452,19 +447,19 @@ module.exports = grammar({
     prefixed_expression: $ =>
       prec.left(PREC.PREFIX_EXPR,
       seq(
-        choice("return", "return!", "yield", "yield!", "lazy", "assert", "upcast", "downcast", "%", "%%", $.prefix_op),
+        choice("lazy", "assert", "upcast", "downcast", "%", "%%", $.prefix_op),
         $._expression,
       )),
 
     return_expression: $ =>
-      prec.left(PREC.PREFIX_EXPR + 1,
+      prec.left(PREC.PREFIX_EXPR + 3,
       seq(
         choice("return", "return!"),
         $._expression,
       )),
 
     yield_expression: $ =>
-      prec.left(PREC.PREFIX_EXPR + 1,
+      prec.left(PREC.PREFIX_EXPR + 3,
       seq(
         choice("yield", "yield!"),
         $._expression,
@@ -474,6 +469,7 @@ module.exports = grammar({
       prec(PREC.CE_EXPR,
       seq(
         $._expression,
+        $._app_expr,
         $.record_open,
         $._comp_or_range_expression,
         $.record_close,
