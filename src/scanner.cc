@@ -5,8 +5,6 @@
 #include <cstring>
 #include <cassert>
 #include <stdio.h>
-#include <string>
-#include <algorithm>
 namespace {
 
 using std::vector;
