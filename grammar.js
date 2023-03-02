@@ -1671,7 +1671,7 @@ module.exports = grammar({
     uint64:     $ => seq(choice($.int, $.xint), imm(choice('UL', 'uL'))),
 
     ieee32: $ => choice(seq($._float, imm("f")), seq($.xint, imm("lf"))),
-    ieee64: $ => choice($._float, seq($.xint, imm("LF"))),
+    ieee64: $ => seq($.xint, imm("LF")),
 
     bignum:     $ => seq($.int, imm(/[QRZING]/)),
     decimal:    $ => seq(choice($._float,$.int), imm(/[Mm]/)),
