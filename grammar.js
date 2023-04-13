@@ -1049,8 +1049,8 @@ module.exports = grammar({
 
     static_type_argument: $ =>
       choice(
-        seq("^", $.identifier),
-        seq("^", $.identifier, repeat(seq("or", "^", $.identifier)))
+        seq(choice("^", "'"), $.identifier),
+        seq(choice("^", "'"), $.identifier, repeat(seq("or", choice("^", "'"), $.identifier)))
       ),
 
     type_arguments: $ =>
