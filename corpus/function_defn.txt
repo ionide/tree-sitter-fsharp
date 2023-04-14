@@ -95,10 +95,8 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
             (constraint
               (static_type_argument
                 (identifier))
-              (member_signature
+              (trait_member_constraint
                 (identifier)
-                (ERROR
-                  (UNEXPECTED 'D'))
                 (type
                   (type
                     (long_identifier
@@ -144,10 +142,8 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
             (constraint
               (static_type_argument
                 (identifier))
-              (member_signature
+              (trait_member_constraint
                 (identifier)
-                (ERROR
-                  (UNEXPECTED 'D'))
                 (type
                   (type
                     (long_identifier

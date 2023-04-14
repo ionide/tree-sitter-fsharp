@@ -3407,7 +3407,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "member_signature"
+              "name": "trait_member_constraint"
             },
             {
               "type": "STRING",
@@ -3822,6 +3822,39 @@
         {
           "type": "STRING",
           "value": ">"
+        }
+      ]
+    },
+    "trait_member_constraint": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "static"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "member"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type"
         }
       ]
     },

@@ -1016,7 +1016,7 @@ module.exports = grammar({
       choice(
         seq($.type_argument, ":>", $.type),
         seq($.type_argument, ":", "null"),
-        seq($.static_type_argument, ":", "(", $.member_signature, ")"),
+        seq($.static_type_argument, ":", "(", $.trait_member_constraint, ")"),
         seq($.type_argument, ":", "(", "new", ":", "unit", "->", "'T", ")"),
         seq($.type_argument, ":", "struct"),
         seq($.type_argument, ":", "not", "struct"),
@@ -1060,6 +1060,15 @@ module.exports = grammar({
         repeat(prec.left(PREC.COMMA, seq(",", $.type_argument_defn))),
         optional($.type_argument_constraints),
         ">"
+      ),
+
+    trait_member_constraint: $ =>
+      seq(
+        optional("static"),
+        "member",
+        $.identifier,
+        ':',
+        $.type
       ),
 
     member_signature: $ =>
