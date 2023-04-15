@@ -354,7 +354,7 @@ module.exports = grammar({
       prec.left(PREC.SEQ_EXPR,
         seq(
           $._expression_inner,
-          repeat(seq($._virtual_end_decl, $._expressions)),
+          optional(seq($._virtual_end_decl, $._expressions)),
       )),
 
 

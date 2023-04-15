@@ -1249,20 +1249,25 @@
             "name": "_expression_inner"
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_virtual_end_decl"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_expressions"
-                }
-              ]
-            }
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_virtual_end_decl"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_expressions"
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }
