@@ -64,7 +64,7 @@ module.exports = grammar({
 
   words: $ => $.identifier,
 
-  inline: $ => [ $._module_elem, $._infix_or_prefix_op, $._base_call, $.access_modifier, $._quote_op_left, $._quote_op_right, $._inner_literal_expressions, $._expression_or_range],
+  inline: $ => [ $._module_elem, $._infix_or_prefix_op, $._base_call, $.access_modifier, $._quote_op_left, $._quote_op_right, $._inner_literal_expressions, $._expression_or_range, $._infix_expression_inner],
 
   supertypes: $ => [ $._module_elem, $._pattern, $._expression_inner, $._type_defn_body ],
 
@@ -357,7 +357,6 @@ module.exports = grammar({
           optional(seq($._virtual_end_decl, $._expressions)),
       )),
 
-
     _expression_inner: $ =>
       choice(
         $.const,
@@ -496,7 +495,7 @@ module.exports = grammar({
       )),
 
     _infix_expression_inner: $ =>
-      prec.left(PREC.SPECIAL_INFIX,
+      prec.right(PREC.SPECIAL_INFIX,
       seq(
         optional($._virtual_end_decl),
         $.infix_op,
@@ -504,10 +503,10 @@ module.exports = grammar({
       )),
 
     infix_expression: $ =>
-      prec.left(PREC.SPECIAL_INFIX,
+      prec.right(PREC.SPECIAL_INFIX,
       seq(
         $._expression_inner,
-        repeat1($._infix_expression_inner),
+        $._infix_expression_inner,
       )),
 
     literal_expression: $ =>

@@ -1748,7 +1748,7 @@
       }
     },
     "_infix_expression_inner": {
-      "type": "PREC_LEFT",
+      "type": "PREC_RIGHT",
       "value": 16,
       "content": {
         "type": "SEQ",
@@ -1777,7 +1777,7 @@
       }
     },
     "infix_expression": {
-      "type": "PREC_LEFT",
+      "type": "PREC_RIGHT",
       "value": 16,
       "content": {
         "type": "SEQ",
@@ -1787,11 +1787,8 @@
             "name": "_expression_inner"
           },
           {
-            "type": "REPEAT1",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_infix_expression_inner"
-            }
+            "type": "SYMBOL",
+            "name": "_infix_expression_inner"
           }
         ]
       }
@@ -7382,7 +7379,8 @@
     "_quote_op_left",
     "_quote_op_right",
     "ReferenceError",
-    "_expression_or_range"
+    "_expression_or_range",
+    "_infix_expression_inner"
   ],
   "supertypes": [
     "_module_elem",

@@ -667,32 +667,24 @@ do
 (file
   (value_declaration
     (do
-      (application_expression
-        (infix_expression
-          (dot_expression
-            (long_identifier_or_op
-              (long_identifier
-                (identifier)))
-            (long_identifier_or_op
-              (long_identifier
-                (identifier))))
-          (infix_op
-            (symbolic_op))
-          (dot_expression
-            (long_identifier_or_op
-              (long_identifier
-                (identifier)))
-            (long_identifier_or_op
-              (long_identifier
-                (identifier)))))
+      (infix_expression
         (dot_expression
           (long_identifier_or_op
-            (long_identifier
-              (identifier)))
+            (long_identifier (identifier)))
           (long_identifier_or_op
-            (long_identifier
-              (identifier))))))))
-
+            (long_identifier (identifier))))
+        (infix_op (symbolic_op))
+        (application_expression
+          (dot_expression
+            (long_identifier_or_op
+              (long_identifier (identifier)))
+            (long_identifier_or_op
+              (long_identifier (identifier))))
+          (dot_expression
+            (long_identifier_or_op
+              (long_identifier (identifier)))
+            (long_identifier_or_op
+              (long_identifier (identifier)))))))))
 
 ================================================================================
 ce expression 1
