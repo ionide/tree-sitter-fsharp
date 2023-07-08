@@ -38,6 +38,7 @@
   "~"
   (infix_op)
   (prefix_op)
+  (symbolic_op)
 ] @operator
 
 
@@ -72,6 +73,8 @@
 
 [
   "open"
+  "#r"
+  "#load"
 ] @keyword.control.import
 
 [
@@ -152,19 +155,7 @@
  (rules (rule (identifier_pattern)))
 ] @type.enum
 
-[
-  (string)
-  (triple_quoted_string)
-] @string
-
-[
-  (int)
-  (int16)
-  (int32)
-  (int64)
-  (float)
-  (decimal)
-] @constant.numeric
+(fsi_directive_decl (string) @namespace)
 
 [
   (import_decl (long_identifier))
@@ -181,6 +172,25 @@
   base: (long_identifier_or_op) @variable.other.member
   field: (long_identifier_or_op) @function)
 
-(function_declaration_left
-  (identifier) @function
-)
+[
+ ;;(value_declaration_left (identifier_pattern) ) 
+ (function_declaration_left (identifier) ) 
+ (call_expression (long_identifier_or_op (long_identifier)))
+ ;;(application_expression (long_identifier_or_op (long_identifier)))
+] @function
+
+[
+  (string)
+  (triple_quoted_string)
+] @string
+
+[
+  (int)
+  (int16)
+  (int32)
+  (int64)
+  (float)
+  (decimal)
+] @constant.numeric
+
+
