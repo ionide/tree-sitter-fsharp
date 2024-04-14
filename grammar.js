@@ -85,18 +85,20 @@ module.exports = grammar({
     // Top-level rules (BEGIN)
     //
     file: $ =>
-      choice(
-        $.named_module,
-        $.namespace,
-        repeat1($._module_elem),
+      optional(
+        choice(
+          $.named_module,
+          $.namespace,
+          repeat1($._module_elem),
+        )
       ),
 
     namespace: $ =>
       seq(
         token.immediate('namespace'),
         choice(
-          "global",
-          field('name', seq(optional("rec"), $.long_identifier)),
+          'global',
+          field('name', seq(optional('rec'), $.long_identifier)),
         ),
         repeat($._module_elem),
       ),
@@ -282,17 +284,17 @@ module.exports = grammar({
     optional_pattern: $ => prec.right(
       seq(
         '?',
-        $._pattern
-      )
+        $._pattern,
+      ),
     ),
 
     type_check_pattern: $ =>
       prec.right(
         seq(
-          ":?",
+          ':?',
           $.atomic_type,
-          optional(seq("as", $.identifier))
-        )
+          optional(seq('as', $.identifier)),
+        ),
       ),
 
     attribute_pattern: $ => prec.left(seq($.attributes, $._pattern)),
@@ -763,7 +765,7 @@ module.exports = grammar({
       prec.right(
         seq(
           $._pattern,
-          optional(seq("when", $._expression)),
+          optional(seq('when', $._expression)),
           '->',
           scoped($._expression, $._indent, $._dedent),
         )),
