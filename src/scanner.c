@@ -177,7 +177,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (valid_symbols[SPECIAL_DEDENT] && is_special_scope_end(lexer)) {
+  if (valid_symbols[SPECIAL_DEDENT] && !found_end_of_line &&
+      is_special_scope_end(lexer)) {
     found_special_scope_end = true;
   } else if (is_infix_op_start(lexer)) {
     found_start_of_infix_op = true;

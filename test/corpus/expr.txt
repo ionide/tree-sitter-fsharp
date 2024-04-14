@@ -1112,6 +1112,27 @@ do
 
 --------------------------------------------------------------------------------
 
+(file
+  (value_declaration
+    (do
+      (if_expression
+        (const
+          (bool))
+        (if_expression
+          (const
+            (bool))
+          (const
+            (int))
+          (elif_expression
+            (const
+              (bool))
+            (const
+              (int)))
+          (const
+            (int)))
+        (const
+          (int))))))
+
 ================================================================================
 anonymous function expression
 ================================================================================
