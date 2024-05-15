@@ -9,3 +9,36 @@ basic compiler directive
 (file
   (compiler_directive_decl
     (string)))
+
+================================================================================
+line compiler directive
+================================================================================
+
+#line 1
+# 1
+
+#line 1 "test"
+# 1 "test"
+
+#line 1 @"test"
+# 1 @"test"
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_line
+    (int))
+  (preproc_line
+    (int))
+  (preproc_line
+    (int)
+    (string))
+  (preproc_line
+    (int)
+    (string))
+  (preproc_line
+    (int)
+    (verbatim_string))
+  (preproc_line
+    (int)
+    (verbatim_string)))

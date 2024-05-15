@@ -1434,7 +1434,7 @@
   },
   {
     "type": "float",
-    "named": false,
+    "named": true,
     "fields": {}
   },
   {
@@ -1782,11 +1782,6 @@
   },
   {
     "type": "infix_op",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "int",
     "named": true,
     "fields": {}
   },
@@ -2420,6 +2415,29 @@
         },
         {
           "type": "prefix_op",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "preproc_line",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "int",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "verbatim_string",
           "named": true
         }
       ]
@@ -3536,11 +3554,6 @@
     }
   },
   {
-    "type": "xint",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "xml_doc",
     "named": true,
     "fields": {},
@@ -3573,6 +3586,10 @@
   },
   {
     "type": "#",
+    "named": false
+  },
+  {
+    "type": "#line",
     "named": false
   },
   {
@@ -3792,14 +3809,6 @@
     "named": false
   },
   {
-    "type": "\\U",
-    "named": false
-  },
-  {
-    "type": "\\u",
-    "named": false
-  },
-  {
     "type": "]",
     "named": false
   },
@@ -3964,6 +3973,10 @@
     "named": false
   },
   {
+    "type": "int",
+    "named": true
+  },
+  {
     "type": "interface",
     "named": false
   },
@@ -4109,11 +4122,11 @@
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unmanaged",
@@ -4158,6 +4171,10 @@
   {
     "type": "with",
     "named": false
+  },
+  {
+    "type": "xint",
+    "named": true
   },
   {
     "type": "xml_doc_content",

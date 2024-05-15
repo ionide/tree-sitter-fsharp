@@ -50,10 +50,11 @@ module.exports = grammar({
   name: 'fsharp',
 
   extras: $ => [
+    /[ \s\f\uFEFF\u2060\u200B]|\\\r?n/,
     $.block_comment,
     $.line_comment,
     $.xml_doc,
-    /[ \s\f\uFEFF\u2060\u200B]|\\\r?n/,
+    $.preproc_line,
   ],
 
   // The external scanner (scanner.c) allows us to inject "dummy" tokens into the grammar.
@@ -1583,27 +1584,9 @@ module.exports = grammar({
     _non_escape_char: _ => token.immediate(prec(100, /\\[^"\'ntbrafv]/)),
     // using \u0008 to model \b
     _simple_char_char: _ => token.immediate(/[^\n\t\r\u0008\a\f\v'\\]/),
-    _hex_digit_imm: _ => token.immediate(/[0-9a-fA-F]/),
-    _digit_char_imm: _ => token.immediate(/[0-9]/),
-    _unicodegraph_short: $ => seq(
-      token.immediate('\\u'),
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-    ),
-    _unicodegraph_long: $ => seq(
-      token.immediate('\\U'),
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-      $._hex_digit_imm,
-    ),
-    _trigraph: $ => seq(token.immediate('\\'), $._digit_char_imm, $._digit_char_imm, $._digit_char_imm),
+    _unicodegraph_short: _ => /\\u[0-9a-fA-F]{4}/,
+    _unicodegraph_long: _ => /\\u[0-9a-fA-F]{8}/,
+    _trigraph: _ => /\\[0-9]{3}/,
 
     _char_char: $ => choice(
       $._simple_char_char,
@@ -1617,16 +1600,12 @@ module.exports = grammar({
     _string_char: $ => choice(
       $._simple_string_char,
       $._escape_char,
-      $._non_escape_char,
       $._trigraph,
       $._unicodegraph_short,
+      $._non_escape_char,
       $._unicodegraph_long,
     ),
 
-    _string_elem: $ => choice(
-      $._string_char,
-      seq('\\', $._string_elem),
-    ),
     char: $ => seq('\'', $._char_char, token.immediate('\'')),
 
     format_string_eval: $ =>
@@ -1639,11 +1618,15 @@ module.exports = grammar({
         '"',
       ),
 
+    _string_literal: $ =>
+      seq('"', repeat($._string_char), '"'),
+
     string: $ =>
       choice(
-        seq('"', repeat($._string_char), '"'),
+        $._string_literal,
         $.format_string,
       ),
+
     _verbatim_string_char: $ => choice(
       $._simple_string_char,
       $._non_escape_char,
@@ -1735,7 +1718,7 @@ module.exports = grammar({
         choice(
           $._infix_or_prefix_op,
           repeat1('~'),
-          /[!][!%&*+-./<>@^|~?]+[!%&*+-./<=>@^|~?]*/,
+          /[!][!%&*+-./<>@^|~?][!%&*+-./<=>@^|~?]*/,
         )),
 
     infix_op: $ =>
@@ -1760,14 +1743,13 @@ module.exports = grammar({
         )),
 
     // Numbers
-    _octaldigit_imm: _ => token.immediate(/[0-7]/),
-    _bitdigit_imm: _ => token.immediate(/[0-1]/),
-    int: $ => seq(/[0-9]/, repeat($._digit_char_imm)),
-    xint: $ => choice(
-      seq(/0[xX]/, repeat1($._hex_digit_imm)),
-      seq(/0[oO]/, repeat1($._octaldigit_imm)),
-      seq(/0[bB]/, repeat1($._bitdigit_imm)),
-    ),
+    int: _ => /[0-9]+/,
+    xint: _ => token(
+      choice(
+        /0[xX][0-9a-fA-F]+/,
+        /0[oO][0-7]+/,
+        /0[bB][0-1]+/,
+      )),
 
     sbyte: $ => seq(choice($.int, $.xint), token.immediate('y')),
     byte: $ => seq(choice($.int, $.xint), token.immediate('uy')),
@@ -1820,10 +1802,25 @@ module.exports = grammar({
           /``([^`\n\r\t])+``/,
         ),
       ),
-  },
 
+    preproc_line: $ =>
+      seq(
+        alias(/#line|#/, '#line'),
+        $.int,
+        optional(choice(
+          alias($._string_literal, $.string),
+          $.verbatim_string
+        )),
+        /\n/,
+      ),
+
+  },
 });
 
 function scoped(rule, indent, dedent) {
   return field('block', seq(indent, rule, dedent));
 }
+
+// function preprocessor(command) {
+//   return alias(new RegExp('#[ \t]*' + command), '#' + command);
+// }
