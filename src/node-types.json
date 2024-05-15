@@ -104,6 +104,10 @@
         "named": true
       },
       {
+        "type": "preproc_if",
+        "named": true
+      },
+      {
         "type": "sequential_expression",
         "named": true
       },
@@ -2421,6 +2425,57 @@
     }
   },
   {
+    "type": "preproc_else",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "_module_elem",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "preproc_if",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "preproc_else",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "preproc_line",
     "named": true,
     "fields": {},
@@ -3586,6 +3641,18 @@
   },
   {
     "type": "#",
+    "named": false
+  },
+  {
+    "type": "#else",
+    "named": false
+  },
+  {
+    "type": "#endif",
+    "named": false
+  },
+  {
+    "type": "#if",
     "named": false
   },
   {

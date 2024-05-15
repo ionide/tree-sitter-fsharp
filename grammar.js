@@ -437,6 +437,7 @@ module.exports = grammar({
         // $.call_expression,
         $.tuple_expression,
         $.application_expression,
+        alias($.preproc_if_in_expression, $.preproc_if),
         // (static-typars : (member-sig) expr)
       ),
 
@@ -1803,9 +1804,11 @@ module.exports = grammar({
         ),
       ),
 
+    // preprocessors
+
     preproc_line: $ =>
       seq(
-        alias(/#line|#/, '#line'),
+        alias(/#line|# /, '#line'),
         $.int,
         optional(choice(
           alias($._string_literal, $.string),
@@ -1814,6 +1817,9 @@ module.exports = grammar({
         /\n/,
       ),
 
+    ...preprocIf('', $ => $._module_elem),
+    ...preprocIf('_in_expression', $ => repeat(seq(optional($._newline), $._expression)), -2),
+
   },
 });
 
@@ -1821,6 +1827,41 @@ function scoped(rule, indent, dedent) {
   return field('block', seq(indent, rule, dedent));
 }
 
-// function preprocessor(command) {
-//   return alias(new RegExp('#[ \t]*' + command), '#' + command);
-// }
+/**
+ *
+ * @param {string} suffix
+ *
+ * @param {RuleBuilder<string>} content
+ *
+ * @param {number} precedence
+ *
+ * @return {RuleBuilders<string, string>}
+ */
+function preprocIf(suffix, content, precedence = 0) {
+  /**
+    *
+    * @param {GrammarSymbols<string>} $
+    *
+    * @return {Rule}
+    *
+    */
+  function alternativeBlock($) {
+    return suffix ? alias($['preproc_else' + suffix], $.preproc_else) : $.preproc_else
+  }
+
+  return {
+    ['preproc_if' + suffix]: $ => prec(precedence, seq(
+      '#if',
+      field('condition', $.identifier),
+      /\n/,
+      content($),
+      field('alternative', optional(alternativeBlock($))),
+      '#endif'
+    )),
+
+    ['preproc_else' + suffix]: $ => prec(precedence, seq(
+      '#else',
+      content($),
+    )),
+  }
+}

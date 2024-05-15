@@ -137,6 +137,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
   bool found_end_of_line = false;
   bool found_start_of_infix_op = false;
   bool found_bracket_end = false;
+  bool found_preprocessor = false;
   uint32_t indent_length = lexer->get_column(lexer);
 
   for (;;) {
@@ -156,12 +157,40 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     } else if (lexer->eof(lexer)) {
       found_end_of_line = true;
       break;
+    } else if (lexer->lookahead == '#' && indent_length == 0) {
+      skip(lexer);
+      if (lexer->lookahead == 'e') {
+        skip(lexer);
+        if (lexer->lookahead == 'n') {
+          skip(lexer);
+          if (lexer->lookahead == 'd') {
+            skip(lexer);
+            if (lexer->lookahead == 'i') {
+              skip(lexer);
+              if (lexer->lookahead == 'f') {
+                return false;
+              }
+            }
+          }
+        }
+      } else if (lexer->lookahead == 'i') {
+        skip(lexer);
+        if (lexer->lookahead == 'f') {
+          while (lexer->lookahead != '\n') {
+            skip(lexer);
+          }
+          found_preprocessor = true;
+        }
+      } else {
+        return false;
+      }
     } else {
       break;
     }
   }
 
   // printf("lexer->lookahead = %c\n", lexer->lookahead);
+  // printf("valid_symbols[NEWLINE] = %d\n", valid_symbols[NEWLINE]);
   // printf("valid_symbols[INDENT] = %d\n", valid_symbols[INDENT]);
   // printf("valid_symbols[DEDENT] = %d\n", valid_symbols[DEDENT]);
 
@@ -263,7 +292,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         }
       }
 
-      if (indent_length < current_indent_length && !found_bracket_end) {
+      if (indent_length < current_indent_length && !found_bracket_end &&
+          !found_preprocessor) {
         array_pop(&scanner->indents);
         lexer->result_symbol = DEDENT;
         return true;

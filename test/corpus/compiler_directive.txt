@@ -42,3 +42,131 @@ line compiler directive
   (preproc_line
     (int)
     (verbatim_string)))
+
+================================================================================
+line compiler directive in expressions
+================================================================================
+
+do
+#line 1
+  1 + 1
+#line 1 "test"
+  2 + 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (preproc_line
+        (int))
+      (infix_expression
+        (application_expression
+          (infix_expression
+            (const
+              (int))
+            (infix_op)
+            (const
+              (int)))
+          (preproc_line
+            (int)
+            (string))
+          (const
+            (int)))
+        (infix_op)
+        (const
+          (int))))))
+
+================================================================================
+preproc_if inside expression block
+================================================================================
+
+do
+  1 + 1
+#if true
+  printfn "blah"
+#endif
+  printfn "bluh"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (preproc_if
+            (identifier)
+            (application_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)))
+              (const
+                (string))))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))
+            (const
+              (string))))))))
+
+================================================================================
+preproc_if inside expression block with seq expression
+================================================================================
+
+do
+  1 + 1
+#if true
+  printfn "blah1"
+  2 + 2
+  printfn "blah2"
+#endif
+  printfn "bluh"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (preproc_if
+            (identifier)
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))
+                (const
+                  (string)))
+              (sequential_expression
+                (infix_expression
+                  (const
+                    (int))
+                  (infix_op)
+                  (const
+                    (int)))
+                (application_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)))
+                  (const
+                    (string))))))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))
+            (const
+              (string))))))))
