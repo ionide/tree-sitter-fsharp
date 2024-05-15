@@ -176,7 +176,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       } else if (lexer->lookahead == 'i') {
         skip(lexer);
         if (lexer->lookahead == 'f') {
-          while (lexer->lookahead != '\n') {
+          while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
             skip(lexer);
           }
           found_preprocessor = true;
