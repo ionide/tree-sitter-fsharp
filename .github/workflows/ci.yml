@@ -29,6 +29,19 @@ jobs:
       - uses: tree-sitter/parser-test-action@v2
         with:
           generate: ${{runner.os == 'Linux'}}
+          test-rust: ${{runner.os == 'Linux'}}
+          test-swift: ${{runner.os == 'macOS'}}
+      - name: Parse sample files
+        uses: tree-sitter/parse-action@v4
+        id: parse-files
+        with:
+          files: examples/**/*.fs
+      - name: Upload failures artifact
+        uses: actions/upload-artifact@v4
+        if: "!cancelled() && steps.parse-files.outcome == 'failure'"
+        with:
+          name: failures-${{runner.os}}
+          path: ${{steps.parse-files.outputs.failures}}
   fuzz:
     name: Fuzz parser
     runs-on: ubuntu-latest

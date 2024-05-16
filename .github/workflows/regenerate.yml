@@ -1,0 +1,13 @@
+name: Regenerate parser
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    uses: tree-sitter/workflows/.github/workflows/regenerate.yml@main
+    if: github.actor == 'dependabot[bot]'
