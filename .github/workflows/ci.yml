@@ -29,8 +29,6 @@ jobs:
       - uses: tree-sitter/parser-test-action@v2
         with:
           generate: ${{runner.os == 'Linux'}}
-          test-rust: ${{runner.os == 'Linux'}}
-          test-swift: ${{runner.os == 'macOS'}}
       - name: Parse sample files
         uses: tree-sitter/parse-action@v4
         id: parse-files
