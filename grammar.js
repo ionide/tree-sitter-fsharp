@@ -1661,7 +1661,7 @@ module.exports = grammar({
 
     const: $ => choice(
       $.sbyte, $.int16, $.int32, $.int64, $.byte, $.uint16, $.uint32, $.int,
-      $.nativeint, $.unativeint, $.decimal,
+      $.nativeint, $.unativeint, $.decimal, $.float,
       $.uint64, $.ieee32, $.ieee64, $.bignum, $.char, $.string,
       $.verbatim_string, $.triple_quoted_string, $.bytearray,
       $.verbatim_bytearray, $.bytechar, $.bool, $.unit),
@@ -1770,20 +1770,21 @@ module.exports = grammar({
     decimal: $ => seq(choice($.float, $.int), token.immediate(/[Mm]/)),
 
     float: $ =>
-      alias(
-        choice(
-          seq(
-            $.int,
-            token.immediate('.'),
-            optional($.int)
-          ),
-          seq(
-            $.int,
-            optional(seq(token.immediate('.'), $.int)),
-            token.immediate(/[eE][+-]?/),
-            $.int
-          ),
-        ), 'float'),
+      prec.right(
+        alias(
+          choice(
+            seq(
+              $.int,
+              token.immediate('.'),
+              optional($.int)
+            ),
+            seq(
+              $.int,
+              optional(seq(token.immediate('.'), $.int)),
+              token.immediate(/[eE][+-]?/),
+              $.int
+            ),
+          ), 'float')),
 
     //
     // Constants (END)
