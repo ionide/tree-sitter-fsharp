@@ -76,6 +76,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$.long_identifier, $._identifier_or_op],
     [$.type_argument, $.static_type_argument],
+    [$.preproc_if, $.preproc_if_in_expression],
     [$.file],
     [$.rules],
   ],
@@ -137,6 +138,7 @@ module.exports = grammar({
         $.fsi_directive_decl,
         $.type_definition,
         $._expression,
+        $.preproc_if,
         // $.exception_defn
       ),
 

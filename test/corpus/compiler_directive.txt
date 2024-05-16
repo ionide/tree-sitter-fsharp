@@ -170,3 +170,33 @@ do
                 (identifier)))
             (const
               (string))))))))
+
+================================================================================
+preproc_if top-level
+================================================================================
+
+namespace Test
+
+#if A
+module A =
+  let x = 4
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (preproc_if
+      (identifier)
+      (module_defn
+        (identifier)
+        (value_declaration
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier
+                  (identifier))))
+            (const
+              (int))))))))

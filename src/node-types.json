@@ -162,6 +162,10 @@
         "named": true
       },
       {
+        "type": "preproc_if",
+        "named": true
+      },
+      {
         "type": "type_definition",
         "named": true
       },
@@ -2477,7 +2481,7 @@
       "required": false,
       "types": [
         {
-          "type": "_expression",
+          "type": "_module_elem",
           "named": true
         }
       ]

@@ -160,6 +160,10 @@
         {
           "type": "SYMBOL",
           "name": "_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "preproc_if"
         }
       ]
     },
@@ -7705,6 +7709,10 @@
     [
       "type_argument",
       "static_type_argument"
+    ],
+    [
+      "preproc_if",
+      "preproc_if_in_expression"
     ],
     [
       "file"
