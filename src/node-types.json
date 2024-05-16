@@ -879,6 +879,10 @@
           "named": true
         },
         {
+          "type": "float",
+          "named": true
+        },
+        {
           "type": "ieee32",
           "named": true
         },
@@ -983,6 +987,10 @@
         },
         {
           "type": "decimal",
+          "named": true
+        },
+        {
+          "type": "float",
           "named": true
         },
         {

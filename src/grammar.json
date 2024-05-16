@@ -6509,6 +6509,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "float"
+        },
+        {
+          "type": "SYMBOL",
           "name": "uint64"
         },
         {
@@ -7299,86 +7303,90 @@
       ]
     },
     "float": {
-      "type": "ALIAS",
+      "type": "PREC_RIGHT",
+      "value": 0,
       "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "int"
-              },
-              {
-                "type": "IMMEDIATE_TOKEN",
-                "content": {
-                  "type": "STRING",
-                  "value": "."
-                }
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "int"
-                  },
-                  {
-                    "type": "BLANK"
+        "type": "ALIAS",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "int"
+                },
+                {
+                  "type": "IMMEDIATE_TOKEN",
+                  "content": {
+                    "type": "STRING",
+                    "value": "."
                   }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "int"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "IMMEDIATE_TOKEN",
-                        "content": {
-                          "type": "STRING",
-                          "value": "."
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "int"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "int"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "IMMEDIATE_TOKEN",
+                          "content": {
+                            "type": "STRING",
+                            "value": "."
+                          }
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "int"
                         }
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "int"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "BLANK"
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "IMMEDIATE_TOKEN",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[eE][+-]?"
                   }
-                ]
-              },
-              {
-                "type": "IMMEDIATE_TOKEN",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "[eE][+-]?"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "int"
                 }
-              },
-              {
-                "type": "SYMBOL",
-                "name": "int"
-              }
-            ]
-          }
-        ]
-      },
-      "named": false,
-      "value": "float"
+              ]
+            }
+          ]
+        },
+        "named": false,
+        "value": "float"
+      }
     },
     "xml_doc": {
       "type": "SEQ",
