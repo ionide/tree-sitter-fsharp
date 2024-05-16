@@ -174,6 +174,15 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               }
             }
           }
+        } else if (lexer->lookahead == 'l') {
+          skip(lexer);
+          if (lexer->lookahead == 's') {
+            skip(lexer);
+            if (lexer->lookahead == 'e') {
+              skip(lexer);
+              found_preprocessor_end = true;
+            }
+          }
         }
       } else if (lexer->lookahead == 'i') {
         skip(lexer);

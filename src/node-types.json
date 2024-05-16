@@ -2447,6 +2447,26 @@
         {
           "type": "_module_elem",
           "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "interface_implementation",
+          "named": true
+        },
+        {
+          "type": "member_defn",
+          "named": true
         }
       ]
     }
@@ -2482,6 +2502,26 @@
       "types": [
         {
           "type": "_module_elem",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "interface_implementation",
+          "named": true
+        },
+        {
+          "type": "member_defn",
           "named": true
         }
       ]
@@ -4201,11 +4241,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

@@ -200,3 +200,43 @@ module A =
                   (identifier))))
             (const
               (int))))))))
+
+================================================================================
+preproc_if in class definition
+================================================================================
+
+type MyClass() =
+#if A
+  member _.F(x: int) = x + 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (preproc_if
+        (identifier)
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier
+                    (identifier)))
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (infix_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)))
+              (infix_op)
+              (const
+                (int)))))))))

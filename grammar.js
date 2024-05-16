@@ -55,6 +55,8 @@ module.exports = grammar({
     $.line_comment,
     $.xml_doc,
     $.preproc_line,
+    $.compiler_directive_decl,
+    $.fsi_directive_decl,
   ],
 
   // The external scanner (scanner.c) allows us to inject "dummy" tokens into the grammar.
@@ -160,14 +162,6 @@ module.exports = grammar({
           '=',
           scoped(repeat1($._module_elem), $._indent, $._dedent),
         )),
-
-    compiler_directive_decl: $ => seq('#nowarn', $.string),
-
-    fsi_directive_decl: $ =>
-      choice(
-        seq('#r', $.string),
-        seq('#load', $.string),
-      ),
 
     import_decl: $ => seq('open', $.long_identifier),
 
@@ -1289,6 +1283,7 @@ module.exports = grammar({
         $.class_inherits_decl,
         $._class_function_or_value_defn,
         $._type_defn_elements,
+        alias($.preproc_if_in_class_definition, $.preproc_if),
       ),
 
     _class_type_body: $ =>
@@ -1811,7 +1806,7 @@ module.exports = grammar({
 
     preproc_line: $ =>
       seq(
-        alias(/#line|# /, '#line'),
+        alias(/#(line)? /, '#line'),
         $.int,
         optional(choice(
           alias($._string_literal, $.string),
@@ -1820,12 +1815,33 @@ module.exports = grammar({
         /\n/,
       ),
 
+    compiler_directive_decl: $ => seq('#nowarn', alias($._string_literal, $.string), /\n/),
+
+    fsi_directive_decl: $ =>
+      seq(
+        choice('#r', '#load'),
+        alias($._string_literal, $.string),
+        /\n/,
+      ),
+
+
     ...preprocIf('', $ => $._module_elem),
     ...preprocIf('_in_expression', $ => repeat(seq(optional($._newline), $._expression)), -2),
+    ...preprocIf('_in_class_definition', $ => repeat(seq(optional($._newline), $._class_type_body_inner)), -2),
 
   },
 });
 
+/**
+ *
+ * @param {Rule} rule
+ *
+ * @param {Rule} indent
+ *
+ * @param {Rule} dedent
+ *
+ * @return {Rule}
+ */
 function scoped(rule, indent, dedent) {
   return field('block', seq(indent, rule, dedent));
 }
