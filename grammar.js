@@ -68,6 +68,9 @@ module.exports = grammar({
     $._then,
     $._else,
     $._elif,
+    $._preproc_if,
+    $._preproc_else,
+    $._preproc_end,
     $._triple_quoted_content,
     $.block_comment_content,
     $.line_comment,
@@ -1870,16 +1873,16 @@ function preprocIf(suffix, content, precedence = 0) {
 
   return {
     ['preproc_if' + suffix]: $ => prec(precedence, seq(
-      '#if',
+      alias($._preproc_if, '#if'),
       field('condition', $.identifier),
       /\n/,
       content($),
       field('alternative', optional(alternativeBlock($))),
-      '#endif'
+      alias($._preproc_end, '#endif')
     )),
 
     ['preproc_else' + suffix]: $ => prec(precedence, seq(
-      '#else',
+      alias($._preproc_else, '#else'),
       content($),
     )),
   }
