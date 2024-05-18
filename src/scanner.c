@@ -223,12 +223,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         advance(lexer);
         if (lexer->lookahead == 'f') {
           advance(lexer);
-          if (valid_symbols[PREPROC_IF]) {
-            lexer->mark_end(lexer);
-          } else {
+          if (valid_symbols[NEWLINE] || valid_symbols[INDENT]) {
             while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
               skip(lexer);
             }
+          } else {
+            lexer->mark_end(lexer);
           }
           found_preprocessor_if = true;
         }
@@ -426,12 +426,12 @@ unsigned tree_sitter_fsharp_external_scanner_serialize(void *payload,
 
   buffer[size++] = (char)scanner->preprocessor_indents.size;
 
-  printf("serialize: %i\n", (char)preprocessor_count);
+  // printf("serialize: %i\n", (char)preprocessor_count);
   for (size_t iter = 0; iter < preprocessor_count &&
                         size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
        iter++) {
     char e = *array_get(&scanner->preprocessor_indents, iter);
-    printf("preproc[%i] = %i\n", (char)iter, e);
+    // printf("preproc[%i] = %i\n", (char)iter, e);
     buffer[size++] = e;
   }
 
@@ -459,16 +459,16 @@ void tree_sitter_fsharp_external_scanner_deserialize(void *payload,
 
     size_t preprocessor_count = (uint8_t)buffer[size++];
 
-    printf("deserialize: %i\n", (char)preprocessor_count);
+    // printf("deserialize: %i\n", (char)preprocessor_count);
 
     for (; size <= preprocessor_count; size++) {
       array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
     }
 
-    for (size_t i = 0; i < scanner->preprocessor_indents.size; i++) {
-      printf("preproc[%i] = %i\n", (char)i,
-             *array_get(&scanner->preprocessor_indents, i));
-    }
+    // for (size_t i = 0; i < scanner->preprocessor_indents.size; i++) {
+    //   printf("preproc[%i] = %i\n", (char)i,
+    //          *array_get(&scanner->preprocessor_indents, i));
+    // }
 
     for (; size < length; size++) {
       array_push(&scanner->indents, (unsigned char)buffer[size]);

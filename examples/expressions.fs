@@ -1,6 +1,6 @@
-namespace Test
-
-#if A
-module A =
-  let x = 4
+do
+  1 + 1
+#if true
+  printfn "blah"
 #endif
+  printfn "bluh"
