@@ -160,6 +160,10 @@
         {
           "type": "SYMBOL",
           "name": "_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "preproc_if"
         }
       ]
     },
@@ -269,50 +273,6 @@
           }
         ]
       }
-    },
-    "compiler_directive_decl": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "#nowarn"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "string"
-        }
-      ]
-    },
-    "fsi_directive_decl": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "#r"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "string"
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "#load"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "string"
-            }
-          ]
-        }
-      ]
     },
     "import_decl": {
       "type": "SEQ",
@@ -2005,12 +1965,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_else"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "else"
         },
         {
@@ -2027,12 +1982,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_then"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "then"
         },
         {
@@ -2053,12 +2003,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_elif"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "elif"
         },
         {
@@ -4656,6 +4601,15 @@
         {
           "type": "SYMBOL",
           "name": "_type_defn_elements"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "preproc_if_in_class_definition"
+          },
+          "named": true,
+          "value": "preproc_if"
         }
       ]
     },
@@ -7456,7 +7410,7 @@
           "type": "ALIAS",
           "content": {
             "type": "PATTERN",
-            "value": "#line|# "
+            "value": "#(line)? "
           },
           "named": false,
           "value": "#line"
@@ -7490,6 +7444,59 @@
               "type": "BLANK"
             }
           ]
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\n"
+        }
+      ]
+    },
+    "compiler_directive_decl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "#nowarn"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_string_literal"
+          },
+          "named": true,
+          "value": "string"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\n"
+        }
+      ]
+    },
+    "fsi_directive_decl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "#r"
+            },
+            {
+              "type": "STRING",
+              "value": "#load"
+            }
+          ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_string_literal"
+          },
+          "named": true,
+          "value": "string"
         },
         {
           "type": "PATTERN",
@@ -7673,6 +7680,117 @@
           }
         ]
       }
+    },
+    "preproc_if_in_class_definition": {
+      "type": "PREC",
+      "value": -2,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "#if"
+          },
+          {
+            "type": "FIELD",
+            "name": "condition",
+            "content": {
+              "type": "SYMBOL",
+              "name": "identifier"
+            }
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\n"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_newline"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_class_type_body_inner"
+                }
+              ]
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "alternative",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "preproc_else_in_class_definition"
+                  },
+                  "named": true,
+                  "value": "preproc_else"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "#endif"
+          }
+        ]
+      }
+    },
+    "preproc_else_in_class_definition": {
+      "type": "PREC",
+      "value": -2,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "#else"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_newline"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_class_type_body_inner"
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   },
   "extras": [
@@ -7695,6 +7813,14 @@
     {
       "type": "SYMBOL",
       "name": "preproc_line"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "compiler_directive_decl"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "fsi_directive_decl"
     }
   ],
   "conflicts": [
@@ -7705,6 +7831,10 @@
     [
       "type_argument",
       "static_type_argument"
+    ],
+    [
+      "preproc_if",
+      "preproc_if_in_expression"
     ],
     [
       "file"
@@ -7728,16 +7858,28 @@
       "name": "_dedent"
     },
     {
-      "type": "SYMBOL",
-      "name": "_then"
+      "type": "STRING",
+      "value": "then"
     },
     {
-      "type": "SYMBOL",
-      "name": "_else"
+      "type": "STRING",
+      "value": "else"
     },
     {
-      "type": "SYMBOL",
-      "name": "_elif"
+      "type": "STRING",
+      "value": "elif"
+    },
+    {
+      "type": "STRING",
+      "value": "#if"
+    },
+    {
+      "type": "STRING",
+      "value": "#else"
+    },
+    {
+      "type": "STRING",
+      "value": "#endif"
     },
     {
       "type": "SYMBOL",
