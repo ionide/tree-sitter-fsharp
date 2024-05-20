@@ -228,6 +228,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               skip(lexer);
             }
           } else {
+            printf("called mark end\n");
             lexer->mark_end(lexer);
           }
           found_preprocessor_if = true;

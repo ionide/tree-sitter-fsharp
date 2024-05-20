@@ -1965,12 +1965,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_else"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "else"
         },
         {
@@ -1987,12 +1982,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_then"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "then"
         },
         {
@@ -2013,12 +2003,7 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_elif"
-          },
-          "named": false,
+          "type": "STRING",
           "value": "elif"
         },
         {
@@ -7526,12 +7511,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_if"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#if"
           },
           {
@@ -7567,12 +7547,7 @@
             }
           },
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_end"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#endif"
           }
         ]
@@ -7585,12 +7560,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_else"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#else"
           },
           {
@@ -7607,12 +7577,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_if"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#if"
           },
           {
@@ -7673,12 +7638,7 @@
             }
           },
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_end"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#endif"
           }
         ]
@@ -7691,12 +7651,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_else"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#else"
           },
           {
@@ -7733,12 +7688,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_if"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#if"
           },
           {
@@ -7799,12 +7749,7 @@
             }
           },
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_end"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#endif"
           }
         ]
@@ -7817,12 +7762,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_preproc_else"
-            },
-            "named": false,
+            "type": "STRING",
             "value": "#else"
           },
           {
@@ -7918,28 +7858,28 @@
       "name": "_dedent"
     },
     {
-      "type": "SYMBOL",
-      "name": "_then"
+      "type": "STRING",
+      "value": "then"
     },
     {
-      "type": "SYMBOL",
-      "name": "_else"
+      "type": "STRING",
+      "value": "else"
     },
     {
-      "type": "SYMBOL",
-      "name": "_elif"
+      "type": "STRING",
+      "value": "elif"
     },
     {
-      "type": "SYMBOL",
-      "name": "_preproc_if"
+      "type": "STRING",
+      "value": "#if"
     },
     {
-      "type": "SYMBOL",
-      "name": "_preproc_else"
+      "type": "STRING",
+      "value": "#else"
     },
     {
-      "type": "SYMBOL",
-      "name": "_preproc_end"
+      "type": "STRING",
+      "value": "#endif"
     },
     {
       "type": "SYMBOL",

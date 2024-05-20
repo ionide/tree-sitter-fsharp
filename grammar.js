@@ -65,12 +65,12 @@ module.exports = grammar({
     $._newline, // we distinguish new scoped based on newlines.
     $._indent, // starts a new indentation-based scope.
     $._dedent, // signals that the current indentation scope has ended.
-    $._then,
-    $._else,
-    $._elif,
-    $._preproc_if,
-    $._preproc_else,
-    $._preproc_end,
+    'then',
+    'else',
+    'elif',
+    '#if',
+    '#else',
+    '#endif',
     $._triple_quoted_content,
     $.block_comment_content,
     $.line_comment,
@@ -553,20 +553,20 @@ module.exports = grammar({
 
     _else_expression: $ =>
       seq(
-        alias($._else, 'else'),
+        'else',
         field('else', $._expression_block),
       ),
 
     _then_expression: $ =>
       seq(
-        alias($._then, 'then'),
+        'then',
         $._indent,
         field('then', $._expression),
       ),
 
     elif_expression: $ =>
       seq(
-        alias($._elif, 'elif'),
+        'elif',
         field('guard', $._expression),
         $._then_expression,
       ),
@@ -1873,16 +1873,16 @@ function preprocIf(suffix, content, precedence = 0) {
 
   return {
     ['preproc_if' + suffix]: $ => prec(precedence, seq(
-      alias($._preproc_if, '#if'),
+      '#if',
       field('condition', $.identifier),
       /\n/,
       content($),
       field('alternative', optional(alternativeBlock($))),
-      alias($._preproc_end, '#endif')
+      '#endif',
     )),
 
     ['preproc_else' + suffix]: $ => prec(precedence, seq(
-      alias($._preproc_else, '#else'),
+      '#else',
       content($),
     )),
   }
