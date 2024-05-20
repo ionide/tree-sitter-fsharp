@@ -190,7 +190,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                   }
                 }
                 if (valid_symbols[PREPROC_END]) {
+                  if (scanner->preprocessor_indents.size > 0) {
+                    array_pop(&scanner->preprocessor_indents);
+                  }
                   lexer->mark_end(lexer);
+                  lexer->result_symbol = PREPROC_END;
+                  return true;
                 }
               }
             }
@@ -215,6 +220,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               }
               if (valid_symbols[PREPROC_ELSE]) {
                 lexer->mark_end(lexer);
+                lexer->result_symbol = PREPROC_ELSE;
+                return true;
               }
             }
           }
@@ -223,15 +230,20 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         advance(lexer);
         if (lexer->lookahead == 'f') {
           advance(lexer);
+          found_preprocessor_if = true;
           if (valid_symbols[NEWLINE] || valid_symbols[INDENT]) {
             while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
               skip(lexer);
             }
           } else {
-            printf("called mark end\n");
+            if (scanner->indents.size > 0) {
+              uint16_t current_indent_length = *array_back(&scanner->indents);
+              array_push(&scanner->preprocessor_indents, current_indent_length);
+            }
             lexer->mark_end(lexer);
+            lexer->result_symbol = PREPROC_IF;
+            return true;
           }
-          found_preprocessor_if = true;
         }
       } else {
         return false;
@@ -387,28 +399,6 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       }
     }
     lexer->result_symbol = BLOCK_COMMENT_CONTENT;
-    return true;
-  }
-
-  if (found_preprocessor_if && valid_symbols[PREPROC_IF]) {
-    if (scanner->indents.size > 0) {
-      uint16_t current_indent_length = *array_back(&scanner->indents);
-      array_push(&scanner->preprocessor_indents, current_indent_length);
-    }
-    lexer->result_symbol = PREPROC_IF;
-    return true;
-  }
-
-  if (found_preprocessor_else && valid_symbols[PREPROC_ELSE]) {
-    lexer->result_symbol = PREPROC_ELSE;
-    return true;
-  }
-
-  if (found_preprocessor_end && valid_symbols[PREPROC_END]) {
-    if (scanner->preprocessor_indents.size > 0) {
-      array_pop(&scanner->preprocessor_indents);
-    }
-    lexer->result_symbol = PREPROC_END;
     return true;
   }
 
