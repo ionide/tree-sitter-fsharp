@@ -117,6 +117,54 @@ do
               (string))))))))
 
 ================================================================================
+preproc_if inside expression block with else branch
+================================================================================
+
+do
+  1 + 1
+#if true
+  printfn "blah"
+#else
+  printfn "huh"
+#endif
+  printfn "bluh"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (preproc_if
+            (identifier)
+            (application_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)))
+              (const
+                (string)))
+            (preproc_else
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))
+                (const
+                  (string)))))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))
+            (const
+              (string))))))))
+
+================================================================================
 preproc_if inside expression block with seq expression
 ================================================================================
 
