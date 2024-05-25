@@ -105,14 +105,12 @@ do
             (identifier)
             (application_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (const
                 (string))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (const
               (string))))))))
 
@@ -146,21 +144,18 @@ do
             (identifier)
             (application_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (const
                 (string)))
             (preproc_else
               (application_expression
                 (long_identifier_or_op
-                  (long_identifier
-                    (identifier)))
+                  (identifier))
                 (const
                   (string)))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (const
               (string))))))))
 
@@ -195,8 +190,7 @@ do
             (sequential_expression
               (application_expression
                 (long_identifier_or_op
-                  (long_identifier
-                    (identifier)))
+                  (identifier))
                 (const
                   (string)))
               (sequential_expression
@@ -208,14 +202,12 @@ do
                     (int)))
                 (application_expression
                   (long_identifier_or_op
-                    (long_identifier
-                      (identifier)))
+                    (identifier))
                   (const
                     (string))))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (const
               (string))))))))
 
@@ -283,8 +275,7 @@ type MyClass() =
                     (identifier)))))
             (infix_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (infix_op)
               (const
                 (int)))))))))

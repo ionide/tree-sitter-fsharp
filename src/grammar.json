@@ -6523,39 +6523,34 @@
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
-        "type": "ALIAS",
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "long_identifier"
-            },
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "long_identifier"
-                },
-                {
-                  "type": "STRING",
-                  "value": "."
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_identifier_or_op"
-                }
-              ]
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_identifier_or_op"
-            }
-          ]
-        },
-        "named": true,
-        "value": "long_identifier"
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "long_identifier"
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "long_identifier"
+              },
+              {
+                "type": "STRING",
+                "value": "."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_identifier_or_op"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_identifier_or_op"
+          }
+        ]
       }
     },
     "long_identifier": {
@@ -6587,13 +6582,9 @@
         ]
       }
     },
-    "_identifier_or_op": {
+    "op_identifier": {
       "type": "CHOICE",
       "members": [
-        {
-          "type": "SYMBOL",
-          "name": "identifier"
-        },
         {
           "type": "TOKEN",
           "content": {
@@ -6636,6 +6627,26 @@
           }
         },
         {
+          "type": "IMMEDIATE_TOKEN",
+          "content": {
+            "type": "STRING",
+            "value": "(*)"
+          }
+        }
+      ]
+    },
+    "_identifier_or_op": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_identifier"
+        },
+        {
           "type": "SEQ",
           "members": [
             {
@@ -6651,13 +6662,6 @@
               "value": ")"
             }
           ]
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
-          "content": {
-            "type": "STRING",
-            "value": "(*)"
-          }
         }
       ]
     },

@@ -203,13 +203,11 @@ module Impl =
               (identifier))))
         (infix_expression
           (long_identifier_or_op
-            (long_identifier
-              (identifier)))
+            (identifier))
           (infix_op)
           (long_identifier_or_op
             (long_identifier
               (identifier))))))))
-
 
 ================================================================================
 attribute on let binding in namespace
@@ -283,10 +281,8 @@ module Impl =
                 (identifier))))
           (infix_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (infix_op)
             (long_identifier_or_op
               (long_identifier
                 (identifier)))))))))
-

@@ -1574,6 +1574,10 @@
           "named": true
         },
         {
+          "type": "op_identifier",
+          "named": true
+        },
+        {
           "type": "type_arguments",
           "named": true
         }
@@ -1943,12 +1947,8 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "active_pattern_op_name",
-          "named": true
-        },
         {
           "type": "identifier",
           "named": true
@@ -1965,7 +1965,19 @@
       "required": true,
       "types": [
         {
+          "type": "active_pattern_op_name",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
           "type": "long_identifier",
+          "named": true
+        },
+        {
+          "type": "op_identifier",
           "named": true
         }
       ]
@@ -2366,6 +2378,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "op_identifier",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "optional_pattern",
@@ -4241,11 +4258,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

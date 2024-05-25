@@ -412,9 +412,10 @@ type A() =
         (type
           (long_identifier
             (identifier)))
-        (const (unit)))
-      (const (unit)))))
-
+        (const
+          (unit)))
+      (const
+        (unit)))))
 
 ================================================================================
 class inherit and member method definition
@@ -812,15 +813,12 @@ type A(x:int, y:int) =
                   (identifier)))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (tuple_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))))))
+                (identifier))))))
       (member_defn
         (method_or_prop_defn
           (property_or_ident
@@ -828,8 +826,7 @@ type A(x:int, y:int) =
             (identifier))
           (infix_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (infix_op)
             (long_identifier_or_op
               (long_identifier
@@ -887,7 +884,6 @@ type A(x:int, y:int) =
             (long_identifier
               (identifier))))))))
 
-
 ================================================================================
 interface implementation with generic type parameter
 ================================================================================
@@ -944,8 +940,7 @@ type A(x: int, y:int) =
                       (identifier))))))
             (application_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier))))))))))
+                (identifier)))))))))
 
 ================================================================================
 multiple interfaces with property members
@@ -1052,8 +1047,7 @@ type A() =
                   (identifier)))))
           (infix_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (infix_op)
             (long_identifier_or_op
               (long_identifier
@@ -1136,14 +1130,12 @@ type A = {
                         (tuple_expression
                           (infix_expression
                             (long_identifier_or_op
-                              (long_identifier
-                                (identifier)))
+                              (identifier))
                             (infix_op)
                             (const
                               (int)))
                           (long_identifier_or_op
-                            (long_identifier
-                              (identifier))))
+                            (identifier)))
                         (infix_op)
                         (const
                           (bool))))))
