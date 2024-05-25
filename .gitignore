@@ -31,6 +31,7 @@
 
 # Grammar volatiles
 dsl.d.ts
+*.out.js
 *.wasm
 *.obj
 *.o

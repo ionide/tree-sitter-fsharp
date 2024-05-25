@@ -96,11 +96,9 @@ and f2 y = y + 1
             (identifier))))
       (application_expression
         (long_identifier_or_op
-          (long_identifier
-            (identifier)))
+          (identifier))
         (long_identifier_or_op
-          (long_identifier
-            (identifier))))
+          (identifier)))
       (function_declaration_left
         (identifier)
         (argument_patterns
@@ -108,8 +106,7 @@ and f2 y = y + 1
             (identifier))))
       (infix_expression
         (long_identifier_or_op
-          (long_identifier
-            (identifier)))
+          (identifier))
         (infix_op)
         (const
           (int))))))

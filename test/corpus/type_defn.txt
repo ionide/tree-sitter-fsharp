@@ -412,9 +412,10 @@ type A() =
         (type
           (long_identifier
             (identifier)))
-        (const (unit)))
-      (const (unit)))))
-
+        (const
+          (unit)))
+      (const
+        (unit)))))
 
 ================================================================================
 class inherit and member method definition
@@ -812,15 +813,12 @@ type A(x:int, y:int) =
                   (identifier)))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (tuple_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))))))
+                (identifier))))))
       (member_defn
         (method_or_prop_defn
           (property_or_ident
@@ -828,8 +826,7 @@ type A(x:int, y:int) =
             (identifier))
           (infix_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (infix_op)
             (long_identifier_or_op
               (long_identifier
@@ -887,7 +884,6 @@ type A(x:int, y:int) =
             (long_identifier
               (identifier))))))))
 
-
 ================================================================================
 interface implementation with generic type parameter
 ================================================================================
@@ -944,8 +940,7 @@ type A(x: int, y:int) =
                       (identifier))))))
             (application_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier))))))))))
+                (identifier)))))))))
 
 ================================================================================
 multiple interfaces with property members
@@ -1052,8 +1047,7 @@ type A() =
                   (identifier)))))
           (infix_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (infix_op)
             (long_identifier_or_op
               (long_identifier
@@ -1132,21 +1126,19 @@ type A = {
                       (long_identifier
                         (identifier)))
                     (paren_expression
-                      (infix_expression
-                        (tuple_expression
-                          (infix_expression
-                            (long_identifier_or_op
-                              (long_identifier
-                                (identifier)))
-                            (infix_op)
-                            (const
-                              (int)))
+                      (tuple_expression
+                        (infix_expression
                           (long_identifier_or_op
-                            (long_identifier
-                              (identifier))))
-                        (infix_op)
-                        (const
-                          (bool))))))
+                            (identifier))
+                          (infix_op)
+                          (const
+                            (int)))
+                        (infix_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (infix_op)
+                          (const
+                            (bool)))))))
                 (attribute
                   (object_construction
                     (type
@@ -1179,3 +1171,33 @@ type A = {
             (type
               (long_identifier
                 (identifier)))))))))
+
+================================================================================
+type with static inline member
+================================================================================
+
+type MyClass() =
+  static member inline F(x) = x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier))
+          (paren_pattern
+            (identifier_pattern
+              (long_identifier
+                (identifier))))
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (int))))))))

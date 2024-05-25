@@ -162,6 +162,10 @@
         "named": true
       },
       {
+        "type": "preproc_if",
+        "named": true
+      },
+      {
         "type": "type_definition",
         "named": true
       },
@@ -1570,6 +1574,10 @@
           "named": true
         },
         {
+          "type": "op_identifier",
+          "named": true
+        },
+        {
           "type": "type_arguments",
           "named": true
         }
@@ -1939,12 +1947,8 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "active_pattern_op_name",
-          "named": true
-        },
         {
           "type": "identifier",
           "named": true
@@ -1961,7 +1965,19 @@
       "required": true,
       "types": [
         {
+          "type": "active_pattern_op_name",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
           "type": "long_identifier",
+          "named": true
+        },
+        {
+          "type": "op_identifier",
           "named": true
         }
       ]
@@ -2105,18 +2121,24 @@
             "named": true
           }
         ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "property_or_ident",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "property_or_ident",
           "named": true
         },
         {
@@ -2364,6 +2386,11 @@
     }
   },
   {
+    "type": "op_identifier",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "optional_pattern",
     "named": true,
     "fields": {},
@@ -2443,6 +2470,26 @@
         {
           "type": "_module_elem",
           "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "interface_implementation",
+          "named": true
+        },
+        {
+          "type": "member_defn",
+          "named": true
         }
       ]
     }
@@ -2477,7 +2524,27 @@
       "required": false,
       "types": [
         {
-          "type": "_expression",
+          "type": "_module_elem",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "interface_implementation",
+          "named": true
+        },
+        {
+          "type": "member_defn",
           "named": true
         }
       ]
@@ -4197,11 +4264,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

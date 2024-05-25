@@ -4,5 +4,4 @@ type A() =
   member this.F(x) = ()
 //^ keyword.function
 //       ^ variable.parameter.builtin
-//            ^ variable.member
-//              ^ variable
+//            ^ function.method

@@ -15,7 +15,8 @@ let x = 1
         (identifier_pattern
           (long_identifier
             (identifier))))
-      (const (int)))))
+      (const
+        (int)))))
 
 ================================================================================
 block comment
@@ -35,7 +36,8 @@ let x = 1
         (identifier_pattern
           (long_identifier
             (identifier))))
-      (const (int)))))
+      (const
+        (int)))))
 
 ================================================================================
 multi-line block comment
@@ -57,7 +59,8 @@ let x = 1
         (identifier_pattern
           (long_identifier
             (identifier))))
-      (const (int)))))
+      (const
+        (int)))))
 
 ================================================================================
 docstring
@@ -77,7 +80,8 @@ let x = 1
         (identifier_pattern
           (long_identifier
             (identifier))))
-      (const (int)))))
+      (const
+        (int)))))
 
 ================================================================================
 comment in simple string
@@ -162,8 +166,7 @@ let f x = x + 1
             (identifier))))
       (infix_expression
         (long_identifier_or_op
-          (long_identifier
-            (identifier)))
+          (identifier))
         (infix_op)
         (const
           (int))))))

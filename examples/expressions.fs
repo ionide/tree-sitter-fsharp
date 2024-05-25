@@ -1,2 +1,10 @@
-do
-  1.
+module A
+
+let f cts =
+  CommandDefinition(
+    """
+      test string
+      """,
+    {| A = 1 |},
+    cancellationToken = cts
+  )

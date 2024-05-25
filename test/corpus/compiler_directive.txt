@@ -105,14 +105,57 @@ do
             (identifier)
             (application_expression
               (long_identifier_or_op
-                (long_identifier
-                  (identifier)))
+                (identifier))
               (const
                 (string))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
+            (const
+              (string))))))))
+
+================================================================================
+preproc_if inside expression block with else branch
+================================================================================
+
+do
+  1 + 1
+#if true
+  printfn "blah"
+#else
+  printfn "huh"
+#endif
+  printfn "bluh"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (preproc_if
+            (identifier)
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (const
+                (string)))
+            (preproc_else
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string)))))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
             (const
               (string))))))))
 
@@ -147,8 +190,7 @@ do
             (sequential_expression
               (application_expression
                 (long_identifier_or_op
-                  (long_identifier
-                    (identifier)))
+                  (identifier))
                 (const
                   (string)))
               (sequential_expression
@@ -160,13 +202,80 @@ do
                     (int)))
                 (application_expression
                   (long_identifier_or_op
-                    (long_identifier
-                      (identifier)))
+                    (identifier))
                   (const
                     (string))))))
           (application_expression
             (long_identifier_or_op
-              (long_identifier
-                (identifier)))
+              (identifier))
             (const
               (string))))))))
+
+================================================================================
+preproc_if top-level
+================================================================================
+
+namespace Test
+
+#if A
+module A =
+  let x = 4
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (preproc_if
+      (identifier)
+      (module_defn
+        (identifier)
+        (value_declaration
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier
+                  (identifier))))
+            (const
+              (int))))))))
+
+================================================================================
+preproc_if in class definition
+================================================================================
+
+type MyClass() =
+#if A
+  member _.F(x: int) = x + 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (preproc_if
+        (identifier)
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier
+                    (identifier)))
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (int)))))))))
