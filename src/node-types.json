@@ -3373,7 +3373,18 @@
   {
     "type": "typed_pattern",
     "named": true,
-    "fields": {},
+    "fields": {
+      "constraints": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_argument_constraints",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,

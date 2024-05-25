@@ -10,8 +10,11 @@ let x = 1
   (value_declaration
     (function_or_value_defn
       (value_declaration_left
-        (identifier_pattern (long_identifier (identifier))))
-      (const (int)))))
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (const
+        (int)))))
 
 ================================================================================
 tuple pattern
@@ -27,12 +30,18 @@ let (x,y) = (1,2)
       (value_declaration_left
         (paren_pattern
           (repeat_pattern
-            (identifier_pattern (long_identifier (identifier)))
-            (identifier_pattern (long_identifier (identifier))))))
+            (identifier_pattern
+              (long_identifier
+                (identifier)))
+            (identifier_pattern
+              (long_identifier
+                (identifier))))))
       (paren_expression
         (tuple_expression
-          (const (int))
-          (const (int)))))))
+          (const
+            (int))
+          (const
+            (int)))))))
 
 ================================================================================
 typed pattern
@@ -49,9 +58,14 @@ let name (x : int) = 1
         (identifier)
         (argument_patterns
           (typed_pattern
-            (identifier_pattern (long_identifier (identifier)))
-            (type (long_identifier (identifier))))))
-      (const (int)))))
+            (identifier_pattern
+              (long_identifier
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))))
+      (const
+        (int)))))
 
 ================================================================================
 typed tuple pattern
@@ -69,11 +83,56 @@ let name (x: int, y: string) = 1, "test"
         (argument_patterns
           (repeat_pattern
             (typed_pattern
-              (identifier_pattern (long_identifier (identifier)))
-              (type (long_identifier (identifier))))
+              (identifier_pattern
+                (long_identifier
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier))))
             (typed_pattern
-              (identifier_pattern (long_identifier (identifier)))
-              (type (long_identifier (identifier)))))))
+              (identifier_pattern
+                (long_identifier
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier)))))))
       (tuple_expression
-        (const (int))
-        (const (string))))))
+        (const
+          (int))
+        (const
+          (string))))))
+
+================================================================================
+typed pattern with constraints
+================================================================================
+
+type A() =
+  member _.B(x: 'T when 'T: equality) = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier
+                  (identifier)))
+              (type
+                (type_argument
+                  (identifier)))
+              (type_argument_constraints
+                (constraint
+                  (type_argument
+                    (identifier))))))
+          (const
+            (unit)))))))

@@ -307,7 +307,16 @@ module.exports = grammar({
     cons_pattern: ($) => prec.left(0, seq($._pattern, "::", $._pattern)),
     disjunct_pattern: ($) => prec.left(0, seq($._pattern, "|", $._pattern)),
     conjunct_pattern: ($) => prec.left(0, seq($._pattern, "&", $._pattern)),
-    typed_pattern: ($) => prec.left(3, seq($._pattern, ":", $.type)),
+    typed_pattern: ($) =>
+      prec.left(
+        3,
+        seq(
+          $._pattern,
+          ":",
+          $.type,
+          field("constraints", optional($.type_argument_constraints)),
+        ),
+      ),
 
     argument_patterns: ($) =>
       // argument patterns are generally no different from normal patterns.
@@ -1022,22 +1031,24 @@ module.exports = grammar({
       ),
 
     constraint: ($) =>
-      choice(
-        seq($.type_argument, ":>", $.type),
-        seq($.type_argument, ":", "null"),
-        seq($.static_type_argument, ":", "(", $.trait_member_constraint, ")"),
-        seq($.type_argument, ":", "(", "new", ":", "unit", "->", "'T", ")"),
-        seq($.type_argument, ":", "struct"),
-        seq($.type_argument, ":", "not", "struct"),
-        seq($.type_argument, ":", "enum", "<", $.type, ">"),
-        seq($.type_argument, ":", "unmanaged"),
-        seq($.type_argument, ":", "equality"),
-        seq($.type_argument, ":", "comparison"),
-        seq($.type_argument, ":", "delegate", "<", $.type, ",", $.type, ">"),
+      prec.right(
+        choice(
+          seq($.type_argument, ":>", $.type),
+          seq($.type_argument, ":", "null"),
+          seq($.static_type_argument, ":", "(", $.trait_member_constraint, ")"),
+          seq($.type_argument, ":", "(", "new", ":", "unit", "->", "'T", ")"),
+          seq($.type_argument, ":", "struct"),
+          seq($.type_argument, ":", "not", "struct"),
+          seq($.type_argument, ":", "enum", "<", $.type, ">"),
+          seq($.type_argument, ":", "unmanaged"),
+          seq($.type_argument, ":", "equality"),
+          seq($.type_argument, ":", "comparison"),
+          seq($.type_argument, ":", "delegate", "<", $.type, ",", $.type, ">"),
+        ),
       ),
 
     type_argument_constraints: ($) =>
-      seq("when", $.constraint, repeat(seq("and", $.constraint))),
+      prec.right(seq("when", $.constraint, repeat(seq("and", $.constraint)))),
 
     type_argument: ($) =>
       choice("_", seq("'", $.identifier), seq("^", $.identifier)),
