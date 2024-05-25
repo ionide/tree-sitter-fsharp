@@ -96,13 +96,13 @@ do
         (long_identifier_or_op
           (identifier))
         (tuple_expression
+          (const
+            (int))
           (tuple_expression
             (const
               (int))
             (const
-              (int)))
-          (const
-            (int)))))))
+              (int))))))))
 
 ================================================================================
 declaration expression should contain all sequential expressions

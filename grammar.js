@@ -430,7 +430,7 @@ module.exports = grammar({
       ),
 
     tuple_expression: ($) =>
-      prec.left(PREC.TUPLE_EXPR, seq($._expression, ",", $._expression)),
+      prec.right(PREC.TUPLE_EXPR, seq($._expression, ",", $._expression)),
 
     brace_expression: ($) =>
       prec(

@@ -1126,19 +1126,19 @@ type A = {
                       (long_identifier
                         (identifier)))
                     (paren_expression
-                      (infix_expression
-                        (tuple_expression
-                          (infix_expression
-                            (long_identifier_or_op
-                              (identifier))
-                            (infix_op)
-                            (const
-                              (int)))
+                      (tuple_expression
+                        (infix_expression
                           (long_identifier_or_op
-                            (identifier)))
-                        (infix_op)
-                        (const
-                          (bool))))))
+                            (identifier))
+                          (infix_op)
+                          (const
+                            (int)))
+                        (infix_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (infix_op)
+                          (const
+                            (bool)))))))
                 (attribute
                   (object_construction
                     (type

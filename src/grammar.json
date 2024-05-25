@@ -1490,7 +1490,7 @@
       ]
     },
     "tuple_expression": {
-      "type": "PREC_LEFT",
+      "type": "PREC_RIGHT",
       "value": 16,
       "content": {
         "type": "SEQ",

@@ -400,13 +400,13 @@ do 2, 3, 4
   (value_declaration
     (do
       (tuple_expression
+        (const
+          (int))
         (tuple_expression
           (const
             (int))
           (const
-            (int)))
-        (const
-          (int))))))
+            (int)))))))
 
 ================================================================================
 list expressions
@@ -2568,3 +2568,52 @@ let f = task { return Some { A = 4; B = 5 } }
                     (identifier))
                   (const
                     (int)))))))))))
+
+================================================================================
+tuple expression vs infix expression in object construction
+================================================================================
+
+module A
+
+let f cts =
+  CommandDefinition(
+    """
+      test string
+      """,
+    {| A = 1 |},
+    cancellationToken = cts
+  )
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (value_declaration
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (tuple_expression
+            (const
+              (triple_quoted_string))
+            (tuple_expression
+              (anon_record_expression
+                (field_initializers
+                  (field_initializer
+                    (long_identifier
+                      (identifier))
+                    (const
+                      (int)))))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))))
