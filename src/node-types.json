@@ -2121,18 +2121,24 @@
             "named": true
           }
         ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "property_or_ident",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "property_or_ident",
           "named": true
         },
         {

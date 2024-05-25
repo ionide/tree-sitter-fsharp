@@ -25,7 +25,7 @@
 
 (wildcard_pattern) @character.special
 
-(type_definition (_ (type_name (identifier) @type.definition)))
+(type_name type_name: (_) @type.definition)
 
 (type) @type
 
@@ -97,9 +97,12 @@
 
 (member_defn
   (method_or_prop_defn
-    (property_or_ident
-      instance: (identifier) @variable.parameter.builtin
-      method: (identifier) @function.method)
+    [
+      (property_or_ident) @function
+      (property_or_ident
+        instance: (identifier) @variable.parameter.builtin
+        method: (identifier) @function.method)
+    ]
     args: (_)? @variable.parameter))
 
 (application_expression

@@ -5527,6 +5527,18 @@
                     "value": "member"
                   },
                   {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "inline"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
                     "type": "SYMBOL",
                     "name": "method_or_prop_defn"
                   }
@@ -5726,10 +5738,6 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "property_or_ident"
-            },
-            {
               "type": "CHOICE",
               "members": [
                 {
@@ -5767,10 +5775,6 @@
     "_property_defn": {
       "type": "SEQ",
       "members": [
-        {
-          "type": "SYMBOL",
-          "name": "property_or_ident"
-        },
         {
           "type": "STRING",
           "value": "="
@@ -5849,49 +5853,58 @@
       "type": "PREC",
       "value": 3,
       "content": {
-        "type": "CHOICE",
+        "type": "SEQ",
         "members": [
           {
-            "type": "SEQ",
+            "type": "FIELD",
+            "name": "name",
+            "content": {
+              "type": "SYMBOL",
+              "name": "property_or_ident"
+            }
+          },
+          {
+            "type": "CHOICE",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "property_or_ident"
-              },
-              {
-                "type": "STRING",
-                "value": "with"
-              },
-              {
-                "type": "FIELD",
-                "name": "block",
-                "content": {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_indent"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_function_or_value_defns"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_dedent"
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "with"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "block",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_function_or_value_defns"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_dedent"
+                        }
+                      ]
                     }
-                  ]
-                }
+                  }
+                ]
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_method_defn"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_property_defn"
               }
             ]
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_method_defn"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_property_defn"
           }
         ]
       }

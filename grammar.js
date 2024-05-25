@@ -1342,6 +1342,7 @@ module.exports = grammar({
               optional("static"),
               optional($.access_modifier),
               "member",
+              optional("inline"),
               $.method_or_prop_defn,
             ),
             seq(
@@ -1379,7 +1380,6 @@ module.exports = grammar({
     _method_defn: ($) =>
       choice(
         seq(
-          $.property_or_ident,
           optional($.type_arguments),
           field("args", repeat1($._pattern)),
           "=",
@@ -1389,7 +1389,6 @@ module.exports = grammar({
 
     _property_defn: ($) =>
       seq(
-        $.property_or_ident,
         "=",
         $._expression_block,
         optional(
@@ -1408,14 +1407,16 @@ module.exports = grammar({
     method_or_prop_defn: ($) =>
       prec(
         3,
-        choice(
-          seq(
-            $.property_or_ident,
-            "with",
-            scoped($._function_or_value_defns, $._indent, $._dedent),
+        seq(
+          field("name", $.property_or_ident),
+          choice(
+            seq(
+              "with",
+              scoped($._function_or_value_defns, $._indent, $._dedent),
+            ),
+            $._method_defn,
+            $._property_defn,
           ),
-          $._method_defn,
-          $._property_defn,
         ),
       ),
 
