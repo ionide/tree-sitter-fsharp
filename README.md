@@ -13,7 +13,7 @@ The parser consists of two parts:
 - `src/scanner.c` is responsible for parsing newlines and comments and keeps track of indentation to open and close scopes.
 - `grammar.js` the main tree-sitter grammar. The indent tokens from the external scanner is access though the `indent` and `dedent` tokens.
 
-The grammar starts with the `file` node at the begging of the rules.
+The grammar starts with the `file` node at the beginning of the rules.
 
 ### Adding to neovim
 #### From the local copy:
@@ -32,7 +32,7 @@ parser_config.fsharp = {
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.fsharp = {
   install_info = {
-    url = "https://github.com/Nsidorenco/tree-sitter-fsharp",
+    url = "https://github.com/ionide/tree-sitter-fsharp",
     branch = "main",
     files = {"src/scanner.c", "src/parser.c" },
   },
@@ -41,21 +41,10 @@ parser_config.fsharp = {
 ```
 
 Then run `:TSInstall fsharp` inside neovim.
+
 ## Status
 The grammar currently has support for most language features, but might have rough edges.
-Some parts, like the type annotations are still very bare-bones.
-
-The grammar supports indentation-based scoping but does not fully support offside indentation and opening new indentation levels on record/list construction.
-
-The precedence rules for the different grammar nodes (and particularly expressions) are not set properly yet, which means that the parser size is much larger than needed.
-
-### Missing
-- [ ] Computational expressions
-- [ ] Type annotations
-- [x] Annotations
-- [ ] Offside tokens inside indentation scope
-- [ ] Testing
-- [ ] Set properly precedence rules
+Offside tokens aren't supported.
 
 ## Testing
 ### Testing corpus
@@ -71,7 +60,9 @@ $ npm run debug $file
 ```
 
 ## How to contribute
-Clone the repo and start playing around with it.
-If you find a code example which fails to parse, please reduce it to a minimal example, such that it can be added to the corpus as a test case.
+Clone the project and start playing around with it.
+If you find a code example which fails to parse, please reduce it to a minimal example and added to the corpus (`test/corpus/*.txt`) as a test case.
 
-PRs fleshing out the grammar or fixing bugs are very welcome!
+For an introduction to developing tree-sitter parsers the [official documentation](https://tree-sitter.github.io/tree-sitter/creating-parsers) is a good reference point.
+
+PRs fleshing out the grammar or fixing bugs are welcome!
