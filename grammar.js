@@ -80,7 +80,7 @@ module.exports = grammar({
 
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
-    [$.type_argument, $.static_type_argument],
+    [$._simple_type, $.type_argument],
     [$.preproc_if, $.preproc_if_in_expression],
     [$.file],
     [$.rules],
@@ -988,7 +988,7 @@ module.exports = grammar({
         ),
       ),
 
-    _simple_type: ($) => $.long_identifier,
+    _simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
     _generic_type: ($) =>
       prec.right(
         5,
@@ -1031,12 +1031,21 @@ module.exports = grammar({
       ),
 
     constraint: ($) =>
-      prec.right(
+      prec(
+        1000000,
         choice(
           seq($.type_argument, ":>", $.type),
           seq($.type_argument, ":", "null"),
-          seq($.static_type_argument, ":", "(", $.trait_member_constraint, ")"),
-          seq($.type_argument, ":", "(", "new", ":", "unit", "->", "'T", ")"),
+          seq(
+            $.type_argument,
+            ":",
+            "(",
+            choice(
+              $.trait_member_constraint,
+              seq("new", ":", "unit", "->", $.type),
+            ),
+            ")",
+          ),
           seq($.type_argument, ":", "struct"),
           seq($.type_argument, ":", "not", "struct"),
           seq($.type_argument, ":", "enum", "<", $.type, ">"),
@@ -1044,26 +1053,29 @@ module.exports = grammar({
           seq($.type_argument, ":", "equality"),
           seq($.type_argument, ":", "comparison"),
           seq($.type_argument, ":", "delegate", "<", $.type, ",", $.type, ">"),
+          seq("default", $.type_argument, ":", $.type),
         ),
       ),
 
     type_argument_constraints: ($) =>
-      prec.right(seq("when", $.constraint, repeat(seq("and", $.constraint)))),
+      seq("when", $.constraint, repeat(seq("and", $.constraint))),
 
     type_argument: ($) =>
-      choice("_", seq("'", $.identifier), seq("^", $.identifier)),
+      prec(
+        10,
+        choice(
+          "_",
+          seq(
+            $._static_type_identifier,
+            repeat(seq("or", $._static_type_identifier)),
+          ),
+        ),
+      ),
 
     type_argument_defn: ($) => seq(optional($.attributes), $.type_argument),
 
-    static_type_argument: ($) =>
-      choice(
-        seq(choice("^", "'"), $.identifier),
-        seq(
-          choice("^", "'"),
-          $.identifier,
-          repeat(seq("or", choice("^", "'"), $.identifier)),
-        ),
-      ),
+    _static_type_identifier: ($) =>
+      prec(10, seq(choice("^", "'"), $.identifier)),
 
     type_arguments: ($) =>
       seq(
@@ -1075,7 +1087,7 @@ module.exports = grammar({
       ),
 
     trait_member_constraint: ($) =>
-      seq(optional("static"), "member", $.identifier, ":", $.type),
+      seq(optional("static"), "member", $._identifier_or_op, ":", $.type),
 
     member_signature: ($) =>
       seq(
@@ -1596,24 +1608,18 @@ module.exports = grammar({
     long_identifier: ($) =>
       prec.right(seq($.identifier, repeat(seq(".", $.identifier)))),
 
-    op_identifier: ($) =>
-      choice(
-        token(
-          prec(
-            1000,
-            seq(
-              "(",
-              choice(
-                "?",
-                /[!%&*+-./<=>@^|~][!%&*+-./<=>@^|~?]*/,
-                "..",
-                ".. ..",
-              ),
-              ")",
-            ),
+    op_identifier: (_) =>
+      token(
+        prec(
+          1000,
+          seq(
+            "(",
+            /\s*/,
+            choice("?", /[!%&*+-./<=>@^|~][!%&*+-./<=>@^|~?]*/, ".. .."),
+            /\s*/,
+            ")",
           ),
         ),
-        token.immediate("(*)"),
       ),
 
     _identifier_or_op: ($) =>

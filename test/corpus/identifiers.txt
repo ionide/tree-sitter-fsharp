@@ -85,3 +85,29 @@ module _ = foo.bar.``baz``
       (identifier)
       (identifier)
       (identifier))))
+
+================================================================================
+op indentifier with whitespace
+================================================================================
+
+let x =
+  Array.map ( + ) [||]
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (long_identifier_or_op
+            (op_identifier)))
+        (array_expression)))))

@@ -150,7 +150,7 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
               (identifier)))
           (type_argument_constraints
             (constraint
-              (static_type_argument
+              (type_argument
                 (identifier))
               (trait_member_constraint
                 (identifier)
@@ -194,7 +194,7 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
               (identifier)))
           (type_argument_constraints
             (constraint
-              (static_type_argument
+              (type_argument
                 (identifier))
               (trait_member_constraint
                 (identifier)

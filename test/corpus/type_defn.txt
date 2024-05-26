@@ -1201,3 +1201,85 @@ type MyClass() =
             (infix_op)
             (const
               (int))))))))
+
+================================================================================
+method with complex generic type constraints
+================================================================================
+
+type A() =
+    member inline _.B<^Value
+                                      when ^Value :> ValueType
+                                      and ^Value : struct
+                                      and ^Value : (new : unit -> ^Value)
+                                      and ^Value : (static member ( + ) : ^Value * ^Value -> ^Value)
+                                      and  ^Value : (static member Zero : ^Value)
+                                      and default ^Value : int>
+                  () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))
+            (type_argument_constraints
+              (constraint
+                (type_argument
+                  (identifier))
+                (type
+                  (long_identifier
+                    (identifier))))
+              (constraint
+                (type_argument
+                  (identifier)))
+              (constraint
+                (type_argument
+                  (identifier))
+                (type
+                  (type_argument
+                    (identifier))))
+              (constraint
+                (type_argument
+                  (identifier))
+                (trait_member_constraint
+                  (op_identifier)
+                  (type
+                    (type
+                      (type_argument
+                        (identifier)))
+                    (type
+                      (type
+                        (type_argument
+                          (identifier)))
+                      (type
+                        (type_argument
+                          (identifier)))))))
+              (constraint
+                (type_argument
+                  (identifier))
+                (trait_member_constraint
+                  (identifier)
+                  (type
+                    (type_argument
+                      (identifier)))))
+              (constraint
+                (type_argument
+                  (identifier))
+                (type
+                  (long_identifier
+                    (identifier))))))
+          (const_pattern
+            (unit))
+          (const
+            (unit)))))))
