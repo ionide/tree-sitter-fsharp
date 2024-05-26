@@ -1,2 +1,2 @@
 type MyClass() =
-  static member inline F(x) = x + 1
+  static member F x y = x + y

@@ -1,9 +1,5 @@
-type A() =
-    member inline _.B<^Value
-                                      when ^Value :> ValueType
-                                      and ^Value : struct
-                                      and ^Value : (new : unit -> ^Value)
-                                      and ^Value : (static member ( + ) : ^Value * ^Value -> ^Value)
-                                      and  ^Value : (static member Zero : ^Value)
-                                      and default ^Value : int>
-                  () = ()
+namespace A
+
+    module B =
+        type Microsoft.FSharp.Linq.QueryBuilder with
+            member this.F () = ()

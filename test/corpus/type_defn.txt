@@ -155,7 +155,8 @@ type A<'B> =
   (type_definition
     (anon_type_defn
       (type_name
-        (identifier)
+        (long_identifier
+          (identifier))
         (type_arguments
           (type_argument_defn
             (type_argument
@@ -526,7 +527,8 @@ and 'T maybe = Maybe<'T>
   (type_definition
     (union_type_defn
       (type_name
-        (identifier)
+        (long_identifier
+          (identifier))
         (type_arguments
           (type_argument_defn
             (type_argument
@@ -1283,3 +1285,48 @@ type A() =
             (unit))
           (const
             (unit)))))))
+
+================================================================================
+type extension with long identifier
+================================================================================
+
+namespace A
+
+   [<AutoOpen>]
+    module B =
+        type Microsoft.FSharp.Linq.QueryBuilder with
+            member this.F () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (module_defn
+      (attributes
+        (attribute_set
+          (attribute
+            (object_construction
+              (type
+                (long_identifier
+                  (identifier)))))))
+      (identifier)
+      (type_definition
+        (type_extension
+          (type_name
+            (long_identifier
+              (identifier)
+              (identifier)
+              (identifier)
+              (identifier)))
+          (type_extension_elements
+            (member_defn
+              (method_or_prop_defn
+                (property_or_ident
+                  (identifier)
+                  (identifier))
+                (const_pattern
+                  (unit))
+                (const
+                  (unit))))))))))
