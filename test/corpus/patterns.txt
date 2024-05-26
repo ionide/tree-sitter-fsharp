@@ -136,3 +136,75 @@ type A() =
                     (identifier))))))
           (const
             (unit)))))))
+
+================================================================================
+active pattern 1
+================================================================================
+
+module A =
+  let (|A|) () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (function_declaration_left
+          (active_pattern
+            (active_pattern_op_name))
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (unit))))))
+
+================================================================================
+active pattern 2
+================================================================================
+
+module A =
+  let (|A|B|) () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (function_declaration_left
+          (active_pattern
+            (active_pattern_op_name)
+            (active_pattern_op_name))
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (unit))))))
+
+================================================================================
+partial active pattern
+================================================================================
+
+module A =
+  let (|A|B|_|) () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (function_declaration_left
+          (active_pattern
+            (active_pattern_op_name)
+            (active_pattern_op_name)
+            (wildcard_active_pattern_op))
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (unit))))))

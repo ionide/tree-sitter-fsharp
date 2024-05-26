@@ -1614,6 +1614,18 @@ module.exports = grammar({
     long_identifier: ($) =>
       prec.right(seq($.identifier, repeat(seq(".", $.identifier)))),
 
+    active_pattern: ($) =>
+      prec(
+        1000,
+        seq(
+          "(|",
+          alias($.identifier, $.active_pattern_op_name),
+          repeat(seq("|", alias($.identifier, $.active_pattern_op_name))),
+          optional(seq("|", alias("_", $.wildcard_active_pattern_op))),
+          "|)",
+        ),
+      ),
+
     op_identifier: (_) =>
       token(
         prec(
@@ -1629,19 +1641,7 @@ module.exports = grammar({
       ),
 
     _identifier_or_op: ($) =>
-      choice(
-        $.identifier,
-        $.op_identifier,
-        seq("(", $.active_pattern_op_name, ")"),
-      ),
-
-    active_pattern_op_name: ($) =>
-      choice(
-        // full pattern
-        seq("|", $.identifier, repeat1(seq("|", $.identifier)), "|"),
-        // partial pattern
-        seq("|", $.identifier, repeat(seq("|", $.identifier)), "|", "_", "|"),
-      ),
+      choice($.identifier, $.op_identifier, $.active_pattern),
 
     _infix_or_prefix_op: (_) => choice("+", "-", "+.", "-.", "%", "&", "&&"),
 

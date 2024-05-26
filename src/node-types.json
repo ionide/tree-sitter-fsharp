@@ -289,7 +289,7 @@
     "fields": {}
   },
   {
-    "type": "active_pattern_op_name",
+    "type": "active_pattern",
     "named": true,
     "fields": {},
     "children": {
@@ -297,7 +297,11 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
+          "type": "active_pattern_op_name",
+          "named": true
+        },
+        {
+          "type": "wildcard_active_pattern_op",
           "named": true
         }
       ]
@@ -1558,7 +1562,7 @@
           "named": true
         },
         {
-          "type": "active_pattern_op_name",
+          "type": "active_pattern",
           "named": true
         },
         {
@@ -1961,7 +1965,7 @@
       "required": true,
       "types": [
         {
-          "type": "active_pattern_op_name",
+          "type": "active_pattern",
           "named": true
         },
         {
@@ -2965,7 +2969,7 @@
       "required": true,
       "types": [
         {
-          "type": "active_pattern_op_name",
+          "type": "active_pattern",
           "named": true
         },
         {
@@ -3790,6 +3794,10 @@
     "named": false
   },
   {
+    "type": "(|",
+    "named": false
+  },
+  {
     "type": ")",
     "named": false
   },
@@ -3960,6 +3968,10 @@
   {
     "type": "abstract",
     "named": false
+  },
+  {
+    "type": "active_pattern_op_name",
+    "named": true
   },
   {
     "type": "and",
@@ -4263,11 +4275,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
@@ -4304,6 +4316,10 @@
   {
     "type": "while",
     "named": false
+  },
+  {
+    "type": "wildcard_active_pattern_op",
+    "named": true
   },
   {
     "type": "wildcard_pattern",
@@ -4343,6 +4359,10 @@
   },
   {
     "type": "|",
+    "named": false
+  },
+  {
+    "type": "|)",
     "named": false
   },
   {
