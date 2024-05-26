@@ -600,7 +600,11 @@ module.exports = grammar({
         $.rules,
       ),
 
-    function_expression: ($) => prec(PREC.MATCH_EXPR, seq("function", $.rules)),
+    function_expression: ($) =>
+      prec(
+        PREC.MATCH_EXPR,
+        seq("function", scoped($.rules, $._indent, $._dedent)),
+      ),
 
     object_instantiation_expression: ($) =>
       prec(PREC.NEW_OBJ, seq("new", $.type, $._expression)),

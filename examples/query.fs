@@ -1,2 +1,5 @@
-module Query =
-  let (|A|B|_|) () = ()
+module A =
+    let x = function
+      | C
+      | B ->  Some()
+      | _ -> None

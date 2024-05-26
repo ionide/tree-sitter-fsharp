@@ -1587,16 +1587,17 @@
   {
     "type": "function_expression",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "rules",
-          "named": true
-        }
-      ]
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "rules",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

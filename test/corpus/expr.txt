@@ -2617,3 +2617,43 @@ let f cts =
                 (infix_op)
                 (long_identifier_or_op
                   (identifier))))))))))
+
+================================================================================
+function expression with under indentation
+================================================================================
+
+module A =
+    let x = function
+      | C
+      | B ->  Some()
+      | _ -> None
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier
+              (identifier))))
+        (function_expression
+          (rules
+            (rule
+              (disjunct_pattern
+                (identifier_pattern
+                  (long_identifier
+                    (identifier)))
+                (identifier_pattern
+                  (long_identifier
+                    (identifier))))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))))
+            (rule
+              (wildcard_pattern)
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier))))))))))

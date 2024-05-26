@@ -2252,8 +2252,25 @@
             "value": "function"
           },
           {
-            "type": "SYMBOL",
-            "name": "rules"
+            "type": "FIELD",
+            "name": "block",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_indent"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "rules"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_dedent"
+                }
+              ]
+            }
           }
         ]
       }
