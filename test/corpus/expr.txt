@@ -2808,3 +2808,28 @@ let x = Async.AwaitWaitHandle(iar.AsyncWaitHandle, ?millisecondsTimeout = millis
               (infix_op)
               (long_identifier_or_op
                 (identifier)))))))))
+
+================================================================================
+function with flexible type argument
+================================================================================
+
+let f (x: #MyType) = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier
+                (identifier)))
+            (type
+              (type
+                (long_identifier
+                  (identifier)))))))
+      (const
+        (unit)))))

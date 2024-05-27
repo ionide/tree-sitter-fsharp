@@ -1008,7 +1008,7 @@ module.exports = grammar({
     _list_type: ($) => seq($.type, "[]"),
     _static_type: ($) => prec(10, seq($.type, $.type_arguments)),
     _constrained_type: ($) => prec.right(seq($.type_argument, ":>", $.type)),
-    _flexible_type: ($) => prec.right(seq(token.immediate("#"), $.type)),
+    _flexible_type: ($) => prec.right(seq("#", $.type)),
 
     types: ($) => seq($.type, repeat(prec.left(PREC.COMMA, seq(",", $.type)))),
 
