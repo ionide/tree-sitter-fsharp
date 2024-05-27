@@ -1654,11 +1654,7 @@ module.exports = grammar({
 
     prefix_op: ($) =>
       prec.left(
-        choice(
-          $._infix_or_prefix_op,
-          repeat1("~"),
-          /[!][!%&*+-./<>@^|~?][!%&*+-./<=>@^|~?]*/,
-        ),
+        choice($._infix_or_prefix_op, repeat1("~"), /[!][!%&*+-./<=>@^|~?]*/),
       ),
 
     infix_op: ($) =>

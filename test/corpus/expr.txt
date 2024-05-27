@@ -2691,3 +2691,53 @@ module A =
               (long_identifier_or_op
                 (long_identifier
                   (identifier))))))))))
+
+================================================================================
+address of expression inside application
+================================================================================
+
+let x = f(&y)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+high prec application followed by pipe
+================================================================================
+
+let x =
+  f(y) |> g
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (infix_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
