@@ -27,7 +27,7 @@
 *.pc
 
 # Example dirs
-/examples/*/
+/examples/playground/*.fs
 
 # Grammar volatiles
 dsl.d.ts
