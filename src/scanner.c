@@ -138,10 +138,6 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
-  if (valid_symbols[INSIDE_STRING] && !error_recovery_mode) {
-    return false;
-  }
-
   lexer->mark_end(lexer);
 
   bool found_end_of_line = false;
@@ -171,7 +167,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       break;
     } else if (lexer->lookahead == '/') {
       skip(lexer);
-      if (lexer->lookahead == '/') {
+      if (!valid_symbols[INSIDE_STRING] && lexer->lookahead == '/') {
         while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
           skip(lexer);
         }

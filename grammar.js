@@ -1525,8 +1525,12 @@ module.exports = grammar({
       ),
 
     // note: \n is allowed in strings
-    _simple_string_char: (_) =>
-      token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
+    _simple_string_char: ($) =>
+      choice(
+        $._inside_string_marker,
+        token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
+      ),
+
     _string_char: ($) =>
       choice(
         $._simple_string_char,
@@ -1545,25 +1549,18 @@ module.exports = grammar({
     format_string: ($) =>
       seq(
         token(prec(100, '$"')),
-        optional($._inside_string_marker),
         repeat(choice($.format_string_eval, $._string_char)),
         '"',
       ),
 
-    _string_literal: ($) =>
-      seq('"', optional($._inside_string_marker), repeat($._string_char), '"'),
+    _string_literal: ($) => seq('"', repeat($._string_char), '"'),
 
     string: ($) => choice($._string_literal, $.format_string),
 
     _verbatim_string_char: ($) =>
       choice($._simple_string_char, $._non_escape_char, "\\"),
     verbatim_string: ($) =>
-      seq(
-        '@"',
-        optional($._inside_string_marker),
-        repeat($._verbatim_string_char),
-        token.immediate('"'),
-      ),
+      seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
     bytechar: ($) => seq("'", $._char_char, token.immediate("'B")),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
     verbatim_bytearray: ($) =>

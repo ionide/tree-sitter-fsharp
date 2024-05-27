@@ -1,1 +1,1 @@
-let x = @"//comment in string"
+let x = "http://test.com"

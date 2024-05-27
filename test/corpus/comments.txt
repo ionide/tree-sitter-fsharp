@@ -140,6 +140,46 @@ let x = @"//comment in string"
         (verbatim_string)))))
 
 ================================================================================
+url in simple string
+================================================================================
+
+let x = "http://www.test.com"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (const
+        (string)))))
+
+================================================================================
+url in format string
+================================================================================
+
+let x = $"http://www.{baseurl}.com"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
 xml docstring
 ================================================================================
 
