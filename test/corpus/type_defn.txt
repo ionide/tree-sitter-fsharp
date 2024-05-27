@@ -241,7 +241,7 @@ type A() =
           (paren_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
@@ -793,7 +793,7 @@ type T() =
             (optional_pattern
               (typed_pattern
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier)))
                 (type
                   (long_identifier
@@ -834,7 +834,7 @@ type A(x:int, y:int) =
           (paren_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
@@ -900,7 +900,7 @@ type A(x:int, y:int) =
             (paren_pattern
               (typed_pattern
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier)))
                 (type
                   (type_argument
@@ -957,7 +957,7 @@ type A(x: int, y:int) =
             (paren_pattern
               (typed_pattern
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier)))
                 (type
                   (type
@@ -1060,7 +1060,7 @@ type A() =
           (paren_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
@@ -1068,7 +1068,7 @@ type A() =
           (paren_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
@@ -1221,7 +1221,7 @@ type MyClass() =
             (identifier))
           (paren_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (infix_expression
             (long_identifier_or_op

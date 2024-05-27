@@ -49,14 +49,14 @@
   (rule
     [
       (type_check_pattern (_) @type)
-      (identifier_pattern (long_identifier) . (long_identifier) @variable)
-      (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))
-      (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))
-      (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))
-      (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))))
-      (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))))
-      (_ (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))))))
-      (_ (_ (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))))))
+      ; (identifier_pattern (long_identifier) . (long_identifier) @variable)
+      ; (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))
+      ; (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))
+      ; (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))
+      ; (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))))
+      ; (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))))
+      ; (_ (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable)))))))
+      ; (_ (_ (_ (_ (_ (_ (_ (identifier_pattern (long_identifier) . (long_identifier) @variable))))))))
     ]))
 
 (fsi_directive_decl . (string) @module)

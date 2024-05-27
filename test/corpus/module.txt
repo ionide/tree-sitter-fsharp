@@ -14,7 +14,7 @@ module test =
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (const
           (int))))))
@@ -35,7 +35,7 @@ module test =
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (const
           (int))))))
@@ -57,7 +57,7 @@ module test =
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (const
           (int))))
@@ -65,7 +65,7 @@ module test =
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (const
           (int))))))
@@ -89,7 +89,7 @@ let y = 5
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         body: (const
           (int))))
@@ -97,7 +97,7 @@ let y = 5
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         body: (const
           (int))))))
@@ -119,7 +119,8 @@ open X.Y
       (identifier)
       (identifier))
     (import_decl
-      (long_identifier (identifier)))
+      (long_identifier
+        (identifier)))
     (import_decl
       (long_identifier
         (identifier)
@@ -149,7 +150,7 @@ module B =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (unit)))))
@@ -159,7 +160,7 @@ module B =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (unit)))))))
@@ -188,7 +189,7 @@ module B =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (unit)))))
@@ -198,7 +199,7 @@ module B =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (unit)))))))
@@ -216,26 +217,26 @@ module B =
 --------------------------------------------------------------------------------
 
 (file
-   (module_defn
-     (identifier)
-     (value_declaration
-       (function_or_value_defn
-         (value_declaration_left
-           (identifier_pattern
-             (long_identifier
-               (identifier))))
-         (const
-           (unit)))))
-   (module_defn
-     (identifier)
-     (value_declaration
-       (function_or_value_defn
-         (value_declaration_left
-           (identifier_pattern
-             (long_identifier
-               (identifier))))
-         (const
-           (unit))))))
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (unit)))))
+  (module_defn
+    (identifier)
+    (value_declaration
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (unit))))))
 
 ================================================================================
 top-level expression in module

@@ -164,7 +164,7 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
         (argument_patterns
           (typed_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (type
               (type_argument
@@ -208,7 +208,7 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
         (argument_patterns
           (typed_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (type
               (type_argument

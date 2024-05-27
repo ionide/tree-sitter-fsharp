@@ -11,7 +11,7 @@ let x = "test"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string)))))
@@ -29,7 +29,7 @@ let x = @"\"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (verbatim_string)))))
@@ -47,7 +47,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -65,7 +65,7 @@ let x = 1L
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int64
@@ -84,7 +84,7 @@ let x = 1l
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int32
@@ -103,7 +103,7 @@ let x = 1s
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int16
@@ -122,7 +122,7 @@ let x = 1y
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (sbyte
@@ -141,7 +141,7 @@ let x = 1uy
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (byte
@@ -160,7 +160,7 @@ let x = 1us
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (uint16
@@ -179,7 +179,7 @@ let x = 1u
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (uint32
@@ -198,7 +198,7 @@ let x = 1ul
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (uint32
@@ -217,7 +217,7 @@ let x = 1UL
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (uint64
@@ -236,7 +236,7 @@ let x = 1uL
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (uint64
@@ -297,7 +297,7 @@ let x = 1.f
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (ieee32
@@ -316,7 +316,7 @@ let x = 0b1lf
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (ieee32
@@ -335,7 +335,7 @@ let x = 0b0LF
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (ieee64
@@ -467,7 +467,7 @@ let str = "name: \"name\""
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string)))))
@@ -486,7 +486,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string
@@ -513,7 +513,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (triple_quoted_string

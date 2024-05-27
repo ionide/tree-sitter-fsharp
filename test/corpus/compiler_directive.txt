@@ -236,7 +236,7 @@ module A =
           (function_or_value_defn
             (value_declaration_left
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier))))
             (const
               (int))))))))
@@ -268,7 +268,7 @@ type MyClass() =
             (paren_pattern
               (typed_pattern
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier)))
                 (type
                   (long_identifier
@@ -298,7 +298,7 @@ let f =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (sequential_expression
         (if_expression
@@ -332,7 +332,7 @@ let f =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (sequential_expression
         (if_expression

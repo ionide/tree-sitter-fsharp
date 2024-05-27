@@ -216,7 +216,7 @@ do
           (function_or_value_defn
             (value_declaration_left
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier))))
             (long_identifier_or_op
               (identifier)))
@@ -678,7 +678,7 @@ let z = ()
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (application_expression
           (long_identifier_or_op
@@ -690,7 +690,7 @@ let z = ()
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (const
           (unit))))))
@@ -858,7 +858,7 @@ let f = async {
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (ce_expression
         (long_identifier_or_op
@@ -892,7 +892,7 @@ let f = async {
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (ce_expression
         (long_identifier_or_op
@@ -925,13 +925,13 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (list_expression
             (long_identifier_or_op
@@ -964,13 +964,13 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (list_expression
             (const
@@ -985,7 +985,7 @@ let x =
               (function_or_value_defn
                 (value_declaration_left
                   (identifier_pattern
-                    (long_identifier
+                    (long_identifier_or_op
                       (identifier))))
                 (const
                   (int)))
@@ -1008,7 +1008,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (application_expression
         (long_identifier_or_op
@@ -1018,7 +1018,7 @@ let x =
             (function_or_value_defn
               (value_declaration_left
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier))))
               (const
                 (int)))
@@ -1040,7 +1040,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (application_expression
         (paren_expression
@@ -1048,7 +1048,7 @@ let x =
             (function_or_value_defn
               (value_declaration_left
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier))))
               (long_identifier_or_op
                 (identifier)))
@@ -1285,7 +1285,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (if_expression
         (long_identifier_or_op
@@ -1313,17 +1313,17 @@ let exampleNamespace =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (paren_expression
         (fun_expression
           (argument_patterns
             (repeat_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))))
           (if_expression
             (infix_expression
@@ -1427,13 +1427,13 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (int)))
@@ -1461,13 +1461,13 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (int)))
@@ -1497,13 +1497,13 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (int)))
@@ -1531,11 +1531,11 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (for_expression
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier)))
         (long_identifier_or_op
           (identifier))
@@ -1561,7 +1561,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (for_expression
         (identifier)
@@ -1591,7 +1591,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (for_expression
         (identifier)
@@ -1621,7 +1621,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (sequential_expression
         (application_expression
@@ -1687,7 +1687,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (sequential_expression
         (if_expression
@@ -1757,7 +1757,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (try_expression
         (const
@@ -1765,7 +1765,7 @@ let test =
         (rules
           (rule
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (const
               (unit))))))))
@@ -1787,7 +1787,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (try_expression
         (const
@@ -1795,7 +1795,7 @@ let test =
         (rules
           (rule
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (const
               (unit))))))))
@@ -1818,7 +1818,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (try_expression
         (const
@@ -1858,7 +1858,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (try_expression
         (const
@@ -1882,7 +1882,7 @@ let test =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (match_expression
         (long_identifier_or_op
@@ -1890,15 +1890,16 @@ let test =
         (rules
           (rule
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))
-              (long_identifier
-                (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
             (long_identifier_or_op
               (identifier)))
           (rule
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (const
               (int))))))))
@@ -2005,7 +2006,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (brace_expression
         (object_expression
@@ -2053,7 +2054,7 @@ do
           (rules
             (rule
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (const
                 (unit)))))
@@ -2127,7 +2128,7 @@ let f xs =
               (function_or_value_defn
                 (value_declaration_left
                   (identifier_pattern
-                    (long_identifier
+                    (long_identifier_or_op
                       (identifier))))
                 (infix_expression
                   (long_identifier_or_op
@@ -2335,7 +2336,7 @@ let disposables = new Disposables.CompositeDisposable()
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (object_instantiation_expression
         (type
@@ -2361,7 +2362,7 @@ let f =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (array_expression
         (const
@@ -2385,7 +2386,7 @@ let x = { A = 12; B = "string" }
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (brace_expression
         (field_initializers
@@ -2413,7 +2414,7 @@ let x = {| A = 12; B = "string"|}
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (anon_record_expression
         (field_initializers
@@ -2444,7 +2445,7 @@ let x = {|
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (anon_record_expression
         (field_initializers
@@ -2474,7 +2475,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (anon_record_expression
         (field_initializers
@@ -2544,7 +2545,7 @@ let f x =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (int)))
@@ -2593,7 +2594,7 @@ let f x =
             (function_or_value_defn
               (value_declaration_left
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier))))
               (const
                 (int)))
@@ -2614,7 +2615,7 @@ let f = task { return Some { A = 4; B = 5 } }
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (ce_expression
         (long_identifier_or_op
@@ -2704,17 +2705,17 @@ module A =
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))))
         (function_expression
           (rules
             (rule
               (disjunct_pattern
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier)))
                 (identifier_pattern
-                  (long_identifier
+                  (long_identifier_or_op
                     (identifier))))
               (application_expression
                 (long_identifier_or_op
@@ -2738,7 +2739,7 @@ let x = f(&y)
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (application_expression
         (long_identifier_or_op
@@ -2762,7 +2763,7 @@ let x =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (infix_expression
         (application_expression
@@ -2788,7 +2789,7 @@ let x = Async.AwaitWaitHandle(iar.AsyncWaitHandle, ?millisecondsTimeout = millis
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (application_expression
         (long_identifier_or_op
@@ -2825,7 +2826,7 @@ let f (x: #MyType) = ()
         (argument_patterns
           (typed_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (type
               (type

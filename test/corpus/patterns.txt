@@ -11,7 +11,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -31,10 +31,10 @@ let (x,y) = (1,2)
         (paren_pattern
           (repeat_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))))
       (paren_expression
         (tuple_expression
@@ -59,7 +59,7 @@ let name (x : int) = 1
         (argument_patterns
           (typed_pattern
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (type
               (long_identifier
@@ -84,14 +84,14 @@ let name (x: int, y: string) = 1, "test"
           (repeat_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
                   (identifier))))
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (long_identifier
@@ -125,7 +125,7 @@ type A() =
           (paren_pattern
             (typed_pattern
               (identifier_pattern
-                (long_identifier
+                (long_identifier_or_op
                   (identifier)))
               (type
                 (type_argument
@@ -226,7 +226,7 @@ let f =
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (match_expression
         (long_identifier_or_op
@@ -234,38 +234,38 @@ let f =
         (rules
           (rule
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))
               (paren_pattern
                 (list_pattern
                   (identifier_pattern
-                    (long_identifier
+                    (long_identifier_or_op
                       (identifier))
                     (paren_pattern
                       (repeat_pattern
                         (identifier_pattern
-                          (long_identifier
+                          (long_identifier_or_op
                             (identifier)))
                         (identifier_pattern
-                          (long_identifier
+                          (long_identifier_or_op
                             (identifier))))))
                   (identifier_pattern
-                    (long_identifier
+                    (long_identifier_or_op
                       (identifier))
                     (paren_pattern
                       (repeat_pattern
                         (list_pattern
                           (identifier_pattern
-                            (long_identifier
+                            (long_identifier_or_op
                               (identifier)))
                           (identifier_pattern
-                            (long_identifier
+                            (long_identifier_or_op
                               (identifier)))
                           (identifier_pattern
-                            (long_identifier
+                            (long_identifier_or_op
                               (identifier))))
                         (identifier_pattern
-                          (long_identifier
+                          (long_identifier_or_op
                             (identifier)))))))))
             (const
               (unit))))))))
@@ -314,7 +314,7 @@ let (Some -1) = Some -1
       (value_declaration_left
         (paren_pattern
           (identifier_pattern
-            (long_identifier
+            (long_identifier_or_op
               (identifier))
             (const
               (int)))))

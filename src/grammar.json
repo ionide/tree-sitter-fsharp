@@ -41,11 +41,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "IMMEDIATE_TOKEN",
-          "content": {
-            "type": "STRING",
-            "value": "namespace"
-          }
+          "type": "STRING",
+          "value": "namespace"
         },
         {
           "type": "CHOICE",
@@ -1311,7 +1308,7 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "long_identifier"
+            "name": "long_identifier_or_op"
           },
           {
             "type": "CHOICE",
@@ -7411,8 +7408,11 @@
       ]
     },
     "line_comment": {
-      "type": "PATTERN",
-      "value": "\\/\\/[^\\/][^\\n\\r]*"
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "\\/\\/[^\\/][^\\n\\r]*"
+      }
     },
     "identifier": {
       "type": "TOKEN",

@@ -118,7 +118,7 @@ module.exports = grammar({
 
     namespace: ($) =>
       seq(
-        token.immediate("namespace"),
+        "namespace",
         choice(
           "global",
           field("name", seq(optional("rec"), $.long_identifier)),
@@ -362,7 +362,7 @@ module.exports = grammar({
       prec.left(
         -1,
         seq(
-          $.long_identifier,
+          $.long_identifier_or_op,
           optional($._pattern_param),
           optional($._pattern),
         ),
@@ -1734,7 +1734,7 @@ module.exports = grammar({
       seq("///", alias(token.immediate(/[^\/][^\n\r]*/), $.xml_doc_content)),
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => /\/\/[^\/][^\n\r]*/,
+    line_comment: (_) => token(/\/\/[^\/][^\n\r]*/),
 
     identifier: (_) =>
       token(

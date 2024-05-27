@@ -13,7 +13,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -34,7 +34,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -57,7 +57,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -78,7 +78,7 @@ let x = 1
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (int)))))
@@ -96,7 +96,7 @@ let x = "//comment in string"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string)))))
@@ -116,7 +116,7 @@ let x = """
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (triple_quoted_string)))))
@@ -134,7 +134,7 @@ let x = @"//comment in string"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (verbatim_string)))))
@@ -152,7 +152,7 @@ let x = "http://www.test.com"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string)))))
@@ -170,7 +170,7 @@ let x = $"http://www.{baseurl}.com"
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
-          (long_identifier
+          (long_identifier_or_op
             (identifier))))
       (const
         (string
@@ -249,7 +249,7 @@ module Json =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (const
             (triple_quoted_string)))))))

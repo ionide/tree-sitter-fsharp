@@ -129,7 +129,7 @@ let f x =
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier))))
           (infix_expression
             (long_identifier_or_op
@@ -187,7 +187,7 @@ do
         (sequential_expression
           (for_expression
             (identifier_pattern
-              (long_identifier
+              (long_identifier_or_op
                 (identifier)))
             (long_identifier_or_op
               (identifier))
