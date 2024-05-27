@@ -1375,15 +1375,15 @@ module.exports = grammar({
           choice(
             seq(
               optional("static"),
-              optional($.access_modifier),
               "member",
               optional("inline"),
+              optional($.access_modifier),
               $.method_or_prop_defn,
             ),
             seq(
               "abstract",
-              optional($.access_modifier),
               optional("member"),
+              optional($.access_modifier),
               $.member_signature,
             ),
             seq("override", optional($.access_modifier), $.method_or_prop_defn),

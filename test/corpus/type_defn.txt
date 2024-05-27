@@ -251,6 +251,32 @@ type A() =
               (identifier))))))))
 
 ================================================================================
+private member method
+================================================================================
+
+type A() =
+  member inline private this.Post() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (access_modifier)
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const_pattern
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
 basic class member definition with two members
 ================================================================================
 

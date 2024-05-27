@@ -5542,18 +5542,6 @@
                     ]
                   },
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "access_modifier"
-                      },
-                      {
-                        "type": "BLANK"
-                      }
-                    ]
-                  },
-                  {
                     "type": "STRING",
                     "value": "member"
                   },
@@ -5563,6 +5551,18 @@
                       {
                         "type": "STRING",
                         "value": "inline"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "access_modifier"
                       },
                       {
                         "type": "BLANK"
@@ -5586,8 +5586,8 @@
                     "type": "CHOICE",
                     "members": [
                       {
-                        "type": "SYMBOL",
-                        "name": "access_modifier"
+                        "type": "STRING",
+                        "value": "member"
                       },
                       {
                         "type": "BLANK"
@@ -5598,8 +5598,8 @@
                     "type": "CHOICE",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": "member"
+                        "type": "SYMBOL",
+                        "name": "access_modifier"
                       },
                       {
                         "type": "BLANK"
