@@ -1,5 +1,6 @@
-module A =
-    let x = function
-      | C
-      | B ->  Some()
-      | _ -> None
+let f =
+    match immutQuery with
+    | CallJoin([ F(A, B)
+                 G([A
+                    B; C], C)]) -> ()
+

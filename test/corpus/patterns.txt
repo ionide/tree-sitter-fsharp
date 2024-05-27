@@ -208,3 +208,64 @@ module A =
               (unit))))
         (const
           (unit))))))
+
+================================================================================
+multiline list patterns
+================================================================================
+
+let f =
+    match immutQuery with
+    | CallJoin([ F(A, B)
+                 G([A
+                    B; C], C)]) -> ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (identifier_pattern
+              (long_identifier
+                (identifier))
+              (paren_pattern
+                (list_pattern
+                  (identifier_pattern
+                    (long_identifier
+                      (identifier))
+                    (paren_pattern
+                      (repeat_pattern
+                        (identifier_pattern
+                          (long_identifier
+                            (identifier)))
+                        (identifier_pattern
+                          (long_identifier
+                            (identifier))))))
+                  (identifier_pattern
+                    (long_identifier
+                      (identifier))
+                    (paren_pattern
+                      (repeat_pattern
+                        (list_pattern
+                          (identifier_pattern
+                            (long_identifier
+                              (identifier)))
+                          (identifier_pattern
+                            (long_identifier
+                              (identifier)))
+                          (identifier_pattern
+                            (long_identifier
+                              (identifier))))
+                        (identifier_pattern
+                          (long_identifier
+                            (identifier)))))))))
+            (const
+              (unit))))))))
