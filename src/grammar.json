@@ -6902,7 +6902,7 @@
     },
     "int": {
       "type": "PATTERN",
-      "value": "[0-9]+"
+      "value": "[+-]?[0-9]+"
     },
     "xint": {
       "type": "TOKEN",

@@ -1684,7 +1684,7 @@ module.exports = grammar({
       ),
 
     // Numbers
-    int: (_) => /[0-9]+/,
+    int: (_) => /[+-]?[0-9]+/,
     xint: (_) =>
       token(choice(/0[xX][0-9a-fA-F]+/, /0[oO][0-7]+/, /0[bB][0-1]+/)),
 

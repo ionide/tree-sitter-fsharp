@@ -299,3 +299,27 @@ let [||] = [||]
       (value_declaration_left
         (array_pattern))
       (array_expression))))
+
+================================================================================
+Identifier pattern with negative int
+================================================================================
+
+let (Some -1) = Some -1
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (paren_pattern
+          (identifier_pattern
+            (long_identifier
+              (identifier))
+            (const
+              (int)))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (int))))))
