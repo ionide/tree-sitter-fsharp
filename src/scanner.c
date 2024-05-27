@@ -164,6 +164,13 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     } else if (lexer->eof(lexer)) {
       found_end_of_line = true;
       break;
+    } else if (lexer->lookahead == '/') {
+      skip(lexer);
+      if (lexer->lookahead == '/') {
+        return false;
+      }
+      found_start_of_infix_op = true;
+      break;
     } else if (lexer->lookahead == '#' && indent_length == 0) {
       advance(lexer);
       if (lexer->lookahead == 'e') {

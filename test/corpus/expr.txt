@@ -1403,8 +1403,42 @@ let x =
               (long_identifier
                 (identifier))))
           (const
-            (int)))
-        (line_comment)
+            (int))
+          (line_comment))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+SeqBlock with line comment outdented
+================================================================================
+
+let x =
+  let y = 5
+// comment
+  y + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier
+                (identifier))))
+          (const
+            (int))
+          (line_comment))
         (infix_expression
           (long_identifier_or_op
             (identifier))
