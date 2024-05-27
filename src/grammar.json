@@ -2034,6 +2034,10 @@
           "value": "elif"
         },
         {
+          "type": "SYMBOL",
+          "name": "_indent"
+        },
+        {
           "type": "FIELD",
           "name": "guard",
           "content": {
@@ -2047,6 +2051,27 @@
         }
       ]
     },
+    "_if_branch": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "if"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_indent"
+        },
+        {
+          "type": "FIELD",
+          "name": "guard",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        }
+      ]
+    },
     "_if_then_else_expression": {
       "type": "PREC_LEFT",
       "value": 18,
@@ -2054,16 +2079,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "if"
-          },
-          {
-            "type": "FIELD",
-            "name": "guard",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_expression"
-            }
+            "type": "SYMBOL",
+            "name": "_if_branch"
           },
           {
             "type": "SYMBOL",
@@ -2090,16 +2107,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "if"
-          },
-          {
-            "type": "FIELD",
-            "name": "guard",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_expression"
-            }
+            "type": "SYMBOL",
+            "name": "_if_branch"
           },
           {
             "type": "SYMBOL",

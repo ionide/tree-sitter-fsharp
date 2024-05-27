@@ -1267,6 +1267,39 @@ do
           (int))))))
 
 ================================================================================
+if-expression with multiline guard
+================================================================================
+
+let x =
+  if b then ()
+  else if
+      // comment
+      true
+  then
+      ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (if_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (unit))
+        (if_expression
+          (line_comment)
+          (const
+            (bool))
+          (const
+            (unit)))))))
+
+================================================================================
 anonymous function expression
 ================================================================================
 

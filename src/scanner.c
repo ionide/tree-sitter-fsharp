@@ -285,6 +285,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           advance(lexer);
           lexer->mark_end(lexer);
           lexer->result_symbol = THEN;
+          array_pop(&scanner->indents);
           return true;
         }
       }
