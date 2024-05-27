@@ -375,7 +375,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       }
 
       if (indent_length < current_indent_length && !found_bracket_end &&
-          can_dedent_preproc && !found_preprocessor_if) {
+          can_dedent_preproc) {
         array_pop(&scanner->indents);
         lexer->result_symbol = DEDENT;
         return true;

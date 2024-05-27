@@ -279,3 +279,36 @@ type MyClass() =
               (infix_op)
               (const
                 (int)))))))))
+
+================================================================================
+preproc_if creating dedent
+================================================================================
+
+let f =
+  if b then x else y
+
+#if B
+  1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (sequential_expression
+        (if_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))
+        (preproc_if
+          (identifier)
+          (const
+            (int)))))))
