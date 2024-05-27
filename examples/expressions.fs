@@ -1,1 +1,7 @@
-let x = "http://test.com"
+let x =
+  if b then ()
+  else if
+      // comment
+      true
+  then
+      ()

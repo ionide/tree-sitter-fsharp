@@ -2774,3 +2774,37 @@ let x =
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+
+================================================================================
+call method with named optional parameter
+================================================================================
+
+let x = Async.AwaitWaitHandle(iar.AsyncWaitHandle, ?millisecondsTimeout = millisecondsTimeout)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))
+        (tuple_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (prefixed_expression
+            (prefix_op)
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))))
