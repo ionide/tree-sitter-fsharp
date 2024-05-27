@@ -73,7 +73,6 @@ module.exports = grammar({
     "#endif",
     $._triple_quoted_content,
     $.block_comment_content,
-    $.line_comment,
     $._inside_string_marker,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.

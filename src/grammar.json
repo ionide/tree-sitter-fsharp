@@ -7918,10 +7918,6 @@
     },
     {
       "type": "SYMBOL",
-      "name": "line_comment"
-    },
-    {
-      "type": "SYMBOL",
       "name": "_inside_string_marker"
     },
     {
