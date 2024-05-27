@@ -1,6 +1,7 @@
-let f =
-    match immutQuery with
-    | CallJoin([ F(A, B)
-                 G([A
-                    B; C], C)]) -> ()
-
+let x =
+  match  e with
+  | A -> ()
+  | _ ->
+      match x with
+      | [] -> B
+      | _ -> C

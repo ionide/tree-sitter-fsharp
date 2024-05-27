@@ -1,2 +1,1 @@
-let x =
-  Array.map ( + ) [||]
+let [] = []

@@ -343,20 +343,18 @@ module.exports = grammar({
       ),
 
     _list_pattern_content: ($) =>
-      seq($._pattern, repeat(seq(choice(";", $._newline), $._pattern))),
+      scoped(
+        seq(
+          optional($._newline),
+          $._pattern,
+          repeat(seq(choice(";", $._newline), $._pattern)),
+        ),
+        $._indent,
+        $._dedent,
+      ),
 
-    list_pattern: ($) =>
-      seq(
-        "[",
-        scoped(optional($._list_pattern_content), $._indent, $._dedent),
-        "]",
-      ),
-    array_pattern: ($) =>
-      seq(
-        "[|",
-        scoped(optional($._list_pattern_content), $._indent, $._dedent),
-        "|]",
-      ),
+    list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
+    array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
     record_pattern: ($) =>
       prec.left(seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)))),
 

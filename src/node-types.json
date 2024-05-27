@@ -525,7 +525,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": ";",
@@ -1923,7 +1923,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": ";",
