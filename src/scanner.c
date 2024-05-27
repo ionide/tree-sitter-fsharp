@@ -16,6 +16,7 @@ enum TokenType {
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   LINE_COMMENT,
+  INSIDE_STRING,
   ERROR_SENTINEL
 };
 
@@ -137,6 +138,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
+  if (valid_symbols[INSIDE_STRING] && !error_recovery_mode) {
+    return false;
+  }
+
   lexer->mark_end(lexer);
 
   bool found_end_of_line = false;
@@ -167,10 +172,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     } else if (lexer->lookahead == '/') {
       skip(lexer);
       if (lexer->lookahead == '/') {
+        while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+          skip(lexer);
+        }
+      } else {
         return false;
       }
-      found_start_of_infix_op = true;
-      break;
     } else if (lexer->lookahead == '#' && indent_length == 0) {
       advance(lexer);
       if (lexer->lookahead == 'e') {

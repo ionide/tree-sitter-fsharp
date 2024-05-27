@@ -74,6 +74,7 @@ module.exports = grammar({
     $._triple_quoted_content,
     $.block_comment_content,
     $.line_comment,
+    $._inside_string_marker,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -1544,18 +1545,25 @@ module.exports = grammar({
     format_string: ($) =>
       seq(
         token(prec(100, '$"')),
+        optional($._inside_string_marker),
         repeat(choice($.format_string_eval, $._string_char)),
         '"',
       ),
 
-    _string_literal: ($) => seq('"', repeat($._string_char), '"'),
+    _string_literal: ($) =>
+      seq('"', optional($._inside_string_marker), repeat($._string_char), '"'),
 
     string: ($) => choice($._string_literal, $.format_string),
 
     _verbatim_string_char: ($) =>
       choice($._simple_string_char, $._non_escape_char, "\\"),
     verbatim_string: ($) =>
-      seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
+      seq(
+        '@"',
+        optional($._inside_string_marker),
+        repeat($._verbatim_string_char),
+        token.immediate('"'),
+      ),
     bytechar: ($) => seq("'", $._char_char, token.immediate("'B")),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
     verbatim_bytearray: ($) =>

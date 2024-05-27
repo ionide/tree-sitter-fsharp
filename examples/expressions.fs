@@ -1,2 +1,1 @@
-let x =
-  f(y) |> g
+let x = @"//comment in string"

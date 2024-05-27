@@ -1403,8 +1403,8 @@ let x =
               (long_identifier
                 (identifier))))
           (const
-            (int))
-          (line_comment))
+            (int)))
+        (line_comment)
         (infix_expression
           (long_identifier_or_op
             (identifier))
@@ -1437,8 +1437,8 @@ let x =
               (long_identifier
                 (identifier))))
           (const
-            (int))
-          (line_comment))
+            (int)))
+        (line_comment)
         (infix_expression
           (long_identifier_or_op
             (identifier))
