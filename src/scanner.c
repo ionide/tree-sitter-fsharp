@@ -83,7 +83,8 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
   case ':':
     skip(lexer);
     return lexer->lookahead == '=' || lexer->lookahead == ':' ||
-           lexer->lookahead == '?';
+           lexer->lookahead == '?' || lexer->lookahead == ' ' ||
+           lexer->lookahead == '>';
   case 'o':
     skip(lexer);
     return lexer->lookahead == 'r';

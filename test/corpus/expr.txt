@@ -389,6 +389,54 @@ do downcast 2
           (int))))))
 
 ================================================================================
+typecast expressions
+================================================================================
+
+do
+  x :> int
+
+  x
+  :> int
+
+  x :?> int
+
+  x
+  :?> int
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (typecast_expression
+          (long_identifier_or_op
+            (identifier))
+          (type
+            (long_identifier
+              (identifier))))
+        (sequential_expression
+          (typecast_expression
+            (long_identifier_or_op
+              (identifier))
+            (type
+              (long_identifier
+                (identifier))))
+          (sequential_expression
+            (typecast_expression
+              (long_identifier_or_op
+                (identifier))
+              (type
+                (long_identifier
+                  (identifier))))
+            (typecast_expression
+              (long_identifier_or_op
+                (identifier))
+              (type
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
 comma separated expressions
 ================================================================================
 

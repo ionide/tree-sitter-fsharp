@@ -510,7 +510,7 @@ module.exports = grammar({
       ),
 
     typecast_expression: ($) =>
-      prec(
+      prec.right(
         PREC.SPECIAL_INFIX,
         seq($._expression, choice(":", ":>", ":?", ":?>"), $.type),
       ),

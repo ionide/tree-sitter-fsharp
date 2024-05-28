@@ -1822,7 +1822,7 @@
       }
     },
     "typecast_expression": {
-      "type": "PREC",
+      "type": "PREC_RIGHT",
       "value": 16,
       "content": {
         "type": "SEQ",
