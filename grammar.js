@@ -1586,6 +1586,7 @@ module.exports = grammar({
         $.uint16,
         $.uint32,
         $.int,
+        $.xint,
         $.nativeint,
         $.unativeint,
         $.decimal,

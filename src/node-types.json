@@ -958,6 +958,10 @@
         {
           "type": "verbatim_string",
           "named": true
+        },
+        {
+          "type": "xint",
+          "named": true
         }
       ]
     }
@@ -1068,6 +1072,10 @@
         },
         {
           "type": "verbatim_string",
+          "named": true
+        },
+        {
+          "type": "xint",
           "named": true
         }
       ]
