@@ -82,7 +82,6 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$._simple_type, $.type_argument],
     [$.preproc_if, $.preproc_if_in_expression],
-    [$.file],
     [$.rules],
   ],
 
@@ -111,10 +110,7 @@ module.exports = grammar({
     // Top-level rules (BEGIN)
     //
     file: ($) =>
-      seq(
-        repeat($.compiler_directive_decl),
-        choice($.named_module, repeat1($.namespace), repeat($._module_elem)),
-      ),
+      choice($.named_module, repeat1($.namespace), repeat($._module_elem)),
 
     namespace: ($) =>
       seq(
@@ -140,7 +136,6 @@ module.exports = grammar({
         $.module_defn,
         $.module_abbrev,
         $.import_decl,
-        $.compiler_directive_decl,
         $.fsi_directive_decl,
         $.type_definition,
         $._expression,
@@ -1743,6 +1738,12 @@ module.exports = grammar({
 
     // preprocessors
 
+    compiler_directive_decl: ($) =>
+      prec(100000, seq("#nowarn", alias($._string_literal, $.string), /\n/)),
+
+    fsi_directive_decl: ($) =>
+      seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),
+
     preproc_line: ($) =>
       seq(
         alias(/#(line)? /, "#line"),
@@ -1750,12 +1751,6 @@ module.exports = grammar({
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
         /\n/,
       ),
-
-    compiler_directive_decl: ($) =>
-      seq("#nowarn", alias($._string_literal, $.string), /\n/),
-
-    fsi_directive_decl: ($) =>
-      seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),
 
     ...preprocIf("", ($) => $._module_elem),
     ...preprocIf(

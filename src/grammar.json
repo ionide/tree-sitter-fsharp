@@ -3,37 +3,25 @@
   "word": "identifier",
   "rules": {
     "file": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "named_module"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "namespace"
+          }
+        },
         {
           "type": "REPEAT",
           "content": {
             "type": "SYMBOL",
-            "name": "compiler_directive_decl"
+            "name": "_module_elem"
           }
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "named_module"
-            },
-            {
-              "type": "REPEAT1",
-              "content": {
-                "type": "SYMBOL",
-                "name": "namespace"
-              }
-            },
-            {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_module_elem"
-              }
-            }
-          ]
         }
       ]
     },
@@ -141,10 +129,6 @@
         {
           "type": "SYMBOL",
           "name": "import_decl"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "compiler_directive_decl"
         },
         {
           "type": "SYMBOL",
@@ -7430,6 +7414,63 @@
         ]
       }
     },
+    "compiler_directive_decl": {
+      "type": "PREC",
+      "value": 100000,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "#nowarn"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_string_literal"
+            },
+            "named": true,
+            "value": "string"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\n"
+          }
+        ]
+      }
+    },
+    "fsi_directive_decl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "#r"
+            },
+            {
+              "type": "STRING",
+              "value": "#load"
+            }
+          ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_string_literal"
+          },
+          "named": true,
+          "value": "string"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\n"
+        }
+      ]
+    },
     "preproc_line": {
       "type": "SEQ",
       "members": [
@@ -7471,59 +7512,6 @@
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\n"
-        }
-      ]
-    },
-    "compiler_directive_decl": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "#nowarn"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_string_literal"
-          },
-          "named": true,
-          "value": "string"
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\n"
-        }
-      ]
-    },
-    "fsi_directive_decl": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "#r"
-            },
-            {
-              "type": "STRING",
-              "value": "#load"
-            }
-          ]
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_string_literal"
-          },
-          "named": true,
-          "value": "string"
         },
         {
           "type": "PATTERN",
@@ -7862,9 +7850,6 @@
     [
       "preproc_if",
       "preproc_if_in_expression"
-    ],
-    [
-      "file"
     ],
     [
       "rules"

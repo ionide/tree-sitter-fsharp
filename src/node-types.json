@@ -142,10 +142,6 @@
         "named": true
       },
       {
-        "type": "compiler_directive_decl",
-        "named": true
-      },
-      {
         "type": "fsi_directive_decl",
         "named": true
       },
