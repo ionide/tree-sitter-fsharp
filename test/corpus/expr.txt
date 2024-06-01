@@ -1348,6 +1348,84 @@ let x =
             (unit)))))))
 
 ================================================================================
+if-then-else expression with nested if
+================================================================================
+
+do
+  if b then
+    if b then
+      ()
+  else
+      ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (if_expression
+        (long_identifier_or_op
+          (identifier))
+        (if_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (unit)))
+        (const
+          (unit))))))
+
+================================================================================
+cursed nested if-then-else expression with nested if in else-branch
+:skip
+================================================================================
+
+do
+  if b then
+    ()
+  else if
+    b
+  then
+    ()
+  else
+    ()
+
+--------------------------------------------------------------------------------
+
+================================================================================
+if-then-elif-else expression with nested if
+================================================================================
+
+do
+  if b then
+    ()
+  elif b then
+    if b then
+      ()
+  else
+      ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (if_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (unit))
+        (elif_expression
+          (long_identifier_or_op
+            (identifier))
+          (if_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (unit))))
+        (const
+          (unit))))))
+
+================================================================================
 anonymous function expression
 ================================================================================
 

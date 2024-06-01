@@ -1994,15 +1994,11 @@
           "value": "then"
         },
         {
-          "type": "SYMBOL",
-          "name": "_indent"
-        },
-        {
           "type": "FIELD",
           "name": "then",
           "content": {
             "type": "SYMBOL",
-            "name": "_expression"
+            "name": "_expression_block"
           }
         }
       ]
@@ -2015,15 +2011,11 @@
           "value": "elif"
         },
         {
-          "type": "SYMBOL",
-          "name": "_indent"
-        },
-        {
           "type": "FIELD",
           "name": "guard",
           "content": {
             "type": "SYMBOL",
-            "name": "_expression"
+            "name": "_expression_block"
           }
         },
         {
@@ -2040,78 +2032,44 @@
           "value": "if"
         },
         {
-          "type": "SYMBOL",
-          "name": "_indent"
-        },
-        {
           "type": "FIELD",
           "name": "guard",
           "content": {
             "type": "SYMBOL",
-            "name": "_expression"
+            "name": "_expression_block"
           }
         }
       ]
     },
-    "_if_then_else_expression": {
-      "type": "PREC_LEFT",
-      "value": 18,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_if_branch"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_then_expression"
-          },
-          {
-            "type": "REPEAT",
-            "content": {
-              "type": "SYMBOL",
-              "name": "elif_expression"
-            }
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_else_expression"
-          }
-        ]
-      }
-    },
-    "_if_then_expression": {
-      "type": "PREC_LEFT",
-      "value": 18,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_if_branch"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_then_expression"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_dedent"
-          }
-        ]
-      }
-    },
     "if_expression": {
-      "type": "CHOICE",
+      "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_if_then_expression"
+          "name": "_if_branch"
         },
         {
           "type": "SYMBOL",
-          "name": "_if_then_else_expression"
+          "name": "_then_expression"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "elif_expression"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_else_expression"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },

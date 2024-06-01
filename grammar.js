@@ -545,30 +545,20 @@ module.exports = grammar({
 
     _else_expression: ($) => seq("else", field("else", $._expression_block)),
 
-    _then_expression: ($) =>
-      seq("then", $._indent, field("then", $._expression)),
+    _then_expression: ($) => seq("then", field("then", $._expression_block)),
 
     elif_expression: ($) =>
-      seq("elif", $._indent, field("guard", $._expression), $._then_expression),
+      seq("elif", field("guard", $._expression_block), $._then_expression),
 
-    _if_branch: ($) => seq("if", $._indent, field("guard", $._expression)),
-
-    _if_then_else_expression: ($) =>
-      prec.left(
-        PREC.IF_EXPR,
-        seq(
-          $._if_branch,
-          $._then_expression,
-          repeat($.elif_expression),
-          $._else_expression,
-        ),
-      ),
-
-    _if_then_expression: ($) =>
-      prec.left(PREC.IF_EXPR, seq($._if_branch, $._then_expression, $._dedent)),
+    _if_branch: ($) => seq("if", field("guard", $._expression_block)),
 
     if_expression: ($) =>
-      choice($._if_then_expression, $._if_then_else_expression),
+      seq(
+        $._if_branch,
+        $._then_expression,
+        repeat($.elif_expression),
+        optional($._else_expression),
+      ),
 
     fun_expression: ($) =>
       prec.right(

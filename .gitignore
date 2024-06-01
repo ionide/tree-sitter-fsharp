@@ -28,6 +28,7 @@
 
 # Example dirs
 /examples/playground/*.fs
+/examples/playground/*.fsx
 
 # Grammar volatiles
 dsl.d.ts

@@ -276,7 +276,9 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
-  if (valid_symbols[THEN] && lexer->lookahead == 't') {
+  if (lexer->lookahead == 't' &&
+      (valid_symbols[THEN] || valid_symbols[DEDENT])) {
+    int16_t token_indent_level = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'h') {
       advance(lexer);
@@ -284,40 +286,74 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         advance(lexer);
         if (lexer->lookahead == 'n') {
           advance(lexer);
-          lexer->mark_end(lexer);
-          lexer->result_symbol = THEN;
-          array_pop(&scanner->indents);
-          return true;
+          // the 'THEN' token is only valid if we have popped the appropriate
+          // amount of dedent tokens.
+          // If 'THEN' is not valid we just continue to pop dedent tokens.
+          if (valid_symbols[THEN]) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = THEN;
+            return true;
+          } else {
+            array_pop(&scanner->indents);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }
-    return false;
   } else if (lexer->lookahead == 'e' &&
-             (valid_symbols[ELSE] || valid_symbols[ELIF])) {
+             (valid_symbols[ELSE] || valid_symbols[ELIF] ||
+              valid_symbols[DEDENT])) {
+    int16_t token_indent_level = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'l') {
       advance(lexer);
-      if (lexer->lookahead == 's' && valid_symbols[ELSE]) {
+      if (lexer->lookahead == 's' &&
+          (valid_symbols[ELSE] || valid_symbols[DEDENT])) {
         advance(lexer);
         if (lexer->lookahead == 'e') {
           advance(lexer);
-          lexer->mark_end(lexer);
-          lexer->result_symbol = ELSE;
-          array_pop(&scanner->indents);
-          return true;
+          if (valid_symbols[ELSE]) {
+            if (scanner->indents.size > 0 &&
+                token_indent_level < *array_back(&scanner->indents)) {
+              array_pop(&scanner->indents);
+              lexer->result_symbol = DEDENT;
+              return true;
+            } else {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = ELSE;
+              return true;
+            }
+          } else {
+            array_pop(&scanner->indents);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
-      } else if (lexer->lookahead == 'i' && valid_symbols[ELIF]) {
+      } else if (lexer->lookahead == 'i' &&
+                 (valid_symbols[ELIF] || valid_symbols[DEDENT])) {
         advance(lexer);
         if (lexer->lookahead == 'f') {
           advance(lexer);
-          lexer->mark_end(lexer);
-          lexer->result_symbol = ELIF;
-          array_pop(&scanner->indents);
-          return true;
+          if (valid_symbols[ELIF]) {
+            if (scanner->indents.size > 0 &&
+                token_indent_level < *array_back(&scanner->indents)) {
+              array_pop(&scanner->indents);
+              lexer->result_symbol = DEDENT;
+              return true;
+            } else {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = ELIF;
+              return true;
+            }
+          } else {
+            array_pop(&scanner->indents);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }
-    return false;
   } else if (is_infix_op_start(lexer)) {
     found_start_of_infix_op = true;
   } else if (lexer->lookahead == '|') {
