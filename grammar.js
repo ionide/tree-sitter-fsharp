@@ -1723,7 +1723,7 @@ module.exports = grammar({
       ),
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => token(/[/]{2}([^/][^\n\r]*)?/),
+    line_comment: (_) => prec(-1, seq("//", /[^\n\r]*/)),
 
     identifier: (_) =>
       token(
