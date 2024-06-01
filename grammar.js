@@ -1717,10 +1717,13 @@ module.exports = grammar({
     //
     //
     xml_doc: ($) =>
-      seq("///", alias(token.immediate(/[^\/][^\n\r]*/), $.xml_doc_content)),
+      prec(
+        1,
+        seq("///", alias(token.immediate(/[^\/][^\n\r]*/), $.xml_doc_content)),
+      ),
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => token(/\/\/[^\/][^\n\r]*/),
+    line_comment: (_) => token(/[/]{2}([^/][^\n\r]*)?/),
 
     identifier: (_) =>
       token(

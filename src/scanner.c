@@ -321,6 +321,26 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               return true;
             } else {
               lexer->mark_end(lexer);
+              for (;;) {
+                if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
+                    lexer->lookahead == '\r' || lexer->lookahead == '\t') {
+                  skip(lexer);
+                } else {
+                  break;
+                }
+              }
+              if (lexer->lookahead == 'i') {
+                advance(lexer);
+                if (lexer->lookahead == 'f') {
+                  advance(lexer);
+                  if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
+                      lexer->lookahead == '\t') {
+                    lexer->mark_end(lexer);
+                    lexer->result_symbol = ELIF;
+                    return true;
+                  }
+                }
+              }
               lexer->result_symbol = ELSE;
               return true;
             }

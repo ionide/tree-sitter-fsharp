@@ -7313,25 +7313,29 @@
       }
     },
     "xml_doc": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "///"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "IMMEDIATE_TOKEN",
-            "content": {
-              "type": "PATTERN",
-              "value": "[^\\/][^\\n\\r]*"
-            }
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "///"
           },
-          "named": true,
-          "value": "xml_doc_content"
-        }
-      ]
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "PATTERN",
+                "value": "[^\\/][^\\n\\r]*"
+              }
+            },
+            "named": true,
+            "value": "xml_doc_content"
+          }
+        ]
+      }
     },
     "block_comment": {
       "type": "SEQ",
@@ -7357,7 +7361,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "\\/\\/[^\\/][^\\n\\r]*"
+        "value": "[/]{2}([^/][^\\n\\r]*)?"
       }
     },
     "identifier": {

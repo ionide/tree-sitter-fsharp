@@ -1340,7 +1340,7 @@ let x =
           (identifier))
         (const
           (unit))
-        (if_expression
+        (elif_expression
           (line_comment)
           (const
             (bool))
@@ -1376,7 +1376,6 @@ do
 
 ================================================================================
 cursed nested if-then-else expression with nested if in else-branch
-:skip
 ================================================================================
 
 do
@@ -1390,6 +1389,22 @@ do
     ()
 
 --------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (if_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (unit))
+        (elif_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (unit)))
+        (const
+          (unit))))))
 
 ================================================================================
 if-then-elif-else expression with nested if
