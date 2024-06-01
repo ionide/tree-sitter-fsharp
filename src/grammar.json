@@ -2604,8 +2604,8 @@
       ]
     },
     "range_expression": {
-      "type": "PREC_LEFT",
-      "value": 14,
+      "type": "PREC",
+      "value": 22,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3027,7 +3027,7 @@
     },
     "_slice_range_special": {
       "type": "PREC_LEFT",
-      "value": 22,
+      "value": 23,
       "content": {
         "type": "CHOICE",
         "members": [
@@ -3046,7 +3046,7 @@
                 "type": "TOKEN",
                 "content": {
                   "type": "PREC",
-                  "value": 14,
+                  "value": 22,
                   "content": {
                     "type": "STRING",
                     "value": ".."
@@ -3062,7 +3062,7 @@
                 "type": "TOKEN",
                 "content": {
                   "type": "PREC",
-                  "value": 100014,
+                  "value": 100022,
                   "content": {
                     "type": "STRING",
                     "value": ".."
@@ -3094,7 +3094,7 @@
                 "type": "TOKEN",
                 "content": {
                   "type": "PREC",
-                  "value": 14,
+                  "value": 22,
                   "content": {
                     "type": "STRING",
                     "value": ".."

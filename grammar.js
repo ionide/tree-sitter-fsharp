@@ -28,7 +28,6 @@ const PREC = {
   ELSE_EXPR: 11,
   INTERFACE: 12,
   COMMA: 13,
-  DOTDOT: 14,
   PREFIX_EXPR: 15,
   SPECIAL_INFIX: 16,
   LARROW: 16,
@@ -43,7 +42,8 @@ const PREC = {
   PAREN_APP: 21,
   TYPED_EXPR: 22,
   PAREN_EXPR: 21,
-  DOTDOT_SLICE: 22,
+  DOTDOT: 22,
+  DOTDOT_SLICE: 23,
 };
 
 module.exports = grammar({
@@ -429,7 +429,6 @@ module.exports = grammar({
         $.match_expression,
         $.try_expression,
         $.literal_expression,
-        // $.call_expression,
         $.tuple_expression,
         $.application_expression,
         alias($.preproc_if_in_expression, $.preproc_if),
@@ -676,7 +675,7 @@ module.exports = grammar({
     array_expression: ($) => seq("[|", optional($._list_element), "|]"),
 
     range_expression: ($) =>
-      prec.left(
+      prec(
         PREC.DOTDOT,
         seq(
           $._expression,
