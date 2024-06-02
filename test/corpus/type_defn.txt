@@ -477,6 +477,48 @@ type A() =
             (unit)))))))
 
 ================================================================================
+class inherit with generics
+================================================================================
+
+type A<'T>(t: 'T) =
+  inherit ControllerBase<'T>(t)
+  do ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))))
+      (primary_constr_args
+        (simple_pattern
+          (simple_pattern
+            (identifier))
+          (type
+            (type_argument
+              (identifier)))))
+      (class_inherits_decl
+        (type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (type
+                (type_argument
+                  (identifier))))))
+        (paren_expression
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (unit)))))
+
+================================================================================
 class member then interface impl. test
 ================================================================================
 

@@ -1464,7 +1464,12 @@ module.exports = grammar({
     //   ),
 
     class_inherits_decl: ($) =>
-      prec.left(seq("inherit", $.type, optional($._expression_block))),
+      prec.left(
+        seq(
+          "inherit",
+          scoped(seq($.type, optional($._expression)), $._indent, $._dedent),
+        ),
+      ),
 
     field_initializer: ($) =>
       prec(
