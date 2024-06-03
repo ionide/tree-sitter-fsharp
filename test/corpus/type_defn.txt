@@ -271,7 +271,7 @@ type A() =
           (property_or_ident
             (identifier)
             (identifier))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit)))))))
@@ -297,7 +297,7 @@ type A() =
           (property_or_ident
             (identifier)
             (identifier))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit))))
@@ -306,7 +306,7 @@ type A() =
           (property_or_ident
             (identifier)
             (identifier))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit)))))))
@@ -336,7 +336,7 @@ type A() =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (const
               (unit))))))))
@@ -367,7 +367,7 @@ type A() =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (const
               (unit))))
@@ -376,7 +376,7 @@ type A() =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (const
               (unit))))))))
@@ -414,7 +414,7 @@ type A() =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (const
               (unit))))))))
@@ -471,7 +471,7 @@ type A() =
           (property_or_ident
             (identifier)
             (identifier))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit)))))))
@@ -540,7 +540,7 @@ type A() =
           (property_or_ident
             (identifier)
             (identifier))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit))))
@@ -553,7 +553,7 @@ type A() =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (const
               (unit))))))))
@@ -796,7 +796,7 @@ type T =
             (property_or_ident
               (identifier)
               (identifier))
-            (const_pattern
+            (const
               (unit))
             (brace_expression
               (field_initializers
@@ -1349,7 +1349,7 @@ type A() =
                 (type
                   (long_identifier
                     (identifier))))))
-          (const_pattern
+          (const
             (unit))
           (const
             (unit)))))))
@@ -1394,7 +1394,7 @@ namespace A
                 (property_or_ident
                   (identifier)
                   (identifier))
-                (const_pattern
+                (const
                   (unit))
                 (const
                   (unit))))))))))

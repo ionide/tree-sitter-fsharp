@@ -2074,9 +2074,9 @@ let a b =
         (rules
           (rule
             (repeat_pattern
-              (const_pattern
+              (const
                 (bool))
-              (const_pattern
+              (const
                 (bool)))
             (infix_expression
               (application_expression
@@ -2095,9 +2095,9 @@ let a b =
                 (identifier))))
           (rule
             (repeat_pattern
-              (const_pattern
+              (const
                 (bool))
-              (const_pattern
+              (const
                 (bool)))
             (infix_expression
               (application_expression
@@ -2160,7 +2160,7 @@ let x =
               (property_or_ident
                 (identifier)
                 (identifier))
-              (const_pattern
+              (const
                 (unit))
               (const
                 (unit))))
@@ -2169,7 +2169,7 @@ let x =
               (property_or_ident
                 (identifier)
                 (identifier))
-              (const_pattern
+              (const
                 (unit))
               (const
                 (unit)))))))))
@@ -2658,7 +2658,7 @@ do
             (identifier))
           (rules
             (rule
-              (const_pattern
+              (const
                 (bool))
               (const
                 (int)))))))))

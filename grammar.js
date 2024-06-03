@@ -267,9 +267,9 @@ module.exports = grammar({
     // Pattern rules (BEGIN)
     _pattern: ($) =>
       choice(
-        alias("null", $.null_pattern),
+        "null",
         alias("_", $.wildcard_pattern),
-        alias($.const, $.const_pattern),
+        $.const,
         $.as_pattern,
         $.disjunct_pattern,
         $.conjunct_pattern,
@@ -690,10 +690,10 @@ module.exports = grammar({
     rule: ($) =>
       prec.right(
         seq(
-          $._pattern,
-          optional(seq("when", $._expression)),
+          field("pattern", $._pattern),
+          optional(seq("when", field("guard", $._expression))),
           "->",
-          $._expression_block,
+          field("block", $._expression_block),
         ),
       ),
 
