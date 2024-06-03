@@ -324,7 +324,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               for (;;) {
                 if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
                     lexer->lookahead == '\r' || lexer->lookahead == '\t') {
-                  skip(lexer);
+                  advance(lexer);
                 } else {
                   break;
                 }
