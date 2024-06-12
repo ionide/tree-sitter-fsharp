@@ -959,6 +959,11 @@ module.exports = grammar({
     //
     // Type rules (BEGIN)
     //
+    _static_parameter: ($) =>
+      prec(4, seq($.identifier, "=", $._static_parameter_value)),
+
+    _static_parameter_value: ($) => seq($.const, optional($._expression)),
+
     type: ($) =>
       prec(
         4,
@@ -998,8 +1003,8 @@ module.exports = grammar({
     type_attribute: ($) =>
       choice(
         $.type,
+        $._static_parameter,
         // measure
-        // static-parameter
       ),
 
     type_attributes: ($) =>

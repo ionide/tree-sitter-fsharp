@@ -1398,3 +1398,25 @@ namespace A
                   (unit))
                 (const
                   (unit))))))))))
+
+================================================================================
+type provider with named arguments
+================================================================================
+
+type sql = SqlProvider<ConnectionString = "secret">
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (identifier)
+            (const
+              (string))))))))
