@@ -196,7 +196,7 @@
         "named": true
       },
       {
-        "type": "const_pattern",
+        "type": "const",
         "named": true
       },
       {
@@ -212,8 +212,8 @@
         "named": true
       },
       {
-        "type": "null_pattern",
-        "named": true
+        "type": "null",
+        "named": false
       },
       {
         "type": "optional_pattern",
@@ -441,10 +441,6 @@
       "types": [
         {
           "type": "_pattern",
-          "named": true
-        },
-        {
-          "type": "const",
           "named": true
         },
         {
@@ -854,121 +850,6 @@
   },
   {
     "type": "const",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "bignum",
-          "named": true
-        },
-        {
-          "type": "bool",
-          "named": true
-        },
-        {
-          "type": "byte",
-          "named": true
-        },
-        {
-          "type": "bytearray",
-          "named": true
-        },
-        {
-          "type": "bytechar",
-          "named": true
-        },
-        {
-          "type": "char",
-          "named": true
-        },
-        {
-          "type": "decimal",
-          "named": true
-        },
-        {
-          "type": "float",
-          "named": true
-        },
-        {
-          "type": "ieee32",
-          "named": true
-        },
-        {
-          "type": "ieee64",
-          "named": true
-        },
-        {
-          "type": "int",
-          "named": true
-        },
-        {
-          "type": "int16",
-          "named": true
-        },
-        {
-          "type": "int32",
-          "named": true
-        },
-        {
-          "type": "int64",
-          "named": true
-        },
-        {
-          "type": "nativeint",
-          "named": true
-        },
-        {
-          "type": "sbyte",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "triple_quoted_string",
-          "named": true
-        },
-        {
-          "type": "uint16",
-          "named": true
-        },
-        {
-          "type": "uint32",
-          "named": true
-        },
-        {
-          "type": "uint64",
-          "named": true
-        },
-        {
-          "type": "unativeint",
-          "named": true
-        },
-        {
-          "type": "unit",
-          "named": true
-        },
-        {
-          "type": "verbatim_bytearray",
-          "named": true
-        },
-        {
-          "type": "verbatim_string",
-          "named": true
-        },
-        {
-          "type": "xint",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "const_pattern",
     "named": true,
     "fields": {},
     "children": {
@@ -1654,10 +1535,6 @@
       "types": [
         {
           "type": "_pattern",
-          "named": true
-        },
-        {
-          "type": "const",
           "named": true
         },
         {
@@ -2793,20 +2670,37 @@
   {
     "type": "rule",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "_pattern",
-          "named": true
-        }
-      ]
+    "fields": {
+      "block": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "guard": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_pattern",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -4217,10 +4111,6 @@
   {
     "type": "null",
     "named": false
-  },
-  {
-    "type": "null_pattern",
-    "named": true
   },
   {
     "type": "of",
