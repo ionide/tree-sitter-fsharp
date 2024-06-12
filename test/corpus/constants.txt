@@ -555,3 +555,34 @@ let x =
       (const
         (triple_quoted_string
           (format_triple_quoted_string))))))
+
+================================================================================
+underscores in numeric literal
+================================================================================
+
+do
+  1_0
+  10_000
+  10_000_000
+  0xDEAD_BEEF
+  0b1101_1110_1010_1101_1011_1110_1110_1111
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (const
+          (int))
+        (sequential_expression
+          (const
+            (int))
+          (sequential_expression
+            (const
+              (int))
+            (sequential_expression
+              (const
+                (xint))
+              (const
+                (xint)))))))))

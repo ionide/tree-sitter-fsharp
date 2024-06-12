@@ -6866,7 +6866,7 @@
     },
     "int": {
       "type": "PATTERN",
-      "value": "[+-]?[0-9]+"
+      "value": "[+-]?([0-9]_?)+"
     },
     "xint": {
       "type": "TOKEN",
@@ -6875,15 +6875,15 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "0[xX][0-9a-fA-F]+"
+            "value": "0[xX]([0-9a-fA-F]_?)+"
           },
           {
             "type": "PATTERN",
-            "value": "0[oO][0-7]+"
+            "value": "0[oO]([0-7]_?)+"
           },
           {
             "type": "PATTERN",
-            "value": "0[bB][0-1]+"
+            "value": "0[bB]([0-1]_?)+"
           }
         ]
       }

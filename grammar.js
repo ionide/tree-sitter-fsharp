@@ -1673,9 +1673,11 @@ module.exports = grammar({
       ),
 
     // Numbers
-    int: (_) => /[+-]?[0-9]+/,
+    int: (_) => /[+-]?([0-9]_?)+/,
     xint: (_) =>
-      token(choice(/0[xX][0-9a-fA-F]+/, /0[oO][0-7]+/, /0[bB][0-1]+/)),
+      token(
+        choice(/0[xX]([0-9a-fA-F]_?)+/, /0[oO]([0-7]_?)+/, /0[bB]([0-1]_?)+/),
+      ),
 
     sbyte: ($) => seq(choice($.int, $.xint), token.immediate("y")),
     byte: ($) => seq(choice($.int, $.xint), token.immediate("uy")),
