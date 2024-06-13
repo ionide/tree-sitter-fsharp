@@ -1417,6 +1417,40 @@ type sql = SqlProvider<ConnectionString = "secret">
           (identifier))
         (type_attributes
           (type_attribute
-            (identifier)
-            (const
-              (string))))))))
+            (named_static_parameter
+              (identifier)
+              (static_parameter_value
+                (const
+                  (string))))))))))
+
+================================================================================
+type provider with multiple parameters
+================================================================================
+
+type sql = SqlProvider<
+  """
+  test
+  """,
+  A="test">
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (static_parameter_value
+              (const
+                (triple_quoted_string))))
+          (type_attribute
+            (named_static_parameter
+              (identifier)
+              (static_parameter_value
+                (const
+                  (string))))))))))

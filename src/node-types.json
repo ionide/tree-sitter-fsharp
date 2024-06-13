@@ -246,6 +246,20 @@
     ]
   },
   {
+    "type": "_static_parameter",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "named_static_parameter",
+        "named": true
+      },
+      {
+        "type": "static_parameter_value",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "_type_defn_body",
     "named": true,
     "subtypes": [
@@ -744,11 +758,6 @@
     "fields": {}
   },
   {
-    "type": "bytechar",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "ce_expression",
     "named": true,
     "fields": {
@@ -777,11 +786,6 @@
         }
       ]
     }
-  },
-  {
-    "type": "char",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "class_inherits_decl",
@@ -870,10 +874,6 @@
         },
         {
           "type": "bytearray",
-          "named": true
-        },
-        {
-          "type": "bytechar",
           "named": true
         },
         {
@@ -2167,6 +2167,25 @@
     }
   },
   {
+    "type": "named_static_parameter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "static_parameter_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "namespace",
     "named": true,
     "fields": {
@@ -3089,15 +3108,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "identifier",
+          "type": "_static_parameter",
           "named": true
         },
         {
@@ -3709,10 +3724,6 @@
     "named": false
   },
   {
-    "type": "'B",
-    "named": false
-  },
-  {
     "type": "(",
     "named": false
   },
@@ -3930,6 +3941,10 @@
   },
   {
     "type": "bool",
+    "named": true
+  },
+  {
+    "type": "char",
     "named": true
   },
   {
@@ -4198,11 +4213,11 @@
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unmanaged",

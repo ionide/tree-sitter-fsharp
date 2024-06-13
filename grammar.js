@@ -103,6 +103,7 @@ module.exports = grammar({
     $._pattern,
     $._expression,
     $._type_defn_body,
+    $._static_parameter,
   ],
 
   rules: {
@@ -959,11 +960,6 @@ module.exports = grammar({
     //
     // Type rules (BEGIN)
     //
-    _static_parameter: ($) =>
-      prec(4, seq($.identifier, "=", $._static_parameter_value)),
-
-    _static_parameter_value: ($) => seq($.const, optional($._expression)),
-
     type: ($) =>
       prec(
         4,
@@ -998,7 +994,20 @@ module.exports = grammar({
     _constrained_type: ($) => prec.right(seq($.type_argument, ":>", $.type)),
     _flexible_type: ($) => prec.right(seq("#", $.type)),
 
-    types: ($) => seq($.type, repeat(prec.left(PREC.COMMA, seq(",", $.type)))),
+    types: ($) =>
+      seq($.type, repeat(prec.left(PREC.COMMA - 1, seq(",", $.type)))),
+
+    _static_type_identifier: ($) =>
+      prec(10, seq(choice("^", "'"), $.identifier)),
+
+    _static_parameter: ($) =>
+      choice($.static_parameter_value, $.named_static_parameter),
+
+    named_static_parameter: ($) =>
+      prec(3, seq($.identifier, "=", $.static_parameter_value)),
+
+    static_parameter_value: ($) =>
+      prec(-1, seq($.const, optional($._expression))),
 
     type_attribute: ($) =>
       choice(
@@ -1067,9 +1076,6 @@ module.exports = grammar({
       ),
 
     type_argument_defn: ($) => seq(optional($.attributes), $.type_argument),
-
-    _static_type_identifier: ($) =>
-      prec(10, seq(choice("^", "'"), $.identifier)),
 
     type_arguments: ($) =>
       seq(
@@ -1532,7 +1538,8 @@ module.exports = grammar({
         $._unicodegraph_long,
       ),
 
-    char: ($) => seq("'", $._char_char, token.immediate("'")),
+    char: (_) =>
+      /'([^\n\t\r\u0008\a\f\v'\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4})*'B?/,
 
     format_string_eval: ($) =>
       seq(token.immediate(prec(1000, "{")), $._expression, "}"),
@@ -1552,7 +1559,6 @@ module.exports = grammar({
       choice($._simple_string_char, $._non_escape_char, "\\"),
     verbatim_string: ($) =>
       seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
-    bytechar: ($) => seq("'", $._char_char, token.immediate("'B")),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
     verbatim_bytearray: ($) =>
       seq('@"', repeat($._verbatim_string_char), token.immediate('"B')),
@@ -1600,7 +1606,6 @@ module.exports = grammar({
         $.triple_quoted_string,
         $.bytearray,
         $.verbatim_bytearray,
-        $.bytechar,
         $.bool,
         $.unit,
       ),
