@@ -1664,7 +1664,7 @@ module.exports = grammar({
         PREC.INFIX_OP,
         choice(
           $._infix_or_prefix_op,
-          /[-+<>|&^*/%][!%&*+-./<=>@^|~?]*/,
+          /[-+<>|&^*/'%@][!%&*+-./<=>@^|~?]*/,
           "||",
           "=",
           "!=",
