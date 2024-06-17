@@ -3140,7 +3140,7 @@ let f (a: seq<'T>) (b: 'T) =
         (unit)))))
 
 ================================================================================
-match inside parent with underindentation
+match inside paren with underindentation
 ================================================================================
 
 do
@@ -3149,3 +3149,23 @@ do
   | _ -> id) 1
 
 --------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (application_expression
+        (paren_expression
+          (match_expression
+            (long_identifier_or_op
+              (identifier))
+            (rules
+              (rule
+                (wildcard_pattern)
+                (long_identifier_or_op
+                  (identifier)))
+              (rule
+                (wildcard_pattern)
+                (long_identifier_or_op
+                  (identifier))))))
+        (const
+          (int))))))

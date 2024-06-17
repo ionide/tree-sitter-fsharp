@@ -252,3 +252,41 @@ module A =
     (identifier)
     (const
       (unit))))
+
+================================================================================
+named top-level module with attribute
+================================================================================
+
+/// Some documentation comment here
+[<RequireQualifiedAccess>]
+module internal Some.Qualified.ModuleName
+
+open System
+open System.Collections.Generic
+
+--------------------------------------------------------------------------------
+
+(file
+  (xml_doc
+    (xml_doc_content))
+  (named_module
+    (attributes
+      (attribute_set
+        (attribute
+          (object_construction
+            (type
+              (long_identifier
+                (identifier)))))))
+    (access_modifier)
+    (long_identifier
+      (identifier)
+      (identifier)
+      (identifier))
+    (import_decl
+      (long_identifier
+        (identifier)))
+    (import_decl
+      (long_identifier
+        (identifier)
+        (identifier)
+        (identifier)))))

@@ -125,6 +125,7 @@ module.exports = grammar({
 
     named_module: ($) =>
       seq(
+        optional($.attributes),
         "module",
         optional($.access_modifier),
         field("name", $.long_identifier),
@@ -146,6 +147,7 @@ module.exports = grammar({
 
     module_abbrev: ($) =>
       seq(
+        optional($.attributes),
         "module",
         $.identifier,
         "=",
