@@ -384,6 +384,18 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       found_bracket_end = true;
       break;
     case ' ':
+      if (scanner->indents.size > 0) {
+        uint16_t current_indent_length = *array_back(&scanner->indents);
+        if (found_end_of_line && indent_length == current_indent_length &&
+            indent_length > 0 && !found_start_of_infix_op &&
+            !found_bracket_end) {
+          if (valid_symbols[NEWLINE] && !error_recovery_mode &&
+              !found_preprocessor_end) {
+            lexer->result_symbol = NEWLINE;
+            return true;
+          }
+        }
+      }
       break;
     default:
       found_start_of_infix_op = true;

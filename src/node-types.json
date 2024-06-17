@@ -1893,7 +1893,18 @@
   {
     "type": "match_expression",
     "named": true,
-    "fields": {},
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "rules",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
