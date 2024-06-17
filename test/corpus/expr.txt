@@ -3101,3 +3101,40 @@ let x
     (long_identifier_or_op
       (long_identifier
         (identifier)))))
+
+================================================================================
+function decl with static parameter
+================================================================================
+
+let f (a: seq<'T>) (b: 'T) =
+  ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (type
+                    (type_argument
+                      (identifier)))))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (type_argument
+                (identifier))))))
+      (const
+        (unit)))))

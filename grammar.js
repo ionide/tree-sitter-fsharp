@@ -998,16 +998,16 @@ module.exports = grammar({
       seq($.type, repeat(prec.left(PREC.COMMA - 1, seq(",", $.type)))),
 
     _static_type_identifier: ($) =>
-      prec(10, seq(choice("^", "'"), $.identifier)),
+      prec(10, seq(choice("^", token(prec(100, "'"))), $.identifier)),
 
     _static_parameter: ($) =>
+      // $.named_static_parameter,
       choice($.static_parameter_value, $.named_static_parameter),
 
     named_static_parameter: ($) =>
       prec(3, seq($.identifier, "=", $.static_parameter_value)),
 
-    static_parameter_value: ($) =>
-      prec(-1, seq($.const, optional($._expression))),
+    static_parameter_value: ($) => seq($.const, optional($._expression)),
 
     type_attribute: ($) =>
       choice(
@@ -1019,7 +1019,7 @@ module.exports = grammar({
     type_attributes: ($) =>
       seq(
         $.type_attribute,
-        repeat(prec.left(PREC.COMMA, seq(",", $.type_attribute))),
+        repeat(prec.right(PREC.COMMA, seq(",", $.type_attribute))),
       ),
 
     atomic_type: ($) =>
@@ -1539,7 +1539,10 @@ module.exports = grammar({
       ),
 
     char: (_) =>
-      /'([^\n\t\r\u0008\a\f\v'\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4})*'B?/,
+      prec(
+        -1,
+        /'([^\n\t\r\u0008\a\f\v'\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4})*'B?/,
+      ),
 
     format_string_eval: ($) =>
       seq(token.immediate(prec(1000, "{")), $._expression, "}"),

@@ -3431,8 +3431,15 @@
                 "value": "^"
               },
               {
-                "type": "STRING",
-                "value": "'"
+                "type": "TOKEN",
+                "content": {
+                  "type": "PREC",
+                  "value": 100,
+                  "content": {
+                    "type": "STRING",
+                    "value": "'"
+                  }
+                }
               }
             ]
           },
@@ -3522,7 +3529,7 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "PREC_LEFT",
+            "type": "PREC_RIGHT",
             "value": 13,
             "content": {
               "type": "SEQ",
@@ -6177,8 +6184,12 @@
       ]
     },
     "char": {
-      "type": "PATTERN",
-      "value": "'([^\\n\\t\\r\\u0008\\a\\f\\v'\\\\]|\\\\[\"\\'ntbrafv]|\\\\[0-9]{3}|\\\\u[0-9a-fA-F]{4})*'B?"
+      "type": "PREC",
+      "value": -1,
+      "content": {
+        "type": "PATTERN",
+        "value": "'([^\\n\\t\\r\\u0008\\a\\f\\v'\\\\]|\\\\[\"\\'ntbrafv]|\\\\[0-9]{3}|\\\\u[0-9a-fA-F]{4})*'B?"
+      }
     },
     "format_string_eval": {
       "type": "SEQ",

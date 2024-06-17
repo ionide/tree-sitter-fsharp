@@ -788,6 +788,11 @@
     }
   },
   {
+    "type": "char",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "class_inherits_decl",
     "named": true,
     "fields": {
@@ -3944,10 +3949,6 @@
     "named": true
   },
   {
-    "type": "char",
-    "named": true
-  },
-  {
     "type": "comparison",
     "named": false
   },
@@ -4213,11 +4214,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
