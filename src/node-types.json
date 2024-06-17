@@ -2082,9 +2082,13 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "attributes",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -2177,6 +2181,10 @@
         },
         {
           "type": "access_modifier",
+          "named": true
+        },
+        {
+          "type": "attributes",
           "named": true
         }
       ]
