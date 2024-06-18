@@ -447,8 +447,16 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         can_dedent_preproc = true;
       }
 
+      bool can_dedent_infix_op;
+
+      if (found_start_of_infix_op) {
+        can_dedent_infix_op = indent_length + 1 < current_indent_length;
+      } else {
+        can_dedent_infix_op = true;
+      }
+
       if (indent_length < current_indent_length && !found_bracket_end &&
-          can_dedent_preproc) {
+          can_dedent_preproc && can_dedent_infix_op) {
         array_pop(&scanner->indents);
         lexer->result_symbol = DEDENT;
         return true;

@@ -247,3 +247,38 @@ do
                 (identifier)))
             (long_identifier_or_op
               (identifier))))))))
+
+================================================================================
+offside infix op
+================================================================================
+
+do
+  (id 1
+  >=> (x
+      |> id
+      |> id))
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (paren_expression
+        (infix_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (int)))
+          (infix_op)
+          (paren_expression
+            (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))))
