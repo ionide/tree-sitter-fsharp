@@ -6369,6 +6369,10 @@
         {
           "type": "STRING",
           "value": "\\"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\\"\\\""
         }
       ]
     },

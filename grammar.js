@@ -1565,7 +1565,7 @@ module.exports = grammar({
     string: ($) => choice($._string_literal, $.format_string),
 
     _verbatim_string_char: ($) =>
-      choice($._simple_string_char, $._non_escape_char, "\\"),
+      choice($._simple_string_char, $._non_escape_char, "\\", /\"\"/),
     verbatim_string: ($) =>
       seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),

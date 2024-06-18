@@ -586,3 +586,31 @@ do
                 (xint))
               (const
                 (xint)))))))))
+
+================================================================================
+underindented verbatim string
+================================================================================
+
+let johnDoeAsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<Person xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <FirstName>John</FirstName>
+  <LastName>Doe</LastName>
+  <BirthDate>1990-07-12T00:00:00</BirthDate>
+  <Height>1.85</Height>
+  <Piercings>
+    <string>ear</string>
+    <string>nose</string>
+  </Piercings>
+</Person>"
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (verbatim_string)))))

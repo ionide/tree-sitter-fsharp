@@ -114,6 +114,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
   bool error_recovery_mode = valid_symbols[ERROR_SENTINEL];
 
+  if (valid_symbols[INSIDE_STRING] && !error_recovery_mode) {
+    return false;
+  }
+
   if (valid_symbols[TRIPLE_QUOTE_CONTENT] && !error_recovery_mode) {
     lexer->mark_end(lexer);
     while (true) {
