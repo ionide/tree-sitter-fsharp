@@ -374,6 +374,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         }
       }
     }
+  } else if (is_bracket_end(lexer)) {
+    found_bracket_end = true;
   } else if (is_infix_op_start(lexer)) {
     found_start_of_infix_op = true;
   } else if (lexer->lookahead == '|') {
@@ -401,8 +403,6 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       found_start_of_infix_op = true;
       break;
     }
-  } else if (is_bracket_end(lexer)) {
-    found_bracket_end = true;
   }
 
   if (error_recovery_mode && scanner->indents.size > 0) {

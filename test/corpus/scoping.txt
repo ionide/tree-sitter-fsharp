@@ -220,3 +220,30 @@ do
           (type
             (long_identifier
               (identifier))))))))
+
+================================================================================
+fun expression inside parens
+================================================================================
+
+do
+  (fun o -> f >=> h o)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (paren_expression
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (application_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))
+            (long_identifier_or_op
+              (identifier))))))))
