@@ -1454,3 +1454,28 @@ type sql = SqlProvider<
               (static_parameter_value
                 (const
                   (string))))))))))
+
+================================================================================
+record definition with trailing semicolon
+================================================================================
+
+type R = { A: bool; B: bool; }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (type
+            (long_identifier
+              (identifier))))))))

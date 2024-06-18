@@ -1242,7 +1242,11 @@ module.exports = grammar({
       ),
 
     record_fields: ($) =>
-      seq($.record_field, repeat(seq($._newline, $.record_field))),
+      seq(
+        $.record_field,
+        repeat(seq($._newline, $.record_field)),
+        optional($._newline),
+      ),
 
     record_field: ($) =>
       seq(
