@@ -497,9 +497,10 @@ type A<'T>(t: 'T) =
             (type_argument
               (identifier)))))
       (primary_constr_args
-        (simple_pattern
-          (simple_pattern
-            (identifier))
+        (typed_pattern
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
           (type
             (type_argument
               (identifier)))))
@@ -859,18 +860,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier))))
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier)))))
+        (repeat_pattern
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))))
       (member_defn
         (additional_constr_defn
           (paren_pattern
@@ -917,18 +921,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier))))
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier)))))
+        (repeat_pattern
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))))
       (member_defn
         (method_or_prop_defn
           (property_or_ident
@@ -970,18 +977,21 @@ type A(x: int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier))))
-        (simple_pattern
-          (simple_pattern
-            (identifier))
-          (type
-            (long_identifier
-              (identifier)))))
+        (repeat_pattern
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))))))
       (interface_implementation
         (type
           (long_identifier
@@ -1479,3 +1489,112 @@ type R = { A: bool; B: bool; }
           (type
             (long_identifier
               (identifier))))))))
+
+================================================================================
+class with optional parameter in private constructor
+================================================================================
+
+type CsvFile
+    private
+    (
+        readerFunc: Func<TextReader>,
+        [<Optional>] ?separators,
+        [<Optional>] ?quote,
+        [<Optional>] ?hasHeaders,
+        [<Optional>] ?ignoreErrors,
+        [<Optional>] ?skipRows
+    ) as this =
+    member _.F() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (access_modifier)
+        (repeat_pattern
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (type
+                    (long_identifier
+                      (identifier)))))))
+          (attribute_pattern
+            (attributes
+              (attribute_set
+                (attribute
+                  (object_construction
+                    (type
+                      (long_identifier
+                        (identifier)))))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute_set
+                (attribute
+                  (object_construction
+                    (type
+                      (long_identifier
+                        (identifier)))))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute_set
+                (attribute
+                  (object_construction
+                    (type
+                      (long_identifier
+                        (identifier)))))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute_set
+                (attribute
+                  (object_construction
+                    (type
+                      (long_identifier
+                        (identifier)))))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute_set
+                (attribute
+                  (object_construction
+                    (type
+                      (long_identifier
+                        (identifier)))))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (identifier))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit)))))))

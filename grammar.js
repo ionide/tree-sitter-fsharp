@@ -266,8 +266,22 @@ module.exports = grammar({
     // Top-level rules (END)
     //
 
+    primary_constr_args: ($) =>
+      seq(
+        optional($.attributes),
+        optional($.access_modifier),
+        "(",
+        optional($._pattern),
+        ")",
+        optional(seq("as", $.identifier)),
+      ),
+
     //
     // Pattern rules (BEGIN)
+
+    repeat_pattern: ($) =>
+      prec.right(seq($._pattern, repeat1(prec(1, seq(",", $._pattern))))),
+
     _pattern: ($) =>
       choice(
         "null",
@@ -289,7 +303,7 @@ module.exports = grammar({
         $.identifier_pattern,
       ),
 
-    optional_pattern: ($) => prec.right(seq("?", $._pattern)),
+    optional_pattern: ($) => prec.left(seq("?", $._pattern)),
 
     type_check_pattern: ($) =>
       prec.right(seq(":?", $.atomic_type, optional(seq("as", $.identifier)))),
@@ -297,9 +311,6 @@ module.exports = grammar({
     attribute_pattern: ($) => prec.left(seq($.attributes, $._pattern)),
 
     paren_pattern: ($) => seq("(", $._pattern, ")"),
-
-    repeat_pattern: ($) =>
-      prec.right(seq($._pattern, repeat1(prec.right(seq(",", $._pattern))))),
 
     as_pattern: ($) => prec.left(0, seq($._pattern, "as", $.identifier)),
     cons_pattern: ($) => prec.left(0, seq($._pattern, "::", $._pattern)),
@@ -1316,26 +1327,6 @@ module.exports = grammar({
           scoped($._class_type_body, $._indent, $._dedent),
         ),
       ),
-
-    primary_constr_args: ($) =>
-      field(
-        "constructor",
-        seq(
-          optional($.attributes),
-          optional($.access_modifier),
-          "(",
-          optional(
-            seq(
-              $.simple_pattern,
-              repeat(prec.left(PREC.COMMA, seq(",", $.simple_pattern))),
-            ),
-          ),
-          ")",
-        ),
-      ),
-
-    simple_pattern: ($) =>
-      choice($.identifier, seq($.simple_pattern, ":", $.type)),
 
     _class_function_or_value_defn: ($) =>
       seq(
