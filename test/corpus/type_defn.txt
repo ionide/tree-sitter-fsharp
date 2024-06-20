@@ -1588,7 +1588,8 @@ type CsvFile
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier))))))
-        (identifier))
+        (class_as_reference
+          (identifier)))
       (member_defn
         (method_or_prop_defn
           (property_or_ident

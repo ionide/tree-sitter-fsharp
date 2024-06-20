@@ -793,6 +793,21 @@
     "fields": {}
   },
   {
+    "type": "class_as_reference",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "class_inherits_decl",
     "named": true,
     "fields": {
@@ -2534,7 +2549,7 @@
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "class_as_reference",
           "named": true
         }
       ]
@@ -4201,11 +4216,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

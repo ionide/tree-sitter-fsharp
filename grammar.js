@@ -266,6 +266,8 @@ module.exports = grammar({
     // Top-level rules (END)
     //
 
+    class_as_reference: ($) => seq("as", $.identifier),
+
     primary_constr_args: ($) =>
       seq(
         optional($.attributes),
@@ -273,7 +275,7 @@ module.exports = grammar({
         "(",
         optional($._pattern),
         ")",
-        optional(seq("as", $.identifier)),
+        optional($.class_as_reference),
       ),
 
     //
