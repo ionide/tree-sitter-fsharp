@@ -89,7 +89,6 @@ module.exports = grammar({
 
   inline: ($) => [
     $._module_elem,
-    $._infix_or_prefix_op,
     $._base_call,
     $._expression_or_range,
     $._object_expression_inner,
@@ -451,6 +450,24 @@ module.exports = grammar({
         // (static-typars : (member-sig) expr)
       ),
 
+    literal_expression: ($) =>
+      prec(
+        PREC.PAREN_EXPR,
+        choice(
+          seq("<@", $._expression, "@>"),
+          seq("<@@", $._expression, "@@>"),
+        ),
+      ),
+
+    long_identifier_or_op: ($) =>
+      prec.right(
+        choice(
+          $.long_identifier,
+          seq($.long_identifier, ".", $._identifier_or_op),
+          $._identifier_or_op,
+        ),
+      ),
+
     tuple_expression: ($) =>
       prec.right(PREC.TUPLE_EXPR, seq($._expression, ",", $._expression)),
 
@@ -508,15 +525,6 @@ module.exports = grammar({
           $.prefix_op,
         ),
         prec.right(PREC.PREFIX_EXPR, $._expression),
-      ),
-
-    literal_expression: ($) =>
-      prec(
-        PREC.PAREN_EXPR,
-        choice(
-          seq("<@", $._expression, "@>"),
-          seq("<@@", $._expression, "@@>"),
-        ),
       ),
 
     typecast_expression: ($) =>
@@ -1613,15 +1621,6 @@ module.exports = grammar({
       ),
 
     // Identifiers:
-    long_identifier_or_op: ($) =>
-      prec.right(
-        choice(
-          $.long_identifier,
-          seq($.long_identifier, ".", $._identifier_or_op),
-          $._identifier_or_op,
-        ),
-      ),
-
     long_identifier: ($) =>
       prec.right(seq($.identifier, repeat(seq(".", $.identifier)))),
 
@@ -1666,7 +1665,7 @@ module.exports = grammar({
         PREC.INFIX_OP,
         choice(
           $._infix_or_prefix_op,
-          /[-+<>|&^*/'%@][!%&*+-./<=>@^|~?]*/,
+          /[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*/,
           "||",
           "=",
           "!=",
@@ -1675,10 +1674,6 @@ module.exports = grammar({
           "$",
           "or",
           "?",
-          "<@",
-          "<@@",
-          "@>",
-          "@@>",
           "?",
           "?<-",
         ),

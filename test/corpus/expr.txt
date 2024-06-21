@@ -834,12 +834,10 @@ do
             (long_identifier
               (identifier)
               (identifier))))
-        (dot_expression
-          (long_identifier_or_op
-            (identifier))
-          (long_identifier_or_op
-            (long_identifier
-              (identifier))))))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))))))
 
 ================================================================================
 ce expression 1
@@ -3169,3 +3167,49 @@ do
                   (identifier))))))
         (const
           (int))))))
+
+================================================================================
+literal expressions inside paren
+================================================================================
+
+do
+  (<@ (%varExpr).Path @>, convert <@ (%varExpr).JsonOpt @>, <@ (%varExpr).JsonOpt @>)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (paren_expression
+        (tuple_expression
+          (literal_expression
+            (dot_expression
+              (paren_expression
+                (prefixed_expression
+                  (prefix_op)
+                  (long_identifier_or_op
+                    (identifier))))
+              (long_identifier_or_op
+                (identifier))))
+          (tuple_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (literal_expression
+                (dot_expression
+                  (paren_expression
+                    (prefixed_expression
+                      (prefix_op)
+                      (long_identifier_or_op
+                        (identifier))))
+                  (long_identifier_or_op
+                    (identifier)))))
+            (literal_expression
+              (dot_expression
+                (paren_expression
+                  (prefixed_expression
+                    (prefix_op)
+                    (long_identifier_or_op
+                      (identifier))))
+                (long_identifier_or_op
+                  (identifier))))))))))

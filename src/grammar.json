@@ -1585,6 +1585,83 @@
         }
       ]
     },
+    "literal_expression": {
+      "type": "PREC",
+      "value": 21,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "<@"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              },
+              {
+                "type": "STRING",
+                "value": "@>"
+              }
+            ]
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "<@@"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              },
+              {
+                "type": "STRING",
+                "value": "@@>"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "long_identifier_or_op": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "long_identifier"
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "long_identifier"
+              },
+              {
+                "type": "STRING",
+                "value": "."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_identifier_or_op"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_identifier_or_op"
+          }
+        ]
+      }
+    },
     "tuple_expression": {
       "type": "PREC_RIGHT",
       "value": 16,
@@ -1849,49 +1926,6 @@
           }
         }
       ]
-    },
-    "literal_expression": {
-      "type": "PREC",
-      "value": 21,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "<@"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_expression"
-              },
-              {
-                "type": "STRING",
-                "value": "@>"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "<@@"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_expression"
-              },
-              {
-                "type": "STRING",
-                "value": "@@>"
-              }
-            ]
-          }
-        ]
-      }
     },
     "typecast_expression": {
       "type": "PREC_RIGHT",
@@ -6590,40 +6624,6 @@
         }
       ]
     },
-    "long_identifier_or_op": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "long_identifier"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "long_identifier"
-              },
-              {
-                "type": "STRING",
-                "value": "."
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_identifier_or_op"
-              }
-            ]
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_identifier_or_op"
-          }
-        ]
-      }
-    },
     "long_identifier": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -6857,7 +6857,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "[-+<>|&^*/'%@][!%&*+-./<=>@^|~?]*"
+            "value": "[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*"
           },
           {
             "type": "STRING",
@@ -6890,22 +6890,6 @@
           {
             "type": "STRING",
             "value": "?"
-          },
-          {
-            "type": "STRING",
-            "value": "<@"
-          },
-          {
-            "type": "STRING",
-            "value": "<@@"
-          },
-          {
-            "type": "STRING",
-            "value": "@>"
-          },
-          {
-            "type": "STRING",
-            "value": "@@>"
           },
           {
             "type": "STRING",
@@ -7966,7 +7950,6 @@
   ],
   "inline": [
     "_module_elem",
-    "_infix_or_prefix_op",
     "_base_call",
     "_expression_or_range",
     "_object_expression_inner",
