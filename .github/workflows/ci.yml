@@ -39,7 +39,7 @@ jobs:
           files: |
             examples/Giraffe/**/*.fs
             examples/FSharp.Data/**/*.fs
-            examples/FSharp.Compiler/tests/**/*.fs
+            examples/FSharp.Compiler/tests/**/!(E_*).fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
