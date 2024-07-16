@@ -24,7 +24,7 @@ For tree-sitter-fsharp, this involves three steps:
 
 1. Update your Neovim config for nvim-treesitter to refer to tree-sitter-fsharp.
 2. Run `:TSInstall fsharp` inside Neovim.
-3. Copy the files from [./queries/](./queries) to the ./queries/fsharp/ directory of your Neovim runtime directory (where your config is stored) - see [the Adding queries section of the nvim-treesitter README](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-queries).
+3. Copy the files from [./queries/](./queries) to the neovim config directory at`$XDG_CONFIG_HOME/nvim/queries/fsharp/` - see [the Adding queries section of the nvim-treesitter README](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-queries).
 
 The config you need is this (you can use a local path for `url` if you prefer):
 
