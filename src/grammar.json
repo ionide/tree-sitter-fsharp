@@ -3651,28 +3651,6 @@
         ]
       }
     },
-    "static_parameter_value": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "const"
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "const"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_expression"
-            }
-          ]
-        }
-      ]
-    },
     "type_attribute": {
       "type": "CHOICE",
       "members": [
@@ -4492,6 +4470,28 @@
         }
       ]
     },
+    "static_parameter_value": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "const"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "const"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_expression"
+            }
+          ]
+        }
+      ]
+    },
     "type_definition": {
       "type": "PREC_LEFT",
       "value": 0,
@@ -4567,6 +4567,10 @@
         {
           "type": "SYMBOL",
           "name": "anon_type_defn"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "class_type_defn"
         },
         {
           "type": "SYMBOL",
@@ -4765,6 +4769,60 @@
               }
             ]
           }
+        }
+      ]
+    },
+    "class_type_defn": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "type_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "primary_constr_args"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "STRING",
+          "value": "class"
+        },
+        {
+          "type": "FIELD",
+          "name": "block",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_indent"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_class_type_body"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_dedent"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "end"
         }
       ]
     },
@@ -5864,6 +5922,27 @@
     "_property_defn": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ":"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
         {
           "type": "STRING",
           "value": "="
@@ -7456,24 +7535,33 @@
       "type": "PREC",
       "value": 100000,
       "content": {
-        "type": "SEQ",
+        "type": "CHOICE",
         "members": [
           {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "#nowarn"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_string_literal"
+                },
+                "named": true,
+                "value": "string"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\n"
+              }
+            ]
+          },
+          {
             "type": "STRING",
-            "value": "#nowarn"
-          },
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_string_literal"
-            },
-            "named": true,
-            "value": "string"
-          },
-          {
-            "type": "PATTERN",
-            "value": "\\n"
+            "value": "#light"
           }
         ]
       }

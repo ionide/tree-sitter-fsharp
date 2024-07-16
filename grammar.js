@@ -1030,8 +1030,6 @@ module.exports = grammar({
     named_static_parameter: ($) =>
       prec(3, seq($.identifier, "=", $.static_parameter_value)),
 
-    static_parameter_value: ($) => seq($.const, optional($._expression)),
-
     type_attribute: ($) =>
       choice(
         $.type,
@@ -1167,7 +1165,7 @@ module.exports = grammar({
         $.record_type_defn,
         $.union_type_defn,
         $.anon_type_defn,
-        // $.class_type_defn,
+        $.class_type_defn,
         // $.struct_type_defn,
         // $.interface_type_defn,
         $.enum_type_defn,
@@ -1201,16 +1199,16 @@ module.exports = grammar({
     type_abbrev_defn: ($) =>
       seq($.type_name, "=", scoped($.type, $._indent, $._dedent)),
 
-    // class_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "class",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
-    //
+    class_type_defn: ($) =>
+      seq(
+        $.type_name,
+        optional($.primary_constr_args),
+        "=",
+        "class",
+        scoped($._class_type_body, $._indent, $._dedent),
+        "end",
+      ),
+
     // struct_type_defn: $ =>
     //   seq(
     //     $.type_name,
@@ -1425,6 +1423,7 @@ module.exports = grammar({
 
     _property_defn: ($) =>
       seq(
+        optional(seq(":", $.type)),
         "=",
         $._expression_block,
         optional(
@@ -1746,7 +1745,13 @@ module.exports = grammar({
     // preprocessors
 
     compiler_directive_decl: ($) =>
-      prec(100000, seq("#nowarn", alias($._string_literal, $.string), /\n/)),
+      prec(
+        100000,
+        choice(
+          seq("#nowarn", alias($._string_literal, $.string), /\n/),
+          "#light",
+        ),
+      ),
 
     fsi_directive_decl: ($) =>
       seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),

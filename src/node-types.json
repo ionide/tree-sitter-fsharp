@@ -268,6 +268,10 @@
         "named": true
       },
       {
+        "type": "class_type_defn",
+        "named": true
+      },
+      {
         "type": "delegate_type_defn",
         "named": true
       },
@@ -828,12 +832,70 @@
     }
   },
   {
+    "type": "class_type_defn",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "attributes",
+            "named": true
+          },
+          {
+            "type": "class_inherits_decl",
+            "named": true
+          },
+          {
+            "type": "do",
+            "named": false
+          },
+          {
+            "type": "function_or_value_defn",
+            "named": true
+          },
+          {
+            "type": "interface_implementation",
+            "named": true
+          },
+          {
+            "type": "member_defn",
+            "named": true
+          },
+          {
+            "type": "static",
+            "named": false
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "primary_constr_args",
+          "named": true
+        },
+        {
+          "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "compiler_directive_decl",
     "named": true,
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "string",
@@ -2072,6 +2134,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "type",
           "named": true
         },
         {
@@ -3687,6 +3753,10 @@
     "named": false
   },
   {
+    "type": "#light",
+    "named": false
+  },
+  {
     "type": "#line",
     "named": false
   },
@@ -3949,6 +4019,10 @@
   {
     "type": "bool",
     "named": true
+  },
+  {
+    "type": "class",
+    "named": false
   },
   {
     "type": "comparison",
