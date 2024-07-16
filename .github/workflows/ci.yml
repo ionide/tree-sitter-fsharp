@@ -36,10 +36,12 @@ jobs:
         id: parse-files
         continue-on-error: true
         with:
-          files: |
+          files: |-
             examples/Giraffe/**/*.fs
             examples/FSharp.Data/**/*.fs
-            examples/FSharp.Compiler/tests/**/!(E_*).fs
+            examples/FSharp.Compiler/tests/**/*.fs
+          invalid-files: |-
+            examples/FSharp.Compiler/tests/**/E_*.fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
