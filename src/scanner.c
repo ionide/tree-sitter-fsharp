@@ -266,7 +266,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       } else {
         return false;
       }
-    } else if (lexer->lookahead == 'c') {
+    } else if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
       advance(lexer);
       if (lexer->lookahead == 'l') {
         advance(lexer);
@@ -404,7 +404,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       }
-    } else if (lexer->lookahead == 'n') {
+    } else if (lexer->lookahead == 'n' && valid_symbols[END]) {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
@@ -428,6 +428,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           return true;
         }
       }
+      return false;
     }
   } else if (is_bracket_end(lexer)) {
     found_bracket_end = true;
