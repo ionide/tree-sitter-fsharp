@@ -280,6 +280,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                 uint16_t current_indent_length = *array_back(&scanner->indents);
                 array_push(&scanner->special_scope_indents,
                            current_indent_length);
+              } else {
+                array_push(&scanner->special_scope_indents, 0);
               }
               lexer->mark_end(lexer);
               lexer->result_symbol = CLASS;
