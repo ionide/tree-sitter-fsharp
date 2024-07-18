@@ -72,6 +72,7 @@ module.exports = grammar({
     "#else",
     "#endif",
     "class",
+    $._struct_begin,
     "end",
     $._triple_quoted_content,
     $.block_comment_content,
@@ -1203,26 +1204,6 @@ module.exports = grammar({
     type_abbrev_defn: ($) =>
       seq($.type_name, "=", scoped($.type, $._indent, $._dedent)),
 
-    // struct_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "struct",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
-    //
-    // interface_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "interface",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
-
     _class_type_body_inner: ($) =>
       choice(
         $.class_inherits_decl,
@@ -1329,13 +1310,13 @@ module.exports = grammar({
           choice(
             scoped($._class_type_body, $._indent, $._dedent),
             seq(
-              "begin",
+              choice("begin", "class"),
               scoped(optional($._class_type_body), $._indent, $._dedent),
               "end",
             ),
             seq(
-              "class",
-              scoped(optional($._class_type_body), $._indent, $._dedent),
+              $._struct_begin,
+              scoped(repeat($._type_defn_elements), $._indent, $._dedent),
               "end",
             ),
           ),

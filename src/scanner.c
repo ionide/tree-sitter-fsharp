@@ -14,6 +14,7 @@ enum TokenType {
   PREPROC_ELSE,
   PREPROC_END,
   CLASS,
+  STRUCT,
   END,
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
@@ -279,6 +280,26 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               lexer->mark_end(lexer);
               lexer->result_symbol = CLASS;
               return true;
+            }
+          }
+        }
+      }
+    } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
+      advance(lexer);
+      if (lexer->lookahead == 't') {
+        advance(lexer);
+        if (lexer->lookahead == 'r') {
+          advance(lexer);
+          if (lexer->lookahead == 'u') {
+            advance(lexer);
+            if (lexer->lookahead == 'c') {
+              advance(lexer);
+              if (lexer->lookahead == 't') {
+                advance(lexer);
+                lexer->mark_end(lexer);
+                lexer->result_symbol = STRUCT;
+                return true;
+              }
             }
           }
         }

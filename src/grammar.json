@@ -5390,8 +5390,17 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "begin"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "begin"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "class"
+                      }
+                    ]
                   },
                   {
                     "type": "FIELD",
@@ -5432,8 +5441,8 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "class"
+                    "type": "SYMBOL",
+                    "name": "_struct_begin"
                   },
                   {
                     "type": "FIELD",
@@ -5446,16 +5455,11 @@
                           "name": "_indent"
                         },
                         {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "_class_type_body"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
+                          "type": "REPEAT",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_type_defn_elements"
+                          }
                         },
                         {
                           "type": "SYMBOL",
@@ -8070,6 +8074,10 @@
     {
       "type": "STRING",
       "value": "class"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_struct_begin"
     },
     {
       "type": "STRING",

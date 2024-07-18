@@ -67,3 +67,5 @@ jobs:
       - name: Fuzz parser
         uses: tree-sitter/fuzz-action@v4
         if: steps.scanner-changes.outputs.changed == 'true'
+        with:
+          timeout: 30
