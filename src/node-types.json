@@ -268,10 +268,6 @@
         "named": true
       },
       {
-        "type": "class_type_defn",
-        "named": true
-      },
-      {
         "type": "delegate_type_defn",
         "named": true
       },
@@ -366,7 +362,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "_expression",
@@ -407,6 +403,30 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "interface_implementation",
+          "named": true
+        },
+        {
+          "type": "member_defn",
+          "named": true
+        },
         {
           "type": "primary_constr_args",
           "named": true
@@ -829,64 +849,6 @@
           }
         ]
       }
-    }
-  },
-  {
-    "type": "class_type_defn",
-    "named": true,
-    "fields": {
-      "block": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "attributes",
-            "named": true
-          },
-          {
-            "type": "class_inherits_decl",
-            "named": true
-          },
-          {
-            "type": "do",
-            "named": false
-          },
-          {
-            "type": "function_or_value_defn",
-            "named": true
-          },
-          {
-            "type": "interface_implementation",
-            "named": true
-          },
-          {
-            "type": "member_defn",
-            "named": true
-          },
-          {
-            "type": "static",
-            "named": false
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "primary_constr_args",
-          "named": true
-        },
-        {
-          "type": "type_name",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -4290,11 +4252,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

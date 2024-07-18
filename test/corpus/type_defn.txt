@@ -251,6 +251,71 @@ type A() =
               (identifier))))))))
 
 ================================================================================
+basic class member definition with class keyword 1
+================================================================================
+
+type A() = class
+  member this.Post(msg: string) = msg
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+basic class member definition with class keyword 2
+================================================================================
+
+type A() =
+  class
+    member this.Post(msg: string) = msg
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
 private member method
 ================================================================================
 

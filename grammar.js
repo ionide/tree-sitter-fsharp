@@ -71,6 +71,8 @@ module.exports = grammar({
     "#if",
     "#else",
     "#endif",
+    "class",
+    "end",
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
@@ -1165,7 +1167,6 @@ module.exports = grammar({
         $.record_type_defn,
         $.union_type_defn,
         $.anon_type_defn,
-        $.class_type_defn,
         // $.struct_type_defn,
         // $.interface_type_defn,
         $.enum_type_defn,
@@ -1198,16 +1199,6 @@ module.exports = grammar({
 
     type_abbrev_defn: ($) =>
       seq($.type_name, "=", scoped($.type, $._indent, $._dedent)),
-
-    class_type_defn: ($) =>
-      seq(
-        $.type_name,
-        optional($.primary_constr_args),
-        "=",
-        "class",
-        scoped($._class_type_body, $._indent, $._dedent),
-        "end",
-      ),
 
     // struct_type_defn: $ =>
     //   seq(
@@ -1332,7 +1323,11 @@ module.exports = grammar({
           $.type_name,
           optional($.primary_constr_args),
           "=",
-          scoped($._class_type_body, $._indent, $._dedent),
+          choice(
+            scoped($._class_type_body, $._indent, $._dedent),
+            seq("begin", $._class_type_body, "end"),
+            seq("class", $._class_type_body, "end"),
+          ),
         ),
       ),
 
