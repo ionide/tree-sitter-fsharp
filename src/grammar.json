@@ -5404,8 +5404,16 @@
                           "name": "_indent"
                         },
                         {
-                          "type": "SYMBOL",
-                          "name": "_class_type_body"
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_class_type_body"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
                         },
                         {
                           "type": "SYMBOL",
@@ -5438,8 +5446,16 @@
                           "name": "_indent"
                         },
                         {
-                          "type": "SYMBOL",
-                          "name": "_class_type_body"
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_class_type_body"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
                         },
                         {
                           "type": "SYMBOL",
