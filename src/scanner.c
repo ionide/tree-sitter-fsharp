@@ -337,6 +337,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
   } else if (lexer->lookahead == 'e' &&
              (valid_symbols[ELSE] || valid_symbols[ELIF] ||
               valid_symbols[DEDENT] || valid_symbols[END])) {
+    lexer->mark_end(lexer);
     int16_t token_indent_level = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'l') {
@@ -421,12 +422,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
             return true;
           }
         }
+        lexer->mark_end(lexer);
         if (valid_symbols[END]) {
-          lexer->mark_end(lexer);
+          array_pop(&scanner->special_scope_indents);
           lexer->result_symbol = END;
-          if (scanner->special_scope_indents.size > 0) {
-            array_pop(&scanner->special_scope_indents);
-          }
           return true;
         }
       }
