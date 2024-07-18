@@ -5377,8 +5377,25 @@
                     "value": "begin"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_class_type_body"
+                    "type": "FIELD",
+                    "name": "block",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_class_type_body"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_dedent"
+                        }
+                      ]
+                    }
                   },
                   {
                     "type": "STRING",
@@ -5394,8 +5411,25 @@
                     "value": "class"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_class_type_body"
+                    "type": "FIELD",
+                    "name": "block",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_class_type_body"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_dedent"
+                        }
+                      ]
+                    }
                   },
                   {
                     "type": "STRING",

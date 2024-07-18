@@ -362,7 +362,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "_expression",
@@ -403,30 +403,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "attributes",
-          "named": true
-        },
-        {
-          "type": "class_inherits_decl",
-          "named": true
-        },
-        {
-          "type": "function_or_value_defn",
-          "named": true
-        },
-        {
-          "type": "interface_implementation",
-          "named": true
-        },
-        {
-          "type": "member_defn",
-          "named": true
-        },
         {
           "type": "primary_constr_args",
           "named": true

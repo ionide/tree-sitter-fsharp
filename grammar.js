@@ -1325,8 +1325,16 @@ module.exports = grammar({
           "=",
           choice(
             scoped($._class_type_body, $._indent, $._dedent),
-            seq("begin", $._class_type_body, "end"),
-            seq("class", $._class_type_body, "end"),
+            seq(
+              "begin",
+              scoped($._class_type_body, $._indent, $._dedent),
+              "end",
+            ),
+            seq(
+              "class",
+              scoped($._class_type_body, $._indent, $._dedent),
+              "end",
+            ),
           ),
         ),
       ),

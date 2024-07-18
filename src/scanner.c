@@ -276,6 +276,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
             advance(lexer);
             if (lexer->lookahead == 's') {
               advance(lexer);
+              lexer->mark_end(lexer);
+
               if (scanner->indents.size > 0) {
                 uint16_t current_indent_length = *array_back(&scanner->indents);
                 array_push(&scanner->special_scope_indents,
@@ -283,7 +285,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               } else {
                 array_push(&scanner->special_scope_indents, 0);
               }
-              lexer->mark_end(lexer);
+
               lexer->result_symbol = CLASS;
               return true;
             }
@@ -404,7 +406,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       }
-    } else if (lexer->lookahead == 'n' && valid_symbols[END]) {
+    } else if (lexer->lookahead == 'n') {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
