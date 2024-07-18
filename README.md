@@ -16,31 +16,30 @@ The parser consists of two parts:
 The grammar starts with the `file` node at the beginning of the rules.
 
 ### Adding to neovim
-#### From the local copy:
-```lua
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-parser_config.fsharp = {
-  install_info = {
-    url = "path/to/tree-sitter-fsharp",
-    files = {"src/scanner.c", "src/parser.c" }
-  },
-  filetype = "fsharp",
-}
-```
-#### From GitHub repository:
-```lua
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-parser_config.fsharp = {
-  install_info = {
-    url = "https://github.com/ionide/tree-sitter-fsharp",
-    branch = "main",
-    files = {"src/scanner.c", "src/parser.c" },
-  },
-  filetype = "fsharp",
-}
-```
 
-Then run `:TSInstall fsharp` inside neovim.
+tree-sitter-fsharp isn't supported out-of-the box by [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter).
+However, nvim-treesitter has [instructions for how to manually add unsupported parsers](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-parsers).
+
+For tree-sitter-fsharp, this involves three steps:
+
+1. Update your Neovim config for nvim-treesitter to refer to tree-sitter-fsharp.
+2. Run `:TSInstall fsharp` inside Neovim.
+3. Copy the files from [./queries/](./queries) to the neovim config directory at`$XDG_CONFIG_HOME/nvim/queries/fsharp/` - see [the Adding queries section of the nvim-treesitter README](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-queries).
+
+The config you need is this (you can use a local path for `url` if you prefer):
+
+```lua
+local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+parser_config.fsharp = {
+  install_info = {
+    url = 'https://github.com/ionide/tree-sitter-fsharp',
+    branch = 'main',
+    files = { 'src/scanner.c', 'src/parser.c' },
+  },
+  requires_generate_from_grammar = false,
+  filetype = 'fsharp',
+}
+```
 
 ## Status
 The grammar currently has support for most language features, but might have rough edges.
