@@ -407,13 +407,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           lexer->mark_end(lexer);
           lexer->result_symbol = END;
           return true;
-        } else {
+        } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
           array_pop(&scanner->indents);
           lexer->result_symbol = DEDENT;
           return true;
         }
       }
-      return false;
     }
   } else if (is_bracket_end(lexer)) {
     found_bracket_end = true;
