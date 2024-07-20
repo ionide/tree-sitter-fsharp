@@ -279,6 +279,8 @@
   "type"
   "inherit"
   "interface"
+  "struct"
+  "class"
 ] @keyword.type
 
 (try_expression
