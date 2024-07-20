@@ -73,6 +73,7 @@ module.exports = grammar({
     "#endif",
     "class",
     $._struct_begin,
+    $._interface_begin,
     "end",
     $._triple_quoted_content,
     $.block_comment_content,
@@ -1170,9 +1171,8 @@ module.exports = grammar({
         $.delegate_type_defn,
         $.record_type_defn,
         $.union_type_defn,
+        $.interface_type_defn,
         $.anon_type_defn,
-        // $.struct_type_defn,
-        // $.interface_type_defn,
         $.enum_type_defn,
         $.type_abbrev_defn,
         $.type_extension,
@@ -1301,6 +1301,20 @@ module.exports = grammar({
     union_type_field: ($) =>
       prec.left(choice($.type, seq($.identifier, ":", $.type))),
 
+    interface_type_defn: ($) =>
+      prec.left(
+        1,
+        seq(
+          $.type_name,
+          "=",
+          seq(
+            alias($._interface_begin, "interface"),
+            scoped(repeat1($._type_defn_elements), $._indent, $._dedent),
+            "end",
+          ),
+        ),
+      ),
+
     anon_type_defn: ($) =>
       prec.left(
         seq(
@@ -1315,7 +1329,7 @@ module.exports = grammar({
               "end",
             ),
             seq(
-              $._struct_begin,
+              alias($._struct_begin, "struct"),
               scoped(repeat($._type_defn_elements), $._indent, $._dedent),
               "end",
             ),

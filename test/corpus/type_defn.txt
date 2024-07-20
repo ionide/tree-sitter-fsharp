@@ -380,6 +380,63 @@ type A() =
       (primary_constr_args))))
 
 ================================================================================
+interface construct 1
+================================================================================
+
+type A = interface
+  abstract member F: unit -> unit
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+interface construct 2
+================================================================================
+
+type A =
+  interface
+    abstract member F: unit -> unit
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
 private member method
 ================================================================================
 

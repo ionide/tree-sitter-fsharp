@@ -4583,6 +4583,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "interface_type_defn"
+        },
+        {
+          "type": "SYMBOL",
           "name": "anon_type_defn"
         },
         {
@@ -5336,6 +5340,65 @@
         ]
       }
     },
+    "interface_type_defn": {
+      "type": "PREC_LEFT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "type_name"
+          },
+          {
+            "type": "STRING",
+            "value": "="
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_interface_begin"
+                },
+                "named": false,
+                "value": "interface"
+              },
+              {
+                "type": "FIELD",
+                "name": "block",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_indent"
+                    },
+                    {
+                      "type": "REPEAT1",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_type_defn_elements"
+                      }
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_dedent"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "STRING",
+                "value": "end"
+              }
+            ]
+          }
+        ]
+      }
+    },
     "anon_type_defn": {
       "type": "PREC_LEFT",
       "value": 0,
@@ -5441,8 +5504,13 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "_struct_begin"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_struct_begin"
+                    },
+                    "named": false,
+                    "value": "struct"
                   },
                   {
                     "type": "FIELD",
@@ -8078,6 +8146,10 @@
     {
       "type": "SYMBOL",
       "name": "_struct_begin"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_interface_begin"
     },
     {
       "type": "STRING",

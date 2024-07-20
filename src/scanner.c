@@ -15,6 +15,7 @@ enum TokenType {
   PREPROC_END,
   CLASS,
   STRUCT,
+  INTERFACE,
   END,
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
@@ -300,6 +301,37 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                 lexer->mark_end(lexer);
                 lexer->result_symbol = STRUCT;
                 return true;
+              }
+            }
+          } else {
+            return false;
+          }
+        }
+      }
+    } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
+      advance(lexer);
+      if (lexer->lookahead == 'n') {
+        advance(lexer);
+        if (lexer->lookahead == 't') {
+          advance(lexer);
+          if (lexer->lookahead == 'e') {
+            advance(lexer);
+            if (lexer->lookahead == 'r') {
+              advance(lexer);
+              if (lexer->lookahead == 'f') {
+                advance(lexer);
+                if (lexer->lookahead == 'a') {
+                  advance(lexer);
+                  if (lexer->lookahead == 'c') {
+                    advance(lexer);
+                    if (lexer->lookahead == 'e') {
+                      advance(lexer);
+                      lexer->mark_end(lexer);
+                      lexer->result_symbol = INTERFACE;
+                      return true;
+                    }
+                  }
+                }
               }
             }
           } else {
