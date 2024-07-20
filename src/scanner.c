@@ -284,6 +284,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       }
+      return false;
     } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
       advance(lexer);
       if (lexer->lookahead == 't') {
@@ -301,6 +302,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                 return true;
               }
             }
+          } else {
+            return false;
           }
         }
       }
