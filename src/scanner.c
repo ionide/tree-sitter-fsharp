@@ -268,79 +268,84 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
       } else {
         return false;
       }
-    } else if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
+    } else {
+      break;
+    }
+  }
+
+  if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
+    lexer->mark_end(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 'l') {
       advance(lexer);
-      if (lexer->lookahead == 'l') {
+      if (lexer->lookahead == 'a') {
         advance(lexer);
-        if (lexer->lookahead == 'a') {
+        if (lexer->lookahead == 's') {
           advance(lexer);
           if (lexer->lookahead == 's') {
             advance(lexer);
-            if (lexer->lookahead == 's') {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = CLASS;
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
+    lexer->mark_end(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 't') {
+      advance(lexer);
+      if (lexer->lookahead == 'r') {
+        advance(lexer);
+        if (lexer->lookahead == 'u') {
+          advance(lexer);
+          if (lexer->lookahead == 'c') {
+            advance(lexer);
+            if (lexer->lookahead == 't') {
               advance(lexer);
               lexer->mark_end(lexer);
-              lexer->result_symbol = CLASS;
+              lexer->result_symbol = STRUCT;
               return true;
             }
           }
+        } else {
+          return false;
         }
       }
-      return false;
-    } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
+    }
+  } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
+    lexer->mark_end(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 'n') {
       advance(lexer);
       if (lexer->lookahead == 't') {
         advance(lexer);
-        if (lexer->lookahead == 'r') {
+        if (lexer->lookahead == 'e') {
           advance(lexer);
-          if (lexer->lookahead == 'u') {
+          if (lexer->lookahead == 'r') {
             advance(lexer);
-            if (lexer->lookahead == 'c') {
+            if (lexer->lookahead == 'f') {
               advance(lexer);
-              if (lexer->lookahead == 't') {
+              if (lexer->lookahead == 'a') {
                 advance(lexer);
-                lexer->mark_end(lexer);
-                lexer->result_symbol = STRUCT;
-                return true;
-              }
-            }
-          } else {
-            return false;
-          }
-        }
-      }
-    } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
-      advance(lexer);
-      if (lexer->lookahead == 'n') {
-        advance(lexer);
-        if (lexer->lookahead == 't') {
-          advance(lexer);
-          if (lexer->lookahead == 'e') {
-            advance(lexer);
-            if (lexer->lookahead == 'r') {
-              advance(lexer);
-              if (lexer->lookahead == 'f') {
-                advance(lexer);
-                if (lexer->lookahead == 'a') {
+                if (lexer->lookahead == 'c') {
                   advance(lexer);
-                  if (lexer->lookahead == 'c') {
+                  if (lexer->lookahead == 'e') {
                     advance(lexer);
-                    if (lexer->lookahead == 'e') {
-                      advance(lexer);
-                      lexer->mark_end(lexer);
-                      lexer->result_symbol = INTERFACE;
-                      return true;
-                    }
+                    lexer->mark_end(lexer);
+                    lexer->result_symbol = INTERFACE;
+                    return true;
                   }
                 }
               }
             }
-          } else {
-            return false;
           }
+        } else {
+          return false;
         }
       }
-    } else {
-      break;
     }
   }
 
