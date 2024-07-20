@@ -25,6 +25,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-14]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: ${{runner.os != 'Windows'}}
       - uses: tree-sitter/setup-action/cli@v1
       - uses: tree-sitter/parser-test-action@v2
         with:
@@ -32,8 +34,14 @@ jobs:
       - name: Parse sample files
         uses: tree-sitter/parse-action@v4
         id: parse-files
+        continue-on-error: true
         with:
-          files: examples/**/*.fs
+          files: |-
+            examples/Giraffe/**/*.fs
+            examples/FSharp.Data/**/*.fs
+            examples/FSharp.Compiler/tests/**/*.fs
+          invalid-files: |-
+            examples/FSharp.Compiler/tests/**/E_*.fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"

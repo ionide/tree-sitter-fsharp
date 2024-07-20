@@ -1,0 +1,9 @@
+[submodule "examples/FSharp.Data"]
+	path = examples/FSharp.Data
+	url = git@github.com:fsprojects/FSharp.Data.git
+[submodule "examples/Giraffe"]
+	path = examples/Giraffe
+	url = git@github.com:giraffe-fsharp/Giraffe.git
+[submodule "examples/FSharp.Compiler"]
+	path = examples/FSharp.Compiler
+	url = git@github.com:dotnet/fsharp.git
