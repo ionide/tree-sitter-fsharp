@@ -472,6 +472,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           array_pop(&scanner->indents);
           lexer->result_symbol = DEDENT;
           return true;
+        } else {
+          return false;
         }
       }
     }
