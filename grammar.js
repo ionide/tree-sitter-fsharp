@@ -78,6 +78,7 @@ module.exports = grammar({
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
+    $._ignore_indent_marker,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -1771,10 +1772,11 @@ module.exports = grammar({
 
     preproc_line: ($) =>
       seq(
-        alias(/#(line)? /, "#line"),
+        alias(/#(line)?/, "#line"),
         $.int,
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
-        /\n/,
+        optional($._ignore_indent_marker),
+        $._newline,
       ),
 
     ...preprocIf("", ($) => $._module_elem),

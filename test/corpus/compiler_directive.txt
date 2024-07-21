@@ -83,22 +83,22 @@ do
     (do
       (preproc_line
         (int))
-      (infix_expression
-        (application_expression
-          (infix_expression
-            (const
-              (int))
-            (infix_op)
-            (const
-              (int)))
-          (preproc_line
-            (int)
-            (string))
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
           (const
             (int)))
-        (infix_op)
-        (const
-          (int))))))
+        (preproc_line
+          (int)
+          (string))
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))))))
 
 ================================================================================
 preproc_if inside expression block

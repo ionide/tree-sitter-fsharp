@@ -20,6 +20,7 @@ enum TokenType {
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
+  IGNORE_INDENT,
   ERROR_SENTINEL
 };
 
@@ -173,9 +174,14 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
   for (;;) {
     if (lexer->lookahead == '\n') {
-      found_end_of_line = true;
-      indent_length = 0;
-      skip(lexer);
+      if (valid_symbols[NEWLINE] && valid_symbols[IGNORE_INDENT]) {
+        lexer->result_symbol = NEWLINE;
+        return true;
+      } else {
+        found_end_of_line = true;
+        indent_length = 0;
+        skip(lexer);
+      }
     } else if (lexer->lookahead == ' ') {
       indent_length++;
       skip(lexer);
