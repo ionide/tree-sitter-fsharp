@@ -71,6 +71,10 @@ module.exports = grammar({
     "#if",
     "#else",
     "#endif",
+    "class",
+    $._struct_begin,
+    $._interface_begin,
+    "end",
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
@@ -729,7 +733,10 @@ module.exports = grammar({
       ),
 
     begin_end_expression: ($) =>
-      prec(PREC.PAREN_EXPR, seq("begin", $._expression, "end")),
+      prec(
+        PREC.PAREN_EXPR,
+        seq("begin", scoped($._expression, $._indent, $._dedent), "end"),
+      ),
 
     paren_expression: ($) =>
       prec(PREC.PAREN_EXPR, seq("(", $._expression_block, ")")),
@@ -1030,8 +1037,6 @@ module.exports = grammar({
     named_static_parameter: ($) =>
       prec(3, seq($.identifier, "=", $.static_parameter_value)),
 
-    static_parameter_value: ($) => seq($.const, optional($._expression)),
-
     type_attribute: ($) =>
       choice(
         $.type,
@@ -1166,10 +1171,8 @@ module.exports = grammar({
         $.delegate_type_defn,
         $.record_type_defn,
         $.union_type_defn,
+        $.interface_type_defn,
         $.anon_type_defn,
-        // $.class_type_defn,
-        // $.struct_type_defn,
-        // $.interface_type_defn,
         $.enum_type_defn,
         $.type_abbrev_defn,
         $.type_extension,
@@ -1200,36 +1203,6 @@ module.exports = grammar({
 
     type_abbrev_defn: ($) =>
       seq($.type_name, "=", scoped($.type, $._indent, $._dedent)),
-
-    // class_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "class",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
-    //
-    // struct_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "struct",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
-    //
-    // interface_type_defn: $ =>
-    //   seq(
-    //     $.type_name,
-    //     optional($.primary_constr_args),
-    //     "=",
-    //     "interface",
-    //     $.class_type_body,
-    //     "end",
-    //   ),
 
     _class_type_body_inner: ($) =>
       choice(
@@ -1328,13 +1301,39 @@ module.exports = grammar({
     union_type_field: ($) =>
       prec.left(choice($.type, seq($.identifier, ":", $.type))),
 
+    interface_type_defn: ($) =>
+      prec.left(
+        1,
+        seq(
+          $.type_name,
+          "=",
+          seq(
+            alias($._interface_begin, "interface"),
+            scoped(repeat1($._type_defn_elements), $._indent, $._dedent),
+            "end",
+          ),
+        ),
+      ),
+
     anon_type_defn: ($) =>
       prec.left(
         seq(
           $.type_name,
           optional($.primary_constr_args),
           "=",
-          scoped($._class_type_body, $._indent, $._dedent),
+          choice(
+            scoped($._class_type_body, $._indent, $._dedent),
+            seq(
+              choice("begin", "class"),
+              scoped(optional($._class_type_body), $._indent, $._dedent),
+              "end",
+            ),
+            seq(
+              alias($._struct_begin, "struct"),
+              scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+              "end",
+            ),
+          ),
         ),
       ),
 
@@ -1425,6 +1424,7 @@ module.exports = grammar({
 
     _property_defn: ($) =>
       seq(
+        optional(seq(":", $.type)),
         "=",
         $._expression_block,
         optional(
@@ -1744,9 +1744,14 @@ module.exports = grammar({
       ),
 
     // preprocessors
-
     compiler_directive_decl: ($) =>
-      prec(100000, seq("#nowarn", alias($._string_literal, $.string), /\n/)),
+      prec(
+        100000,
+        seq(
+          choice(seq("#nowarn", alias($._string_literal, $.string)), "#light"),
+          /\n/,
+        ),
+      ),
 
     fsi_directive_decl: ($) =>
       seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),

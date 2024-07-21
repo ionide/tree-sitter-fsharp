@@ -13,6 +13,10 @@ enum TokenType {
   PREPROC_IF,
   PREPROC_ELSE,
   PREPROC_END,
+  CLASS,
+  STRUCT,
+  INTERFACE,
+  END,
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
@@ -112,13 +116,27 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *scanner = (Scanner *)payload;
 
-  bool error_recovery_mode = valid_symbols[ERROR_SENTINEL];
+  if (valid_symbols[ERROR_SENTINEL]) {
+    if (scanner->indents.size > 1) {
+      array_pop(&scanner->indents);
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
 
-  if (valid_symbols[INSIDE_STRING] && !error_recovery_mode) {
+    if (scanner->preprocessor_indents.size > 0) {
+      array_pop(&scanner->preprocessor_indents);
+      lexer->result_symbol = PREPROC_END;
+      return true;
+    }
+
     return false;
   }
 
-  if (valid_symbols[TRIPLE_QUOTE_CONTENT] && !error_recovery_mode) {
+  if (valid_symbols[INSIDE_STRING]) {
+    return false;
+  }
+
+  if (valid_symbols[TRIPLE_QUOTE_CONTENT]) {
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
@@ -268,6 +286,80 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
+  if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
+    lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 'l') {
+      advance(lexer);
+      if (lexer->lookahead == 'a') {
+        advance(lexer);
+        if (lexer->lookahead == 's') {
+          advance(lexer);
+          if (lexer->lookahead == 's') {
+            advance(lexer);
+            lexer->mark_end(lexer);
+            lexer->result_symbol = CLASS;
+            return true;
+          }
+        }
+      }
+    }
+  } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
+    lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 't') {
+      advance(lexer);
+      if (lexer->lookahead == 'r') {
+        advance(lexer);
+        if (lexer->lookahead == 'u') {
+          advance(lexer);
+          if (lexer->lookahead == 'c') {
+            advance(lexer);
+            if (lexer->lookahead == 't') {
+              advance(lexer);
+              lexer->mark_end(lexer);
+              lexer->result_symbol = STRUCT;
+              return true;
+            }
+          }
+        }
+      }
+    }
+  } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
+    lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 'n') {
+      advance(lexer);
+      if (lexer->lookahead == 't') {
+        advance(lexer);
+        if (lexer->lookahead == 'e') {
+          advance(lexer);
+          if (lexer->lookahead == 'r') {
+            advance(lexer);
+            if (lexer->lookahead == 'f') {
+              advance(lexer);
+              if (lexer->lookahead == 'a') {
+                advance(lexer);
+                if (lexer->lookahead == 'c') {
+                  advance(lexer);
+                  if (lexer->lookahead == 'e') {
+                    advance(lexer);
+                    lexer->mark_end(lexer);
+                    lexer->result_symbol = INTERFACE;
+                    return true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   // printf("lexer->lookahead = %c\n", lexer->lookahead);
   // printf("valid_symbols[NEWLINE] = %d\n", valid_symbols[NEWLINE]);
   // printf("valid_symbols[INDENT] = %d\n", valid_symbols[INDENT]);
@@ -307,7 +399,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   } else if (lexer->lookahead == 'e' &&
              (valid_symbols[ELSE] || valid_symbols[ELIF] ||
-              valid_symbols[DEDENT])) {
+              valid_symbols[DEDENT] || valid_symbols[END])) {
+    lexer->mark_end(lexer);
     int16_t token_indent_level = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'l') {
@@ -377,6 +470,23 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       }
+    } else if (lexer->lookahead == 'n' &&
+               (valid_symbols[END] || valid_symbols[DEDENT])) {
+      advance(lexer);
+      if (lexer->lookahead == 'd') {
+        advance(lexer);
+        if (valid_symbols[END]) {
+          lexer->mark_end(lexer);
+          lexer->result_symbol = END;
+          return true;
+        } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
+          array_pop(&scanner->indents);
+          lexer->result_symbol = DEDENT;
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   } else if (is_bracket_end(lexer)) {
     found_bracket_end = true;
@@ -395,8 +505,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         if (found_end_of_line && indent_length == current_indent_length &&
             indent_length > 0 && !found_start_of_infix_op &&
             !found_bracket_end) {
-          if (valid_symbols[NEWLINE] && !error_recovery_mode &&
-              !found_preprocessor_end) {
+          if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
             lexer->result_symbol = NEWLINE;
             return true;
           }
@@ -409,14 +518,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (error_recovery_mode && scanner->indents.size > 0) {
-    array_pop(&scanner->indents);
-    lexer->result_symbol = DEDENT;
-    return true;
-  }
-
-  if (valid_symbols[INDENT] && !found_bracket_end && !error_recovery_mode &&
-      !found_preprocessor_end) {
+  if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end) {
     array_push(&scanner->indents, indent_length);
     lexer->result_symbol = INDENT;
     return true;
@@ -434,8 +536,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     if (found_end_of_line) {
       if (indent_length == current_indent_length && indent_length > 0 &&
           !found_start_of_infix_op && !found_bracket_end) {
-        if (valid_symbols[NEWLINE] && !error_recovery_mode &&
-            !found_preprocessor_end) {
+        if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
           lexer->result_symbol = NEWLINE;
           return true;
         }
@@ -468,7 +569,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (valid_symbols[BLOCK_COMMENT_CONTENT] && !error_recovery_mode) {
+  if (valid_symbols[BLOCK_COMMENT_CONTENT]) {
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {

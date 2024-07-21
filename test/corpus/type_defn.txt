@@ -251,6 +251,192 @@ type A() =
               (identifier))))))))
 
 ================================================================================
+basic class member definition with class keyword 1
+================================================================================
+
+type A() = class
+  member this.Post(msg: string) = msg
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+basic class member definition with class keyword 2
+================================================================================
+
+type A() =
+  class
+    member this.Post(msg: string) = msg
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+empty class with class end construct 1
+================================================================================
+
+type A() =
+  class
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with class end construct 1
+================================================================================
+
+type A() = class end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with struct end construct 1
+================================================================================
+
+type A() = struct end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with struct end construct 1
+================================================================================
+
+type A() =
+  struct
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+interface construct 1
+================================================================================
+
+type A = interface
+  abstract member F: unit -> unit
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+interface construct 2
+================================================================================
+
+type A =
+  interface
+    abstract member F: unit -> unit
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (type
+                  (long_identifier
+                    (identifier)))))
+            (type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
 private member method
 ================================================================================
 

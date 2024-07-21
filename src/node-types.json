@@ -276,6 +276,10 @@
         "named": true
       },
       {
+        "type": "interface_type_defn",
+        "named": true
+      },
+      {
         "type": "record_type_defn",
         "named": true
       },
@@ -667,16 +671,17 @@
   {
     "type": "begin_end_expression",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -833,7 +838,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "string",
@@ -1801,6 +1806,36 @@
     }
   },
   {
+    "type": "interface_type_defn",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "interface_implementation",
+            "named": true
+          },
+          {
+            "type": "member_defn",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "line_comment",
     "named": true,
     "fields": {}
@@ -2072,6 +2107,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "type",
           "named": true
         },
         {
@@ -3687,6 +3726,10 @@
     "named": false
   },
   {
+    "type": "#light",
+    "named": false
+  },
+  {
     "type": "#line",
     "named": false
   },
@@ -3949,6 +3992,10 @@
   {
     "type": "bool",
     "named": true
+  },
+  {
+    "type": "class",
+    "named": false
   },
   {
     "type": "comparison",
@@ -4216,11 +4263,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
