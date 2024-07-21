@@ -275,6 +275,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
   if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
     lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'l') {
       advance(lexer);
@@ -291,9 +292,9 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         }
       }
     }
-    return false;
   } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
     lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 't') {
       advance(lexer);
@@ -310,13 +311,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               return true;
             }
           }
-        } else {
-          return false;
         }
       }
     }
   } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
     lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
     advance(lexer);
     if (lexer->lookahead == 'n') {
       advance(lexer);
@@ -342,8 +342,6 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               }
             }
           }
-        } else {
-          return false;
         }
       }
     }
