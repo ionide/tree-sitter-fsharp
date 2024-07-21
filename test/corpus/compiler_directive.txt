@@ -101,6 +101,49 @@ do
             (int)))))))
 
 ================================================================================
+line compiler directive in expressions 2
+================================================================================
+
+let f =
+    if b then exit 1
+
+#line 2 @"F:/foo/SomethingElse.fs"
+    let srcDir = __SOURCE_DIRECTORY__
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (sequential_expression
+        (if_expression
+          (long_identifier_or_op
+            (identifier))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (int)))
+          (preproc_line
+            (int)
+            (verbatim_string)))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (long_identifier_or_op
+              (identifier)))
+          (const
+            (unit)))))))
+
+================================================================================
 preproc_if inside expression block
 ================================================================================
 
