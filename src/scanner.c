@@ -174,9 +174,13 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
   for (;;) {
     if (lexer->lookahead == '\n') {
-      if (valid_symbols[NEWLINE] && valid_symbols[IGNORE_INDENT]) {
-        lexer->result_symbol = NEWLINE;
-        return true;
+      if (valid_symbols[IGNORE_INDENT]) {
+        if (valid_symbols[NEWLINE]) {
+          lexer->result_symbol = NEWLINE;
+          return true;
+        } else {
+          return false;
+        }
       } else {
         found_end_of_line = true;
         indent_length = 0;
