@@ -7720,8 +7720,20 @@
             ]
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_ignore_indent_marker"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_newline"
           }
         ]
       }
@@ -7752,8 +7764,20 @@
           "value": "string"
         },
         {
-          "type": "PATTERN",
-          "value": "\\n"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_ignore_indent_marker"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_newline"
         }
       ]
     },
@@ -7836,8 +7860,20 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_ignore_indent_marker"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_newline"
           },
           {
             "type": "SYMBOL",
@@ -7902,8 +7938,20 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_ignore_indent_marker"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_newline"
           },
           {
             "type": "REPEAT",
@@ -8013,8 +8061,20 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_ignore_indent_marker"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_newline"
           },
           {
             "type": "REPEAT",

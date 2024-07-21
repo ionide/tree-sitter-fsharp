@@ -1763,12 +1763,18 @@ module.exports = grammar({
         100000,
         seq(
           choice(seq("#nowarn", alias($._string_literal, $.string)), "#light"),
-          /\n/,
+          optional($._ignore_indent_marker),
+          $._newline,
         ),
       ),
 
     fsi_directive_decl: ($) =>
-      seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),
+      seq(
+        choice("#r", "#load"),
+        alias($._string_literal, $.string),
+        optional($._ignore_indent_marker),
+        $._newline,
+      ),
 
     preproc_line: ($) =>
       seq(
@@ -1838,7 +1844,8 @@ function preprocIf(suffix, content, precedence = 0) {
         seq(
           "#if",
           field("condition", $.identifier),
-          /\n/,
+          optional($._ignore_indent_marker),
+          $._newline,
           content($),
           field("alternative", optional(alternativeBlock($))),
           "#endif",
