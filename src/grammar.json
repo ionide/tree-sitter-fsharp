@@ -7655,33 +7655,38 @@
       "type": "PREC",
       "value": 100000,
       "content": {
-        "type": "CHOICE",
+        "type": "SEQ",
         "members": [
           {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
               {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "#nowarn"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_string_literal"
+                    },
+                    "named": true,
+                    "value": "string"
+                  }
+                ]
+              },
+              {
                 "type": "STRING",
-                "value": "#nowarn"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "_string_literal"
-                },
-                "named": true,
-                "value": "string"
-              },
-              {
-                "type": "PATTERN",
-                "value": "\\n"
+                "value": "#light"
               }
             ]
           },
           {
-            "type": "STRING",
-            "value": "#light"
+            "type": "PATTERN",
+            "value": "\\n"
           }
         ]
       }

@@ -1744,13 +1744,12 @@ module.exports = grammar({
       ),
 
     // preprocessors
-
     compiler_directive_decl: ($) =>
       prec(
         100000,
-        choice(
-          seq("#nowarn", alias($._string_literal, $.string), /\n/),
-          "#light",
+        seq(
+          choice(seq("#nowarn", alias($._string_literal, $.string)), "#light"),
+          /\n/,
         ),
       ),
 
