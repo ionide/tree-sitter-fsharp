@@ -512,6 +512,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
+  if (error_recovery_mode && scanner->special_scope_indents.size > 0) {
+    array_pop(&scanner->special_scope_indents);
+    lexer->result_symbol = PREPROC_END;
+    return true;
+  }
+
   if (valid_symbols[INDENT] && !found_bracket_end && !error_recovery_mode &&
       !found_preprocessor_end) {
     array_push(&scanner->indents, indent_length);
