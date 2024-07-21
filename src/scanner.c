@@ -25,7 +25,7 @@ enum TokenType {
 
 typedef struct {
   Array(uint16_t) indents;
-  Array(uint16_t) special_scope_indents;
+  Array(uint16_t) preprocessor_indents;
 } Scanner;
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -116,13 +116,27 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *scanner = (Scanner *)payload;
 
-  bool error_recovery_mode = valid_symbols[ERROR_SENTINEL];
+  if (valid_symbols[ERROR_SENTINEL]) {
+    if (scanner->indents.size > 1) {
+      array_pop(&scanner->indents);
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
 
-  if (valid_symbols[INSIDE_STRING] && !error_recovery_mode) {
+    if (scanner->preprocessor_indents.size > 0) {
+      array_pop(&scanner->preprocessor_indents);
+      lexer->result_symbol = PREPROC_END;
+      return true;
+    }
+
     return false;
   }
 
-  if (valid_symbols[TRIPLE_QUOTE_CONTENT] && !error_recovery_mode) {
+  if (valid_symbols[INSIDE_STRING]) {
+    return false;
+  }
+
+  if (valid_symbols[TRIPLE_QUOTE_CONTENT]) {
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
@@ -197,11 +211,11 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                 advance(lexer);
                 found_preprocessor_end = true;
                 if (scanner->indents.size > 0 &&
-                    scanner->special_scope_indents.size > 0) {
+                    scanner->preprocessor_indents.size > 0) {
                   uint16_t current_indent_length =
                       *array_back(&scanner->indents);
                   uint16_t current_preproc_length =
-                      *array_back(&scanner->special_scope_indents);
+                      *array_back(&scanner->preprocessor_indents);
                   if (current_preproc_length < current_indent_length) {
                     array_pop(&scanner->indents);
                     lexer->result_symbol = DEDENT;
@@ -209,8 +223,8 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
                   }
                 }
                 if (valid_symbols[PREPROC_END]) {
-                  if (scanner->special_scope_indents.size > 0) {
-                    array_pop(&scanner->special_scope_indents);
+                  if (scanner->preprocessor_indents.size > 0) {
+                    array_pop(&scanner->preprocessor_indents);
                   }
                   lexer->mark_end(lexer);
                   lexer->result_symbol = PREPROC_END;
@@ -227,10 +241,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
               advance(lexer);
               found_preprocessor_else = true;
               if (scanner->indents.size > 0 &&
-                  scanner->special_scope_indents.size > 0) {
+                  scanner->preprocessor_indents.size > 0) {
                 uint16_t current_indent_length = *array_back(&scanner->indents);
                 uint16_t current_preproc_length =
-                    *array_back(&scanner->special_scope_indents);
+                    *array_back(&scanner->preprocessor_indents);
                 if (current_preproc_length < current_indent_length) {
                   array_pop(&scanner->indents);
                   lexer->result_symbol = DEDENT;
@@ -257,8 +271,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           } else {
             if (scanner->indents.size > 0) {
               uint16_t current_indent_length = *array_back(&scanner->indents);
-              array_push(&scanner->special_scope_indents,
-                         current_indent_length);
+              array_push(&scanner->preprocessor_indents, current_indent_length);
             }
             lexer->mark_end(lexer);
             lexer->result_symbol = PREPROC_IF;
@@ -492,8 +505,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         if (found_end_of_line && indent_length == current_indent_length &&
             indent_length > 0 && !found_start_of_infix_op &&
             !found_bracket_end) {
-          if (valid_symbols[NEWLINE] && !error_recovery_mode &&
-              !found_preprocessor_end) {
+          if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
             lexer->result_symbol = NEWLINE;
             return true;
           }
@@ -506,20 +518,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (error_recovery_mode && scanner->indents.size > 0) {
-    array_pop(&scanner->indents);
-    lexer->result_symbol = DEDENT;
-    return true;
-  }
-
-  if (error_recovery_mode && scanner->special_scope_indents.size > 0) {
-    array_pop(&scanner->special_scope_indents);
-    lexer->result_symbol = PREPROC_END;
-    return true;
-  }
-
-  if (valid_symbols[INDENT] && !found_bracket_end && !error_recovery_mode &&
-      !found_preprocessor_end) {
+  if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end) {
     array_push(&scanner->indents, indent_length);
     lexer->result_symbol = INDENT;
     return true;
@@ -537,8 +536,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     if (found_end_of_line) {
       if (indent_length == current_indent_length && indent_length > 0 &&
           !found_start_of_infix_op && !found_bracket_end) {
-        if (valid_symbols[NEWLINE] && !error_recovery_mode &&
-            !found_preprocessor_end) {
+        if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
           lexer->result_symbol = NEWLINE;
           return true;
         }
@@ -546,9 +544,9 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
       bool can_dedent_preproc;
 
-      if (scanner->special_scope_indents.size > 0) {
+      if (scanner->preprocessor_indents.size > 0) {
         uint16_t current_preproc_length =
-            *array_back(&scanner->special_scope_indents);
+            *array_back(&scanner->preprocessor_indents);
         can_dedent_preproc = current_preproc_length < indent_length;
       } else {
         can_dedent_preproc = true;
@@ -571,7 +569,7 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (valid_symbols[BLOCK_COMMENT_CONTENT] && !error_recovery_mode) {
+  if (valid_symbols[BLOCK_COMMENT_CONTENT]) {
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
@@ -605,18 +603,18 @@ unsigned tree_sitter_fsharp_external_scanner_serialize(void *payload,
   Scanner *scanner = (Scanner *)payload;
   size_t size = 0;
 
-  size_t preprocessor_count = scanner->special_scope_indents.size;
+  size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
     preprocessor_count = UINT8_MAX;
   }
 
-  buffer[size++] = (char)scanner->special_scope_indents.size;
+  buffer[size++] = (char)scanner->preprocessor_indents.size;
 
   // printf("serialize: %i\n", (char)preprocessor_count);
   for (size_t iter = 0; iter < preprocessor_count &&
                         size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
        iter++) {
-    char e = *array_get(&scanner->special_scope_indents, iter);
+    char e = *array_get(&scanner->preprocessor_indents, iter);
     // printf("preproc[%i] = %i\n", (char)iter, e);
     buffer[size++] = e;
   }
@@ -639,7 +637,7 @@ void tree_sitter_fsharp_external_scanner_deserialize(void *payload,
   array_delete(&scanner->indents);
   array_push(&scanner->indents, 0);
 
-  array_delete(&scanner->special_scope_indents);
+  array_delete(&scanner->preprocessor_indents);
   if (length > 0) {
     size_t size = 0;
 
@@ -648,7 +646,7 @@ void tree_sitter_fsharp_external_scanner_deserialize(void *payload,
     // printf("deserialize: %i\n", (char)preprocessor_count);
 
     for (; size <= preprocessor_count; size++) {
-      array_push(&scanner->special_scope_indents, (unsigned char)buffer[size]);
+      array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
     }
 
     // for (size_t i = 0; i < scanner->preprocessor_indents.size; i++) {
@@ -667,7 +665,7 @@ void tree_sitter_fsharp_external_scanner_deserialize(void *payload,
 void *tree_sitter_fsharp_external_scanner_create() {
   Scanner *scanner = ts_calloc(1, sizeof(Scanner));
   array_init(&scanner->indents);
-  array_init(&scanner->special_scope_indents);
+  array_init(&scanner->preprocessor_indents);
   tree_sitter_fsharp_external_scanner_deserialize(scanner, NULL, 0);
   return scanner;
 }
@@ -675,6 +673,6 @@ void *tree_sitter_fsharp_external_scanner_create() {
 void tree_sitter_fsharp_external_scanner_destroy(void *payload) {
   Scanner *scanner = (Scanner *)payload;
   array_delete(&scanner->indents);
-  array_delete(&scanner->special_scope_indents);
+  array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }
