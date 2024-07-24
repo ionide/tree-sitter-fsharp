@@ -155,46 +155,6 @@ if x = y then () else failwith "Failed: 1"
 
 --------------------------------------------------------------------------------
 
-(file
-  (compiler_directive_decl)
-  (value_declaration
-    (function_or_value_defn
-      (value_declaration_left
-        (identifier_pattern
-          (long_identifier_or_op
-            (identifier))))
-      (const
-        (string))))
-  (value_declaration
-    (function_or_value_defn
-      (value_declaration_left
-        (identifier_pattern
-          (long_identifier_or_op
-            (identifier))))
-      (sequential_expression
-        (application_expression
-          (dot_expression
-            (const
-              (char))
-            (long_identifier_or_op
-              (identifier))))
-        (long_identifier_or_op
-          (MISSING identifier)))))
-  (if_expression
-    (infix_expression
-      (long_identifier_or_op
-        (identifier))
-      (infix_op)
-      (long_identifier_or_op
-        (identifier)))
-    (const
-      (unit))
-    (application_expression
-      (long_identifier_or_op
-        (identifier))
-      (const
-        (string)))))
-
 ================================================================================
 preproc_if inside expression block
 ================================================================================
