@@ -290,3 +290,56 @@ open System.Collections.Generic
         (identifier)
         (identifier)
         (identifier)))))
+
+================================================================================
+module with expression and non-expression elements
+================================================================================
+
+module A =
+  print "A"
+  type B = C
+
+--------------------------------------------------------------------------------
+
+(file
+ (module_defn (identifier)
+   (application_expression
+    (long_identifier_or_op (identifier))
+    (const
+     (string)))
+  (type_definition type
+   (union_type_defn
+    (type_name
+     (identifier))
+    (union_type_cases
+     (union_type_case
+      (identifier)))))))
+
+================================================================================
+module with multiple expressions and non-expression
+================================================================================
+
+module A =
+  print "A"
+  print "D"
+  type B = C
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn (identifier)
+    (application_expression
+      (long_identifier_or_op (identifier))
+      (const
+        (string)))
+    (application_expression
+      (long_identifier_or_op (identifier))
+      (const
+        (string)))
+    (type_definition type
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier)))))))

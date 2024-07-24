@@ -165,8 +165,21 @@ module.exports = grammar({
           optional($.access_modifier),
           $.identifier,
           "=",
-          scoped(repeat1($._module_elem), $._indent, $._dedent),
+          scoped($._module_body, $._indent, $._dedent),
         ),
+      ),
+
+    _module_body: ($) =>
+      seq(
+        $._module_elem,
+        repeat(
+          prec(
+            // Make sure that the lexer tries to parse a module node before a sequential expression
+            // TODO: I think it eliminates seq_expr from module bodies entirely? Is this okay behavior?
+            PREC.SEQ_EXPR + 1,
+            seq(alias($._newline, ";"), $._module_elem)
+          )
+        )
       ),
 
     import_decl: ($) => seq("open", $.long_identifier),
