@@ -174,8 +174,8 @@ module.exports = grammar({
         $._module_elem,
         repeat(
           prec(
-            // Make sure that the lexer tries to parse a module node before a sequential expression
-            // TODO: I think it eliminates seq_expr from module bodies entirely? Is this okay behavior?
+            // Make sure to parse a module node before a sequential expression
+            // NOTE: This removes all sequential expressions from module bodies
             PREC.SEQ_EXPR + 1,
             seq(alias($._newline, ";"), $._module_elem)
           )

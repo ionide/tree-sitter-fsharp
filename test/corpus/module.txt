@@ -307,7 +307,7 @@ module A =
     (long_identifier_or_op (identifier))
     (const
      (string)))
-  (type_definition type
+  (type_definition
    (union_type_defn
     (type_name
      (identifier))
@@ -336,7 +336,7 @@ module A =
       (long_identifier_or_op (identifier))
       (const
         (string)))
-    (type_definition type
+    (type_definition
       (union_type_defn
         (type_name
           (identifier))
