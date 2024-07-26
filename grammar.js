@@ -383,7 +383,7 @@ module.exports = grammar({
     list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
     record_pattern: ($) =>
-      prec.left(seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)))),
+      prec.left(seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}")),
 
     identifier_pattern: ($) =>
       prec.left(
