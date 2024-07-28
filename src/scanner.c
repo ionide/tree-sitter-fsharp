@@ -20,6 +20,7 @@ enum TokenType {
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
+  NEWLINE_NO_ALIGNED,
   ERROR_SENTINEL
 };
 
@@ -279,6 +280,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       } else {
+        if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED]) {
+          lexer->result_symbol = NEWLINE_NO_ALIGNED;
+          return true;
+        }
         return false;
       }
     } else {
@@ -360,10 +365,11 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  // printf("lexer->lookahead = %c\n", lexer->lookahead);
-  // printf("valid_symbols[NEWLINE] = %d\n", valid_symbols[NEWLINE]);
-  // printf("valid_symbols[INDENT] = %d\n", valid_symbols[INDENT]);
-  // printf("valid_symbols[DEDENT] = %d\n", valid_symbols[DEDENT]);
+  if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED] &&
+      !found_start_of_infix_op && !found_preprocessor_end) {
+    lexer->result_symbol = NEWLINE_NO_ALIGNED;
+    return true;
+  }
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
@@ -610,12 +616,10 @@ unsigned tree_sitter_fsharp_external_scanner_serialize(void *payload,
 
   buffer[size++] = (char)scanner->preprocessor_indents.size;
 
-  // printf("serialize: %i\n", (char)preprocessor_count);
   for (size_t iter = 0; iter < preprocessor_count &&
                         size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
        iter++) {
     char e = *array_get(&scanner->preprocessor_indents, iter);
-    // printf("preproc[%i] = %i\n", (char)iter, e);
     buffer[size++] = e;
   }
 
@@ -640,19 +644,11 @@ void tree_sitter_fsharp_external_scanner_deserialize(void *payload,
   array_delete(&scanner->preprocessor_indents);
   if (length > 0) {
     size_t size = 0;
-
     size_t preprocessor_count = (uint8_t)buffer[size++];
-
-    // printf("deserialize: %i\n", (char)preprocessor_count);
 
     for (; size <= preprocessor_count; size++) {
       array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
     }
-
-    // for (size_t i = 0; i < scanner->preprocessor_indents.size; i++) {
-    //   printf("preproc[%i] = %i\n", (char)i,
-    //          *array_get(&scanner->preprocessor_indents, i));
-    // }
 
     for (; size < length; size++) {
       array_push(&scanner->indents, (unsigned char)buffer[size]);

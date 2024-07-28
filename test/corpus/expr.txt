@@ -2858,7 +2858,9 @@ module A =
                     (identifier))))
               (application_expression
                 (long_identifier_or_op
-                  (identifier))))
+                  (identifier))
+                (const
+                  (unit))))
             (rule
               (wildcard_pattern)
               (long_identifier_or_op

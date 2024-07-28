@@ -6750,8 +6750,15 @@
       }
     },
     "unit": {
-      "type": "STRING",
-      "value": "()"
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 100000,
+        "content": {
+          "type": "STRING",
+          "value": "()"
+        }
+      }
     },
     "const": {
       "type": "CHOICE",
@@ -7690,38 +7697,33 @@
       "type": "PREC",
       "value": 100000,
       "content": {
-        "type": "SEQ",
+        "type": "CHOICE",
         "members": [
           {
-            "type": "CHOICE",
+            "type": "SEQ",
             "members": [
               {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "#nowarn"
-                  },
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_string_literal"
-                    },
-                    "named": true,
-                    "value": "string"
-                  }
-                ]
+                "type": "STRING",
+                "value": "#nowarn"
               },
               {
-                "type": "STRING",
-                "value": "#light"
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_string_literal"
+                },
+                "named": true,
+                "value": "string"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_newline_not_aligned"
               }
             ]
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "STRING",
+            "value": "#light"
           }
         ]
       }
@@ -7764,7 +7766,7 @@
           "type": "ALIAS",
           "content": {
             "type": "PATTERN",
-            "value": "#(line)? "
+            "value": "#(line)?"
           },
           "named": false,
           "value": "#line"
@@ -7800,8 +7802,8 @@
           ]
         },
         {
-          "type": "PATTERN",
-          "value": "\\n"
+          "type": "SYMBOL",
+          "name": "_newline_not_aligned"
         }
       ]
     },
@@ -7824,8 +7826,8 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "SYMBOL",
+            "name": "_newline_not_aligned"
           },
           {
             "type": "SYMBOL",
@@ -7890,8 +7892,8 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "SYMBOL",
+            "name": "_newline_not_aligned"
           },
           {
             "type": "REPEAT",
@@ -8001,8 +8003,8 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "SYMBOL",
+            "name": "_newline_not_aligned"
           },
           {
             "type": "REPEAT",
@@ -8206,6 +8208,10 @@
     {
       "type": "SYMBOL",
       "name": "_inside_string_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_newline_not_aligned"
     },
     {
       "type": "SYMBOL",

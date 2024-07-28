@@ -78,6 +78,7 @@ module.exports = grammar({
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
+    $._newline_not_aligned,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -177,9 +178,9 @@ module.exports = grammar({
             // Make sure to parse a module node before a sequential expression
             // NOTE: This removes all sequential expressions from module bodies
             PREC.SEQ_EXPR + 1,
-            seq(alias($._newline, ";"), $._module_elem)
-          )
-        )
+            seq(alias($._newline, ";"), $._module_elem),
+          ),
+        ),
       ),
 
     import_decl: ($) => seq("open", $.long_identifier),
@@ -383,7 +384,9 @@ module.exports = grammar({
     list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
     record_pattern: ($) =>
-      prec.left(seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}")),
+      prec.left(
+        seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}"),
+      ),
 
     identifier_pattern: ($) =>
       prec.left(
@@ -1602,7 +1605,7 @@ module.exports = grammar({
 
     bool: (_) => token(choice("true", "false")),
 
-    unit: (_) => "()",
+    unit: (_) => token(prec(100000, "()")),
 
     const: ($) =>
       choice(
@@ -1760,9 +1763,13 @@ module.exports = grammar({
     compiler_directive_decl: ($) =>
       prec(
         100000,
-        seq(
-          choice(seq("#nowarn", alias($._string_literal, $.string)), "#light"),
-          /\n/,
+        choice(
+          seq(
+            "#nowarn",
+            alias($._string_literal, $.string),
+            $._newline_not_aligned,
+          ),
+          "#light",
         ),
       ),
 
@@ -1771,10 +1778,10 @@ module.exports = grammar({
 
     preproc_line: ($) =>
       seq(
-        alias(/#(line)? /, "#line"),
+        alias(/#(line)?/, "#line"),
         $.int,
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
-        /\n/,
+        $._newline_not_aligned,
       ),
 
     ...preprocIf("", ($) => $._module_elem),
@@ -1836,7 +1843,7 @@ function preprocIf(suffix, content, precedence = 0) {
         seq(
           "#if",
           field("condition", $.identifier),
-          /\n/,
+          $._newline_not_aligned,
           content($),
           field("alternative", optional(alternativeBlock($))),
           "#endif",

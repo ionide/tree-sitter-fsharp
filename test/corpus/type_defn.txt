@@ -1206,7 +1206,9 @@ type A(x: int, y:int) =
                       (identifier))))))
             (application_expression
               (long_identifier_or_op
-                (identifier)))))))))
+                (identifier))
+              (const
+                (unit)))))))))
 
 ================================================================================
 multiple interfaces with property members

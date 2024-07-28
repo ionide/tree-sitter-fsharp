@@ -83,22 +83,105 @@ do
     (do
       (preproc_line
         (int))
-      (infix_expression
-        (application_expression
-          (infix_expression
-            (const
-              (int))
-            (infix_op)
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (preproc_line
+          (int)
+          (string))
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+line compiler directive in expressions 2
+================================================================================
+
+let f =
+    if b then exit 1
+
+#line 2 @"F:/foo/SomethingElse.fs"
+    let srcDir = __SOURCE_DIRECTORY__
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (sequential_expression
+        (if_expression
+          (long_identifier_or_op
+            (identifier))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
             (const
               (int)))
           (preproc_line
             (int)
-            (string))
+            (verbatim_string)))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (long_identifier_or_op
+              (identifier)))
           (const
-            (int)))
-        (infix_op)
-        (const
-          (int))))))
+            (unit)))))))
+
+================================================================================
+light compiler directive directly above expression
+================================================================================
+
+#light
+let x = "a"
+let y = 'a'.ToString()
+
+if x = y then () else failwith "Failed: 1"
+
+--------------------------------------------------------------------------------
+
+(file
+  (compiler_directive_decl)
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op (identifier))))
+        (const (string))))
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op (identifier))))
+       (application_expression
+        (dot_expression
+          (const (char))
+          (long_identifier_or_op (identifier)))
+        (const (unit)))))
+  (if_expression
+    (infix_expression
+      (long_identifier_or_op (identifier))
+      (infix_op)
+      (long_identifier_or_op (identifier)))
+    (const (unit))
+    (application_expression
+      (long_identifier_or_op (identifier))
+      (const (string)))))
 
 ================================================================================
 preproc_if inside expression block
