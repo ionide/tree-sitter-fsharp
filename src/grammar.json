@@ -264,7 +264,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "_module_node"
+                  "name": "_module_body"
                 },
                 {
                   "type": "SYMBOL",
@@ -276,7 +276,7 @@
         ]
       }
     },
-    "_module_node": {
+    "_module_body": {
       "type": "SEQ",
       "members": [
         {
@@ -1399,6 +1399,10 @@
                 }
               ]
             }
+          },
+          {
+            "type": "STRING",
+            "value": "}"
           }
         ]
       }
