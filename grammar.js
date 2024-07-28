@@ -78,7 +78,7 @@ module.exports = grammar({
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
-    $._ignore_indent_marker,
+    $._newline_not_aligned,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -1767,28 +1767,21 @@ module.exports = grammar({
           seq(
             "#nowarn",
             alias($._string_literal, $.string),
-            optional($._ignore_indent_marker),
-            $._newline,
+            $._newline_not_aligned,
           ),
           "#light",
         ),
       ),
 
     fsi_directive_decl: ($) =>
-      seq(
-        choice("#r", "#load"),
-        alias($._string_literal, $.string),
-        optional($._ignore_indent_marker),
-        $._newline,
-      ),
+      seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),
 
     preproc_line: ($) =>
       seq(
         alias(/#(line)?/, "#line"),
         $.int,
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
-        optional($._ignore_indent_marker),
-        $._newline,
+        $._newline_not_aligned,
       ),
 
     ...preprocIf("", ($) => $._module_elem),
@@ -1850,8 +1843,7 @@ function preprocIf(suffix, content, precedence = 0) {
         seq(
           "#if",
           field("condition", $.identifier),
-          optional($._ignore_indent_marker),
-          $._newline,
+          $._newline_not_aligned,
           content($),
           field("alternative", optional(alternativeBlock($))),
           "#endif",

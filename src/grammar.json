@@ -7716,20 +7716,8 @@
                 "value": "string"
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_ignore_indent_marker"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
                 "type": "SYMBOL",
-                "name": "_newline"
+                "name": "_newline_not_aligned"
               }
             ]
           },
@@ -7766,20 +7754,8 @@
           "value": "string"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_ignore_indent_marker"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_newline"
+          "type": "PATTERN",
+          "value": "\\n"
         }
       ]
     },
@@ -7826,20 +7802,8 @@
           ]
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_ignore_indent_marker"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
           "type": "SYMBOL",
-          "name": "_newline"
+          "name": "_newline_not_aligned"
         }
       ]
     },
@@ -7862,20 +7826,8 @@
             }
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_ignore_indent_marker"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_newline_not_aligned"
           },
           {
             "type": "SYMBOL",
@@ -7940,20 +7892,8 @@
             }
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_ignore_indent_marker"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_newline_not_aligned"
           },
           {
             "type": "REPEAT",
@@ -8063,20 +8003,8 @@
             }
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_ignore_indent_marker"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_newline_not_aligned"
           },
           {
             "type": "REPEAT",
@@ -8283,7 +8211,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_ignore_indent_marker"
+      "name": "_newline_not_aligned"
     },
     {
       "type": "SYMBOL",

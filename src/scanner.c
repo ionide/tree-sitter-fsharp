@@ -20,7 +20,7 @@ enum TokenType {
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
-  IGNORE_INDENT,
+  NEWLINE_NO_ALIGNED,
   ERROR_SENTINEL
 };
 
@@ -174,18 +174,9 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
 
   for (;;) {
     if (lexer->lookahead == '\n') {
-      if (valid_symbols[IGNORE_INDENT]) {
-        if (valid_symbols[NEWLINE]) {
-          lexer->result_symbol = NEWLINE;
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        found_end_of_line = true;
-        indent_length = 0;
-        skip(lexer);
-      }
+      found_end_of_line = true;
+      indent_length = 0;
+      skip(lexer);
     } else if (lexer->lookahead == ' ') {
       indent_length++;
       skip(lexer);
@@ -289,6 +280,10 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
           }
         }
       } else {
+        if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED]) {
+          lexer->result_symbol = NEWLINE_NO_ALIGNED;
+          return true;
+        }
         return false;
       }
     } else {
@@ -368,6 +363,12 @@ bool tree_sitter_fsharp_external_scanner_scan(void *payload, TSLexer *lexer,
         }
       }
     }
+  }
+
+  if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED] &&
+      !found_start_of_infix_op && !found_preprocessor_end) {
+    lexer->result_symbol = NEWLINE_NO_ALIGNED;
+    return true;
   }
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
