@@ -178,9 +178,9 @@ module.exports = grammar({
             // Make sure to parse a module node before a sequential expression
             // NOTE: This removes all sequential expressions from module bodies
             PREC.SEQ_EXPR + 1,
-            seq(alias($._newline, ";"), $._module_elem)
-          )
-        )
+            seq(alias($._newline, ";"), $._module_elem),
+          ),
+        ),
       ),
 
     import_decl: ($) => seq("open", $.long_identifier),
@@ -384,7 +384,9 @@ module.exports = grammar({
     list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
     record_pattern: ($) =>
-      prec.left(seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}")),
+      prec.left(
+        seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}"),
+      ),
 
     identifier_pattern: ($) =>
       prec.left(
@@ -1603,7 +1605,7 @@ module.exports = grammar({
 
     bool: (_) => token(choice("true", "false")),
 
-    unit: (_) => "()",
+    unit: (_) => token(prec(100000, "()")),
 
     const: ($) =>
       choice(
@@ -1761,10 +1763,14 @@ module.exports = grammar({
     compiler_directive_decl: ($) =>
       prec(
         100000,
-        seq(
-          choice(seq("#nowarn", alias($._string_literal, $.string)), "#light"),
-          optional($._ignore_indent_marker),
-          $._newline,
+        choice(
+          seq(
+            "#nowarn",
+            alias($._string_literal, $.string),
+            optional($._ignore_indent_marker),
+            $._newline,
+          ),
+          "#light",
         ),
       ),
 

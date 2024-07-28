@@ -6750,8 +6750,15 @@
       }
     },
     "unit": {
-      "type": "STRING",
-      "value": "()"
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 100000,
+        "content": {
+          "type": "STRING",
+          "value": "()"
+        }
+      }
     },
     "const": {
       "type": "CHOICE",
@@ -7690,50 +7697,45 @@
       "type": "PREC",
       "value": 100000,
       "content": {
-        "type": "SEQ",
+        "type": "CHOICE",
         "members": [
           {
-            "type": "CHOICE",
+            "type": "SEQ",
             "members": [
               {
-                "type": "SEQ",
+                "type": "STRING",
+                "value": "#nowarn"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_string_literal"
+                },
+                "named": true,
+                "value": "string"
+              },
+              {
+                "type": "CHOICE",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "#nowarn"
+                    "type": "SYMBOL",
+                    "name": "_ignore_indent_marker"
                   },
                   {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_string_literal"
-                    },
-                    "named": true,
-                    "value": "string"
+                    "type": "BLANK"
                   }
                 ]
               },
               {
-                "type": "STRING",
-                "value": "#light"
-              }
-            ]
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
                 "type": "SYMBOL",
-                "name": "_ignore_indent_marker"
-              },
-              {
-                "type": "BLANK"
+                "name": "_newline"
               }
             ]
           },
           {
-            "type": "SYMBOL",
-            "name": "_newline"
+            "type": "STRING",
+            "value": "#light"
           }
         ]
       }
