@@ -2680,6 +2680,10 @@
         "required": true,
         "types": [
           {
+            "type": "access_modifier",
+            "named": true
+          },
+          {
             "type": "record_fields",
             "named": true
           },
@@ -3494,6 +3498,10 @@
         "multiple": true,
         "required": true,
         "types": [
+          {
+            "type": "access_modifier",
+            "named": true
+          },
           {
             "type": "type_extension_elements",
             "named": true

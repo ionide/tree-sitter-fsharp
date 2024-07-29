@@ -1235,6 +1235,7 @@ module.exports = grammar({
 
     _record_type_defn_inner: ($) =>
       seq(
+        optional($.access_modifier),
         "{",
         scoped($.record_fields, $._indent, $._dedent),
         "}",
@@ -1279,7 +1280,11 @@ module.exports = grammar({
     enum_type_case: ($) => seq($.identifier, "=", $.const),
 
     _union_type_defn_inner: ($) =>
-      seq($.union_type_cases, optional($.type_extension_elements)),
+      seq(
+        optional($.access_modifier),
+        $.union_type_cases,
+        optional($.type_extension_elements),
+      ),
 
     union_type_defn: ($) =>
       prec.left(
