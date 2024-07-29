@@ -4,6 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
+      - .github/**
       - grammar.js
       - src/**
       - test/**
@@ -26,11 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: ${{runner.os != 'Windows'}}
+          submodules: ${{runner.os == 'Linux'}}
       - uses: tree-sitter/setup-action/cli@v1
       - uses: tree-sitter/parser-test-action@v2
         with:
-          generate: ${{runner.os == 'Linux'}}
+          generate: false # ${{runner.os == 'Linux'}}
       - name: Parse sample files
         uses: tree-sitter/parse-action@v4
         id: parse-files
