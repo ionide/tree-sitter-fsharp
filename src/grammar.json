@@ -7722,8 +7722,17 @@
             ]
           },
           {
-            "type": "STRING",
-            "value": "#light"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "#light"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_newline_not_aligned"
+              }
+            ]
           }
         ]
       }

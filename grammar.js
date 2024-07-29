@@ -1768,7 +1768,7 @@ module.exports = grammar({
             alias($._string_literal, $.string),
             $._newline_not_aligned,
           ),
-          "#light",
+          seq("#light", $._newline_not_aligned),
         ),
       ),
 
