@@ -1771,3 +1771,78 @@ type CsvFile
             (unit))
           (const
             (unit)))))))
+
+================================================================================
+record definition with private constructor
+================================================================================
+
+type T = private {
+  A : int
+  B : bool
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (record_fields
+        (record_field
+          (identifier)
+          (type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+DU definition with private constructor
+================================================================================
+
+type T =
+  private
+  | A
+  | B
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+single case DU definition with private constructor
+================================================================================
+
+type T = private S of string
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (type
+                (long_identifier
+                  (identifier))))))))))
