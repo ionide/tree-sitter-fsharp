@@ -3214,3 +3214,41 @@ do
                       (identifier))))
                 (long_identifier_or_op
                   (identifier))))))))))
+
+================================================================================
+if-then-else follow by identifier starting with 'e'
+================================================================================
+
+let f x =
+  let a = if b then 0 else 1
+  exit b
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (if_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (int))
+            (const
+              (int))))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
