@@ -11,12 +11,10 @@ module test =
 (file
   (module_defn
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))))
     (identifier)
     (value_declaration
       (function_or_value_defn
@@ -40,22 +38,18 @@ module test =
 (file
   (module_defn
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))))
     (identifier)
     (value_declaration
       (function_or_value_defn
@@ -80,23 +74,18 @@ module test =
 (file
   (module_defn
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier))))))
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))))
     (identifier)
     (value_declaration
       (function_or_value_defn
@@ -120,15 +109,13 @@ type A() =
 (file
   (type_definition
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))
-            (paren_expression
-              (const
-                (string)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string)))))
     (anon_type_defn
       (type_name
         (identifier))
@@ -156,21 +143,17 @@ module Impl =
 (file
   (module_defn
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))))
     (identifier)
     (value_declaration
       (attributes
-        (attribute_set
-          (attribute
-            (object_construction
-              (type
-                (long_identifier
-                  (identifier)))))))
+        (attribute
+          (type
+            (long_identifier
+              (identifier)))))
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -180,12 +163,10 @@ module Impl =
           (string))))
     (value_declaration
       (attributes
-        (attribute_set
-          (attribute
-            (object_construction
-              (type
-                (long_identifier
-                  (identifier)))))))
+        (attribute
+          (type
+            (long_identifier
+              (identifier)))))
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -234,21 +215,17 @@ module Impl =
       (identifier))
     (module_defn
       (attributes
-        (attribute_set
-          (attribute
-            (object_construction
-              (type
-                (long_identifier
-                  (identifier)))))))
+        (attribute
+          (type
+            (long_identifier
+              (identifier)))))
       (identifier)
       (value_declaration
         (attributes
-          (attribute_set
-            (attribute
-              (object_construction
-                (type
-                  (long_identifier
-                    (identifier)))))))
+          (attribute
+            (type
+              (long_identifier
+                (identifier)))))
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern
@@ -258,12 +235,10 @@ module Impl =
             (string))))
       (value_declaration
         (attributes
-          (attribute_set
-            (attribute
-              (object_construction
-                (type
-                  (long_identifier
-                    (identifier)))))))
+          (attribute
+            (type
+              (long_identifier
+                (identifier)))))
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern

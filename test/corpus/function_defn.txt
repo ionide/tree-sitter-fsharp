@@ -244,12 +244,10 @@ module Program =
       (identifier)
       (value_declaration
         (attributes
-          (attribute_set
-            (attribute
-              (object_construction
-                (type
-                  (long_identifier
-                    (identifier)))))))
+          (attribute
+            (type
+              (long_identifier
+                (identifier)))))
         (function_or_value_defn
           (function_declaration_left
             (identifier)

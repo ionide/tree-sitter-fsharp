@@ -330,11 +330,11 @@
         "type": "REPEAT1",
         "content": {
           "type": "SYMBOL",
-          "name": "attribute_set"
+          "name": "_attribute_set"
         }
       }
     },
-    "attribute_set": {
+    "_attribute_set": {
       "type": "SEQ",
       "members": [
         {
@@ -382,7 +382,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "attribute_target"
+                  "name": "_attribute_target"
                 },
                 {
                   "type": "STRING",
@@ -397,11 +397,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "object_construction"
+          "name": "_object_construction"
         }
       ]
     },
-    "attribute_target": {
+    "_attribute_target": {
       "type": "CHOICE",
       "members": [
         {
@@ -442,7 +442,7 @@
         }
       ]
     },
-    "object_construction": {
+    "_object_construction": {
       "type": "PREC_LEFT",
       "value": 2,
       "content": {
@@ -1883,7 +1883,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "object_construction"
+          "name": "_object_construction"
         },
         {
           "type": "CHOICE",
@@ -8220,7 +8220,6 @@
   ],
   "inline": [
     "_module_elem",
-    "_base_call",
     "_expression_or_range",
     "_object_expression_inner",
     "_record_type_defn_inner",

@@ -16,13 +16,12 @@
 
 (primary_constr_args (_) @variable.parameter)
 
+(class_as_reference
+  (_) @variable.parameter.builtin)
+
+
 ((identifier_pattern (long_identifier (identifier) @character.special))
  (#match? @character.special "^\_.*"))
-
-((long_identifier
-  (identifier)+
-  .
-  (identifier) @variable.member))
 
 ;; ----------------------------------------------------------------------------
 ;; Punctuation
@@ -60,6 +59,9 @@
   .
   (_) @variable)
 
+(optional_pattern
+  "?" @character.special)
+
 (fsi_directive_decl . (string) @module)
 
 (import_decl . (_) @module)
@@ -84,17 +86,13 @@
     (identifier) @property))
 
 (dot_expression
-  base: (_) @module
-  field: (_) @variable.member)
+  base: (_)? @module)
 
 (value_declaration_left . (_) @variable)
 
 (function_declaration_left
   . (_) @function
-  [
-    (argument_patterns)
-    (argument_patterns (long_identifier (identifier)))
-  ] @variable.parameter)
+  . (_)* @variable_parameter)
 
 (member_defn
   (method_or_prop_defn
@@ -108,14 +106,7 @@
 
 (application_expression
   .
-  [
-    (long_identifier_or_op [
-      (long_identifier (identifier)* (identifier) @function.call)
-      (identifier) @function.call
-    ])
-    (typed_expression . (long_identifier_or_op (long_identifier (identifier)* . (identifier) @function.call)))
-    (dot_expression base: (_) @variable.member field: (_) @function.call)
-  ] @function.call)
+  (_) @function.call)
 
 ((infix_expression
   .
@@ -170,6 +161,9 @@
 
 (compiler_directive_decl) @keyword.directive
 
+(preproc_line
+  "#line" @keyword.directive)
+
 (attribute) @attribute
 
 [
@@ -183,9 +177,12 @@
   "|]"
   "{|"
   "|}"
+] @punctuation.bracket
+
+[
   "[<"
   ">]"
-] @punctuation.bracket
+] @punctuation.special
 
 (format_string_eval
   [
@@ -279,16 +276,10 @@
   "type"
   "inherit"
   "interface"
-  "struct"
+  "and"
   "class"
+  "struct"
 ] @keyword.type
-
-(try_expression
-  [
-    "try"
-    "with"
-    "finally"
-  ] @keyword.exception)
 
 ((identifier) @keyword.exception
  (#any-of? @keyword.exception "failwith" "failwithf" "raise" "reraise"))
@@ -327,6 +318,13 @@
 
 (match_expression "with" @keyword.conditional)
 
+(try_expression
+  [
+    "try"
+    "with"
+    "finally"
+  ] @keyword.exception)
+
 ((type
   (long_identifier (identifier) @type.builtin))
  (#any-of? @type.builtin "bool" "byte" "sbyte" "int16" "uint16" "int" "uint" "int64" "uint64" "nativeint" "unativeint" "decimal" "float" "double" "float32" "single" "char" "string" "unit"))
@@ -346,8 +344,19 @@
   .
   (identifier)))
 
-(long_identifier_or_op
-  (op_identifier) @operator)
+(op_identifier) @operator
 
 ((identifier) @module.builtin
  (#any-of? @module.builtin "Array" "Async" "Directory" "File" "List" "Option" "Path" "Map" "Set" "Lazy" "Seq" "Task" "String" "Result" ))
+
+((value_declaration
+   (attributes
+     (attribute
+       (type
+         (long_identifier
+           (identifier) @attribute_name))))
+   (function_or_value_defn
+     (value_declaration_left
+       .
+       (_) @constant)))
+ (#eq? @attribute_name "Literal"))

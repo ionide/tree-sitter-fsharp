@@ -271,12 +271,10 @@ open System.Collections.Generic
     (xml_doc_content))
   (named_module
     (attributes
-      (attribute_set
-        (attribute
-          (object_construction
-            (type
-              (long_identifier
-                (identifier)))))))
+      (attribute
+        (type
+          (long_identifier
+            (identifier)))))
     (access_modifier)
     (long_identifier
       (identifier)
@@ -302,18 +300,20 @@ module A =
 --------------------------------------------------------------------------------
 
 (file
- (module_defn (identifier)
-   (application_expression
-    (long_identifier_or_op (identifier))
-    (const
-     (string)))
-  (type_definition
-   (union_type_defn
-    (type_name
-     (identifier))
-    (union_type_cases
-     (union_type_case
-      (identifier)))))))
+  (module_defn
+    (identifier)
+    (application_expression
+      (long_identifier_or_op
+        (identifier))
+      (const
+        (string)))
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier)))))))
 
 ================================================================================
 module with multiple expressions and non-expression
@@ -327,13 +327,16 @@ module A =
 --------------------------------------------------------------------------------
 
 (file
-  (module_defn (identifier)
+  (module_defn
+    (identifier)
     (application_expression
-      (long_identifier_or_op (identifier))
+      (long_identifier_or_op
+        (identifier))
       (const
         (string)))
     (application_expression
-      (long_identifier_or_op (identifier))
+      (long_identifier_or_op
+        (identifier))
       (const
         (string)))
     (type_definition

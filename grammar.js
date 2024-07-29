@@ -94,7 +94,6 @@ module.exports = grammar({
 
   inline: ($) => [
     $._module_elem,
-    $._base_call,
     $._expression_or_range,
     $._object_expression_inner,
     $._record_type_defn_inner,
@@ -188,8 +187,8 @@ module.exports = grammar({
     //
     // Attributes (BEGIN)
     //
-    attributes: ($) => prec.left(repeat1($.attribute_set)),
-    attribute_set: ($) =>
+    attributes: ($) => prec.left(repeat1($._attribute_set)),
+    _attribute_set: ($) =>
       seq(
         "[<",
         $.attribute,
@@ -197,8 +196,8 @@ module.exports = grammar({
         ">]",
       ),
     attribute: ($) =>
-      seq(optional(seq($.attribute_target, ":")), $.object_construction),
-    attribute_target: (_) =>
+      seq(optional(seq($._attribute_target, ":")), $._object_construction),
+    _attribute_target: (_) =>
       choice(
         "assembly",
         "module",
@@ -211,7 +210,7 @@ module.exports = grammar({
         "event",
       ),
 
-    object_construction: ($) =>
+    _object_construction: ($) =>
       prec.left(PREC.SEQ_EXPR + 1, seq($.type, optional($._expression))),
 
     //
@@ -529,7 +528,7 @@ module.exports = grammar({
       prec(PREC.NEW_EXPR, seq("new", $._base_call, $._object_expression_inner)),
 
     _base_call: ($) =>
-      seq($.object_construction, optional(seq("as", $.identifier))),
+      seq($._object_construction, optional(seq("as", $.identifier))),
 
     prefixed_expression: ($) =>
       seq(

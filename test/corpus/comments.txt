@@ -240,12 +240,10 @@ module Json =
       (identifier)
       (value_declaration
         (attributes
-          (attribute_set
-            (attribute
-              (object_construction
-                (type
-                  (long_identifier
-                    (identifier)))))))
+          (attribute
+            (type
+              (long_identifier
+                (identifier)))))
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern

@@ -1382,36 +1382,32 @@ type A = {
         (record_fields
           (record_field
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))
-                    (paren_expression
-                      (tuple_expression
-                        (infix_expression
-                          (long_identifier_or_op
-                            (identifier))
-                          (infix_op)
-                          (const
-                            (int)))
-                        (infix_expression
-                          (long_identifier_or_op
-                            (identifier))
-                          (infix_op)
-                          (const
-                            (bool)))))))
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))
+                (paren_expression
+                  (tuple_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (int)))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (bool))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (identifier)
             (type
               (long_identifier
@@ -1571,12 +1567,10 @@ namespace A
       (identifier))
     (module_defn
       (attributes
-        (attribute_set
-          (attribute
-            (object_construction
-              (type
-                (long_identifier
-                  (identifier)))))))
+        (attribute
+          (type
+            (long_identifier
+              (identifier)))))
       (identifier)
       (type_definition
         (type_extension
@@ -1718,60 +1712,50 @@ type CsvFile
                       (identifier)))))))
           (attribute_pattern
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (optional_pattern
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))))
           (attribute_pattern
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (optional_pattern
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))))
           (attribute_pattern
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (optional_pattern
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))))
           (attribute_pattern
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (optional_pattern
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))))
           (attribute_pattern
             (attributes
-              (attribute_set
-                (attribute
-                  (object_construction
-                    (type
-                      (long_identifier
-                        (identifier)))))))
+              (attribute
+                (type
+                  (long_identifier
+                    (identifier)))))
             (optional_pattern
               (identifier_pattern
                 (long_identifier_or_op
