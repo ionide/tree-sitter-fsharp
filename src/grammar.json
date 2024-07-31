@@ -6015,6 +6015,19 @@
                 ]
               },
               {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "static"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "value_declaration"
+                  }
+                ]
+              },
+              {
                 "type": "SYMBOL",
                 "name": "additional_constr_defn"
               }
