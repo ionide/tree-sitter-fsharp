@@ -1846,3 +1846,64 @@ type T = private S of string
               (type
                 (long_identifier
                   (identifier))))))))))
+
+================================================================================
+static member operator definition
+================================================================================
+
+module M
+
+type T = T of string with
+    static member (+)(s, s') = s + s'
+
+let str1 = "a" + "b"
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier)
+            (union_type_fields
+              (union_type_field
+                (type
+                  (long_identifier
+                    (identifier)))))))
+        (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (op_identifier))
+              (paren_pattern
+                (repeat_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))
+    (value_declaration
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (infix_expression
+          (const
+            (string))
+          (infix_op)
+          (const
+            (string)))))))
