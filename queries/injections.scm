@@ -2,7 +2,10 @@
  (line_comment)
  (block_comment_content)
 ] @injection.content
-  (#set! injection.language "comment"))
+ (#set! injection.language "comment"))
 
-((xml_doc (xml_doc_content) @injection.content)
- (#set! injection.language "xml"))
+((line_comment) @injection.content
+ (#match? @injection.content "^///")
+ (#offset! @injection.content 0 3 0 0)
+ (#set! injection.language "xml")
+ (#set! injection.combined))

@@ -267,8 +267,7 @@ open System.Collections.Generic
 --------------------------------------------------------------------------------
 
 (file
-  (xml_doc
-    (xml_doc_content))
+  (line_comment)
   (named_module
     (attributes
       (attribute

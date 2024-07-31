@@ -45,5 +45,4 @@
  (string)
  (line_comment)
  (block_comment)
- (xml_doc)
 ] @indent.auto

@@ -3668,21 +3668,6 @@
     }
   },
   {
-    "type": "xml_doc",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "xml_doc_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "!=",
     "named": false
   },
@@ -3820,14 +3805,6 @@
   },
   {
     "type": ".[",
-    "named": false
-  },
-  {
-    "type": "//",
-    "named": false
-  },
-  {
-    "type": "///",
     "named": false
   },
   {
@@ -4252,11 +4229,11 @@
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unmanaged",
@@ -4308,10 +4285,6 @@
   },
   {
     "type": "xint",
-    "named": true
-  },
-  {
-    "type": "xml_doc_content",
     "named": true
   },
   {
