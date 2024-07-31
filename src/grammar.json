@@ -8157,6 +8157,10 @@
     {
       "type": "SYMBOL",
       "name": "fsi_directive_decl"
+    },
+    {
+      "type": "STRING",
+      "value": ";"
     }
   ],
   "conflicts": [
