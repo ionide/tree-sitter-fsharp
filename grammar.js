@@ -1418,6 +1418,7 @@ module.exports = grammar({
               ":",
               $.type,
             ),
+            seq("static", $.value_declaration),
             $.additional_constr_defn,
           ),
         ),

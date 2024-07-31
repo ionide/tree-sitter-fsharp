@@ -1907,3 +1907,40 @@ let str1 = "a" + "b"
           (infix_op)
           (const
             (string)))))))
+
+================================================================================
+type extension aligned with union definition
+================================================================================
+
+type U =
+    | Case1
+    | Case2 of int
+
+    static do printfn "init U 1"
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (type
+                (long_identifier
+                  (identifier)))))))
+      (type_extension_elements
+        (member_defn
+          (value_declaration
+            (do
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))))))))

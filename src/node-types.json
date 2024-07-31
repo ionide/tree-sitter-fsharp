@@ -1985,6 +1985,10 @@
         {
           "type": "type",
           "named": true
+        },
+        {
+          "type": "value_declaration",
+          "named": true
         }
       ]
     }
