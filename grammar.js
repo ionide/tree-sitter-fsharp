@@ -1430,7 +1430,7 @@ module.exports = grammar({
           ".",
           field("method", $.identifier),
         ),
-        $.identifier,
+        $._identifier_or_op,
       ),
 
     _method_defn: ($) =>

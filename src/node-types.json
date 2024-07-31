@@ -2593,7 +2593,15 @@
       "required": false,
       "types": [
         {
+          "type": "active_pattern",
+          "named": true
+        },
+        {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "op_identifier",
           "named": true
         }
       ]

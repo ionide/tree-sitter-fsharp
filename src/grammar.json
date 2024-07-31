@@ -6053,7 +6053,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "identifier"
+          "name": "_identifier_or_op"
         }
       ]
     },
