@@ -57,6 +57,7 @@ module.exports = grammar({
     $.preproc_line,
     $.compiler_directive_decl,
     $.fsi_directive_decl,
+    ";",
   ],
 
   // The external scanner (scanner.c) allows us to inject "dummy" tokens into the grammar.
