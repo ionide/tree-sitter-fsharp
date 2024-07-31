@@ -6,7 +6,8 @@
   (block_comment)
 ] @comment @spell
 
-(xml_doc) @comment.documentation @spell
+((line_comment) @comment.documentation @spell
+ (#match? @comment.documentation "^///"))
 
 (const
   [
@@ -106,7 +107,9 @@
 
 (application_expression
   .
-  (_) @function.call)
+  (_) @function.call
+  .
+  (_) @variable)
 
 ((infix_expression
   .

@@ -53,7 +53,6 @@ module.exports = grammar({
     /[ \s\f\uFEFF\u2060\u200B]|\\\r?n/,
     $.block_comment,
     $.line_comment,
-    $.xml_doc,
     $.preproc_line,
     $.compiler_directive_decl,
     $.fsi_directive_decl,
@@ -1751,14 +1750,9 @@ module.exports = grammar({
     // Constants (END)
     //
     //
-    xml_doc: ($) =>
-      prec(
-        1,
-        seq("///", alias(token.immediate(/[^\/][^\n\r]*/), $.xml_doc_content)),
-      ),
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => prec(-1, seq("//", /[^\n\r]*/)),
+    line_comment: (_) => prec(-1, seq(/\/\/+[^\n\r]*/)),
 
     identifier: (_) =>
       token(

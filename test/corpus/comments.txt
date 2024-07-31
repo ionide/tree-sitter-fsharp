@@ -19,6 +19,26 @@ let x = 1
         (int)))))
 
 ================================================================================
+line comment with four slashes
+================================================================================
+
+//// comment
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (line_comment)
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
 block comment
 ================================================================================
 
@@ -72,8 +92,7 @@ let x = 1
 --------------------------------------------------------------------------------
 
 (file
-  (xml_doc
-    (xml_doc_content))
+  (line_comment)
   (value_declaration
     (function_or_value_defn
       (value_declaration_left
@@ -191,12 +210,9 @@ let f x = x + 1
 --------------------------------------------------------------------------------
 
 (file
-  (xml_doc
-    (xml_doc_content))
-  (xml_doc
-    (xml_doc_content))
-  (xml_doc
-    (xml_doc_content))
+  (line_comment)
+  (line_comment)
+  (line_comment)
   (value_declaration
     (function_or_value_defn
       (function_declaration_left

@@ -7652,31 +7652,6 @@
         "value": "float"
       }
     },
-    "xml_doc": {
-      "type": "PREC",
-      "value": 1,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "///"
-          },
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "IMMEDIATE_TOKEN",
-              "content": {
-                "type": "PATTERN",
-                "value": "[^\\/][^\\n\\r]*"
-              }
-            },
-            "named": true,
-            "value": "xml_doc_content"
-          }
-        ]
-      }
-    },
     "block_comment": {
       "type": "SEQ",
       "members": [
@@ -7704,12 +7679,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "//"
-          },
-          {
             "type": "PATTERN",
-            "value": "[^\\n\\r]*"
+            "value": "\\/\\/+[^\\n\\r]*"
           }
         ]
       }
@@ -8154,10 +8125,6 @@
     {
       "type": "SYMBOL",
       "name": "line_comment"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "xml_doc"
     },
     {
       "type": "SYMBOL",

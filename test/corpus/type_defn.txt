@@ -1336,22 +1336,19 @@ type A = {
 --------------------------------------------------------------------------------
 
 (file
-  (xml_doc
-    (xml_doc_content))
+  (line_comment)
   (type_definition
     (record_type_defn
       (type_name
         (identifier))
-      (xml_doc
-        (xml_doc_content))
+      (line_comment)
       (record_fields
         (record_field
           (identifier)
           (type
             (long_identifier
               (identifier))))
-        (xml_doc
-          (xml_doc_content))
+        (line_comment)
         (record_field
           (identifier)
           (type
