@@ -159,7 +159,7 @@ do
             (identifier)
             (identifier)))
         (types
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 
@@ -412,27 +412,27 @@ do
         (typecast_expression
           (long_identifier_or_op
             (identifier))
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (sequential_expression
           (typecast_expression
             (long_identifier_or_op
               (identifier))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))
           (sequential_expression
             (typecast_expression
               (long_identifier_or_op
                 (identifier))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))
             (typecast_expression
               (long_identifier_or_op
                 (identifier))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))))))))
 
@@ -1478,7 +1478,7 @@ let exampleNamespace =
                 (typecast_expression
                   (long_identifier_or_op
                     (identifier))
-                  (type
+                  (simple_type
                     (long_identifier
                       (identifier))))))
             (long_identifier_or_op
@@ -2149,7 +2149,7 @@ let x =
             (identifier))))
       (brace_expression
         (object_expression
-          (type
+          (simple_type
             (long_identifier
               (identifier)))
           (member_defn
@@ -2477,7 +2477,7 @@ let disposables = new Disposables.CompositeDisposable()
           (long_identifier_or_op
             (identifier))))
       (object_instantiation_expression
-        (type
+        (simple_type
           (long_identifier
             (identifier)
             (identifier)))
@@ -2968,8 +2968,8 @@ let f (x: #MyType) = ()
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
-              (type
+            (flexible_type
+              (simple_type
                 (long_identifier
                   (identifier)))))))
       (const
@@ -3120,21 +3120,19 @@ let f (a: seq<'T>) (b: 'T) =
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (generic_type
               (long_identifier
                 (identifier))
               (type_attributes
                 (type_attribute
-                  (type
-                    (type_argument
-                      (identifier)))))))
+                  (type_argument
+                    (identifier))))))
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
-              (type_argument
-                (identifier))))))
+            (type_argument
+              (identifier)))))
       (const
         (unit)))))
 

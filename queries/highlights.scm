@@ -32,7 +32,7 @@
 (type_name type_name: (_) @type.definition)
 
 [
- (type)
+ (_type)
  (atomic_type)
 ] @type
 
@@ -328,7 +328,7 @@
     "finally"
   ] @keyword.exception)
 
-((type
+((_type
   (long_identifier (identifier) @type.builtin))
  (#any-of? @type.builtin "bool" "byte" "sbyte" "int16" "uint16" "int" "uint" "int64" "uint64" "nativeint" "unativeint" "decimal" "float" "double" "float32" "single" "char" "string" "unit"))
 
@@ -355,7 +355,7 @@
 ((value_declaration
    (attributes
      (attribute
-       (type
+       (_type
          (long_identifier
            (identifier) @attribute_name))))
    (function_or_value_defn

@@ -100,10 +100,10 @@ type A =
           (curried_spec
             (arguments_spec
               (argument_spec
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -129,16 +129,16 @@ type A =
               (argument_spec
                 (argument_name_spec
                   (identifier))
-                (type
+                (simple_type
                   (long_identifier
                     (identifier))))
               (argument_spec
                 (argument_name_spec
                   (identifier))
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -171,12 +171,10 @@ type A<'B> =
           (curried_spec
             (arguments_spec
               (argument_spec
-                (type
-                  (type_argument
-                    (identifier)))))
-            (type
-              (type_argument
-                (identifier)))))))))
+                (type_argument
+                  (identifier))))
+            (type_argument
+              (identifier))))))))
 
 ================================================================================
 basic class definition
@@ -212,7 +210,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (class_inherits_decl
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (const
@@ -243,7 +241,7 @@ type A() =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (long_identifier_or_op
@@ -276,7 +274,7 @@ end
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (long_identifier_or_op
@@ -309,7 +307,7 @@ type A() =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (long_identifier_or_op
@@ -400,10 +398,10 @@ end
           (curried_spec
             (arguments_spec
               (argument_spec
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -429,10 +427,10 @@ type A =
           (curried_spec
             (arguments_spec
               (argument_spec
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -514,7 +512,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (interface_implementation
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (member_defn
@@ -545,7 +543,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (interface_implementation
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (member_defn
@@ -585,7 +583,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (interface_implementation
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (member_defn
@@ -622,7 +620,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (class_inherits_decl
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (const
@@ -647,7 +645,7 @@ type A() =
         (identifier))
       (primary_constr_args)
       (class_inherits_decl
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (const
@@ -687,18 +685,16 @@ type A<'T>(t: 'T) =
           (identifier_pattern
             (long_identifier_or_op
               (identifier)))
-          (type
-            (type_argument
-              (identifier)))))
+          (type_argument
+            (identifier))))
       (class_inherits_decl
-        (type
+        (generic_type
           (long_identifier
             (identifier))
           (type_attributes
             (type_attribute
-              (type
-                (type_argument
-                  (identifier))))))
+              (type_argument
+                (identifier)))))
         (paren_expression
           (long_identifier_or_op
             (identifier))))
@@ -732,7 +728,7 @@ type A() =
           (const
             (unit))))
       (interface_implementation
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (member_defn
@@ -793,9 +789,8 @@ and 'T maybe = Maybe<'T>
           (identifier)
           (union_type_fields
             (union_type_field
-              (type
-                (type_argument
-                  (identifier))))))
+              (type_argument
+                (identifier)))))
         (union_type_case
           (identifier))))
     (type_abbrev_defn
@@ -803,14 +798,13 @@ and 'T maybe = Maybe<'T>
         (type_argument
           (identifier))
         (identifier))
-      (type
+      (generic_type
         (long_identifier
           (identifier))
         (type_attributes
           (type_attribute
-            (type
-              (type_argument
-                (identifier)))))))))
+            (type_argument
+              (identifier))))))))
 
 ================================================================================
 record definition
@@ -830,12 +824,12 @@ type T =
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 
@@ -859,12 +853,12 @@ type T =
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (type_extension_elements
@@ -905,12 +899,12 @@ type T =
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (type_extension_elements
@@ -953,12 +947,12 @@ type T =
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (type_extension_elements
@@ -1024,7 +1018,7 @@ type T() =
                 (identifier_pattern
                   (long_identifier_or_op
                     (identifier)))
-                (type
+                (simple_type
                   (long_identifier
                     (identifier))))))
           (const
@@ -1051,14 +1045,14 @@ type A(x:int, y:int) =
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))))
       (member_defn
@@ -1068,7 +1062,7 @@ type A(x:int, y:int) =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (application_expression
@@ -1112,14 +1106,14 @@ type A(x:int, y:int) =
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))))
       (member_defn
@@ -1137,12 +1131,10 @@ type A(x:int, y:int) =
                 (identifier_pattern
                   (long_identifier_or_op
                     (identifier)))
-                (type
-                  (type_argument
-                    (identifier)))))
-            (type
-              (type_argument
-                (identifier))))
+                (type_argument
+                  (identifier))))
+            (type_argument
+              (identifier)))
           (long_identifier_or_op
             (long_identifier
               (identifier))))))))
@@ -1168,25 +1160,24 @@ type A(x: int, y:int) =
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))))
       (interface_implementation
-        (type
+        (generic_type
           (long_identifier
             (identifier))
           (type_attributes
             (type_attribute
-              (type
-                (type_argument
-                  (identifier))))))
+              (type_argument
+                (identifier)))))
         (member_defn
           (method_or_prop_defn
             (property_or_ident
@@ -1197,13 +1188,12 @@ type A(x: int, y:int) =
                 (identifier_pattern
                   (long_identifier_or_op
                     (identifier)))
-                (type
-                  (type
+                (function_type
+                  (simple_type
                     (long_identifier
                       (identifier)))
-                  (type
-                    (type_argument
-                      (identifier))))))
+                  (type_argument
+                    (identifier)))))
             (application_expression
               (long_identifier_or_op
                 (identifier))
@@ -1238,19 +1228,19 @@ type IProp2 =
           (member_signature
             (identifier)
             (curried_spec
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))))
         (member_defn
           (member_signature
             (identifier)
             (curried_spec
-              (type
+              (generic_type
                 (long_identifier
                   (identifier))
                 (type_attributes
                   (type_attribute
-                    (type
+                    (simple_type
                       (long_identifier
                         (identifier)))))))))))
     (type_definition
@@ -1261,19 +1251,19 @@ type IProp2 =
           (member_signature
             (identifier)
             (curried_spec
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))))
         (member_defn
           (member_signature
             (identifier)
             (curried_spec
-              (type
+              (generic_type
                 (long_identifier
                   (identifier))
                 (type_attributes
                   (type_attribute
-                    (type
+                    (simple_type
                       (long_identifier
                         (identifier)))))))))))))
 
@@ -1302,7 +1292,7 @@ type A() =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (paren_pattern
@@ -1310,7 +1300,7 @@ type A() =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))
           (infix_expression
@@ -1345,13 +1335,13 @@ type A = {
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (line_comment)
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 
@@ -1380,11 +1370,11 @@ type A = {
           (record_field
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier))))
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))
                 (paren_expression
@@ -1402,11 +1392,11 @@ type A = {
                       (const
                         (bool))))))
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (identifier)
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -1428,8 +1418,8 @@ type A = {
       (record_fields
         (record_field
           (identifier)
-          (type
-            (type
+          (list_type
+            (simple_type
               (long_identifier
                 (identifier)))))))))
 
@@ -1498,7 +1488,7 @@ type A() =
               (constraint
                 (type_argument
                   (identifier))
-                (type
+                (simple_type
                   (long_identifier
                     (identifier))))
               (constraint
@@ -1507,37 +1497,32 @@ type A() =
               (constraint
                 (type_argument
                   (identifier))
-                (type
-                  (type_argument
-                    (identifier))))
+                (type_argument
+                  (identifier)))
               (constraint
                 (type_argument
                   (identifier))
                 (trait_member_constraint
                   (op_identifier)
-                  (type
-                    (type
+                  (compound_type
+                    (type_argument
+                      (identifier))
+                    (function_type
                       (type_argument
-                        (identifier)))
-                    (type
-                      (type
-                        (type_argument
-                          (identifier)))
-                      (type
-                        (type_argument
-                          (identifier)))))))
+                        (identifier))
+                      (type_argument
+                        (identifier))))))
               (constraint
                 (type_argument
                   (identifier))
                 (trait_member_constraint
                   (identifier)
-                  (type
-                    (type_argument
-                      (identifier)))))
+                  (type_argument
+                    (identifier))))
               (constraint
                 (type_argument
                   (identifier))
-                (type
+                (simple_type
                   (long_identifier
                     (identifier))))))
           (const
@@ -1565,7 +1550,7 @@ namespace A
     (module_defn
       (attributes
         (attribute
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (identifier)
@@ -1601,7 +1586,7 @@ type sql = SqlProvider<ConnectionString = "secret">
     (type_abbrev_defn
       (type_name
         (identifier))
-      (type
+      (generic_type
         (long_identifier
           (identifier))
         (type_attributes
@@ -1629,7 +1614,7 @@ type sql = SqlProvider<
     (type_abbrev_defn
       (type_name
         (identifier))
-      (type
+      (generic_type
         (long_identifier
           (identifier))
         (type_attributes
@@ -1660,12 +1645,12 @@ type R = { A: bool; B: bool; }
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 
@@ -1699,18 +1684,18 @@ type CsvFile
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (generic_type
               (long_identifier
                 (identifier))
               (type_attributes
                 (type_attribute
-                  (type
+                  (simple_type
                     (long_identifier
                       (identifier)))))))
           (attribute_pattern
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (optional_pattern
@@ -1720,7 +1705,7 @@ type CsvFile
           (attribute_pattern
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (optional_pattern
@@ -1730,7 +1715,7 @@ type CsvFile
           (attribute_pattern
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (optional_pattern
@@ -1740,7 +1725,7 @@ type CsvFile
           (attribute_pattern
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (optional_pattern
@@ -1750,7 +1735,7 @@ type CsvFile
           (attribute_pattern
             (attributes
               (attribute
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))
             (optional_pattern
@@ -1789,12 +1774,12 @@ type T = private {
       (record_fields
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))
         (record_field
           (identifier)
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 
@@ -1840,7 +1825,7 @@ type T = private S of string
           (identifier)
           (union_type_fields
             (union_type_field
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))))))))
 
@@ -1870,7 +1855,7 @@ let str1 = "a" + "b"
             (identifier)
             (union_type_fields
               (union_type_field
-                (type
+                (simple_type
                   (long_identifier
                     (identifier)))))))
         (type_extension_elements
@@ -1929,7 +1914,7 @@ type U =
           (identifier)
           (union_type_fields
             (union_type_field
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))))
       (type_extension_elements
@@ -1954,7 +1939,7 @@ exception MyError of string
   (exception_definition
     (long_identifier
       (identifier))
-    (type
+    (simple_type
       (long_identifier
         (identifier)))))
 
@@ -1970,10 +1955,10 @@ exception MyError of string * int
   (exception_definition
     (long_identifier
       (identifier))
-    (type
-      (type
+    (compound_type
+      (simple_type
         (long_identifier
           (identifier)))
-      (type
+      (simple_type
         (long_identifier
           (identifier))))))

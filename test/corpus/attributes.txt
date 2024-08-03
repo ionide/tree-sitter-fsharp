@@ -12,7 +12,7 @@ module test =
   (module_defn
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))))
     (identifier)
@@ -39,15 +39,15 @@ module test =
   (module_defn
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier))))
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier))))
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))))
     (identifier)
@@ -75,15 +75,15 @@ module test =
   (module_defn
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier))))
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier))))
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))))
     (identifier)
@@ -110,7 +110,7 @@ type A() =
   (type_definition
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))
         (paren_expression
@@ -144,14 +144,14 @@ module Impl =
   (module_defn
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))))
     (identifier)
     (value_declaration
       (attributes
         (attribute
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (function_or_value_defn
@@ -164,7 +164,7 @@ module Impl =
     (value_declaration
       (attributes
         (attribute
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (function_or_value_defn
@@ -216,14 +216,14 @@ module Impl =
     (module_defn
       (attributes
         (attribute
-          (type
+          (simple_type
             (long_identifier
               (identifier)))))
       (identifier)
       (value_declaration
         (attributes
           (attribute
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))
         (function_or_value_defn
@@ -236,7 +236,7 @@ module Impl =
       (value_declaration
         (attributes
           (attribute
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))
         (function_or_value_defn
