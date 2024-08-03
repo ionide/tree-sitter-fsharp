@@ -271,7 +271,7 @@ open System.Collections.Generic
   (named_module
     (attributes
       (attribute
-        (type
+        (simple_type
           (long_identifier
             (identifier)))))
     (access_modifier)

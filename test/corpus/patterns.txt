@@ -61,7 +61,7 @@ let name (x : int) = 1
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
+            (simple_type
               (long_identifier
                 (identifier))))))
       (const
@@ -86,14 +86,14 @@ let name (x: int, y: string) = 1, "test"
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier))))
             (typed_pattern
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
+              (simple_type
                 (long_identifier
                   (identifier)))))))
       (tuple_expression
@@ -127,9 +127,8 @@ type A() =
               (identifier_pattern
                 (long_identifier_or_op
                   (identifier)))
-              (type
-                (type_argument
-                  (identifier)))
+              (type_argument
+                (identifier))
               (type_argument_constraints
                 (constraint
                   (type_argument
@@ -336,13 +335,13 @@ let {F1 = v1} = {F1 = "a"}
   (value_declaration
     (function_or_value_defn
       (value_declaration_left
-       (record_pattern
-        (field_pattern
-         (long_identifier
-          (identifier))
-         (identifier_pattern
-          (long_identifier_or_op
-           (identifier))))))
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))))
       (brace_expression
         (field_initializers
           (field_initializer

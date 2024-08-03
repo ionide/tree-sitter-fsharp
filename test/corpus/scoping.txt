@@ -217,7 +217,7 @@ do
                 (identifier)))
             (long_identifier_or_op
               (identifier)))
-          (type
+          (simple_type
             (long_identifier
               (identifier))))))))
 

@@ -257,7 +257,7 @@ module Json =
       (value_declaration
         (attributes
           (attribute
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))
         (function_or_value_defn

@@ -154,21 +154,19 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
                 (identifier))
               (trait_member_constraint
                 (identifier)
-                (type
-                  (type
+                (function_type
+                  (simple_type
                     (long_identifier
                       (identifier)))
-                  (type
-                    (type_argument
-                      (identifier))))))))
+                  (type_argument
+                    (identifier)))))))
         (argument_patterns
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
-              (type_argument
-                (identifier))))))
+            (type_argument
+              (identifier)))))
       (application_expression
         (long_identifier_or_op
           (long_identifier
@@ -200,21 +198,19 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
                 (identifier))
               (trait_member_constraint
                 (identifier)
-                (type
-                  (type
+                (function_type
+                  (simple_type
                     (long_identifier
                       (identifier)))
-                  (type
-                    (type_argument
-                      (identifier))))))))
+                  (type_argument
+                    (identifier)))))))
         (argument_patterns
           (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
                 (identifier)))
-            (type
-              (type_argument
-                (identifier))))))
+            (type_argument
+              (identifier)))))
       (application_expression
         (long_identifier_or_op
           (long_identifier
@@ -245,7 +241,7 @@ module Program =
       (value_declaration
         (attributes
           (attribute
-            (type
+            (simple_type
               (long_identifier
                 (identifier)))))
         (function_or_value_defn
