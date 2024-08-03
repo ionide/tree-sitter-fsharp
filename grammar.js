@@ -143,6 +143,7 @@ module.exports = grammar({
         $.import_decl,
         $.fsi_directive_decl,
         $.type_definition,
+        $.exception_definition,
         $._expression,
         $.preproc_if,
         // $.exception_defn
@@ -1170,6 +1171,15 @@ module.exports = grammar({
       ),
 
     static_parameter_value: ($) => choice($.const, seq($.const, $._expression)),
+
+    exception_definition: ($) =>
+      seq(
+        optional($.attributes),
+        "exception",
+        field("exception_name", $.long_identifier),
+        "of",
+        $.type,
+      ),
 
     type_definition: ($) =>
       prec.left(
