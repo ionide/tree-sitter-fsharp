@@ -152,6 +152,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "exception_definition"
+        },
+        {
+          "type": "SYMBOL",
           "name": "_expression"
         },
         {
@@ -4541,6 +4545,43 @@
               "name": "_expression"
             }
           ]
+        }
+      ]
+    },
+    "exception_definition": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "attributes"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "exception"
+        },
+        {
+          "type": "FIELD",
+          "name": "exception_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "long_identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "of"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type"
         }
       ]
     },

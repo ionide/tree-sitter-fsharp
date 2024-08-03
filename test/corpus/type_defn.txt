@@ -1941,3 +1941,39 @@ type U =
                   (identifier))
                 (const
                   (string))))))))))
+
+================================================================================
+exception defn
+================================================================================
+
+exception MyError of string
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (type
+      (long_identifier
+        (identifier)))))
+
+================================================================================
+exception defn 2
+================================================================================
+
+exception MyError of string * int
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (type
+      (type
+        (long_identifier
+          (identifier)))
+      (type
+        (long_identifier
+          (identifier))))))

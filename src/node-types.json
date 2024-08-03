@@ -142,6 +142,10 @@
         "named": true
       },
       {
+        "type": "exception_definition",
+        "named": true
+      },
+      {
         "type": "fsi_directive_decl",
         "named": true
       },
@@ -1256,6 +1260,36 @@
       "types": [
         {
           "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "exception_definition",
+    "named": true,
+    "fields": {
+      "exception_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "long_identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "type",
           "named": true
         }
       ]
@@ -4024,6 +4058,10 @@
     "named": false
   },
   {
+    "type": "exception",
+    "named": false
+  },
+  {
     "type": "f",
     "named": false
   },
@@ -4229,11 +4267,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
