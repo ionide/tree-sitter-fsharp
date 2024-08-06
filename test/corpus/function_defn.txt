@@ -172,8 +172,7 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
           (long_identifier
             (identifier)
             (identifier)))
-        (const
-          (unit))))))
+        (unit)))))
 
 ================================================================================
 basic function with srt constraint (new-style, with ')
@@ -216,8 +215,7 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
           (long_identifier
             (identifier)
             (identifier)))
-        (const
-          (unit))))))
+        (unit)))))
 
 ================================================================================
 function decl should be preferred over value decl

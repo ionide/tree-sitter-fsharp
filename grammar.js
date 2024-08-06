@@ -36,7 +36,6 @@ const PREC = {
   SPECIAL_PREFIX: 17,
   // DO_EXPR: 17,
   IF_EXPR: 18,
-  NEW_OBJ: 18,
   DOT: 19,
   INDEX_EXPR: 20,
   PAREN_APP: 21,
@@ -44,6 +43,7 @@ const PREC = {
   PAREN_EXPR: 21,
   DOTDOT: 22,
   DOTDOT_SLICE: 23,
+  NEW_OBJ: 24,
 };
 
 module.exports = grammar({
@@ -441,7 +441,6 @@ module.exports = grammar({
         $.paren_expression,
         $.begin_end_expression,
         $.long_identifier_or_op,
-        $.dot_expression,
         $.typed_expression,
         $.infix_expression,
         $.index_expression,
@@ -467,6 +466,7 @@ module.exports = grammar({
         $.literal_expression,
         $.tuple_expression,
         $.application_expression,
+        $.dot_expression,
         alias($.preproc_if_in_expression, $.preproc_if),
         // (static-typars : (member-sig) expr)
       ),
@@ -660,16 +660,6 @@ module.exports = grammar({
         ),
       ),
 
-    dot_expression: ($) =>
-      prec.right(
-        PREC.DOT,
-        seq(
-          field("base", $._expression),
-          ".",
-          field("field", $.long_identifier_or_op),
-        ),
-      ),
-
     typed_expression: ($) =>
       prec(
         PREC.PAREN_EXPR,
@@ -758,22 +748,30 @@ module.exports = grammar({
     paren_expression: ($) =>
       prec(PREC.PAREN_EXPR, seq("(", $._expression_block, ")")),
 
-    application_expression: ($) =>
+    _high_prec_app: ($) =>
       prec.left(
-        PREC.APP_EXPR,
+        PREC.DOT + 1,
         seq(
           $._expression,
           choice(
-            prec(PREC.APP_EXPR, $._expression),
-            prec(
-              PREC.PAREN_APP + 100,
-              seq(
-                token.immediate(prec(10000, "(")),
-                optional($._expression_block),
-                ")",
-              ),
-            ),
+            $.unit,
+            seq(token.immediate(prec(10000, "(")), $._expression_block, ")"),
           ),
+        ),
+      ),
+
+    _low_prec_app: ($) =>
+      prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
+
+    application_expression: ($) => choice($._high_prec_app, $._low_prec_app),
+
+    dot_expression: ($) =>
+      prec.right(
+        PREC.DOT,
+        seq(
+          field("base", $._expression),
+          ".",
+          field("field", $.long_identifier_or_op),
         ),
       ),
 
