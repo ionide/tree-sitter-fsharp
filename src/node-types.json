@@ -483,6 +483,10 @@
         {
           "type": "_expression",
           "named": true
+        },
+        {
+          "type": "unit",
+          "named": true
         }
       ]
     }

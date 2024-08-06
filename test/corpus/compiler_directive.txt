@@ -177,8 +177,7 @@ if x = y then () else failwith "Failed: 1"
             (char))
           (long_identifier_or_op
             (identifier)))
-        (const
-          (unit)))))
+        (unit))))
   (if_expression
     (infix_expression
       (long_identifier_or_op
