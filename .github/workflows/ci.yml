@@ -43,6 +43,7 @@ jobs:
             examples/FSharp.Compiler/tests/**/*.fs
           invalid-files: |-
             examples/FSharp.Compiler/tests/**/E_*.fs
+            examples/FSharp.Compiler/tests/**/neg*.fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
