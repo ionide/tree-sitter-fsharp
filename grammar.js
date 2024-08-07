@@ -1704,6 +1704,7 @@ module.exports = grammar({
         PREC.INFIX_OP,
         choice(
           $._infix_or_prefix_op,
+          token.immediate(prec(1, /[+-]/)),
           /[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*/,
           "||",
           "=",
@@ -1719,7 +1720,7 @@ module.exports = grammar({
       ),
 
     // Numbers
-    int: (_) => /[+-]?([0-9]_?)+/,
+    int: (_) => token(/[+-]?([0-9]_?)+/),
     xint: (_) =>
       token(
         choice(/0[xX]([0-9a-fA-F]_?)+/, /0[oO]([0-7]_?)+/, /0[bB]([0-1]_?)+/),

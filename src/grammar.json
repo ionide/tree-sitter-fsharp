@@ -7189,6 +7189,17 @@
             "name": "_infix_or_prefix_op"
           },
           {
+            "type": "IMMEDIATE_TOKEN",
+            "content": {
+              "type": "PREC",
+              "value": 1,
+              "content": {
+                "type": "PATTERN",
+                "value": "[+-]"
+              }
+            }
+          },
+          {
             "type": "PATTERN",
             "value": "[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*"
           },
@@ -7236,8 +7247,11 @@
       }
     },
     "int": {
-      "type": "PATTERN",
-      "value": "[+-]?([0-9]_?)+"
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[+-]?([0-9]_?)+"
+      }
     },
     "xint": {
       "type": "TOKEN",

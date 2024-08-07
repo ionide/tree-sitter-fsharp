@@ -614,3 +614,79 @@ let johnDoeAsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
             (identifier))))
       (const
         (verbatim_string)))))
+
+================================================================================
+number positive parsing
+================================================================================
+
+do 
+  1 + 1
+  1 +1
+  1+1
+  +1
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (application_expression
+            (const
+              (int))
+            (const
+              (int)))
+          (sequential_expression
+            (infix_expression
+              (const
+                (int))
+              (infix_op)
+              (const
+                (int)))
+            (const
+              (int))))))))
+
+================================================================================
+number negative parsing
+================================================================================
+
+do 
+  1 - 1
+  1 -1
+  1-1
+  -1
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (sequential_expression
+        (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int)))
+        (sequential_expression
+          (application_expression
+            (const
+              (int))
+            (const
+              (int)))
+          (sequential_expression
+            (infix_expression
+              (const
+                (int))
+              (infix_op)
+              (const
+                (int)))
+            (const
+              (int))))))))
