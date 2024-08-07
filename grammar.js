@@ -1704,6 +1704,7 @@ module.exports = grammar({
         PREC.INFIX_OP,
         choice(
           $._infix_or_prefix_op,
+          token.immediate(prec(1, /[+-]/)),
           /[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*/,
           "||",
           "=",
@@ -1719,7 +1720,7 @@ module.exports = grammar({
       ),
 
     // Numbers
-    int: (_) => /[+-]?([0-9]_?)+/,
+    int: (_) => token(/[+-]?([0-9]_?)+/),
     xint: (_) =>
       token(
         choice(/0[xX]([0-9a-fA-F]_?)+/, /0[oO]([0-7]_?)+/, /0[bB]([0-1]_?)+/),
@@ -1770,7 +1771,7 @@ module.exports = grammar({
     //
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => prec(-1, seq(/\/\/+[^\n\r]*/)),
+    line_comment: (_) => token(seq(/\/\/+[^\n\r]*/)),
 
     identifier: (_) =>
       token(

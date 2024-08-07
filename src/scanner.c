@@ -67,7 +67,19 @@ static inline bool scan_block_comment(TSLexer *lexer) {
 static inline bool is_infix_op_start(TSLexer *lexer) {
   switch (lexer->lookahead) {
   case '+':
+    skip(lexer);
+    return lexer->lookahead != '0' && lexer->lookahead != '1' &&
+           lexer->lookahead != '2' && lexer->lookahead != '3' &&
+           lexer->lookahead != '4' && lexer->lookahead != '5' &&
+           lexer->lookahead != '6' && lexer->lookahead != '7' &&
+           lexer->lookahead != '8' && lexer->lookahead != '9';
   case '-':
+    skip(lexer);
+    return lexer->lookahead != '0' && lexer->lookahead != '1' &&
+           lexer->lookahead != '2' && lexer->lookahead != '3' &&
+           lexer->lookahead != '4' && lexer->lookahead != '5' &&
+           lexer->lookahead != '6' && lexer->lookahead != '7' &&
+           lexer->lookahead != '8' && lexer->lookahead != '9';
   case '%':
   case '&':
   case '=':
