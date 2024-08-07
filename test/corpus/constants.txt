@@ -621,6 +621,7 @@ number positive parsing
 
 do 
   1 + 1
+  1+ 1
   1 +1
   1+1
   +1
@@ -638,20 +639,27 @@ do
           (const
             (int)))
         (sequential_expression
-          (application_expression
+          (infix_expression
             (const
               (int))
+            (infix_op)
             (const
               (int)))
           (sequential_expression
-            (infix_expression
+            (application_expression
               (const
                 (int))
-              (infix_op)
               (const
                 (int)))
-            (const
-              (int))))))))
+            (sequential_expression
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int)))
+              (const
+                (int)))))))))
 
 ================================================================================
 number negative parsing
@@ -659,6 +667,7 @@ number negative parsing
 
 do 
   1 - 1
+  1- 1
   1 -1
   1-1
   -1
@@ -676,17 +685,24 @@ do
           (const
             (int)))
         (sequential_expression
-          (application_expression
+          (infix_expression
             (const
               (int))
+            (infix_op)
             (const
               (int)))
           (sequential_expression
-            (infix_expression
+            (application_expression
               (const
                 (int))
-              (infix_op)
               (const
                 (int)))
-            (const
-              (int))))))))
+            (sequential_expression
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int)))
+              (const
+                (int)))))))))
