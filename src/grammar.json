@@ -7742,8 +7742,7 @@
       ]
     },
     "line_comment": {
-      "type": "PREC",
-      "value": -1,
+      "type": "TOKEN",
       "content": {
         "type": "SEQ",
         "members": [

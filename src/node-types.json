@@ -1975,11 +1975,6 @@
     }
   },
   {
-    "type": "line_comment",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "list_expression",
     "named": true,
     "fields": {},
@@ -4325,6 +4320,10 @@
   {
     "type": "lf",
     "named": false
+  },
+  {
+    "type": "line_comment",
+    "named": true
   },
   {
     "type": "match",
