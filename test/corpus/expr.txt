@@ -3280,3 +3280,45 @@ let f services =
           (long_identifier_or_op
             (identifier)))
         (unit)))))
+
+================================================================================
+function application with explicit type
+================================================================================
+
+f<string>()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+          (typed_expression
+            (long_identifier_or_op
+              (identifier))
+            (types
+              (simple_type
+              (long_identifier
+                (identifier)))))
+        (unit)))
+
+================================================================================
+function application with explicit anonymous type
+================================================================================
+
+f<{|x: string|}>()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+          (typed_expression
+            (long_identifier_or_op
+              (identifier))
+            (types
+              (anon_record_type
+                (record_fields
+                  (record_field
+                    (identifier)
+                    (simple_type
+                      (long_identifier
+                        (identifier))))))))
+        (unit)))

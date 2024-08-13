@@ -834,6 +834,34 @@ type T =
               (identifier))))))))
 
 ================================================================================
+anonymous record definition
+================================================================================
+
+type T =
+    {| A: int
+       B: int |}
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+            (identifier))
+      (anon_record_type
+            (record_fields
+              (record_field
+                (identifier)
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (record_field
+                (identifier)
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))
+
+================================================================================
 Type extension
 ================================================================================
 
