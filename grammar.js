@@ -1020,6 +1020,7 @@ module.exports = grammar({
           $.type_argument,
           $.constrained_type,
           $.flexible_type,
+          $.anon_record_type
         ),
       ),
 
@@ -1038,7 +1039,7 @@ module.exports = grammar({
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
-
+    anon_record_type: ($) => seq("{|", scoped($.record_fields, $._indent, $._dedent), "|}"),
     types: ($) =>
       seq($._type, repeat(prec.left(PREC.COMMA - 1, seq(",", $._type)))),
 
