@@ -6,12 +6,12 @@
         "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
       ],
       "include_dirs": [
-        "src",
+        "grammars/fsharp/src",
       ],
       "sources": [
         "bindings/node/binding.cc",
-        "src/parser.c",
-        "src/scanner.c",
+        "grammars/fsharp/src/parser.c",
+        "grammars/fsharp/src/scanner.c",
       ],
       "cflags_c": [
         "-std=c11",

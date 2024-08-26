@@ -8,11 +8,11 @@
   "main": "bindings/node",
   "types": "bindings/node",
   "files": [
-    "grammar.js",
     "binding.gyp",
     "bindings/node/*",
+    "grammars/fsharp/src/**",
     "queries/*",
-    "src/**"
+    "*.wasm"
   ],
   "devDependencies": {
     "eslint": "^9.8.0",
@@ -29,22 +29,39 @@
     }
   },
   "scripts": {
-    "build": "tree-sitter generate --no-bindings",
+    "build": "npm run build-fsharp && npm run build-interface",
+    "build-fsharp": "cd grammars/fsharp && tree-sitter generate --no-bindings",
+    "build-interface": "cd grammars/interface && tree-sitter generate --no-bindings",
+    "test": "npm run test-fsharp && npm run test-interface && npm run test-highlighting",
+    "test-fsharp": "cd grammars/fsharp && tree-sitter test",
+    "test-interface": "cd grammars/interface && tree-sitter test",
+    "test-highlighting": "tree-sitter test",
     "lint": "eslint grammar.js",
     "parse": "tree-sitter parse",
     "debug": "tree-sitter parse -d",
-    "test": "tree-sitter test",
     "install": "node-gyp-build",
     "prebuildify": "prebuildify --napi --strip"
   },
   "tree-sitter": [
     {
       "scope": "source.fsharp",
+      "path": "grammars/fsharp",
       "file-types": [
         "fs",
         "fsx"
       ],
-      "injection-regex": "fs",
+      "injection-regex": "^(fsharp|fsx?)$",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "tags": "queries/tags.scm"
+    },
+    {
+      "scope": "source.fsharp.interface",
+      "path": "grammars/interface",
+      "file-types": [
+        "fsi"
+      ],
+      "injection-regex": "^(fsharp_interface|fsi)$",
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",
       "tags": "queries/tags.scm"
