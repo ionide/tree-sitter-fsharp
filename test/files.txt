@@ -1,0 +1,3 @@
+examples/Giraffe/**/*.fs
+examples/FSharp.Data/**/*.fs
+examples/FSharp.Compiler/tests/**/*.fs

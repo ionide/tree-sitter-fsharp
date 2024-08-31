@@ -1,0 +1,2 @@
+examples/FSharp.Compiler/tests/**/E_*.fs
+examples/FSharp.Compiler/tests/**/neg*.fs
