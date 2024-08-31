@@ -4,16 +4,19 @@ description = "fsharp grammar for the tree-sitter parsing library"
 version = "0.0.1"
 keywords = ["incremental", "parsing", "fsharp"]
 categories = ["parsing", "text-editors"]
-repository = "https://github.com/nsidorenco/tree-sitter-fsharp"
+repository = "https://github.com/ionide/tree-sitter-fsharp"
 edition = "2021"
 license = "MIT"
 
 build = "bindings/rust/build.rs"
 include = [
   "bindings/rust/*",
-  "grammar.js",
-  "queries/*",
-  "src/*",
+  "common",
+  "fsharp/grammar.js",
+  "fsharp/src",
+  "fsharp_signature/grammar.js",
+  "fsharp_signature/src",
+  "queries"
 ]
 
 [lib]

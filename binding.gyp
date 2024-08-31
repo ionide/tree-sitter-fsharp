@@ -6,16 +6,27 @@
         "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
       ],
       "include_dirs": [
-        "src",
+        "fsharp/src",
       ],
       "sources": [
         "bindings/node/binding.cc",
-        "src/parser.c",
-        "src/scanner.c",
+        "fsharp/src/parser.c",
+        "fsharp/src/scanner.c",
+        "fsharp_signature/src/parser.c",
+        "fsharp_signature/src/scanner.c"
       ],
-      "cflags_c": [
-        "-std=c11",
+      "conditions": [
+        ["OS!='win'", {
+          "cflags_c": [
+            "-std=c11",
+          ],
+        }, { # OS == "win"
+          "cflags_c": [
+            "/std:c11",
+            "/utf-8",
+          ],
+        }],
       ],
-    }
+    },
   ]
 }

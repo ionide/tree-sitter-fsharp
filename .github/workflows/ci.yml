@@ -3,13 +3,6 @@ name: CI
 on:
   push:
     branches: ["main"]
-    paths:
-      - .github/**
-      - grammar.js
-      - src/**
-      - test/**
-      - bindings/**
-      - binding.gyp
   pull_request:
 
 concurrency:
@@ -17,55 +10,150 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  test-parsers:
     name: Test parser
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-14]
+        language: [fsharp, fsharp_signature]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: tree-sitter/setup-action/cli@v1
+      - name: test language
+        uses: tree-sitter/parser-test-action@v2
+        with:
+          test-parser-cmd: cd ${{matrix.language}} && tree-sitter test
+  parse-examples:
+    name: Parse examples
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14]
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: ${{runner.os == 'Linux'}}
+          submodules: true
       - uses: tree-sitter/setup-action/cli@v1
-      - uses: tree-sitter/parser-test-action@v2
-        with:
-          generate: false # ${{runner.os == 'Linux'}}
       - name: Parse sample files
         uses: tree-sitter/parse-action@v4
         id: parse-files
         continue-on-error: true
         with:
-          files: |-
-            examples/Giraffe/**/*.fs
-            examples/FSharp.Data/**/*.fs
-            examples/FSharp.Compiler/tests/**/*.fs
-          invalid-files: |-
-            examples/FSharp.Compiler/tests/**/E_*.fs
-            examples/FSharp.Compiler/tests/**/neg*.fs
+          files-list: test/files.txt
+          invalid-files-list: test/invalid-files.txt
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
         with:
           name: failures-${{runner.os}}
           path: ${{steps.parse-files.outputs.failures}}
+
+  test-go:
+    name: Test Go binding
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache-dependency-path: bindings/go/go.mod
+      - name: Get dependencies
+        working-directory: bindings/go
+        run: go get -t .
+      - name: Test
+        working-directory: bindings/go
+        run: go test -v
+
+  test-node:
+    name: Test Node binding
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Test
+        run: npm run test-binding
+
+  test-python:
+    name: Test Python binding
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          cache: pip
+          python-version: 3.12
+          cache-dependency-path: pyproject.toml
+      - name: Build
+        run: pip install -e .[core]
+      - name: Test
+        run: python -munittest discover -v -s bindings/python/tests
+
+  test-rust:
+    name: Test Rust binding
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build
+        run: cargo build -v
+      - name: Test
+        run: cargo test -v
+
+  # test-swift:
+  #   name: Test Swift binding
+  #   runs-on: ${{matrix.os}}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Build
+  #       run: swift build
+  #     - name: Test
+  #       run: swift test
+
   fuzz:
-    name: Fuzz parser
+    name: Fuzz fsharp
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [fsharp, fsharp_signature]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Check for scanner changes
-        id: scanner-changes
-        run: |-
-          if git diff --quiet HEAD^ -- src/scanner.c; then
-            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
-          else
-            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
-          fi
       - name: Fuzz parser
         uses: tree-sitter/fuzz-action@v4
-        if: steps.scanner-changes.outputs.changed == 'true'
+        with:
+          directory: ${{matrix.language}}
