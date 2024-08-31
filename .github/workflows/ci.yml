@@ -23,11 +23,11 @@ jobs:
       - name: test fsharp
         uses: tree-sitter/parser-test-action@v2
         with:
-          test-parser-cmd: cd grammars/fsharp && tree-sitter test
+          test-parser-cmd: cd fsharp && tree-sitter test
       - name: test fsharp signature
         uses: tree-sitter/parser-test-action@v2
         with:
-          test-parser-cmd: cd grammars/signature && tree-sitter test
+          test-parser-cmd: cd signature && tree-sitter test
   parse-examples:
     name: Parse examples
     runs-on: ${{matrix.os}}
@@ -139,20 +139,20 @@ jobs:
       - name: Test
         run: cargo test -v
 
-  # test-swift:
-  #   name: Test Swift binding
-  #   runs-on: ${{matrix.os}}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [ubuntu-latest, macos-latest]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Build
-  #       run: swift build
-  #     - name: Test
-  #       run: swift test
+  test-swift:
+    name: Test Swift binding
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test
 
   fuzz:
     name: Fuzz fsharp
