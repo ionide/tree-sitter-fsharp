@@ -3,9 +3,9 @@ VERSION := 0.0.1
 LANGUAGE_NAME := tree-sitter-fsharp
 
 # repository
-FSHARP_DIR := grammars/fsharp
-SIGNATURE_DIR := grammars/signature
-SRC_DIR := grammars/fsharp/src
+FSHARP_DIR := fsharp
+SIGNATURE_DIR := fsharp_signature
+SRC_DIR := fsharp/src
 
 PARSER_REPO_URL := $(shell git remote get-url origin 2>/dev/null)
 

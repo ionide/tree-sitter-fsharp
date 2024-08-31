@@ -12,10 +12,10 @@ build = "bindings/rust/build.rs"
 include = [
   "bindings/rust/*",
   "common",
-  "grammars/fsharp/grammar.js",
-  "grammars/fsharp/src",
-  "grammars/signature/grammar.js",
-  "grammars/signature/src",
+  "fsharp/grammar.js",
+  "fsharp/src",
+  "fsharp_signature/grammar.js",
+  "fsharp_signature/src",
   "queries"
 ]
 

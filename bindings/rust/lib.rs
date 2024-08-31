@@ -49,12 +49,12 @@ pub fn language_fsharp_signature() -> Language {
 /// The content of the [`node-types.json`][] file for FSharp.
 ///
 /// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers#static-node-types
-pub const FSHARP_NODE_TYPES: &'static str = include_str!("../../grammars/fsharp/src/node-types.json");
+pub const FSHARP_NODE_TYPES: &'static str = include_str!("../../fsharp/src/node-types.json");
 
 /// The content of the [`node-types.json`][] file for FSharp signature.
 ///
 /// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers#static-node-types
-pub const SIGNATURE_NODE_TYPES: &'static str = include_str!("../../grammars/signature/src/node-types.json");
+pub const SIGNATURE_NODE_TYPES: &'static str = include_str!("../../fsharp_signature/src/node-types.json");
 
 /// The syntax highlighting query for FSharp.
 pub const HIGHLIGHTS_QUERY: &'static str = include_str!("../../queries/highlights.scm");

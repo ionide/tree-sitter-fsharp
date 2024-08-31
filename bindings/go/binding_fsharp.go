@@ -1,8 +1,8 @@
 package tree_sitter_fsharp
 
-// #cgo CFLAGS: -I../../grammars/fsharp/src -std=c11 -fPIC
-// #include "../../grammars/fsharp/src/parser.c"
-// #include "../../grammars/fsharp/src/scanner.c"
+// #cgo CFLAGS: -I../../fsharp/src -std=c11 -fPIC
+// #include "../../fsharp/src/parser.c"
+// #include "../../fsharp/src/scanner.c"
 import "C"
 
 import "unsafe"

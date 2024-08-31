@@ -15,16 +15,16 @@ let package = Package(
             dependencies: [],
             path: ".",
             sources: [
-                "grammars/fsharp/src/parser.c",
-                "grammars/fsharp/src/scanner.c",
-                "grammars/signature/src/parser.c",
-                "grammars/signature/src/scanner.c",
+                "fsharp/src/parser.c",
+                "fsharp/src/scanner.c",
+                "fsharp_signature/src/parser.c",
+                "fsharp_signature/src/scanner.c",
             ],
             resources: [
                 .copy("queries")
             ],
             publicHeadersPath: "bindings/swift",
-            cSettings: [.headerSearchPath("grammars/fsharp/src")]
+            cSettings: [.headerSearchPath("fsharp/src")]
         ),
         .testTarget(
             name: "TreeSitterFSharpTests",

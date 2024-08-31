@@ -1,9 +1,8 @@
 fn main() {
     let root_dir = std::path::Path::new(".");
     let common_dir = root_dir.join("common");
-    let grammars_dir = root_dir.join("grammars");
-    let fsharp_dir = grammars_dir.join("fsharp").join("src");
-    let signature_dir = grammars_dir.join("signature").join("src");
+    let fsharp_dir = root_dir.join("fsharp").join("src");
+    let signature_dir = root_dir.join("signature").join("src");
 
     let mut c_config = cc::Build::new();
     c_config.std("c11").include(&fsharp_dir);

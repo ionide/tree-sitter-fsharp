@@ -35,10 +35,10 @@ setup(
             name="_binding",
             sources=[
                 "bindings/python/tree_sitter_fsharp/binding.c",
-                "grammars/fsharp/src/parser.c",
-                "grammars/fsharp/src/scanner.c",
-                "grammars/signature/src/parser.c",
-                "grammars/signature/src/scanner.c",
+                "fsharp/src/parser.c",
+                "fsharp/src/scanner.c",
+                "fsharp_signature/src/parser.c",
+                "fsharp_signature/src/scanner.c",
             ],
             extra_compile_args=(
                 [
@@ -56,7 +56,7 @@ setup(
                 ("PY_SSIZE_T_CLEAN", None),
                 ("TREE_SITTER_HIDE_SYMBOLS", None),
             ],
-            include_dirs=["grammars/fsharp/src"],
+            include_dirs=["fsharp/src"],
             py_limited_api=True,
         )
     ],

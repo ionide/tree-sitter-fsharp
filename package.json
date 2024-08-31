@@ -11,8 +11,8 @@
     "binding.gyp",
     "bindings/node/*",
     "common/**",
-    "grammars/fsharp/src/**",
-    "grammars/signature/src/**",
+    "fsharp/src/**",
+    "fsharp_signature/src/**",
     "queries/*",
     "*.wasm"
   ],
@@ -35,8 +35,8 @@
     "build-fsharp": "cd grammars/fsharp && tree-sitter generate --no-bindings",
     "build-signature": "cd grammars/signature && tree-sitter generate --no-bindings",
     "test": "npm run test-fsharp && npm run test-signature && npm run test-highlighting && npm run test-binding",
-    "test-fsharp": "cd grammars/fsharp && tree-sitter test",
-    "test-signature": "cd grammars/signature && tree-sitter test",
+    "test-fsharp": "cd fsharp && tree-sitter test",
+    "test-signature": "cd signature && tree-sitter test",
     "test-highlighting": "tree-sitter test",
     "test-binding": "node --test bindings/node/*_test.js",
     "lint": "eslint grammar.js",
@@ -48,7 +48,7 @@
   "tree-sitter": [
     {
       "scope": "source.fsharp",
-      "path": "grammars/fsharp",
+      "path": "fsharp",
       "file-types": [
         "fs",
         "fsx"
@@ -60,7 +60,7 @@
     },
     {
       "scope": "source.fsharp.signature",
-      "path": "grammars/signature",
+      "path": "fsharp_signature",
       "file-types": [
         "fsi"
       ],
