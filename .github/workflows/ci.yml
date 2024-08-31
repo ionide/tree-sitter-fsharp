@@ -17,17 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-14]
+        language: [fsharp, fsharp_signature]
     steps:
       - uses: actions/checkout@v4
       - uses: tree-sitter/setup-action/cli@v1
-      - name: test fsharp
+      - name: test language
         uses: tree-sitter/parser-test-action@v2
         with:
-          test-parser-cmd: cd fsharp && tree-sitter test
-      - name: test fsharp signature
-        uses: tree-sitter/parser-test-action@v2
-        with:
-          test-parser-cmd: cd signature && tree-sitter test
+          test-parser-cmd: cd ${{matrix.language}} && tree-sitter test
   parse-examples:
     name: Parse examples
     runs-on: ${{matrix.os}}
@@ -47,14 +44,6 @@ jobs:
         with:
           files-list: test/files.txt
           invalid-files-list: test/invalid-files.txt
-
-          files: |-
-            examples/Giraffe/**/*.fs
-            examples/FSharp.Data/**/*.fs
-            examples/FSharp.Compiler/tests/**/*.fs
-          invalid-files: |-
-            examples/FSharp.Compiler/tests/**/E_*.fs
-            examples/FSharp.Compiler/tests/**/neg*.fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
