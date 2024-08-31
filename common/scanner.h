@@ -1,3 +1,6 @@
+#ifndef TREE_SITTER_FSHARP_SCANNER_H_
+#define TREE_SITTER_FSHARP_SCANNER_H_
+
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/array.h"
 #include "tree_sitter/parser.h"
@@ -667,3 +670,5 @@ static void destroy(Scanner *scanner) {
   array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }
+
+#endif // TREE_SITTER_FSHARP_SCANNER_H_
