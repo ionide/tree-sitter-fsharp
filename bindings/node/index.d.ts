@@ -25,4 +25,4 @@ type Language = {
 };
 
 export const fsharp: Language;
-export const interface: Language;
+export const signature: Language;

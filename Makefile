@@ -3,9 +3,11 @@ VERSION := 0.0.1
 LANGUAGE_NAME := tree-sitter-fsharp
 
 # repository
-SRC_DIR := src
+FSHARP_DIR := grammars/fsharp
+SIGNATURE_DIR := grammars/signature
+SRC_DIR := grammars/fsharp/src
 
-PARSER_REPO_URL := $(shell git -C $(SRC_DIR) remote get-url origin 2>/dev/null)
+PARSER_REPO_URL := $(shell git remote get-url origin 2>/dev/null)
 
 ifeq ($(PARSER_URL),)
 	PARSER_URL := $(subst .git,,$(PARSER_REPO_URL))
@@ -28,7 +30,7 @@ LIBDIR ?= $(PREFIX)/lib
 PCLIBDIR ?= $(LIBDIR)/pkgconfig
 
 # object files
-OBJS := $(patsubst %.c,%.o,$(wildcard $(SRC_DIR)/*.c))
+OBJS := $(patsubst %.c,%.o,$(wildcard grammars/*/src/*.c))
 
 # flags
 ARFLAGS := rcs
@@ -81,14 +83,16 @@ $(LANGUAGE_NAME).pc: bindings/c/$(LANGUAGE_NAME).pc.in
 		-e 's|=$(PREFIX)|=$${prefix}|' \
 		-e 's|@PREFIX@|$(PREFIX)|' $< > $@
 
-$(SRC_DIR)/parser.c: grammar.js
-	$(TS) generate --no-bindings
+$(FSHARP_DIR)/src/parser.c: $(FSHARP_DIR)/grammar.js
+	cd $(FSHARP_DIR) && $(TS) generate --no-bindings
+
+$(SIGNATURE_DIR)/src/parser.c: $(FSHARP_DIR)/grammar.js $(SIGNATURE_DIR)/grammar.js
+	cd $(SIGNATURE_DIR) && $(TS) generate --no-bindings
 
 install: all
-	install -d '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter '$(DESTDIR)$(PCLIBDIR)' '$(DESTDIR)$(LIBDIR)'
-	install -m644 bindings/c/$(LANGUAGE_NAME).h '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h
-	install -m644 $(LANGUAGE_NAME).pc '$(DESTDIR)$(PCLIBDIR)'/$(LANGUAGE_NAME).pc
-	install -m644 lib$(LANGUAGE_NAME).a '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).a
+	install -Dm644 bindings/c/$(LANGUAGE_NAME).h '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h
+	install -Dm644 $(LANGUAGE_NAME).pc '$(DESTDIR)$(PCLIBDIR)'/$(LANGUAGE_NAME).pc
+	install -Dm755 lib$(LANGUAGE_NAME).a '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).a
 	install -m755 lib$(LANGUAGE_NAME).$(SOEXT) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXT)

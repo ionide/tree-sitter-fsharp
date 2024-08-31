@@ -1,4 +1,4 @@
-module github.com/tree-sitter/tree-sitter-fsharp
+module github.com/ionide/tree-sitter-fsharp
 
 go 1.22
 

@@ -847,19 +847,19 @@ type T =
   (type_definition
     (type_abbrev_defn
       (type_name
-            (identifier))
+        (identifier))
       (anon_record_type
-            (record_fields
-              (record_field
-                (identifier)
-                (simple_type
-                  (long_identifier
-                    (identifier))))
-              (record_field
-                (identifier)
-                (simple_type
-                  (long_identifier
-                    (identifier)))))))))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
 
 ================================================================================
 Type extension
@@ -1041,14 +1041,14 @@ type T() =
             (identifier)
             (identifier))
           (paren_pattern
-            (optional_pattern
-              (typed_pattern
+            (typed_pattern
+              (optional_pattern
                 (identifier_pattern
                   (long_identifier_or_op
-                    (identifier)))
-                (simple_type
-                  (long_identifier
-                    (identifier))))))
+                    (identifier))))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
           (const
             (unit)))))))
 
@@ -1068,21 +1068,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (repeat_pattern
-          (typed_pattern
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
             (identifier_pattern
               (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
                 (identifier))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
       (member_defn
         (additional_constr_defn
           (paren_pattern
@@ -1129,21 +1129,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (repeat_pattern
-          (typed_pattern
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
             (identifier_pattern
               (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
                 (identifier))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
       (member_defn
         (method_or_prop_defn
           (property_or_ident
@@ -1183,21 +1183,21 @@ type A(x: int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (repeat_pattern
-          (typed_pattern
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
             (identifier_pattern
               (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
                 (identifier))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
       (interface_implementation
         (generic_type
           (long_identifier

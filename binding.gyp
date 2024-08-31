@@ -12,10 +12,21 @@
         "bindings/node/binding.cc",
         "grammars/fsharp/src/parser.c",
         "grammars/fsharp/src/scanner.c",
+        "grammars/signature/src/parser.c",
+        "grammars/signature/src/scanner.c"
       ],
-      "cflags_c": [
-        "-std=c11",
+      "conditions": [
+        ["OS!='win'", {
+          "cflags_c": [
+            "-std=c11",
+          ],
+        }, { # OS == "win"
+          "cflags_c": [
+            "/std:c11",
+            "/utf-8",
+          ],
+        }],
       ],
-    }
+    },
   ]
 }

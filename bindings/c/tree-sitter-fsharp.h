@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 const TSLanguage *tree_sitter_fsharp(void);
+const TSLanguage *tree_sitter_fsharp_signature(void);
 
 #ifdef __cplusplus
 }

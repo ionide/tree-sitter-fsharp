@@ -81,21 +81,21 @@ let name (x: int, y: string) = 1, "test"
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (repeat_pattern
-            (typed_pattern
+          (typed_pattern
+            (repeat_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
               (identifier_pattern
                 (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
                   (identifier))))
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
-                  (identifier)))))))
+            (simple_type
+              (long_identifier
+                (identifier))))))
       (tuple_expression
         (const
           (int))
