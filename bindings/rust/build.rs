@@ -13,7 +13,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed={}", common_dir.to_str().unwrap());
 
-    for dir in &[fsharp_dir, signature_dir, type_dir] {
+    for dir in &[fsharp_dir, signature_dir] {
         let parser_path = dir.join("parser.c");
         let scanner_path = dir.join("scanner.c");
         c_config.file(&parser_path);
