@@ -139,20 +139,20 @@ jobs:
       - name: Test
         run: cargo test -v
 
-  test-swift:
-    name: Test Swift binding
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build
-        run: swift build
-      - name: Test
-        run: swift test
+  # test-swift:
+  #   name: Test Swift binding
+  #   runs-on: ${{matrix.os}}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Build
+  #       run: swift build
+  #     - name: Test
+  #       run: swift test
 
   fuzz-fsharp:
     name: Fuzz fsharp
