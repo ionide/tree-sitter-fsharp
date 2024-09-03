@@ -12,8 +12,30 @@ let package = Package(
     targets: [
         .target(
             name: "TreeSitterFSharp",
-            dependencies: [],
             path: ".",
+            exclude: [
+                "Cargo.toml",
+                "Makefile",
+                "binding.gyp",
+                "bindings/c",
+                "bindings/go",
+                "bindings/node",
+                "bindings/python",
+                "bindings/rust",
+                "prebuilds",
+                "grammar.js",
+                "package.json",
+                "package-lock.json",
+                "pyproject.toml",
+                "setup.py",
+                "test",
+                "examples",
+                ".editorconfig",
+                ".github",
+                ".gitignore",
+                ".gitattributes",
+                ".gitmodules",
+            ],
             sources: [
                 "fsharp/src/parser.c",
                 "fsharp/src/scanner.c",
@@ -34,7 +56,6 @@ let package = Package(
             ],
             path: "bindings/swift/TreeSitterFSharpTests"
         )
-    ],
-    cLanguageStandard: .c11
+    ]
 )
 

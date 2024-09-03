@@ -19,7 +19,7 @@ static PyMethodDef methods[] = {
     {"fsharp", _binding_language_fsharp, METH_NOARGS,
      "Get the tree-sitter language for FSharp."},
     {"signature", _binding_language_fsharp_signature, METH_NOARGS,
-     "Get the tree-sitter language for FSharp signature."},
+     "Get the tree-sitter language for FSharp interfaces."},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef module = {.m_base = PyModuleDef_HEAD_INIT,

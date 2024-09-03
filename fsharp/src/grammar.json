@@ -7782,13 +7782,8 @@
     "line_comment": {
       "type": "TOKEN",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "\\/\\/+[^\\n\\r]*"
-          }
-        ]
+        "type": "PATTERN",
+        "value": "\\/\\/+[^\\n\\r]*"
       }
     },
     "identifier": {

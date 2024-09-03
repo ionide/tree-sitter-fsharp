@@ -10,10 +10,7 @@ final class TreeSitterFSharpTests: XCTestCase {
         let parser = Parser()
         try parser.setLanguage(language)
 
-        let source = """
-        module M =
-            let x = 0
-        """
+        let source = "module M = ()"
 
         let tree = try XCTUnwrap(parser.parse(source))
         let root = try XCTUnwrap(tree.rootNode)
@@ -27,10 +24,7 @@ final class TreeSitterFSharpTests: XCTestCase {
         let parser = Parser()
         try parser.setLanguage(language)
 
-        let source = """
-        module M =
-            val x : int -> int
-        """
+        let source = "val x : int -> int"
 
         let tree = try XCTUnwrap(parser.parse(source))
         let root = try XCTUnwrap(tree.rootNode)

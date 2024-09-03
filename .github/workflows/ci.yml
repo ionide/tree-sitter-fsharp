@@ -24,7 +24,12 @@ jobs:
       - name: test language
         uses: tree-sitter/parser-test-action@v2
         with:
-          test-parser-cmd: cd ${{matrix.language}} && tree-sitter test
+          test-rust: ${{ runner.os == 'Linux' }}
+          test-node: true
+          test-python: true
+          test-go: true
+          test-swift: ${{ runner.os == 'macOS' }}
+
   parse-examples:
     name: Parse examples
     runs-on: ${{matrix.os}}
@@ -50,98 +55,6 @@ jobs:
         with:
           name: failures-${{runner.os}}
           path: ${{steps.parse-files.outputs.failures}}
-
-  test-go:
-    name: Test Go binding
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-          cache-dependency-path: bindings/go/go.mod
-      - name: Get dependencies
-        working-directory: bindings/go
-        run: go get -t .
-      - name: Test
-        working-directory: bindings/go
-        run: go test -v
-
-  test-node:
-    name: Test Node binding
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-      - name: Install dependencies
-        run: npm install
-      - name: Test
-        run: npm run test-binding
-
-  test-python:
-    name: Test Python binding
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          cache: pip
-          python-version: 3.12
-          cache-dependency-path: pyproject.toml
-      - name: Build
-        run: pip install -e .[core]
-      - name: Test
-        run: python -munittest discover -v -s bindings/python/tests
-
-  test-rust:
-    name: Test Rust binding
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Build
-        run: cargo build -v
-      - name: Test
-        run: cargo test -v
-
-  # test-swift:
-  #   name: Test Swift binding
-  #   runs-on: ${{matrix.os}}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [ubuntu-latest, macos-latest]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Build
-  #       run: swift build
-  #     - name: Test
-  #       run: swift test
 
   fuzz:
     name: Fuzz fsharp

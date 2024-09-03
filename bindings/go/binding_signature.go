@@ -8,6 +8,6 @@ import "C"
 import "unsafe"
 
 // Get the tree-sitter Language for FSharp signature.
-func FSharpSignature() unsafe.Pointer {
+func LanguageFSharpSignature() unsafe.Pointer {
 	return unsafe.Pointer(C.tree_sitter_fsharp_signature())
 }

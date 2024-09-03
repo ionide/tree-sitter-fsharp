@@ -1,0 +1,26 @@
+===
+literal string value
+:language(fsharp_signature)
+===
+
+[<Literal>]
+val myVal : string = "test"
+
+---
+
+(file
+  (value_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (value_declaration_left
+      (identifier_pattern
+        (long_identifier_or_op
+          (identifier))))
+    (simple_type
+      (long_identifier
+        (identifier)))
+    (const
+      (string))))

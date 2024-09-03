@@ -1,11 +1,6 @@
 {
-  "0": "f",
-  "1": "s",
-  "2": "h",
-  "3": "a",
-  "4": "r",
-  "5": "p",
   "name": "fsharp_signature",
+  "inherits": "fsharp",
   "word": "identifier",
   "rules": {
     "file": {
@@ -7755,13 +7750,8 @@
     "line_comment": {
       "type": "TOKEN",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "\\/\\/+[^\\n\\r]*"
-          }
-        ]
+        "type": "PATTERN",
+        "value": "\\/\\/+[^\\n\\r]*"
       }
     },
     "identifier": {
