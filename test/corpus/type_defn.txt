@@ -1,0 +1,1991 @@
+================================================================================
+Enum type definition
+================================================================================
+
+type Test = Red = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (enum_type_defn
+      (type_name
+        (identifier))
+      (enum_type_cases
+        (enum_type_case
+          (identifier)
+          (const
+            (int)))))))
+
+================================================================================
+Enum type definition - multi line
+================================================================================
+
+type Test =
+  | Red = "red"
+  | Blue = "blue"
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (enum_type_defn
+      (type_name
+        (identifier))
+      (enum_type_cases
+        (enum_type_case
+          (identifier)
+          (const
+            (string)))
+        (enum_type_case
+          (identifier)
+          (const
+            (string)))))))
+
+================================================================================
+Union type definition
+================================================================================
+
+type Test = Red
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+Union type definition - multi line
+================================================================================
+
+type Test =
+  | Red
+  | Blue
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+basic interface definition
+================================================================================
+
+type A =
+  abstract member F : unit -> unit
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+basic interface definition with optional parameters
+================================================================================
+
+type A =
+  abstract member F: x:int * ?y:int -> int
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (argument_name_spec
+                  (identifier))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (argument_spec
+                (argument_name_spec
+                  (identifier))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+generic interface definition
+================================================================================
+
+type A<'B> =
+  abstract member F<'A> : 'A -> 'B'
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))))
+      (member_defn
+        (member_signature
+          (identifier)
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier))))
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (type_argument
+                  (identifier))))
+            (type_argument
+              (identifier))))))))
+
+================================================================================
+basic class definition
+================================================================================
+
+type A() =
+  do ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (const
+        (unit)))))
+
+================================================================================
+class inherit definition
+================================================================================
+
+type A() =
+  inherit ControllerBase()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (class_inherits_decl
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (const
+          (unit))))))
+
+================================================================================
+basic class member definition
+================================================================================
+
+type A() =
+  member this.Post(msg: string) = msg
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+basic class member definition with class keyword 1
+================================================================================
+
+type A() = class
+  member this.Post(msg: string) = msg
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+basic class member definition with class keyword 2
+================================================================================
+
+type A() =
+  class
+    member this.Post(msg: string) = msg
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+empty class with class end construct 1
+================================================================================
+
+type A() =
+  class
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with class end construct 1
+================================================================================
+
+type A() = class end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with struct end construct 1
+================================================================================
+
+type A() = struct end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+empty class with struct end construct 1
+================================================================================
+
+type A() =
+  struct
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args))))
+
+================================================================================
+interface construct 1
+================================================================================
+
+type A = interface
+  abstract member F: unit -> unit
+end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+interface construct 2
+================================================================================
+
+type A =
+  interface
+    abstract member F: unit -> unit
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        (identifier))
+      (member_defn
+        (member_signature
+          (identifier)
+          (curried_spec
+            (arguments_spec
+              (argument_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+private member method
+================================================================================
+
+type A() =
+  member inline private this.Post() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (access_modifier)
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
+basic class member definition with two members
+================================================================================
+
+type A() =
+  member this.Post() = ()
+  member this.Get() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit))))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
+basic class interface implementation definition
+================================================================================
+
+type A() =
+  interface A with
+    member _.B() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (interface_implementation
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (const
+              (unit))))))))
+
+================================================================================
+basic class interface implementation definition with two members
+================================================================================
+
+type A() =
+  interface A with
+    member _.B() = ()
+    member _.C() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (interface_implementation
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (const
+              (unit))))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (const
+              (unit))))))))
+
+================================================================================
+class interface implementation definition with member and property
+================================================================================
+
+type A() =
+  interface A with
+    member _.B = 1
+    member _.C() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (interface_implementation
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (int))))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (const
+              (unit))))))))
+
+================================================================================
+class inherit and do definition
+================================================================================
+
+type A() =
+  inherit ControllerBase()
+  do ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (class_inherits_decl
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (const
+          (unit)))
+      (const
+        (unit)))))
+
+================================================================================
+class inherit and member method definition
+================================================================================
+
+type A() =
+  inherit ControllerBase()
+  member ctx.Index() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (class_inherits_decl
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (const
+          (unit)))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
+class inherit with generics
+================================================================================
+
+type A<'T>(t: 'T) =
+  inherit ControllerBase<'T>(t)
+  do ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))))
+      (primary_constr_args
+        (typed_pattern
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (type_argument
+            (identifier))))
+      (class_inherits_decl
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (type_argument
+                (identifier)))))
+        (paren_expression
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (unit)))))
+
+================================================================================
+class member then interface impl. test
+================================================================================
+
+type A() =
+  member B.C() = ()
+  interface Z with
+    member _.Y() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit))))
+      (interface_implementation
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (const
+              (unit))))))))
+
+================================================================================
+Mutual type definition
+================================================================================
+
+type A = | B
+and B = C
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+Recursive type definition
+================================================================================
+
+type Maybe<'T> = | Just of 'T | Nothing
+and 'T maybe = Maybe<'T>
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (type_argument
+                (identifier)))))
+        (union_type_case
+          (identifier))))
+    (type_abbrev_defn
+      (type_name
+        (type_argument
+          (identifier))
+        (identifier))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (type_argument
+              (identifier))))))))
+
+================================================================================
+record definition
+================================================================================
+
+type T =
+    { A: int
+      B: int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+anonymous record definition
+================================================================================
+
+type T =
+    {| A: int
+       B: int |}
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (anon_record_type
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Type extension
+================================================================================
+
+type T =
+    { A: int
+      B: int }
+
+    static member Default = { A = 1; B = 2 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier))
+            (brace_expression
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))))))))))
+
+================================================================================
+Type extension. "with" keyword
+================================================================================
+
+type T =
+    { A: int
+      B: int }
+
+    with static member Default = { A = 1; B = 2 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier))
+            (brace_expression
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))))))))))
+
+================================================================================
+Type extension. "with" keyword newline
+================================================================================
+
+type T =
+    { A: int
+      B: int }
+
+    with
+      static member Default1 = { A = 1; B = 2 }
+      member x.Test() = { A = 1; B = 2 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier))
+            (brace_expression
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))))))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (unit))
+            (brace_expression
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (const
+                    (int)))))))))))
+
+================================================================================
+method with optional typed argument
+================================================================================
+
+type T() =
+  member _.A(?x: int) = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (optional_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (const
+            (unit)))))))
+
+================================================================================
+class with additional constructor
+================================================================================
+
+type A(x:int, y:int) =
+  new(x:int) = A(x, x)
+  member _.P = x + y
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (member_defn
+        (additional_constr_defn
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (tuple_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier))))))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+class method with generic type parameter
+================================================================================
+
+type A(x:int, y:int) =
+  member _.F<'Res>(x: 'Res) : 'Res = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier))))
+          (typed_pattern
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (type_argument
+                  (identifier))))
+            (type_argument
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+interface implementation with generic type parameter
+================================================================================
+
+type A(x: int, y:int) =
+  interface IFun<'T> with
+    member _.Invoke(x: unit -> 'T) = x()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (typed_pattern
+          (repeat_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (interface_implementation
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (type_argument
+                (identifier)))))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (function_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))
+                  (type_argument
+                    (identifier)))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (unit))))))))
+
+================================================================================
+multiple interfaces with property members
+================================================================================
+
+namespace Test
+
+type IProp1 =
+    abstract member Prop1: string
+    abstract member Prop2: Array<int>
+
+type IProp2 =
+    abstract member Prop1: string
+    abstract member Prop2: Array<int>
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          (identifier))
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (generic_type
+                (long_identifier
+                  (identifier))
+                (type_attributes
+                  (type_attribute
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          (identifier))
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (generic_type
+                (long_identifier
+                  (identifier))
+                (type_attributes
+                  (type_attribute
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))))
+
+================================================================================
+member with curried arguments
+================================================================================
+
+type A() =
+    member this.Curried (x: int) (y: int) = x + y
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+record with xml docs on fields
+================================================================================
+
+/// A is used for...
+type A = {
+  /// B is used for...
+  B: int
+  /// C is used for...
+  C: int
+}
+
+--------------------------------------------------------------------------------
+
+(file
+  (line_comment)
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (line_comment)
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (line_comment)
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+record attributed scoping
+================================================================================
+
+namespace test
+
+type A = {
+  [<IfFalse; CoolProperty(A = 1, Enabled = false); IsTrue>]
+  A : int
+}
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (paren_expression
+                  (tuple_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (int)))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (bool))))))
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+type with shorthand array postfix
+================================================================================
+
+type A = {
+  A : int[]
+}
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (list_type
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+type with static inline member
+================================================================================
+
+type MyClass() =
+  static member inline F(x) = x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier))
+          (paren_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (int))))))))
+
+================================================================================
+method with complex generic type constraints
+================================================================================
+
+type A() =
+    member inline _.B<^Value
+                                      when ^Value :> ValueType
+                                      and ^Value : struct
+                                      and ^Value : (new : unit -> ^Value)
+                                      and ^Value : (static member ( + ) : ^Value * ^Value -> ^Value)
+                                      and  ^Value : (static member Zero : ^Value)
+                                      and default ^Value : int>
+                  () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))
+            (type_argument_constraints
+              (constraint
+                (type_argument
+                  (identifier))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (constraint
+                (type_argument
+                  (identifier)))
+              (constraint
+                (type_argument
+                  (identifier))
+                (type_argument
+                  (identifier)))
+              (constraint
+                (type_argument
+                  (identifier))
+                (trait_member_constraint
+                  (op_identifier)
+                  (compound_type
+                    (type_argument
+                      (identifier))
+                    (function_type
+                      (type_argument
+                        (identifier))
+                      (type_argument
+                        (identifier))))))
+              (constraint
+                (type_argument
+                  (identifier))
+                (trait_member_constraint
+                  (identifier)
+                  (type_argument
+                    (identifier))))
+              (constraint
+                (type_argument
+                  (identifier))
+                (simple_type
+                  (long_identifier
+                    (identifier))))))
+          (const
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
+type extension with long identifier
+================================================================================
+
+namespace A
+
+   [<AutoOpen>]
+    module B =
+        type Microsoft.FSharp.Linq.QueryBuilder with
+            member this.F () = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier))
+    (module_defn
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (identifier)
+      (type_definition
+        (type_extension
+          (type_name
+            (long_identifier
+              (identifier)
+              (identifier)
+              (identifier)
+              (identifier)))
+          (type_extension_elements
+            (member_defn
+              (method_or_prop_defn
+                (property_or_ident
+                  (identifier)
+                  (identifier))
+                (const
+                  (unit))
+                (const
+                  (unit))))))))))
+
+================================================================================
+type provider with named arguments
+================================================================================
+
+type sql = SqlProvider<ConnectionString = "secret">
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (named_static_parameter
+              (identifier)
+              (static_parameter_value
+                (const
+                  (string))))))))))
+
+================================================================================
+type provider with multiple parameters
+================================================================================
+
+type sql = SqlProvider<
+  """
+  test
+  """,
+  A="test">
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (static_parameter_value
+              (const
+                (triple_quoted_string))))
+          (type_attribute
+            (named_static_parameter
+              (identifier)
+              (static_parameter_value
+                (const
+                  (string))))))))))
+
+================================================================================
+record definition with trailing semicolon
+================================================================================
+
+type R = { A: bool; B: bool; }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+class with optional parameter in private constructor
+================================================================================
+
+type CsvFile
+    private
+    (
+        readerFunc: Func<TextReader>,
+        [<Optional>] ?separators,
+        [<Optional>] ?quote,
+        [<Optional>] ?hasHeaders,
+        [<Optional>] ?ignoreErrors,
+        [<Optional>] ?skipRows
+    ) as this =
+    member _.F() = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (access_modifier)
+        (repeat_pattern
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))
+          (attribute_pattern
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (attribute_pattern
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (optional_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (class_as_reference
+          (identifier)))
+      (member_defn
+        (method_or_prop_defn
+          (property_or_ident
+            (identifier)
+            (identifier))
+          (const
+            (unit))
+          (const
+            (unit)))))))
+
+================================================================================
+record definition with private constructor
+================================================================================
+
+type T = private {
+  A : int
+  B : bool
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+DU definition with private constructor
+================================================================================
+
+type T =
+  private
+  | A
+  | B
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+single case DU definition with private constructor
+================================================================================
+
+type T = private S of string
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (access_modifier)
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (simple_type
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+static member operator definition
+================================================================================
+
+module M
+
+type T = T of string with
+    static member (+)(s, s') = s + s'
+
+let str1 = "a" + "b"
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier)
+            (union_type_fields
+              (union_type_field
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (op_identifier))
+              (paren_pattern
+                (repeat_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))
+    (value_declaration
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (infix_expression
+          (const
+            (string))
+          (infix_op)
+          (const
+            (string)))))))
+
+================================================================================
+type extension aligned with union definition
+================================================================================
+
+type U =
+    | Case1
+    | Case2 of int
+
+    static do printfn "init U 1"
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      (type_extension_elements
+        (member_defn
+          (value_declaration
+            (do
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))))))))
+
+================================================================================
+exception defn
+================================================================================
+
+exception MyError of string
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (simple_type
+      (long_identifier
+        (identifier)))))
+
+================================================================================
+exception defn 2
+================================================================================
+
+exception MyError of string * int
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (compound_type
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (simple_type
+        (long_identifier
+          (identifier))))))
