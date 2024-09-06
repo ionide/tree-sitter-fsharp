@@ -413,6 +413,10 @@
           {
             "type": "field_initializers",
             "named": true
+          },
+          {
+            "type": "with_field_expression",
+            "named": true
           }
         ]
       }

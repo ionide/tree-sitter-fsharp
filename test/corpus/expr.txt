@@ -3291,14 +3291,14 @@ f<string>()
 
 (file
   (application_expression
-          (typed_expression
-            (long_identifier_or_op
-              (identifier))
-            (types
-              (simple_type
-              (long_identifier
-                (identifier)))))
-        (unit)))
+    (typed_expression
+      (long_identifier_or_op
+        (identifier))
+      (types
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (unit)))
 
 ================================================================================
 function application with explicit anonymous type
@@ -3310,15 +3310,41 @@ f<{|x: string|}>()
 
 (file
   (application_expression
-          (typed_expression
-            (long_identifier_or_op
-              (identifier))
-            (types
-              (anon_record_type
-                (record_fields
-                  (record_field
-                    (identifier)
-                    (simple_type
-                      (long_identifier
-                        (identifier))))))))
-        (unit)))
+    (typed_expression
+      (long_identifier_or_op
+        (identifier))
+      (types
+        (anon_record_type
+          (record_fields
+            (record_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier))))))))
+    (unit)))
+
+================================================================================
+function application with explicit anonymous type
+================================================================================
+
+let x = {| y with A = 1 |}
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (anon_record_expression
+        (with_field_expression
+          (long_identifier_or_op
+            (identifier))
+          (field_initializers
+            (field_initializer
+              (long_identifier
+                (identifier))
+              (const
+                (int)))))))))
