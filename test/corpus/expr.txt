@@ -3324,7 +3324,7 @@ f<{|x: string|}>()
     (unit)))
 
 ================================================================================
-function application with explicit anonymous type
+anonymous record update expression
 ================================================================================
 
 let x = {| y with A = 1 |}
@@ -3345,6 +3345,36 @@ let x = {| y with A = 1 |}
           (field_initializers
             (field_initializer
               (long_identifier
+                (identifier))
+              (const
+                (int)))))))))
+
+================================================================================
+Method call with multiline parameters
+================================================================================
+
+do
+  x.Call(x, true,
+    c, 1)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (application_expression
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))
+        (tuple_expression
+          (long_identifier_or_op
+            (identifier))
+          (tuple_expression
+            (const
+              (bool))
+            (tuple_expression
+              (long_identifier_or_op
                 (identifier))
               (const
                 (int)))))))))

@@ -23,6 +23,7 @@ enum TokenType {
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
   NEWLINE_NO_ALIGNED,
+  TUPLE_MARKER,
   ERROR_SENTINEL
 };
 
@@ -572,7 +573,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       }
 
       if (indent_length < current_indent_length && !found_bracket_end &&
-          can_dedent_preproc && can_dedent_infix_op) {
+          can_dedent_preproc && can_dedent_infix_op &&
+          !valid_symbols[TUPLE_MARKER]) {
         array_pop(&scanner->indents);
         lexer->result_symbol = DEDENT;
         return true;
