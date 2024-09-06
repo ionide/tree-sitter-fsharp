@@ -513,7 +513,15 @@ module.exports = grammar({
     anon_record_expression: ($) =>
       prec(
         PREC.PAREN_EXPR,
-        seq("{|", scoped($.field_initializers, $._indent, $._dedent), "|}"),
+        seq(
+          "{|",
+          scoped(
+            choice($.field_initializers, $.with_field_expression),
+            $._indent,
+            $._dedent,
+          ),
+          "|}",
+        ),
       ),
 
     with_field_expression: ($) =>

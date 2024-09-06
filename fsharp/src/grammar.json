@@ -1794,8 +1794,17 @@
                   "name": "_indent"
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "field_initializers"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "field_initializers"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "with_field_expression"
+                    }
+                  ]
                 },
                 {
                   "type": "SYMBOL",
