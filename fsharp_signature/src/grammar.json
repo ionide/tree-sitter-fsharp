@@ -1731,11 +1731,11 @@
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "with_field_expression"
+                      "name": "object_expression"
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "object_expression"
+                      "name": "with_field_expression"
                     }
                   ]
                 },
@@ -1800,6 +1800,78 @@
         ]
       }
     },
+    "_object_expression_inner": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_object_members"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "interface_implementation"
+          }
+        }
+      ]
+    },
+    "object_expression": {
+      "type": "PREC",
+      "value": 25,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "new"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_object_construction"
+                  }
+                ]
+              },
+              {
+                "type": "SYMBOL",
+                "name": "object_instantiation_expression"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "as"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "identifier"
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_object_expression_inner"
+          }
+        ]
+      }
+    },
     "with_field_expression": {
       "type": "SEQ",
       "members": [
@@ -1831,73 +1903,6 @@
               }
             ]
           }
-        }
-      ]
-    },
-    "_object_expression_inner": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_object_members"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "interface_implementation"
-          }
-        }
-      ]
-    },
-    "object_expression": {
-      "type": "PREC",
-      "value": 5,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "new"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_base_call"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_object_expression_inner"
-          }
-        ]
-      }
-    },
-    "_base_call": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_object_construction"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "as"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "identifier"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         }
       ]
     },
@@ -5865,8 +5870,25 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SYMBOL",
-              "name": "member_defn"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_newline"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "member_defn"
+                }
+              ]
             }
           }
         ]

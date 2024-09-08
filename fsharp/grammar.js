@@ -17,7 +17,6 @@ const PREC = {
   THEN_EXPR: 2,
   RARROW: 3,
   INFIX_OP: 4,
-  NEW_EXPR: 5,
   LET_EXPR: 60,
   LET_DECL: 7,
   DO_EXPR: 8,
@@ -505,8 +504,8 @@ module.exports = grammar({
           scoped(
             choice(
               $.field_initializers,
-              $.with_field_expression,
               $.object_expression,
+              $.with_field_expression,
             ),
             $._indent,
             $._dedent,
@@ -529,21 +528,28 @@ module.exports = grammar({
         ),
       ),
 
+    _object_expression_inner: ($) =>
+      seq($._object_members, repeat($.interface_implementation)),
+
+    object_expression: ($) =>
+      prec(
+        PREC.NEW_OBJ + 1,
+        seq(
+          choice(
+            seq("new", $._object_construction),
+            $.object_instantiation_expression,
+          ),
+          optional(seq("as", $.identifier)),
+          $._object_expression_inner,
+        ),
+      ),
+
     with_field_expression: ($) =>
       seq(
         $._expression,
         "with",
         scoped($.field_initializers, $._indent, $._dedent),
       ),
-
-    _object_expression_inner: ($) =>
-      seq($._object_members, repeat($.interface_implementation)),
-
-    object_expression: ($) =>
-      prec(PREC.NEW_EXPR, seq("new", $._base_call, $._object_expression_inner)),
-
-    _base_call: ($) =>
-      seq($._object_construction, optional(seq("as", $.identifier))),
 
     prefixed_expression: ($) =>
       seq(
@@ -1423,7 +1429,10 @@ module.exports = grammar({
     interface_implementation: ($) =>
       prec.left(seq("interface", $._type, optional($._object_members))),
 
-    _member_defns: ($) => prec.left(seq($.member_defn, repeat($.member_defn))),
+    _member_defns: ($) =>
+      prec.left(
+        seq($.member_defn, repeat(seq(optional($._newline), $.member_defn))),
+      ),
 
     _object_members: ($) =>
       seq("with", scoped($._member_defns, $._indent, $._dedent)),
