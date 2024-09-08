@@ -120,8 +120,9 @@ type A() =
       (type_name
         (identifier))
       (primary_constr_args)
-      (const
-        (unit)))))
+      (type_extension_elements
+        (const
+          (unit))))))
 
 ================================================================================
 attribute on let binding

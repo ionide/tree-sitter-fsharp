@@ -277,83 +277,7 @@
         "required": true,
         "types": [
           {
-            "type": "anon_record_expression",
-            "named": true
-          },
-          {
-            "type": "application_expression",
-            "named": true
-          },
-          {
-            "type": "array_expression",
-            "named": true
-          },
-          {
-            "type": "attributes",
-            "named": true
-          },
-          {
-            "type": "begin_end_expression",
-            "named": true
-          },
-          {
-            "type": "brace_expression",
-            "named": true
-          },
-          {
-            "type": "ce_expression",
-            "named": true
-          },
-          {
             "type": "class_inherits_decl",
-            "named": true
-          },
-          {
-            "type": "const",
-            "named": true
-          },
-          {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
-            "type": "do",
-            "named": false
-          },
-          {
-            "type": "do_expression",
-            "named": true
-          },
-          {
-            "type": "dot_expression",
-            "named": true
-          },
-          {
-            "type": "for_expression",
-            "named": true
-          },
-          {
-            "type": "fun_expression",
-            "named": true
-          },
-          {
-            "type": "function_expression",
-            "named": true
-          },
-          {
-            "type": "function_or_value_defn",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "infix_expression",
             "named": true
           },
           {
@@ -361,75 +285,11 @@
             "named": true
           },
           {
-            "type": "list_expression",
-            "named": true
-          },
-          {
-            "type": "literal_expression",
-            "named": true
-          },
-          {
-            "type": "long_identifier_or_op",
-            "named": true
-          },
-          {
-            "type": "match_expression",
-            "named": true
-          },
-          {
             "type": "member_defn",
             "named": true
           },
           {
-            "type": "mutate_expression",
-            "named": true
-          },
-          {
-            "type": "null",
-            "named": false
-          },
-          {
-            "type": "object_instantiation_expression",
-            "named": true
-          },
-          {
-            "type": "paren_expression",
-            "named": true
-          },
-          {
-            "type": "prefixed_expression",
-            "named": true
-          },
-          {
-            "type": "preproc_if",
-            "named": true
-          },
-          {
-            "type": "sequential_expression",
-            "named": true
-          },
-          {
-            "type": "static",
-            "named": false
-          },
-          {
-            "type": "try_expression",
-            "named": true
-          },
-          {
-            "type": "tuple_expression",
-            "named": true
-          },
-          {
-            "type": "typecast_expression",
-            "named": true
-          },
-          {
-            "type": "typed_expression",
-            "named": true
-          },
-          {
-            "type": "while_expression",
+            "type": "type_extension_elements",
             "named": true
           }
         ]
@@ -9085,10 +8945,6 @@
           "named": true
         },
         {
-          "type": "attributes",
-          "named": true
-        },
-        {
           "type": "begin_end_expression",
           "named": true
         },
@@ -9141,10 +8997,6 @@
           "named": true
         },
         {
-          "type": "function_or_value_defn",
-          "named": true
-        },
-        {
           "type": "if_expression",
           "named": true
         },
@@ -9161,10 +9013,6 @@
           "named": true
         },
         {
-          "type": "interface_implementation",
-          "named": true
-        },
-        {
           "type": "list_expression",
           "named": true
         },
@@ -9178,10 +9026,6 @@
         },
         {
           "type": "match_expression",
-          "named": true
-        },
-        {
-          "type": "member_defn",
           "named": true
         },
         {
@@ -9226,6 +9070,10 @@
         },
         {
           "type": "type_definition",
+          "named": true
+        },
+        {
+          "type": "type_extension_elements",
           "named": true
         },
         {
@@ -9289,10 +9137,6 @@
           "named": true
         },
         {
-          "type": "attributes",
-          "named": true
-        },
-        {
           "type": "begin_end_expression",
           "named": true
         },
@@ -9345,10 +9189,6 @@
           "named": true
         },
         {
-          "type": "function_or_value_defn",
-          "named": true
-        },
-        {
           "type": "if_expression",
           "named": true
         },
@@ -9365,10 +9205,6 @@
           "named": true
         },
         {
-          "type": "interface_implementation",
-          "named": true
-        },
-        {
           "type": "list_expression",
           "named": true
         },
@@ -9382,10 +9218,6 @@
         },
         {
           "type": "match_expression",
-          "named": true
-        },
-        {
-          "type": "member_defn",
           "named": true
         },
         {
@@ -9430,6 +9262,10 @@
         },
         {
           "type": "type_definition",
+          "named": true
+        },
+        {
+          "type": "type_extension_elements",
           "named": true
         },
         {
@@ -11999,11 +11835,155 @@
         "required": false,
         "types": [
           {
+            "type": "anon_record_expression",
+            "named": true
+          },
+          {
+            "type": "application_expression",
+            "named": true
+          },
+          {
+            "type": "array_expression",
+            "named": true
+          },
+          {
+            "type": "attributes",
+            "named": true
+          },
+          {
+            "type": "begin_end_expression",
+            "named": true
+          },
+          {
+            "type": "brace_expression",
+            "named": true
+          },
+          {
+            "type": "ce_expression",
+            "named": true
+          },
+          {
+            "type": "const",
+            "named": true
+          },
+          {
+            "type": "declaration_expression",
+            "named": true
+          },
+          {
+            "type": "do",
+            "named": false
+          },
+          {
+            "type": "do_expression",
+            "named": true
+          },
+          {
+            "type": "dot_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "fun_expression",
+            "named": true
+          },
+          {
+            "type": "function_expression",
+            "named": true
+          },
+          {
+            "type": "function_or_value_defn",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "infix_expression",
+            "named": true
+          },
+          {
             "type": "interface_implementation",
             "named": true
           },
           {
+            "type": "list_expression",
+            "named": true
+          },
+          {
+            "type": "literal_expression",
+            "named": true
+          },
+          {
+            "type": "long_identifier_or_op",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "member_defn",
+            "named": true
+          },
+          {
+            "type": "mutate_expression",
+            "named": true
+          },
+          {
+            "type": "null",
+            "named": false
+          },
+          {
+            "type": "object_instantiation_expression",
+            "named": true
+          },
+          {
+            "type": "paren_expression",
+            "named": true
+          },
+          {
+            "type": "prefixed_expression",
+            "named": true
+          },
+          {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
+            "type": "sequential_expression",
+            "named": true
+          },
+          {
+            "type": "static",
+            "named": false
+          },
+          {
+            "type": "try_expression",
+            "named": true
+          },
+          {
+            "type": "tuple_expression",
+            "named": true
+          },
+          {
+            "type": "typecast_expression",
+            "named": true
+          },
+          {
+            "type": "typed_expression",
+            "named": true
+          },
+          {
+            "type": "while_expression",
             "named": true
           }
         ]
@@ -12014,11 +11994,143 @@
       "required": false,
       "types": [
         {
+          "type": "anon_record_expression",
+          "named": true
+        },
+        {
+          "type": "application_expression",
+          "named": true
+        },
+        {
+          "type": "array_expression",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "begin_end_expression",
+          "named": true
+        },
+        {
+          "type": "brace_expression",
+          "named": true
+        },
+        {
+          "type": "ce_expression",
+          "named": true
+        },
+        {
+          "type": "const",
+          "named": true
+        },
+        {
+          "type": "declaration_expression",
+          "named": true
+        },
+        {
+          "type": "do_expression",
+          "named": true
+        },
+        {
+          "type": "dot_expression",
+          "named": true
+        },
+        {
+          "type": "for_expression",
+          "named": true
+        },
+        {
+          "type": "fun_expression",
+          "named": true
+        },
+        {
+          "type": "function_expression",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "if_expression",
+          "named": true
+        },
+        {
+          "type": "index_expression",
+          "named": true
+        },
+        {
+          "type": "infix_expression",
+          "named": true
+        },
+        {
           "type": "interface_implementation",
           "named": true
         },
         {
+          "type": "list_expression",
+          "named": true
+        },
+        {
+          "type": "literal_expression",
+          "named": true
+        },
+        {
+          "type": "long_identifier_or_op",
+          "named": true
+        },
+        {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "member_defn",
+          "named": true
+        },
+        {
+          "type": "mutate_expression",
+          "named": true
+        },
+        {
+          "type": "object_instantiation_expression",
+          "named": true
+        },
+        {
+          "type": "paren_expression",
+          "named": true
+        },
+        {
+          "type": "prefixed_expression",
+          "named": true
+        },
+        {
+          "type": "preproc_if",
+          "named": true
+        },
+        {
+          "type": "sequential_expression",
+          "named": true
+        },
+        {
+          "type": "try_expression",
+          "named": true
+        },
+        {
+          "type": "tuple_expression",
+          "named": true
+        },
+        {
+          "type": "typecast_expression",
+          "named": true
+        },
+        {
+          "type": "typed_expression",
+          "named": true
+        },
+        {
+          "type": "while_expression",
           "named": true
         }
       ]

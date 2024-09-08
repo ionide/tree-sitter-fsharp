@@ -1156,17 +1156,19 @@ module.exports = grammar({
       seq(optional("static"), "member", $._identifier_or_op, ":", $._type),
 
     member_signature: ($) =>
-      seq(
-        $.identifier,
-        optional($.type_arguments),
-        ":",
-        $.curried_spec,
-        optional(
-          choice(
-            seq("with", "get"),
-            seq("with", "set"),
-            seq("with", "get", ",", "set"),
-            seq("with", "set", ",", "get"),
+      prec.left(
+        seq(
+          $.identifier,
+          optional($.type_arguments),
+          ":",
+          $.curried_spec,
+          optional(
+            choice(
+              seq("with", "get"),
+              seq("with", "set"),
+              seq("with", "get", ",", "set"),
+              seq("with", "set", ",", "get"),
+            ),
           ),
         ),
       ),
@@ -1252,12 +1254,7 @@ module.exports = grammar({
       seq($.type_name, "=", scoped($._type, $._indent, $._dedent)),
 
     _class_type_body_inner: ($) =>
-      choice(
-        $.class_inherits_decl,
-        $._class_function_or_value_defn,
-        $._type_defn_elements,
-        alias($.preproc_if_in_class_definition, $.preproc_if),
-      ),
+      choice($.class_inherits_decl, $.type_extension_elements),
 
     _class_type_body: ($) =>
       seq(
@@ -1396,11 +1393,22 @@ module.exports = grammar({
         choice($.function_or_value_defn, seq("do", $._expression_block)),
       ),
 
-    type_extension_elements: ($) =>
-      seq(
+    _type_extension_inner: ($) =>
+      repeat1(
         choice(
-          seq("with", scoped($._type_defn_elements, $._indent, $._dedent)),
+          $._class_function_or_value_defn,
           $._type_defn_elements,
+          alias($.preproc_if_in_class_definition, $.preproc_if),
+        ),
+      ),
+
+    type_extension_elements: ($) =>
+      prec.left(
+        seq(
+          choice(
+            seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+            $._type_extension_inner,
+          ),
         ),
       ),
 
@@ -1476,18 +1484,20 @@ module.exports = grammar({
       ),
 
     _property_defn: ($) =>
-      seq(
-        optional(seq(":", $._type)),
-        "=",
-        $._expression_block,
-        optional(
-          seq(
-            "with",
-            choice(
-              "get",
-              "set",
-              seq("get", ",", "set"),
-              seq("set", ",", "get"),
+      prec.left(
+        seq(
+          optional(seq(":", $._type)),
+          "=",
+          $._expression_block,
+          optional(
+            seq(
+              "with",
+              choice(
+                "get",
+                "set",
+                seq("get", ",", "set"),
+                seq("set", ",", "get"),
+              ),
             ),
           ),
         ),
