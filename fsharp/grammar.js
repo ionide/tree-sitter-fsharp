@@ -79,6 +79,7 @@ module.exports = grammar({
     $.block_comment_content,
     $._inside_string_marker,
     $._newline_not_aligned,
+    $._tuple_marker,
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -490,7 +491,10 @@ module.exports = grammar({
       ),
 
     tuple_expression: ($) =>
-      prec.right(PREC.TUPLE_EXPR, seq($._expression, ",", $._expression)),
+      prec.right(
+        PREC.TUPLE_EXPR,
+        seq($._expression, ",", optional($._tuple_marker), $._expression),
+      ),
 
     brace_expression: ($) =>
       prec(

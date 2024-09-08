@@ -1716,6 +1716,18 @@
             "value": ","
           },
           {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_tuple_marker"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
             "type": "SYMBOL",
             "name": "_expression"
           }
@@ -8339,6 +8351,10 @@
     {
       "type": "SYMBOL",
       "name": "_newline_not_aligned"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_tuple_marker"
     },
     {
       "type": "SYMBOL",
