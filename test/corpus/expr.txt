@@ -2149,9 +2149,10 @@ let x =
             (identifier))))
       (brace_expression
         (object_expression
-          (simple_type
-            (long_identifier
-              (identifier)))
+          (object_instantiation_expression
+            (simple_type
+              (long_identifier
+                (identifier))))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -2476,13 +2477,13 @@ let disposables = new Disposables.CompositeDisposable()
         (identifier_pattern
           (long_identifier_or_op
             (identifier))))
-      (object_instantiation_expression
-        (simple_type
-          (long_identifier
-            (identifier)
-            (identifier)))
-        (const
-          (unit))))))
+      (application_expression
+        (object_instantiation_expression
+          (simple_type
+            (long_identifier
+              (identifier)
+              (identifier))))
+        (unit)))))
 
 ================================================================================
 if expression inside array
@@ -3399,9 +3400,9 @@ do
           (object_instantiation_expression
             (simple_type
               (long_identifier
-                (identifier)))
-            (const
-              (unit)))
+                (identifier))))
+          (const
+            (unit))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -3438,9 +3439,10 @@ do
     (do
       (brace_expression
         (object_expression
-          (simple_type
-            (long_identifier
-              (identifier)))
+          (object_instantiation_expression
+            (simple_type
+              (long_identifier
+                (identifier))))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -3484,9 +3486,10 @@ let implementer() =
             (unit))))
       (brace_expression
         (object_expression
-          (simple_type
-            (long_identifier
-              (identifier)))
+          (object_instantiation_expression
+            (simple_type
+              (long_identifier
+                (identifier))))
           (member_defn
             (method_or_prop_defn
               (property_or_ident

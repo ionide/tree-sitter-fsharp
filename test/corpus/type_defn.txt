@@ -2064,7 +2064,7 @@ type C() =
             (property_or_ident
               (identifier)
               (identifier))
-            (property_getter
+            (property_accessor
               (argument_patterns
                 (const
                   (unit)))
@@ -2092,7 +2092,7 @@ type C() =
             (property_or_ident
               (identifier)
               (identifier))
-            (property_setter
+            (property_accessor
               (argument_patterns
                 (identifier_pattern
                   (long_identifier_or_op
@@ -2127,13 +2127,13 @@ type C() =
             (property_or_ident
               (identifier)
               (identifier))
-            (property_getter
+            (property_accessor
               (argument_patterns
                 (const
                   (unit)))
               (const
                 (unit)))
-            (property_setter
+            (property_accessor
               (argument_patterns
                 (identifier_pattern
                   (long_identifier_or_op
@@ -2166,13 +2166,13 @@ type C() =
             (property_or_ident
               (identifier)
               (identifier))
-            (property_getter
+            (property_accessor
               (argument_patterns
                 (const
                   (unit)))
               (const
                 (unit)))
-            (property_setter
+            (property_accessor
               (argument_patterns
                 (identifier_pattern
                   (long_identifier_or_op
@@ -2205,7 +2205,7 @@ type C() =
             (property_or_ident
               (identifier)
               (identifier))
-            (property_getter
+            (property_accessor
               (argument_patterns
                 (const
                   (unit)))

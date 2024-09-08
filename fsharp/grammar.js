@@ -535,10 +535,8 @@ module.exports = grammar({
       prec(
         PREC.NEW_OBJ + 1,
         seq(
-          choice(
-            seq("new", $._object_construction),
-            $.object_instantiation_expression,
-          ),
+          $.object_instantiation_expression,
+          optional($._expression),
           optional(seq("as", $.identifier)),
           $._object_expression_inner,
         ),
@@ -656,7 +654,7 @@ module.exports = grammar({
       ),
 
     object_instantiation_expression: ($) =>
-      prec(PREC.NEW_OBJ, seq("new", $._type, $._expression)),
+      prec(PREC.NEW_OBJ, seq("new", $._type)),
 
     mutate_expression: ($) =>
       prec.right(
@@ -1494,25 +1492,11 @@ module.exports = grammar({
         ),
       ),
 
-    property_getter: ($) =>
-      seq(
-        "get",
-        $.argument_patterns,
-        optional(seq(":", $._type)),
-        "=",
-        $._expression,
-      ),
+    _property_accessor_body: ($) =>
+      seq($.argument_patterns, optional(seq(":", $._type)), "=", $._expression),
 
-    property_setter: ($) =>
-      seq(
-        "set",
-        $.argument_patterns,
-        optional(seq(":", $._type)),
-        "=",
-        $._expression,
-      ),
-
-    _property_accessors: ($) => choice($.property_setter, $.property_getter),
+    property_accessor: ($) =>
+      seq(choice("get", "set"), $._property_accessor_body),
 
     _property_defn: ($) =>
       prec.left(
@@ -1525,8 +1509,8 @@ module.exports = grammar({
               "with",
               scoped(
                 seq(
-                  $._property_accessors,
-                  repeat(seq("and", $._property_accessors)),
+                  $.property_accessor,
+                  repeat(seq("and", $.property_accessor)),
                 ),
                 $._indent,
                 $._dedent,
@@ -1665,7 +1649,7 @@ module.exports = grammar({
     char: (_) =>
       prec(
         -1,
-        /'([^\n\t\r\u0008\a\f\v'\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4})*'B?/,
+        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|(\\\\))?'B?/,
       ),
 
     format_string_eval: ($) =>
