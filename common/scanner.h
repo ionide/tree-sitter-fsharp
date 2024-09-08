@@ -19,6 +19,7 @@ enum TokenType {
   STRUCT,
   INTERFACE,
   END,
+  AND,
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
@@ -407,6 +408,19 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             lexer->result_symbol = DEDENT;
             return true;
           }
+        }
+      }
+    }
+  } else if (lexer->lookahead == 'a' && valid_symbols[AND]) {
+    advance(lexer);
+    if (lexer->lookahead == 'n') {
+      advance(lexer);
+      if (lexer->lookahead == 'd') {
+        advance(lexer);
+        if (lexer->lookahead == ' ') {
+          lexer->result_symbol = AND;
+          lexer->mark_end(lexer);
+          return true;
         }
       }
     }
