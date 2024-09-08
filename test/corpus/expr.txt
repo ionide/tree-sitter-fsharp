@@ -2149,10 +2149,8 @@ let x =
             (identifier))))
       (brace_expression
         (object_expression
-          (object_instantiation_expression
-            (simple_type
-              (long_identifier
-                (identifier))))
+          (long_identifier_or_op
+            (identifier))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -2477,13 +2475,13 @@ let disposables = new Disposables.CompositeDisposable()
         (identifier_pattern
           (long_identifier_or_op
             (identifier))))
-      (application_expression
-        (object_instantiation_expression
-          (simple_type
+      (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
             (long_identifier
               (identifier)
-              (identifier))))
-        (unit)))))
+              (identifier)))
+          (unit))))))
 
 ================================================================================
 if expression inside array
@@ -3397,11 +3395,9 @@ do
     (do
       (brace_expression
         (object_expression
-          (object_instantiation_expression
-            (simple_type
-              (long_identifier
-                (identifier))))
-          (const
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
             (unit))
           (member_defn
             (method_or_prop_defn
@@ -3439,10 +3435,8 @@ do
     (do
       (brace_expression
         (object_expression
-          (object_instantiation_expression
-            (simple_type
-              (long_identifier
-                (identifier))))
+          (long_identifier_or_op
+            (identifier))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -3486,10 +3480,8 @@ let implementer() =
             (unit))))
       (brace_expression
         (object_expression
-          (object_instantiation_expression
-            (simple_type
-              (long_identifier
-                (identifier))))
+          (long_identifier_or_op
+            (identifier))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -3530,3 +3522,97 @@ let implementer() =
                   (unit))
                 (const
                   (unit))))))))))
+
+================================================================================
+object expression generic interface
+================================================================================
+
+let implementer() =
+    { new IFirst<_,_> with
+        member this.H() = ()
+        member this.J() = () }
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      (brace_expression
+        (object_expression
+          (typed_expression
+            (long_identifier_or_op
+              (identifier))
+            (types
+              (type_argument)
+              (type_argument)))
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (const
+                (unit))))
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (const
+                (unit)))))))))
+
+================================================================================
+object expression generic base class
+================================================================================
+
+let implementer() =
+    { new C<_,_>() with
+        member this.H() = ()
+        member this.J() = () }
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      (brace_expression
+        (object_expression
+          (application_expression
+            (typed_expression
+              (long_identifier_or_op
+                (identifier))
+              (types
+                (type_argument)
+                (type_argument)))
+            (unit))
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (const
+                (unit))))
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (const
+                (unit)))))))))

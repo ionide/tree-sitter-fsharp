@@ -92,10 +92,6 @@
         "named": false
       },
       {
-        "type": "object_instantiation_expression",
-        "named": true
-      },
-      {
         "type": "paren_expression",
         "named": true
       },
@@ -2518,21 +2514,6 @@
         },
         {
           "type": "interface_implementation",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "object_instantiation_expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "_type",
           "named": true
         }
       ]

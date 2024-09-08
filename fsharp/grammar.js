@@ -446,7 +446,6 @@ module.exports = grammar({
         $.infix_expression,
         $.index_expression,
         $.mutate_expression,
-        $.object_instantiation_expression,
         $.list_expression,
         $.array_expression,
         $.ce_expression,
@@ -535,8 +534,8 @@ module.exports = grammar({
       prec(
         PREC.NEW_OBJ + 1,
         seq(
-          $.object_instantiation_expression,
-          optional($._expression),
+          "new",
+          $._expression,
           optional(seq("as", $.identifier)),
           $._object_expression_inner,
         ),
@@ -560,6 +559,7 @@ module.exports = grammar({
           "assert",
           "upcast",
           "downcast",
+          "new",
           $.prefix_op,
         ),
         prec.right(PREC.PREFIX_EXPR, $._expression),
@@ -652,9 +652,6 @@ module.exports = grammar({
         PREC.MATCH_EXPR,
         seq("function", scoped($.rules, $._indent, $._dedent)),
       ),
-
-    object_instantiation_expression: ($) =>
-      prec(PREC.NEW_OBJ, seq("new", $._type)),
 
     mutate_expression: ($) =>
       prec.right(

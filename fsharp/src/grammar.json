@@ -1527,10 +1527,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "object_instantiation_expression"
-        },
-        {
-          "type": "SYMBOL",
           "name": "list_expression"
         },
         {
@@ -1855,20 +1851,12 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "object_instantiation_expression"
+            "type": "STRING",
+            "value": "new"
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_expression"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
+            "type": "SYMBOL",
+            "name": "_expression"
           },
           {
             "type": "CHOICE",
@@ -1969,6 +1957,10 @@
             {
               "type": "STRING",
               "value": "downcast"
+            },
+            {
+              "type": "STRING",
+              "value": "new"
             },
             {
               "type": "SYMBOL",
@@ -2446,23 +2438,6 @@
                 }
               ]
             }
-          }
-        ]
-      }
-    },
-    "object_instantiation_expression": {
-      "type": "PREC",
-      "value": 24,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "new"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_type"
           }
         ]
       }
