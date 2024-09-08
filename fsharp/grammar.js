@@ -75,6 +75,7 @@ module.exports = grammar({
     $._struct_begin,
     $._interface_begin,
     "end",
+    "and",
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
@@ -1499,8 +1500,14 @@ module.exports = grammar({
             seq("=", $._expression_block),
             seq(
               "with",
-              $._property_accessors,
-              repeat(seq("and", $._property_accessors)),
+              scoped(
+                seq(
+                  $._property_accessors,
+                  repeat(seq("and", $._property_accessors)),
+                ),
+                $._indent,
+                $._dedent,
+              ),
             ),
           ),
         ),
@@ -1535,7 +1542,10 @@ module.exports = grammar({
           choice(
             $._method_defn,
             $._property_defn,
-            seq("with", $._function_or_value_defns),
+            seq(
+              "with",
+              scoped($._function_or_value_defns, $._indent, $._dedent),
+            ),
           ),
         ),
       ),

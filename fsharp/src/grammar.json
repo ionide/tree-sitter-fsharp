@@ -6372,21 +6372,43 @@
                     "value": "with"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_property_accessors"
-                  },
-                  {
-                    "type": "REPEAT",
+                    "type": "FIELD",
+                    "name": "block",
                     "content": {
                       "type": "SEQ",
                       "members": [
                         {
-                          "type": "STRING",
-                          "value": "and"
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_property_accessors"
+                            },
+                            {
+                              "type": "REPEAT",
+                              "content": {
+                                "type": "SEQ",
+                                "members": [
+                                  {
+                                    "type": "STRING",
+                                    "value": "and"
+                                  },
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_property_accessors"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
                         },
                         {
                           "type": "SYMBOL",
-                          "name": "_property_accessors"
+                          "name": "_dedent"
                         }
                       ]
                     }
@@ -6533,8 +6555,25 @@
                     "value": "with"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_function_or_value_defns"
+                    "type": "FIELD",
+                    "name": "block",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_function_or_value_defns"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_dedent"
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -8495,6 +8534,10 @@
     {
       "type": "STRING",
       "value": "end"
+    },
+    {
+      "type": "STRING",
+      "value": "and"
     },
     {
       "type": "SYMBOL",
