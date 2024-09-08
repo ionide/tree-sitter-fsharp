@@ -10,9 +10,8 @@
   "files": [
     "binding.gyp",
     "bindings/node/*",
+    "prebuilds/**",
     "common/**",
-    "fsharp/src/**",
-    "fsharp_signature/src/**",
     "queries/*",
     "*.wasm"
   ],
