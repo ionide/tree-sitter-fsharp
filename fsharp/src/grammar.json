@@ -5845,18 +5845,11 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_member_defns"
+          "name": "member_defn"
         },
         {
-          "type": "PREC_LEFT",
-          "value": 0,
-          "content": {
-            "type": "REPEAT1",
-            "content": {
-              "type": "SYMBOL",
-              "name": "interface_implementation"
-            }
-          }
+          "type": "SYMBOL",
+          "name": "interface_implementation"
         }
       ]
     },

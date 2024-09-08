@@ -1421,8 +1421,8 @@ module.exports = grammar({
 
     _type_defn_elements: ($) =>
       choice(
-        $._member_defns,
-        prec.left(repeat1($.interface_implementation)),
+        $.member_defn,
+        $.interface_implementation,
         // $._interface_signature
       ),
 
