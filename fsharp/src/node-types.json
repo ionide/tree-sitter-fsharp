@@ -2136,6 +2136,10 @@
       "required": true,
       "types": [
         {
+          "type": "_expression",
+          "named": true
+        },
+        {
           "type": "_type",
           "named": true
         },
@@ -2161,6 +2165,10 @@
         },
         {
           "type": "method_or_prop_defn",
+          "named": true
+        },
+        {
+          "type": "property_or_ident",
           "named": true
         },
         {
@@ -2207,40 +2215,6 @@
           }
         ]
       },
-      "block": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ":",
-            "named": false
-          },
-          {
-            "type": "=",
-            "named": false
-          },
-          {
-            "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "_type",
-            "named": true
-          },
-          {
-            "type": "and",
-            "named": false
-          },
-          {
-            "type": "function_declaration_left",
-            "named": true
-          },
-          {
-            "type": "value_declaration_left",
-            "named": true
-          }
-        ]
-      },
       "body": {
         "multiple": true,
         "required": false,
@@ -2275,7 +2249,23 @@
           "named": true
         },
         {
+          "type": "function_declaration_left",
+          "named": true
+        },
+        {
+          "type": "property_getter",
+          "named": true
+        },
+        {
+          "type": "property_setter",
+          "named": true
+        },
+        {
           "type": "type_arguments",
+          "named": true
+        },
+        {
+          "type": "value_declaration_left",
           "named": true
         }
       ]
@@ -2755,6 +2745,25 @@
     }
   },
   {
+    "type": "property_getter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "argument_patterns",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "property_or_ident",
     "named": true,
     "fields": {
@@ -2793,6 +2802,25 @@
         },
         {
           "type": "op_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "property_setter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "argument_patterns",
           "named": true
         }
       ]
@@ -4459,11 +4487,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",

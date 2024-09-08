@@ -1446,6 +1446,7 @@ module.exports = grammar({
               optional($.access_modifier),
               $.member_signature,
             ),
+            seq("member", "val", $.property_or_ident, $._val_property_defn),
             seq("override", optional($.access_modifier), $.method_or_prop_defn),
             seq("default", optional($.access_modifier), $.method_or_prop_defn),
             seq(
@@ -1483,12 +1484,35 @@ module.exports = grammar({
         ),
       ),
 
+    property_getter: ($) => seq("get", $.argument_patterns, "=", $._expression),
+
+    property_setter: ($) => seq("set", $.argument_patterns, "=", $._expression),
+
+    _property_accessors: ($) => choice($.property_setter, $.property_getter),
+
     _property_defn: ($) =>
       prec.left(
+        PREC.APP_EXPR + 100001,
+        seq(
+          optional(seq(":", $._type)),
+          choice(
+            seq("=", $._expression_block),
+            seq(
+              "with",
+              $._property_accessors,
+              repeat(seq("and", $._property_accessors)),
+            ),
+          ),
+        ),
+      ),
+
+    _val_property_defn: ($) =>
+      prec.left(
+        PREC.APP_EXPR + 100000,
         seq(
           optional(seq(":", $._type)),
           "=",
-          $._expression_block,
+          $._expression,
           optional(
             seq(
               "with",
@@ -1509,12 +1533,9 @@ module.exports = grammar({
         seq(
           field("name", $.property_or_ident),
           choice(
-            seq(
-              "with",
-              scoped($._function_or_value_defns, $._indent, $._dedent),
-            ),
             $._method_defn,
             $._property_defn,
+            seq("with", $._function_or_value_defns),
           ),
         ),
       ),
