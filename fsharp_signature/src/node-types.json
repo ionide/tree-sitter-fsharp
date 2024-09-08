@@ -9546,6 +9546,10 @@
           "named": true
         },
         {
+          "type": "anon_record_type",
+          "named": true
+        },
+        {
           "type": "application_expression",
           "named": true
         },
@@ -9570,7 +9574,15 @@
           "named": true
         },
         {
+          "type": "compound_type",
+          "named": true
+        },
+        {
           "type": "const",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
           "named": true
         },
         {
@@ -9586,6 +9598,10 @@
           "named": true
         },
         {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
           "type": "for_expression",
           "named": true
         },
@@ -9595,6 +9611,14 @@
         },
         {
           "type": "function_expression",
+          "named": true
+        },
+        {
+          "type": "function_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
           "named": true
         },
         {
@@ -9611,6 +9635,10 @@
         },
         {
           "type": "list_expression",
+          "named": true
+        },
+        {
+          "type": "list_type",
           "named": true
         },
         {
@@ -9638,6 +9666,14 @@
           "named": true
         },
         {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
           "type": "prefixed_expression",
           "named": true
         },
@@ -9650,11 +9686,23 @@
           "named": true
         },
         {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
           "type": "try_expression",
           "named": true
         },
         {
           "type": "tuple_expression",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         },
         {
@@ -9729,6 +9777,10 @@
           "named": true
         },
         {
+          "type": "anon_record_type",
+          "named": true
+        },
+        {
           "type": "application_expression",
           "named": true
         },
@@ -9753,7 +9805,15 @@
           "named": true
         },
         {
+          "type": "compound_type",
+          "named": true
+        },
+        {
           "type": "const",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
           "named": true
         },
         {
@@ -9769,6 +9829,10 @@
           "named": true
         },
         {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
           "type": "for_expression",
           "named": true
         },
@@ -9778,6 +9842,14 @@
         },
         {
           "type": "function_expression",
+          "named": true
+        },
+        {
+          "type": "function_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
           "named": true
         },
         {
@@ -9794,6 +9866,10 @@
         },
         {
           "type": "list_expression",
+          "named": true
+        },
+        {
+          "type": "list_type",
           "named": true
         },
         {
@@ -9821,6 +9897,14 @@
           "named": true
         },
         {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
           "type": "prefixed_expression",
           "named": true
         },
@@ -9833,11 +9917,23 @@
           "named": true
         },
         {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
           "type": "try_expression",
           "named": true
         },
         {
           "type": "tuple_expression",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         },
         {

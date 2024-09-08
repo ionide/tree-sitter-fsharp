@@ -2783,6 +2783,10 @@
           "named": true
         },
         {
+          "type": "_type",
+          "named": true
+        },
+        {
           "type": "argument_patterns",
           "named": true
         }
@@ -2843,6 +2847,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "_type",
           "named": true
         },
         {

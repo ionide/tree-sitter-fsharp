@@ -2183,3 +2183,34 @@ type C() =
                 (long_identifier_or_op
                   (long_identifier
                     (identifier)))))))))))
+
+================================================================================
+property with typed getter
+================================================================================
+
+type C() =
+  member _.P with get():int = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (property_getter
+              (argument_patterns
+                (const
+                  (unit)))
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (const
+                (int)))))))))
