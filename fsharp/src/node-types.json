@@ -447,23 +447,7 @@
         "required": true,
         "types": [
           {
-            "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "attributes",
-            "named": true
-          },
-          {
             "type": "class_inherits_decl",
-            "named": true
-          },
-          {
-            "type": "do",
-            "named": false
-          },
-          {
-            "type": "function_or_value_defn",
             "named": true
           },
           {
@@ -475,8 +459,8 @@
             "named": true
           },
           {
-            "type": "static",
-            "named": false
+            "type": "type_extension_elements",
+            "named": true
           }
         ]
       }
@@ -2666,23 +2650,11 @@
           "named": true
         },
         {
-          "type": "attributes",
-          "named": true
-        },
-        {
           "type": "class_inherits_decl",
           "named": true
         },
         {
-          "type": "function_or_value_defn",
-          "named": true
-        },
-        {
-          "type": "interface_implementation",
-          "named": true
-        },
-        {
-          "type": "member_defn",
+          "type": "type_extension_elements",
           "named": true
         }
       ]
@@ -2722,23 +2694,11 @@
           "named": true
         },
         {
-          "type": "attributes",
-          "named": true
-        },
-        {
           "type": "class_inherits_decl",
           "named": true
         },
         {
-          "type": "function_or_value_defn",
-          "named": true
-        },
-        {
-          "type": "interface_implementation",
-          "named": true
-        },
-        {
-          "type": "member_defn",
+          "type": "type_extension_elements",
           "named": true
         }
       ]
@@ -3464,12 +3424,32 @@
         "required": false,
         "types": [
           {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "attributes",
+            "named": true
+          },
+          {
+            "type": "do",
+            "named": false
+          },
+          {
+            "type": "function_or_value_defn",
+            "named": true
+          },
+          {
             "type": "interface_implementation",
             "named": true
           },
           {
             "type": "member_defn",
             "named": true
+          },
+          {
+            "type": "static",
+            "named": false
           }
         ]
       }
@@ -3478,6 +3458,18 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "function_or_value_defn",
+          "named": true
+        },
         {
           "type": "interface_implementation",
           "named": true

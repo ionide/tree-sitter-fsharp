@@ -117,24 +117,25 @@ type A() =
       (type_name
         (identifier))
       (primary_constr_args)
-      (member_defn
-        (method_or_prop_defn
-          (property_or_ident
-            (identifier)
-            (identifier))
-          (paren_pattern
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (type_argument
-                (identifier))
-              (type_argument_constraints
-                (constraint
-                  (type_argument
-                    (identifier))))))
-          (const
-            (unit)))))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (type_argument
+                  (identifier))
+                (type_argument_constraints
+                  (constraint
+                    (type_argument
+                      (identifier))))))
+            (const
+              (unit))))))))
 
 ================================================================================
 active pattern 1
