@@ -280,8 +280,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             }
           } else {
             if (scanner->indents.size > 0) {
-              uint16_t current_indent_length = *array_back(&scanner->indents);
-              array_push(&scanner->preprocessor_indents, current_indent_length);
+              if (valid_symbols[PREPROC_IF]) {
+                uint16_t current_indent_length = *array_back(&scanner->indents);
+                array_push(&scanner->preprocessor_indents,
+                           current_indent_length);
+              } else {
+                array_pop(&scanner->indents);
+                lexer->result_symbol = DEDENT;
+                return true;
+              }
             }
             lexer->mark_end(lexer);
             lexer->result_symbol = PREPROC_IF;
