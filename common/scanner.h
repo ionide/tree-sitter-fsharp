@@ -512,16 +512,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
-        if (valid_symbols[END]) {
-          lexer->mark_end(lexer);
-          lexer->result_symbol = END;
-          return true;
-        } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
-          array_pop(&scanner->indents);
-          lexer->result_symbol = DEDENT;
-          return true;
-        } else {
-          return false;
+        if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
+            lexer->eof(lexer)) {
+          if (valid_symbols[END]) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = END;
+            return true;
+          } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
+            array_pop(&scanner->indents);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }
