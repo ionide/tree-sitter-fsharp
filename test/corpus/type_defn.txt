@@ -2309,3 +2309,62 @@ type C() =
                 (unit))
               (const
                 (unit)))))))))
+
+================================================================================
+type extension with ($) identifier
+================================================================================
+
+type A = A
+    with
+        static member inline ($) (x: T, y) =
+            fun propertyName -> x.TryGetProperty propertyName
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier)))))
+  (infix_expression
+    (application_expression
+      (application_expression
+        (application_expression
+          (application_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (identifier)))
+        (long_identifier_or_op
+          (op_identifier)))
+      (paren_expression
+        (tuple_expression
+          (typecast_expression
+            (long_identifier_or_op
+              (identifier))
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (long_identifier_or_op
+            (identifier)))))
+    (infix_op)
+    (fun_expression
+      (argument_patterns
+        (long_identifier
+          (identifier)))
+      (application_expression
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
