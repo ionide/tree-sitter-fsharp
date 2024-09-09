@@ -181,6 +181,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool found_start_of_infix_op = false;
   bool found_bracket_end = false;
   bool found_preprocessor_end = false;
+  bool found_comment = false;
   uint32_t indent_length = lexer->get_column(lexer);
 
   for (;;) {
@@ -203,6 +204,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     } else if (lexer->lookahead == '/') {
       skip(lexer);
       if (!valid_symbols[INSIDE_STRING] && lexer->lookahead == '/') {
+        found_comment = true;
         while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
           skip(lexer);
         }
@@ -234,7 +236,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                     return true;
                   }
                 }
-                if (valid_symbols[PREPROC_END]) {
+                if (valid_symbols[PREPROC_END] && !found_comment) {
                   if (scanner->preprocessor_indents.size > 0) {
                     array_pop(&scanner->preprocessor_indents);
                   }
@@ -262,7 +264,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                   return true;
                 }
               }
-              if (valid_symbols[PREPROC_ELSE]) {
+              if (valid_symbols[PREPROC_ELSE] && !found_comment) {
                 lexer->mark_end(lexer);
                 lexer->result_symbol = PREPROC_ELSE;
                 return true;
@@ -289,10 +291,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                 lexer->result_symbol = DEDENT;
                 return true;
               }
+            } else if (!found_comment) {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = PREPROC_IF;
+              return true;
             }
-            lexer->mark_end(lexer);
-            lexer->result_symbol = PREPROC_IF;
-            return true;
           }
         }
       } else {
@@ -418,7 +421,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
     }
-  } else if (lexer->lookahead == 'a' && valid_symbols[AND]) {
+  } else if (lexer->lookahead == 'a' && valid_symbols[AND] && !found_comment) {
     advance(lexer);
     if (lexer->lookahead == 'n') {
       advance(lexer);
@@ -433,7 +436,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   } else if (lexer->lookahead == 'e' &&
              (valid_symbols[ELSE] || valid_symbols[ELIF] ||
-              valid_symbols[END] || valid_symbols[DEDENT])) {
+              valid_symbols[END] || valid_symbols[DEDENT]) &&
+             !found_comment) {
     advance(lexer);
     int16_t token_indent_level = lexer->get_column(lexer);
     if (lexer->lookahead == 'l') {
