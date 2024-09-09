@@ -3616,3 +3616,57 @@ let implementer() =
                 (unit))
               (const
                 (unit)))))))))
+
+================================================================================
+scoping issues with end indentifier
+================================================================================
+
+let f x =
+    x
+    |> List.map (fun endpoint ->
+        match endpoint with
+        | A -> f endpoints)
+    |> g
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (infix_expression
+        (application_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier))))
+          (paren_expression
+            (fun_expression
+              (argument_patterns
+                (long_identifier
+                  (identifier)))
+              (match_expression
+                (long_identifier_or_op
+                  (identifier))
+                (rules
+                  (rule
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier)))
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier)))))))))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
