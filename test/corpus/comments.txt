@@ -321,3 +321,29 @@ do
       (line_comment)
       (const
         (int)))))
+
+================================================================================
+line comment before and
+================================================================================
+
+type T = unit
+// comment
+and U = unit
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))
+    (line_comment)
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))))

@@ -465,3 +465,38 @@ let f =
           (line_comment)
           (const
             (int)))))))
+
+================================================================================
+preproc_if with comment before #if
+================================================================================
+
+let f =
+  if b then x else y
+
+// comment
+#if B
+  1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (sequential_expression
+        (if_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))
+        (line_comment)
+        (preproc_if
+          (identifier)
+          (const
+            (int)))))))
