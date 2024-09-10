@@ -408,36 +408,11 @@ module.exports = grammar({
         -1,
         seq(
           $.long_identifier_or_op,
-          optional($._pattern_param),
+          optional($._pattern),
           optional($._pattern),
         ),
       ),
 
-    _pattern_param: ($) =>
-      prec(
-        2,
-        choice(
-          $.const,
-          $.long_identifier,
-          // seq($.long_identifier, $._pattern_param),
-          // seq($._pattern_param, ":", $.type),
-          // seq(
-          //   "[",
-          //   $._pattern_param,
-          //   repeat(seq($._seperator, $._pattern_param)),
-          //   "]",
-          // ),
-          // seq(
-          //   "(",
-          //   $._pattern_param,
-          //   repeat(seq($._seperator, $._pattern_param)),
-          //   ")",
-          // ),
-          // seq("<@", $._expression, "@>"),
-          // seq("<@@", $._expression, "@@>"),
-          "null",
-        ),
-      ),
     //
     // Pattern rules (END)
     //

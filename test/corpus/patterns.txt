@@ -490,3 +490,37 @@ type T =
                           (bool)))))
                   (const
                     (bool)))))))))))
+
+================================================================================
+parameterized pattern
+================================================================================
+
+do
+    match x with
+    | Parse (TextConversions.AsFloat [||] false) _ -> ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))
+              (paren_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (array_pattern)
+                  (const
+                    (bool))))
+              (wildcard_pattern))
+            (const
+              (unit))))))))

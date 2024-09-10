@@ -21,7 +21,7 @@
   (_) @variable.parameter.builtin)
 
 
-((identifier_pattern (long_identifier (identifier) @character.special))
+((argument_patterns (long_identifier (identifier) @character.special))
  (#match? @character.special "^\_.*"))
 
 ;; ----------------------------------------------------------------------------
