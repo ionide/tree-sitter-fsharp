@@ -322,6 +322,7 @@ module.exports = grammar({
         $.type_check_pattern,
         $.optional_pattern,
         $.identifier_pattern,
+        $.named_field_pattern,
       ),
 
     optional_pattern: ($) => prec.left(seq("?", $._pattern)),
@@ -331,7 +332,7 @@ module.exports = grammar({
 
     attribute_pattern: ($) => prec.left(seq($.attributes, $._pattern)),
 
-    paren_pattern: ($) => seq("(", $._pattern, ")"),
+    paren_pattern: ($) => prec(1, seq("(", $._pattern, ")")),
 
     as_pattern: ($) => prec.left(0, seq($._pattern, "as", $.identifier)),
     cons_pattern: ($) => prec.left(0, seq($._pattern, "::", $._pattern)),
@@ -377,7 +378,7 @@ module.exports = grammar({
         seq(
           optional($._newline),
           $._pattern,
-          repeat(seq(choice(";", $._newline), $._pattern)),
+          repeat(seq($._newline, $._pattern)),
         ),
         $._indent,
         $._dedent,
@@ -387,7 +388,19 @@ module.exports = grammar({
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
     record_pattern: ($) =>
       prec.left(
-        seq("{", $.field_pattern, repeat(seq(";", $.field_pattern)), "}"),
+        seq(
+          "{",
+          $.field_pattern,
+          repeat(seq($._newline, $.field_pattern)),
+          "}",
+        ),
+      ),
+
+    named_field: ($) => seq(optional(seq($.identifier, "=")), $._pattern),
+
+    named_field_pattern: ($) =>
+      prec.left(
+        seq("(", $.named_field, repeat(seq($._newline, $.named_field)), ")"),
       ),
 
     identifier_pattern: ($) =>
