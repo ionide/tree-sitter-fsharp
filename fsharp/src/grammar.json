@@ -1492,7 +1492,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "_pattern_param"
+                "name": "_pattern"
               },
               {
                 "type": "BLANK"
@@ -1510,27 +1510,6 @@
                 "type": "BLANK"
               }
             ]
-          }
-        ]
-      }
-    },
-    "_pattern_param": {
-      "type": "PREC",
-      "value": 2,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "const"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "long_identifier"
-          },
-          {
-            "type": "STRING",
-            "value": "null"
           }
         ]
       }

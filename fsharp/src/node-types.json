@@ -1706,10 +1706,6 @@
           "named": true
         },
         {
-          "type": "long_identifier",
-          "named": true
-        },
-        {
           "type": "long_identifier_or_op",
           "named": true
         }
