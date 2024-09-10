@@ -388,3 +388,105 @@ let {F1 = v1; F2 = v2} = {F1 = "a"; F2 = "b"}
               (identifier))
             (const
               (string))))))))
+
+================================================================================
+named pattern
+================================================================================
+
+type T =
+    | T of a: bool
+
+    member x.F =
+        match x with
+        | T(a = true) -> true
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (match_expression
+              (long_identifier_or_op
+                (identifier))
+              (rules
+                (rule
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))
+                    (named_field_pattern
+                      (named_field
+                        (identifier)
+                        (const
+                          (bool)))))
+                  (const
+                    (bool)))))))))))
+
+================================================================================
+multiple named pattern
+================================================================================
+
+type T =
+    | T of a: bool
+
+    member x.F =
+        match x with
+        | T(a = true; b = false) -> true
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (match_expression
+              (long_identifier_or_op
+                (identifier))
+              (rules
+                (rule
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))
+                    (named_field_pattern
+                      (named_field
+                        (identifier)
+                        (const
+                          (bool)))
+                      (named_field
+                        (identifier)
+                        (const
+                          (bool)))))
+                  (const
+                    (bool)))))))))))
