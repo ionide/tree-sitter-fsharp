@@ -494,8 +494,8 @@ let f =
           (long_identifier_or_op
             (identifier))
           (long_identifier_or_op
-            (identifier)))
-        (line_comment)
+            (identifier))
+          (line_comment))
         (preproc_if
           (identifier)
           (const

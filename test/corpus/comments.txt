@@ -339,11 +339,45 @@ and U = unit
         (identifier))
       (union_type_cases
         (union_type_case
-          (identifier))))
-    (line_comment)
+          (identifier)))
+      (line_comment))
     (union_type_defn
       (type_name
         (identifier))
       (union_type_cases
         (union_type_case
           (identifier))))))
+
+================================================================================
+line comment in if-then-else
+================================================================================
+
+do
+  if
+    // comment
+    true // comment
+  then
+    // comment
+    1 // comment
+  else
+    // comment
+    2 // comment
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (if_expression
+        (line_comment)
+        (const
+          (bool))
+        (line_comment)
+        (line_comment)
+        (const
+          (int))
+        (line_comment)
+        (line_comment)
+        (const
+          (int))
+        (line_comment)))))
