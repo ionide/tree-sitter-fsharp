@@ -424,16 +424,26 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
     }
-  } else if (lexer->lookahead == 'a' && valid_symbols[AND]) {
+  } else if (lexer->lookahead == 'a' &&
+             (valid_symbols[AND] || valid_symbols[DEDENT])) {
     advance(lexer);
     if (lexer->lookahead == 'n') {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
         if (lexer->lookahead == ' ') {
-          lexer->result_symbol = AND;
-          lexer->mark_end(lexer);
-          return true;
+          // the 'AND' token is only valid if we have popped the appropriate
+          // amount of dedent tokens.
+          // If 'AND' is not valid we just continue to pop dedent tokens.
+          if (valid_symbols[AND]) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = AND;
+            return true;
+          } else {
+            array_pop(&scanner->indents);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }

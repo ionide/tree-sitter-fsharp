@@ -1478,7 +1478,12 @@ module.exports = grammar({
       ),
 
     _property_accessor_body: ($) =>
-      seq($.argument_patterns, optional(seq(":", $._type)), "=", $._expression),
+      seq(
+        $.argument_patterns,
+        optional(seq(":", $._type)),
+        "=",
+        $._expression_block,
+      ),
 
     property_accessor: ($) =>
       seq(choice("get", "set"), $._property_accessor_body),
