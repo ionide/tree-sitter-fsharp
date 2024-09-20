@@ -1348,7 +1348,7 @@ module.exports = grammar({
           "=",
           seq(
             alias($._interface_begin, "interface"),
-            scoped(repeat1($._type_defn_elements), $._indent, $._dedent),
+            scoped(repeat($._type_defn_elements), $._indent, $._dedent),
             "end",
           ),
         ),

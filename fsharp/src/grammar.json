@@ -5556,7 +5556,7 @@
                       "name": "_indent"
                     },
                     {
-                      "type": "REPEAT1",
+                      "type": "REPEAT",
                       "content": {
                         "type": "SYMBOL",
                         "name": "_type_defn_elements"
