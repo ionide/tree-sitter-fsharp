@@ -395,6 +395,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\n') {
+      advance(lexer);
+    }
     lexer->mark_end(lexer);
     lexer->result_symbol = NEWLINE;
     return true;
