@@ -75,6 +75,7 @@ module.exports = grammar({
     $._interface_begin,
     "end",
     "and",
+    "with",
     $._triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
@@ -405,7 +406,7 @@ module.exports = grammar({
 
     identifier_pattern: ($) =>
       prec.left(
-        -1,
+        1,
         seq(
           $.long_identifier_or_op,
           optional($._pattern),

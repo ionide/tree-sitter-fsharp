@@ -1981,6 +1981,35 @@ let test =
               (unit))))))))
 
 ================================================================================
+try-with expression single line
+================================================================================
+
+do
+  (fun _ -> try p.Kill(true) with _ -> ())
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (paren_expression
+        (fun_expression
+          (argument_patterns)
+          (try_expression
+            (application_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (const
+                (bool)))
+            (rules
+              (rule
+                (wildcard_pattern)
+                (const
+                  (unit))))))))))
+
+================================================================================
 try-finally expression
 ================================================================================
 
@@ -3670,3 +3699,47 @@ let f x =
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+
+================================================================================
+multiple disjunction patterns with parameters
+================================================================================
+
+do
+  match x with
+  | Key(_,_,_)
+  | Key(_,_,_)
+  | Key -> 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (do
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (disjunct_pattern
+              (disjunct_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))
+                  (paren_pattern
+                    (repeat_pattern
+                      (wildcard_pattern)
+                      (wildcard_pattern)
+                      (wildcard_pattern))))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))
+                  (paren_pattern
+                    (repeat_pattern
+                      (wildcard_pattern)
+                      (wildcard_pattern)
+                      (wildcard_pattern)))))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (const
+              (int))))))))

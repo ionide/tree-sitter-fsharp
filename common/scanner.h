@@ -20,6 +20,7 @@ enum TokenType {
   INTERFACE,
   END,
   AND,
+  WITH,
   TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
@@ -446,6 +447,32 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             array_pop(&scanner->indents);
             lexer->result_symbol = DEDENT;
             return true;
+          }
+        }
+      }
+    }
+  } else if (lexer->lookahead == 'w' &&
+             (valid_symbols[WITH] || valid_symbols[DEDENT])) {
+    advance(lexer);
+    if (lexer->lookahead == 'i') {
+      advance(lexer);
+      if (lexer->lookahead == 't') {
+        advance(lexer);
+        if (lexer->lookahead == 'h') {
+          advance(lexer);
+          if (lexer->lookahead == ' ') {
+            // the 'WITH' token is only valid if we have popped the appropriate
+            // amount of dedent tokens.
+            // If 'WITH' is not valid we just continue to pop dedent tokens.
+            if (valid_symbols[WITH]) {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = WITH;
+              return true;
+            } else {
+              array_pop(&scanner->indents);
+              lexer->result_symbol = DEDENT;
+              return true;
+            }
           }
         }
       }

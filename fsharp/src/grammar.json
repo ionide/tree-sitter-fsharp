@@ -1479,7 +1479,7 @@
     },
     "identifier_pattern": {
       "type": "PREC_LEFT",
-      "value": -1,
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -8563,6 +8563,10 @@
     {
       "type": "STRING",
       "value": "and"
+    },
+    {
+      "type": "STRING",
+      "value": "with"
     },
     {
       "type": "SYMBOL",
