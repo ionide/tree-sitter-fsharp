@@ -199,6 +199,27 @@ type A() =
           (unit))))))
 
 ================================================================================
+class-as definition
+================================================================================
+
+type A() as this =
+  do ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (class_as_reference
+          (identifier)))
+      (type_extension_elements
+        (const
+          (unit))))))
+
+================================================================================
 class inherit definition
 ================================================================================
 
@@ -2413,3 +2434,117 @@ type A = A
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+
+================================================================================
+record with mutable properties
+================================================================================
+
+type T =
+    {
+        mutable x: int
+        mutable y: int32
+    }
+    with
+    member t.F f =
+      cell.x
+      |> f
+    static member Create x y =
+      { x = x; y = y }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (infix_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (brace_expression
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))))))))))
+
+================================================================================
+DU with no case indentation
+================================================================================
+
+type T =
+| A of int
+| B of string
+
+type T = U
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (type_definition
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))))))
