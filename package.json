@@ -33,7 +33,7 @@
   },
   "scripts": {
     "install": "node-gyp-build",
-    "generate": "for dir in fsharp fsharp_signature; do cd $dir && tree-sitter generate --no-bindings && cd ..; done",
+    "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate --no-bindings; cd -; done",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "node --test bindings/node/*_test.js"

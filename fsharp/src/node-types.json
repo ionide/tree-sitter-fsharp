@@ -459,6 +459,10 @@
             "named": true
           },
           {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
             "type": "type_extension_elements",
             "named": true
           }
@@ -1963,6 +1967,10 @@
           {
             "type": "member_defn",
             "named": true
+          },
+          {
+            "type": "preproc_if",
+            "named": true
           }
         ]
       }
@@ -2666,6 +2674,10 @@
         },
         {
           "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "member_defn",
           "named": true
         },
         {
