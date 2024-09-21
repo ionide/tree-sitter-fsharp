@@ -1288,13 +1288,17 @@ module.exports = grammar({
       ),
 
     enum_type_defn: ($) =>
-      seq($.type_name, "=", scoped($.enum_type_cases, $._indent, $._dedent)),
+      seq(
+        $.type_name,
+        "=",
+        choice(
+          scoped($.enum_type_cases, $._indent, $._dedent),
+          $.enum_type_cases,
+        ),
+      ),
 
     enum_type_cases: ($) =>
-      choice(
-        seq(optional("|"), $.enum_type_case),
-        seq(seq("|", $.enum_type_case), repeat1(seq("|", $.enum_type_case))),
-      ),
+      seq(optional("|"), $.enum_type_case, repeat(seq("|", $.enum_type_case))),
 
     enum_type_case: ($) => seq($.identifier, "=", $.const),
 
@@ -1310,7 +1314,10 @@ module.exports = grammar({
         seq(
           $.type_name,
           "=",
-          scoped($._union_type_defn_inner, $._indent, $._dedent),
+          choice(
+            scoped($._union_type_defn_inner, $._indent, $._dedent),
+            $._union_type_defn_inner,
+          ),
         ),
       ),
 

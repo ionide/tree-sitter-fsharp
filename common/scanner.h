@@ -553,6 +553,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       found_bracket_end = true;
       break;
     case ' ':
+      if (indent_length == 0) {
+        indent_length = 1;
+      }
       if (scanner->indents.size > 0) {
         uint16_t current_indent_length = *array_back(&scanner->indents);
         if (found_end_of_line && indent_length == current_indent_length &&
