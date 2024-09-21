@@ -179,6 +179,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   lexer->mark_end(lexer);
 
   bool found_end_of_line = false;
+  bool found_end_of_line_semi_colon = false;
   bool found_start_of_infix_op = false;
   bool found_bracket_end = false;
   bool found_preprocessor_end = false;
@@ -399,9 +400,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     while (lexer->lookahead == ' ' || lexer->lookahead == '\n') {
       advance(lexer);
     }
+    found_end_of_line = true;
+    found_end_of_line_semi_colon = true;
     lexer->mark_end(lexer);
-    lexer->result_symbol = NEWLINE;
-    return true;
   }
 
   if (lexer->lookahead == 't' &&
@@ -599,6 +600,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       found_start_of_infix_op = true;
       break;
     }
+  }
+
+  if (valid_symbols[NEWLINE] && found_end_of_line_semi_colon) {
+    lexer->result_symbol = NEWLINE;
+    return true;
   }
 
   if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end) {
