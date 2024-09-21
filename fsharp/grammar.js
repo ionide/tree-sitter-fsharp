@@ -1392,13 +1392,7 @@ module.exports = grammar({
       ),
 
     _type_extension_inner: ($) =>
-      repeat1(
-        choice(
-          $._class_function_or_value_defn,
-          $._type_defn_elements,
-          alias($.preproc_if_in_class_definition, $.preproc_if),
-        ),
-      ),
+      repeat1(choice($._class_function_or_value_defn, $._type_defn_elements)),
 
     type_extension_elements: ($) =>
       prec.left(
@@ -1414,6 +1408,7 @@ module.exports = grammar({
       choice(
         $.member_defn,
         $.interface_implementation,
+        alias($.preproc_if_in_class_definition, $.preproc_if),
         // $._interface_signature
       ),
 
@@ -1874,6 +1869,7 @@ module.exports = grammar({
       ($) => repeat(seq(optional($._newline), $._class_type_body_inner)),
       -2,
     ),
+    ...preprocIf("_in_member_definition", ($) => repeat($.member_defn), -2),
   },
 });
 

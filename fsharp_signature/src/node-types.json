@@ -289,6 +289,10 @@
             "named": true
           },
           {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
             "type": "type_extension_elements",
             "named": true
           }
@@ -6001,6 +6005,10 @@
           {
             "type": "member_defn",
             "named": true
+          },
+          {
+            "type": "preproc_if",
+            "named": true
           }
         ]
       }
@@ -8921,6 +8929,10 @@
         },
         {
           "type": "match_expression",
+          "named": true
+        },
+        {
+          "type": "member_defn",
           "named": true
         },
         {

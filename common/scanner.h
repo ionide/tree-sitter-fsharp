@@ -215,7 +215,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       } else {
         return false;
       }
-    } else if (lexer->lookahead == '#' && indent_length == 0) {
+    } else if (lexer->lookahead == '#') {
       advance(lexer);
       if (lexer->lookahead == 'e') {
         advance(lexer);
