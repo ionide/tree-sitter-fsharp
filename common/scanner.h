@@ -580,6 +580,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     case '}':
       found_bracket_end = true;
       break;
+    case '>':
+      found_start_of_infix_op = true;
+      break;
     case ' ':
       if (indent_length == 0) {
         indent_length = 1;
@@ -644,7 +647,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       bool can_dedent_infix_op;
 
       if (found_start_of_infix_op) {
-        can_dedent_infix_op = indent_length + 1 < current_indent_length;
+        can_dedent_infix_op = indent_length + 2 < current_indent_length;
       } else {
         can_dedent_infix_op = true;
       }

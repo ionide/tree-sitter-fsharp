@@ -1334,11 +1334,8 @@ module.exports = grammar({
         8,
         seq(
           optional($.attributes),
-          choice(
-            $.identifier,
-            seq($.identifier, "of", $.union_type_fields),
-            seq($.identifier, ":", $._type),
-          ),
+          $.identifier,
+          optional(choice(seq("of", $.union_type_fields), seq(":", $._type))),
         ),
       ),
 
@@ -1737,7 +1734,7 @@ module.exports = grammar({
           seq(
             "(",
             /\s*/,
-            choice("?", /[!%&*+-./<=>@^|~$][!%&*+-./<=>@^|~?]*/, ".. .."),
+            choice("?", /[!%&*+-./<=>@^|~$?][!%&*+-./<=>@^|~?]*/, ".. .."),
             /\s*/,
             ")",
           ),
@@ -1760,7 +1757,7 @@ module.exports = grammar({
         choice(
           $._infix_or_prefix_op,
           token.immediate(prec(1, /[+-]/)),
-          /[-+<>|&^*/'%@][!%&*+./<=>@^|~?-]*/,
+          /[-+<>|&^*/'%@?][!%&*+./<=>@^|~?-]*/,
           "||",
           "=",
           "!=",
@@ -1771,6 +1768,7 @@ module.exports = grammar({
           "?",
           "?",
           "?<-",
+          "?->",
         ),
       ),
 

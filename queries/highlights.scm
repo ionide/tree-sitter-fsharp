@@ -7,7 +7,7 @@
 ] @comment @spell
 
 ((line_comment) @comment.documentation @spell
- (#match? @comment.documentation "^///"))
+ (#not-match? @comment.documentation "^///"))
 
 (const
   [
@@ -27,8 +27,6 @@
 ;; ----------------------------------------------------------------------------
 ;; Punctuation
 
-(wildcard_pattern) @character.special
-
 (type_name type_name: (_) @type.definition)
 
 [
@@ -47,12 +45,14 @@
           "?"? @character.special
           name: (_) @variable.parameter)))))
 
-(union_type_case) @constant
+(union_type_case (identifier) @constant)
 
 (rules
   (rule
     pattern: (_) @constant
     block: (_)))
+
+(wildcard_pattern) @character.special
 
 (identifier_pattern
   .
@@ -86,14 +86,15 @@
     .
     (identifier) @property))
 
-(dot_expression
-  base: (_)? @module)
-
 (value_declaration_left . (_) @variable)
 
 (function_declaration_left
-  . (_) @function
-  . (_)* @variable_parameter)
+  . (_) @function)
+
+(argument_patterns) @variable.parameter
+(typed_pattern
+  (_pattern) @variable.parameter
+  (_type) @type)
 
 (member_defn
   (method_or_prop_defn
@@ -104,6 +105,13 @@
         method: (identifier) @function.method)
     ]
     args: (_)* @variable.parameter))
+
+
+(dot_expression
+  .
+  (_) @variable.member
+  .
+  (_))
 
 (application_expression
   .
@@ -196,6 +204,8 @@
 [
   ","
   ";"
+  ":"
+  "."
 ] @punctuation.delimiter
 
 [
@@ -207,13 +217,23 @@
   "~"
   "->"
   "<-"
+  "&"
   "&&"
+  "|"
   "||"
   ":>"
   ":?>"
+  ".."
   (infix_op)
   (prefix_op)
+  (op_identifier)
 ] @operator
+
+(generic_type
+  [
+   "<"
+   ">"
+  ] @punctuation.bracket)
 
 [
   "if"
@@ -343,11 +363,9 @@
   "#else" @keyword.directive)
 
 ((long_identifier
-  (identifier)+ @module
+  (identifier)+ @variable.member
   .
   (identifier)))
-
-(op_identifier) @operator
 
 ((identifier) @module.builtin
  (#any-of? @module.builtin "Array" "Async" "Directory" "File" "List" "Option" "Path" "Map" "Set" "Lazy" "Seq" "Task" "String" "Result" ))
@@ -357,9 +375,10 @@
      (attribute
        (_type
          (long_identifier
-           (identifier) @attribute_name))))
+           (identifier) @attribute))))
    (function_or_value_defn
      (value_declaration_left
        .
        (_) @constant)))
- (#eq? @attribute_name "Literal"))
+ (#eq? @attribute "Literal"))
+
