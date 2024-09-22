@@ -175,7 +175,9 @@
 (preproc_line
   "#line" @keyword.directive)
 
-(attribute) @attribute
+(attribute
+  target: (identifier)? @keyword
+  (_type) @attribute)
 
 [
   "("
@@ -317,8 +319,6 @@
   "in"
   "do"
   "do!"
-  "event"
-  "field"
   "fun"
   "function"
   "get"
@@ -326,8 +326,6 @@
   "lazy"
   "new"
   "of"
-  "param"
-  "property"
   "struct"
   "val"
   "module"

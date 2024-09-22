@@ -1006,7 +1006,18 @@
   {
     "type": "attribute",
     "named": true,
-    "fields": {},
+    "fields": {
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": false,
@@ -4780,7 +4791,7 @@
     },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "anon_record_type",
@@ -13889,10 +13900,6 @@
     "named": false
   },
   {
-    "type": "assembly",
-    "named": false
-  },
-  {
     "type": "assert",
     "named": false
   },
@@ -13914,10 +13921,6 @@
   },
   {
     "type": "comparison",
-    "named": false
-  },
-  {
-    "type": "constructor",
     "named": false
   },
   {
@@ -13969,19 +13972,11 @@
     "named": false
   },
   {
-    "type": "event",
-    "named": false
-  },
-  {
     "type": "exception",
     "named": false
   },
   {
     "type": "f",
-    "named": false
-  },
-  {
-    "type": "field",
     "named": false
   },
   {
@@ -14125,14 +14120,6 @@
     "named": false
   },
   {
-    "type": "param",
-    "named": false
-  },
-  {
-    "type": "property",
-    "named": false
-  },
-  {
     "type": "rec",
     "named": false
   },
@@ -14182,11 +14169,11 @@
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unmanaged",

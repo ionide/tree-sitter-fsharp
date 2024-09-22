@@ -500,3 +500,37 @@ let f =
           (identifier)
           (const
             (int)))))))
+
+================================================================================
+attributes with target
+================================================================================
+
+[<assembly:AssemblyVersionAttribute("1.0.0.0")>]
+[<``module``:MyCustomModuleAttribute>]
+let f = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (attributes
+      (attribute
+        (identifier)
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string))))
+      (attribute
+        (identifier)
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (unit)))))
