@@ -200,18 +200,9 @@ module.exports = grammar({
         ">]",
       ),
     attribute: ($) =>
-      seq(optional(seq($._attribute_target, ":")), $._object_construction),
-    _attribute_target: (_) =>
-      choice(
-        "assembly",
-        "module",
-        "return",
-        "field",
-        "property",
-        "param",
-        "type",
-        "constructor",
-        "event",
+      seq(
+        optional(seq(field("target", $.identifier), ":")),
+        $._object_construction,
       ),
 
     _object_construction: ($) =>
