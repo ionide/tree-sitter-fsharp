@@ -3743,3 +3743,40 @@ do
                   (identifier))))
             (const
               (int))))))))
+
+================================================================================
+function definition vs value definition regression 1
+================================================================================
+
+let setDefaultColors fg bg sp =
+    setHighlight {
+        id = 0
+    }
+    (*trace "setDefaultColors: %A %A %A" fg bg sp*)
+
+--------------------------------------------------------------------------------
+
+(file
+  (value_declaration
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (brace_expression
+          (field_initializers
+            (field_initializer
+              (long_identifier
+                (identifier))
+              (const
+                (int))))))
+      (block_comment
+        (block_comment_content)))))

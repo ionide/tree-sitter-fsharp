@@ -359,19 +359,16 @@ module.exports = grammar({
     field_pattern: ($) => prec(1, seq($.long_identifier, "=", $._pattern)),
 
     _atomic_pattern: ($) =>
-      prec(
-        1000,
-        choice(
-          "null",
-          "_",
-          $.const,
-          $.long_identifier,
-          $.list_pattern,
-          $.record_pattern,
-          $.array_pattern,
-          seq("(", $._pattern, ")"),
-          // :? atomic_type
-        ),
+      choice(
+        "null",
+        "_",
+        $.const,
+        $.long_identifier,
+        $.list_pattern,
+        $.record_pattern,
+        $.array_pattern,
+        seq("(", $._pattern, ")"),
+        // :? atomic_type
       ),
 
     _list_pattern_content: ($) =>
