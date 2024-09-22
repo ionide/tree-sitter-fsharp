@@ -184,6 +184,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool found_bracket_end = false;
   bool found_preprocessor_end = false;
   bool found_preproc_if = false;
+  bool found_comment_start = false;
   uint32_t indent_length = lexer->get_column(lexer);
 
   for (;;) {
@@ -603,9 +604,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       found_start_of_infix_op = true;
       break;
     }
+  } else if (lexer->lookahead == '(') {
+    skip(lexer);
+    if (lexer->lookahead == '*') {
+      found_comment_start = true;
+    }
   }
 
-  if (valid_symbols[NEWLINE] && found_end_of_line_semi_colon) {
+  if (valid_symbols[NEWLINE] && found_end_of_line_semi_colon &&
+      !found_comment_start) {
     lexer->result_symbol = NEWLINE;
     return true;
   }
@@ -628,7 +635,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     if (found_end_of_line) {
       if (indent_length == current_indent_length && indent_length > 0 &&
           !found_start_of_infix_op && !found_bracket_end) {
-        if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
+        if (valid_symbols[NEWLINE] && !found_preprocessor_end &&
+            !found_comment_start) {
           lexer->result_symbol = NEWLINE;
           return true;
         }
