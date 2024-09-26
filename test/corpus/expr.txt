@@ -7,7 +7,7 @@ do 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (const
         (int)))))
@@ -21,7 +21,7 @@ do 4 3
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (const
@@ -38,7 +38,7 @@ do 4 3 3
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (application_expression
@@ -58,7 +58,7 @@ do test
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (long_identifier_or_op
         (long_identifier
@@ -73,7 +73,7 @@ do begin test end
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (begin_end_expression
         (long_identifier_or_op
@@ -88,7 +88,7 @@ do begin 2 1 end
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (begin_end_expression
         (application_expression
@@ -106,7 +106,7 @@ do null
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do)))
 
 ================================================================================
@@ -118,7 +118,7 @@ do ()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (const
         (unit)))))
@@ -133,7 +133,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (typed_expression
         (long_identifier_or_op
@@ -151,7 +151,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (typed_expression
         (long_identifier_or_op
@@ -172,7 +172,7 @@ do (4)
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (const
@@ -189,7 +189,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (sequential_expression
@@ -209,7 +209,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (declaration_expression
@@ -232,7 +232,7 @@ do test (4)
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (long_identifier_or_op
@@ -252,7 +252,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (application_expression
@@ -272,7 +272,7 @@ do (A[1]).B
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (dot_expression
         (paren_expression
@@ -295,7 +295,7 @@ do test.[test]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (index_expression
         (long_identifier_or_op
@@ -312,7 +312,7 @@ do test[test]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (long_identifier_or_op
@@ -330,7 +330,7 @@ do test <- 2
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (mutate_expression
         (long_identifier_or_op
@@ -347,7 +347,7 @@ do test <- 2 <- 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (mutate_expression
         (long_identifier_or_op
@@ -367,7 +367,7 @@ do upcast 2
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (prefixed_expression
         (const
@@ -382,7 +382,7 @@ do downcast 2
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (prefixed_expression
         (const
@@ -406,7 +406,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (typecast_expression
@@ -445,7 +445,7 @@ do 2, 3, 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (tuple_expression
         (const
@@ -465,7 +465,7 @@ do [2; 3; 4]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (list_expression
         (const
@@ -484,7 +484,7 @@ do [2; 3; 4][1]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (list_expression
@@ -507,7 +507,7 @@ do [2][1]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (list_expression
@@ -526,7 +526,7 @@ do [2] [1]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (list_expression
@@ -545,7 +545,7 @@ do [|2; 3; 4|]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (array_expression
         (const
@@ -564,7 +564,7 @@ do [|2; 3; 4|][1]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (array_expression
@@ -587,7 +587,7 @@ do [|2|][1]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (array_expression
@@ -606,7 +606,7 @@ do [|2|] [|1|]
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (array_expression
@@ -627,7 +627,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (declaration_expression
         (function_or_value_defn
@@ -653,7 +653,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (declaration_expression
         (function_or_value_defn
@@ -680,7 +680,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (declaration_expression
         (function_or_value_defn
@@ -712,7 +712,7 @@ let z = ()
   (named_module
     (long_identifier
       (identifier))
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (function_declaration_left
           (identifier)
@@ -722,7 +722,7 @@ let z = ()
         (paren_expression
           (long_identifier_or_op
             (identifier)))))
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -734,7 +734,7 @@ let z = ()
           (paren_expression
             (const
               (string))))))
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -753,7 +753,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (infix_expression
         (const
@@ -774,7 +774,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (infix_expression
         (const
@@ -796,7 +796,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (fun_expression
         (argument_patterns
@@ -821,7 +821,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (infix_expression
@@ -849,7 +849,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (ce_expression
         (long_identifier_or_op
@@ -870,7 +870,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (ce_expression
         (long_identifier_or_op
@@ -900,7 +900,7 @@ let f = async {
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -934,7 +934,7 @@ let f = async {
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -967,7 +967,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1006,7 +1006,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1050,7 +1050,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1082,7 +1082,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1115,7 +1115,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1135,7 +1135,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1158,7 +1158,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1179,7 +1179,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1197,7 +1197,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1217,7 +1217,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1239,7 +1239,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1264,7 +1264,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1292,7 +1292,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1327,7 +1327,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1359,7 +1359,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (long_identifier_or_op
@@ -1389,7 +1389,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (long_identifier_or_op
@@ -1420,7 +1420,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (long_identifier_or_op
@@ -1448,7 +1448,7 @@ let exampleNamespace =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1496,7 +1496,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (brace_expression
         (with_field_expression
@@ -1525,7 +1525,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (brace_expression
         (field_initializers
@@ -1562,7 +1562,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1596,7 +1596,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1632,7 +1632,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1666,7 +1666,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1696,7 +1696,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1726,7 +1726,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1756,7 +1756,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1783,7 +1783,7 @@ let test f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -1822,7 +1822,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1856,7 +1856,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (const
@@ -1892,7 +1892,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1922,7 +1922,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1953,7 +1953,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -1990,7 +1990,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (fun_expression
@@ -2022,7 +2022,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2046,7 +2046,7 @@ let test =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2085,7 +2085,7 @@ let a b =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2170,7 +2170,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2211,7 +2211,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (match_expression
@@ -2242,7 +2242,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2269,7 +2269,7 @@ let f xs =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2320,7 +2320,7 @@ let f xs =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2400,7 +2400,7 @@ let f xs =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2475,7 +2475,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (infix_expression
         (infix_expression
@@ -2498,7 +2498,7 @@ let disposables = new Disposables.CompositeDisposable()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2524,7 +2524,7 @@ let f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2548,7 +2548,7 @@ let x = { A = 12; B = "string" }
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2576,7 +2576,7 @@ let x = {| A = 12; B = "string"|}
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2607,7 +2607,7 @@ let x = {|
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2637,7 +2637,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2670,7 +2670,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (while_expression
@@ -2700,7 +2700,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2745,7 +2745,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -2777,7 +2777,7 @@ let f = task { return Some { A = 4; B = 5 } }
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2824,7 +2824,7 @@ let f cts =
   (named_module
     (long_identifier
       (identifier))
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (function_declaration_left
           (identifier)
@@ -2867,7 +2867,7 @@ module A =
 (file
   (module_defn
     (identifier)
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -2902,7 +2902,7 @@ let x = f(&y)
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2926,7 +2926,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2952,7 +2952,7 @@ let x = Async.AwaitWaitHandle(iar.AsyncWaitHandle, ?millisecondsTimeout = millis
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -2986,7 +2986,7 @@ let f (x: #MyType) = ()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3013,7 +3013,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (for_expression
         (identifier_pattern
@@ -3038,7 +3038,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (for_expression
         (identifier_pattern
@@ -3065,7 +3065,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (for_expression
         (identifier_pattern
@@ -3095,7 +3095,7 @@ let x
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3109,7 +3109,7 @@ let x
           (int))
         (const
           (int)))))
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -3138,7 +3138,7 @@ let f (a: seq<'T>) (b: 'T) =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3175,7 +3175,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (paren_expression
@@ -3204,7 +3204,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (tuple_expression
@@ -3251,7 +3251,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3290,7 +3290,7 @@ let f services =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3360,7 +3360,7 @@ let x = {| y with A = 1 |}
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -3388,7 +3388,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (long_identifier_or_op
@@ -3420,7 +3420,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (brace_expression
         (object_expression
@@ -3460,7 +3460,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (brace_expression
         (object_expression
@@ -3500,7 +3500,7 @@ let implementer() =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3564,7 +3564,7 @@ let implementer() =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3610,7 +3610,7 @@ let implementer() =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3660,7 +3660,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -3713,7 +3713,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (match_expression
         (long_identifier_or_op
@@ -3757,7 +3757,7 @@ let setDefaultColors fg bg sp =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)

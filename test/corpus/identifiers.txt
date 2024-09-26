@@ -7,7 +7,7 @@ do sample
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (long_identifier_or_op
         (long_identifier
@@ -22,7 +22,7 @@ do wh0ar3y0u
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (long_identifier_or_op
         (long_identifier
@@ -37,7 +37,7 @@ do ``I can have anything in here ASDFAS?DFS``
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (long_identifier_or_op
         (long_identifier
@@ -52,7 +52,7 @@ do _yo
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (long_identifier_or_op
         (long_identifier
@@ -96,7 +96,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern

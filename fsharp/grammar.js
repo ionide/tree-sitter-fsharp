@@ -140,7 +140,7 @@ module.exports = grammar({
 
     _module_elem: ($) =>
       choice(
-        $.value_declaration,
+        alias($.value_declaration, $.declaration_expression),
         $.module_defn,
         $.module_abbrev,
         $.import_decl,

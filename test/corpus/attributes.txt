@@ -16,7 +16,7 @@ module test =
           (long_identifier
             (identifier)))))
     (identifier)
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -51,7 +51,7 @@ module test =
           (long_identifier
             (identifier)))))
     (identifier)
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -87,7 +87,7 @@ module test =
           (long_identifier
             (identifier)))))
     (identifier)
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -149,7 +149,7 @@ module Impl =
           (long_identifier
             (identifier)))))
     (identifier)
-    (value_declaration
+    (declaration_expression
       (attributes
         (attribute
           (simple_type
@@ -162,7 +162,7 @@ module Impl =
               (identifier))))
         (const
           (string))))
-    (value_declaration
+    (declaration_expression
       (attributes
         (attribute
           (simple_type
@@ -177,7 +177,7 @@ module Impl =
           (string)))))
   (module_defn
     (identifier)
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern
@@ -221,7 +221,7 @@ module Impl =
             (long_identifier
               (identifier)))))
       (identifier)
-      (value_declaration
+      (declaration_expression
         (attributes
           (attribute
             (simple_type
@@ -234,7 +234,7 @@ module Impl =
                 (identifier))))
           (const
             (string))))
-      (value_declaration
+      (declaration_expression
         (attributes
           (attribute
             (simple_type
@@ -249,7 +249,7 @@ module Impl =
             (string)))))
     (module_defn
       (identifier)
-      (value_declaration
+      (declaration_expression
         (function_or_value_defn
           (value_declaration_left
             (identifier_pattern

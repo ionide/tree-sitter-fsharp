@@ -127,8 +127,13 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "value_declaration"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "value_declaration"
+          },
+          "named": true,
+          "value": "declaration_expression"
         },
         {
           "type": "SYMBOL",

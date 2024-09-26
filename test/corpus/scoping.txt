@@ -7,7 +7,7 @@ let f x = x + 1
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -32,7 +32,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -59,7 +59,7 @@ let f x = x + 1
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -90,7 +90,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (application_expression
         (long_identifier_or_op
@@ -118,7 +118,7 @@ let f x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -177,7 +177,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (long_identifier_or_op
@@ -206,7 +206,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (prefixed_expression
         (typecast_expression
@@ -231,7 +231,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (fun_expression
@@ -261,7 +261,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (paren_expression
         (infix_expression

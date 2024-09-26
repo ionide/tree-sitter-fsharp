@@ -138,6 +138,10 @@
         "named": true
       },
       {
+        "type": "declaration_expression",
+        "named": true
+      },
+      {
         "type": "exception_definition",
         "named": true
       },
@@ -163,10 +167,6 @@
       },
       {
         "type": "type_definition",
-        "named": true
-      },
-      {
-        "type": "value_declaration",
         "named": true
       }
     ]
@@ -1134,7 +1134,7 @@
     "fields": {
       "in": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "_expression",
@@ -1149,6 +1149,14 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "do",
           "named": true
         },
         {

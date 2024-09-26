@@ -7,7 +7,7 @@ let functionName x = 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -26,7 +26,7 @@ let inline functionName x = 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -45,7 +45,7 @@ let private functionName x = 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (access_modifier)
@@ -65,7 +65,7 @@ let rec private functionName x = 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (access_modifier)
@@ -86,7 +86,7 @@ and f2 y = y + 1
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (access_modifier)
@@ -120,7 +120,7 @@ let inline private functionName x = 4
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (access_modifier)
@@ -140,7 +140,7 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -183,7 +183,7 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -236,7 +236,7 @@ module Program =
       (identifier))
     (module_defn
       (identifier)
-      (value_declaration
+      (declaration_expression
         (attributes
           (attribute
             (simple_type

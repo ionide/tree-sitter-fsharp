@@ -9,7 +9,7 @@ let x = 1
 
 (file
   (line_comment)
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -29,7 +29,7 @@ let x = 1
 
 (file
   (line_comment)
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -50,7 +50,7 @@ let x = 1
 (file
   (block_comment
     (block_comment_content))
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -73,7 +73,7 @@ let x = 1
 (file
   (block_comment
     (block_comment_content))
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -93,7 +93,7 @@ let x = 1
 
 (file
   (line_comment)
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -111,7 +111,7 @@ let x = "//comment in string"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -131,7 +131,7 @@ let x = """
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -149,7 +149,7 @@ let x = @"//comment in string"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -167,7 +167,7 @@ let x = "http://www.test.com"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -185,7 +185,7 @@ let x = $"http://www.{baseurl}.com"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -213,7 +213,7 @@ let f x = x + 1
   (line_comment)
   (line_comment)
   (line_comment)
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (identifier)
@@ -254,7 +254,7 @@ module Json =
       (identifier))
     (module_defn
       (identifier)
-      (value_declaration
+      (declaration_expression
         (attributes
           (attribute
             (simple_type
@@ -294,7 +294,7 @@ module Json =
       (identifier))
     (module_defn
       (identifier)
-      (value_declaration
+      (declaration_expression
         (function_or_value_defn
           (function_declaration_left
             (identifier)
@@ -316,7 +316,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (line_comment)
       (const
@@ -366,7 +366,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (if_expression
         (line_comment)

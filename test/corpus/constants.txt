@@ -7,7 +7,7 @@ let x = "test"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -25,7 +25,7 @@ let x = @"\"
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -43,7 +43,7 @@ let x = 1
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -61,7 +61,7 @@ let x = 1L
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -80,7 +80,7 @@ let x = 1l
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -99,7 +99,7 @@ let x = 1s
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -118,7 +118,7 @@ let x = 1y
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -137,7 +137,7 @@ let x = 1uy
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -156,7 +156,7 @@ let x = 1us
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -175,7 +175,7 @@ let x = 1u
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -194,7 +194,7 @@ let x = 1ul
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -213,7 +213,7 @@ let x = 1UL
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -232,7 +232,7 @@ let x = 1uL
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -253,7 +253,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -280,7 +280,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -311,7 +311,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -330,7 +330,7 @@ let x = 1.f
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -349,7 +349,7 @@ let x = 0b1lf
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -368,7 +368,7 @@ let x = 0b0LF
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -393,7 +393,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -434,7 +434,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -474,7 +474,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -500,7 +500,7 @@ let str = "name: \"name\""
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -519,7 +519,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -546,7 +546,7 @@ let x =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -570,7 +570,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const
@@ -606,7 +606,7 @@ let johnDoeAsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -629,7 +629,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -675,7 +675,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -720,7 +720,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (const

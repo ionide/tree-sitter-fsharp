@@ -11,7 +11,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -54,7 +54,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (prefixed_expression
@@ -87,7 +87,7 @@ let (?->) x = x
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (function_declaration_left
         (op_identifier)

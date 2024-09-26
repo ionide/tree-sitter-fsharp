@@ -2001,7 +2001,7 @@ let str1 = "a" + "b"
                 (infix_op)
                 (long_identifier_or_op
                   (identifier))))))))
-    (value_declaration
+    (declaration_expression
       (function_or_value_defn
         (value_declaration_left
           (identifier_pattern

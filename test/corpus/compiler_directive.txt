@@ -28,7 +28,7 @@ do ()
       (identifier))
     (compiler_directive_decl
       (string))
-    (value_declaration
+    (declaration_expression
       (do
         (const
           (unit))))))
@@ -79,7 +79,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (preproc_line
         (int))
@@ -114,7 +114,7 @@ let f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -157,7 +157,7 @@ if x = y then () else failwith "Failed: 1"
 
 (file
   (compiler_directive_decl)
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -165,7 +165,7 @@ if x = y then () else failwith "Failed: 1"
             (identifier))))
       (const
         (string))))
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -207,7 +207,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -246,7 +246,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -291,7 +291,7 @@ do
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (do
       (sequential_expression
         (infix_expression
@@ -348,7 +348,7 @@ module A =
       (identifier)
       (module_defn
         (identifier)
-        (value_declaration
+        (declaration_expression
           (function_or_value_defn
             (value_declaration_left
               (identifier_pattern
@@ -412,7 +412,7 @@ let f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -446,7 +446,7 @@ let f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -481,7 +481,7 @@ let f =
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (function_or_value_defn
       (value_declaration_left
         (identifier_pattern
@@ -512,7 +512,7 @@ let f = ()
 --------------------------------------------------------------------------------
 
 (file
-  (value_declaration
+  (declaration_expression
     (attributes
       (attribute
         (identifier)

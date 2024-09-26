@@ -2528,7 +2528,7 @@
     "fields": {
       "in": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "anon_record_expression",
@@ -2674,6 +2674,10 @@
           "named": true
         },
         {
+          "type": "attributes",
+          "named": true
+        },
+        {
           "type": "begin_end_expression",
           "named": true
         },
@@ -2691,6 +2695,10 @@
         },
         {
           "type": "declaration_expression",
+          "named": true
+        },
+        {
+          "type": "do",
           "named": true
         },
         {
@@ -7687,10 +7695,6 @@
             "named": true
           },
           {
-            "type": "value_declaration",
-            "named": true
-          },
-          {
             "type": "while_expression",
             "named": true
           }
@@ -8999,10 +9003,6 @@
           "named": true
         },
         {
-          "type": "value_declaration",
-          "named": true
-        },
-        {
           "type": "while_expression",
           "named": true
         }
@@ -9184,10 +9184,6 @@
         },
         {
           "type": "typed_expression",
-          "named": true
-        },
-        {
-          "type": "value_declaration",
           "named": true
         },
         {
