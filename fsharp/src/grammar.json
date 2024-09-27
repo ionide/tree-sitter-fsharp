@@ -3414,10 +3414,6 @@
           },
           {
             "type": "SYMBOL",
-            "name": "constrained_type"
-          },
-          {
-            "type": "SYMBOL",
             "name": "flexible_type"
           },
           {

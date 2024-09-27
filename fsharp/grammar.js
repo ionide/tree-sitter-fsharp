@@ -1009,7 +1009,6 @@ module.exports = grammar({
           $.list_type,
           $.static_type,
           $.type_argument,
-          $.constrained_type,
           $.flexible_type,
           $.anon_record_type,
         ),
