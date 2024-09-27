@@ -1022,12 +1022,10 @@ module.exports = grammar({
       ),
     paren_type: ($) => seq("(", $._type, ")"),
     function_type: ($) => prec.right(seq($._type, "->", $._type)),
-    compound_type: ($) =>
-      prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
+    compound_type: ($) => prec.right(seq($._type, "*", $._type)),
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
     list_type: ($) => seq($._type, "[]"),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
-    constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
     anon_record_type: ($) =>
       seq("{|", scoped($.record_fields, $._indent, $._dedent), "|}"),

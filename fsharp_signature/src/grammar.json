@@ -1,6 +1,11 @@
 {
+  "0": "f",
+  "1": "s",
+  "2": "h",
+  "3": "a",
+  "4": "r",
+  "5": "p",
   "name": "fsharp_signature",
-  "inherits": "fsharp",
   "word": "identifier",
   "rules": {
     "file": {
@@ -3486,24 +3491,12 @@
             "name": "_type"
           },
           {
-            "type": "REPEAT1",
-            "content": {
-              "type": "PREC_RIGHT",
-              "value": 0,
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "*"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_type"
-                  }
-                ]
-              }
-            }
+            "type": "STRING",
+            "value": "*"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_type"
           }
         ]
       }
@@ -3551,27 +3544,6 @@
           {
             "type": "SYMBOL",
             "name": "type_arguments"
-          }
-        ]
-      }
-    },
-    "constrained_type": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "type_argument"
-          },
-          {
-            "type": "STRING",
-            "value": ":>"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_type"
           }
         ]
       }
