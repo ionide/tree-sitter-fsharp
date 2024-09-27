@@ -573,10 +573,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -953,10 +949,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -1056,10 +1048,6 @@
         },
         {
           "type": "const",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -1836,10 +1824,6 @@
             "named": true
           },
           {
-            "type": "constrained_type",
-            "named": true
-          },
-          {
             "type": "declaration_expression",
             "named": true
           },
@@ -2004,10 +1988,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -2319,65 +2299,6 @@
     }
   },
   {
-    "type": "constrained_type",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "anon_record_type",
-          "named": true
-        },
-        {
-          "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
-          "type": "flexible_type",
-          "named": true
-        },
-        {
-          "type": "function_type",
-          "named": true
-        },
-        {
-          "type": "generic_type",
-          "named": true
-        },
-        {
-          "type": "list_type",
-          "named": true
-        },
-        {
-          "type": "paren_type",
-          "named": true
-        },
-        {
-          "type": "postfix_type",
-          "named": true
-        },
-        {
-          "type": "simple_type",
-          "named": true
-        },
-        {
-          "type": "static_type",
-          "named": true
-        },
-        {
-          "type": "type_argument",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "constraint",
     "named": true,
     "fields": {},
@@ -2391,10 +2312,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -2458,10 +2375,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -2814,10 +2727,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -3734,10 +3643,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -4057,10 +3962,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -4810,10 +4711,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -4874,10 +4771,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -5967,10 +5860,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -6280,10 +6169,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -6701,10 +6586,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "declaration_expression",
           "named": true
         },
@@ -7010,10 +6891,6 @@
           },
           {
             "type": "const",
-            "named": true
-          },
-          {
-            "type": "constrained_type",
             "named": true
           },
           {
@@ -7341,10 +7218,6 @@
         },
         {
           "type": "const",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -8597,10 +8470,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -8653,10 +8522,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -9356,10 +9221,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "declaration_expression",
           "named": true
         },
@@ -9687,10 +9548,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -11169,10 +11026,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -11248,10 +11101,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -11599,10 +11448,6 @@
             "named": true
           },
           {
-            "type": "constrained_type",
-            "named": true
-          },
-          {
             "type": "flexible_type",
             "named": true
           },
@@ -11734,10 +11579,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -12276,10 +12117,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "declaration_expression",
           "named": true
         },
@@ -12597,10 +12434,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "disjunct_pattern",
           "named": true
         },
@@ -12697,10 +12530,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -12839,10 +12668,6 @@
           "named": true
         },
         {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
           "named": true
         },
@@ -12964,10 +12789,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {
@@ -13287,10 +13108,6 @@
         },
         {
           "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
           "named": true
         },
         {

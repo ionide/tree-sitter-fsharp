@@ -276,10 +276,6 @@
         "named": true
       },
       {
-        "type": "constrained_type",
-        "named": true
-      },
-      {
         "type": "flexible_type",
         "named": true
       },
@@ -1051,21 +1047,6 @@
         },
         {
           "type": "xint",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "constrained_type",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "_type",
           "named": true
         }
       ]
