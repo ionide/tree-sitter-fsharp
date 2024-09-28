@@ -2548,3 +2548,111 @@ type T = U
       (union_type_cases
         (union_type_case
           (identifier))))))
+
+================================================================================
+test class with text names
+================================================================================
+module Tests
+
+module ``Basic should`` =
+    [<Fact>]
+    let ``Pass basic test``() = Assert.True(true)
+
+type ``X Should``() =
+    [<Fact>]
+    member _.``Pass cool test``() = Assert.True(true)
+
+    [<Theory>]
+    [<InlineData(1, 2, 3)>]
+    member _.``Pass cool test parametrized``(x) = Assert.True(x > 0)
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (module_defn
+      (identifier)
+      (declaration_expression
+        (attributes
+          (attribute
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (function_or_value_defn
+          (function_declaration_left
+            (identifier)
+            (argument_patterns
+              (const
+                (unit))))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (const
+              (bool))))))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          (identifier))
+        (primary_constr_args)
+        (type_extension_elements
+          (member_defn
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (const
+                  (bool))))))
+        (type_extension_elements
+          (member_defn
+            (attributes
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (paren_expression
+                  (tuple_expression
+                    (const
+                      (int))
+                    (tuple_expression
+                      (const
+                        (int))
+                      (const
+                        (int)))))))
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (paren_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (infix_op)
+                  (const
+                    (int)))))))))))
