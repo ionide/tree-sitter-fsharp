@@ -23,10 +23,9 @@ each grammar starts with the `file` node at the beginning of the rules.
 
 ### Adding to neovim
 
-tree-sitter-fsharp isn't supported out-of-the box by [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter).
-However, nvim-treesitter has [instructions for how to manually add unsupported parsers](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-parsers).
+tree-sitter-fsharp is supported through the usual installation methods of [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter).
 
-For tree-sitter-fsharp, this involves three steps:
+Installing the lastest grammar from this repo involves the following three steps:
 
 1. Update your Neovim config for nvim-treesitter to refer to tree-sitter-fsharp.
 2. Run `:TSInstall fsharp` inside Neovim.
@@ -52,10 +51,10 @@ parser_config.fsharp = {
 
 The `package.json` defines some helpful targets for developing the grammar:
 
-- `npm run build` rebuilds all parser.
-- `npm test` runs all tests for both parsers.
-- `npm run parse $file` run the `fsharp` parser on `$file` and outputs the parse tree.
-- `npm run debug $file` run the `fsharp` parser on `$file` and prints debug information.
+- `npm run generate` rebuilds all parser.
+- `npx tree-sitter test` runs all tests for both parsers.
+- `npx tree-sitter parse $file` run the `fsharp` parser on `$file` and outputs the parse tree.
+- `npx tree-sitter parse -d $file` run the `fsharp` parser on `$file` and prints debug information.
 
 ## How to contribute
 
