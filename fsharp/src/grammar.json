@@ -8076,13 +8076,30 @@
           ]
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_string_literal"
-          },
-          "named": true,
-          "value": "string"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_string_literal"
+                  },
+                  "named": true,
+                  "value": "string"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "verbatim_string"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "PATTERN",

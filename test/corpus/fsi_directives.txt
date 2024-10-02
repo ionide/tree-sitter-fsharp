@@ -1,37 +1,44 @@
 ===
-refer dll 
+refer dll
 ===
 
 #r "path/to/MyAssembly.dll"
+#r @"path/to/MyAssembly.dll"
 
 ---
 
 (file
   (fsi_directive_decl
-    (string)))
+    (string))
+  (fsi_directive_decl
+    (verbatim_string)))
 
 ===
-refer nuget package 
+refer nuget package
 ===
 
-#r "path/to/MyAssembly.dll"
+#r "nuget: FSharp.Data"
+#r @"nuget: FSharp.Data"
 
 ---
 
 (file
   (fsi_directive_decl
-    (string)))
+    (string))
+  (fsi_directive_decl
+    (verbatim_string)))
 
 ===
-load script 
+load script
 ===
 
 #load "Script1.fsx"
+#load @"Script1.fsx"
 
 ---
 
 (file
   (fsi_directive_decl
-    (string)))
-
-
+    (string))
+  (fsi_directive_decl
+    (verbatim_string)))

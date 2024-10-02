@@ -1,11 +1,6 @@
 {
-  "0": "f",
-  "1": "s",
-  "2": "h",
-  "3": "a",
-  "4": "r",
-  "5": "p",
   "name": "fsharp_signature",
+  "inherits": "fsharp",
   "word": "identifier",
   "rules": {
     "file": {
@@ -8049,13 +8044,30 @@
           ]
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_string_literal"
-          },
-          "named": true,
-          "value": "string"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_string_literal"
+                  },
+                  "named": true,
+                  "value": "string"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "verbatim_string"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "PATTERN",

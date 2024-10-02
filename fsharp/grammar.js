@@ -1834,7 +1834,11 @@ module.exports = grammar({
       ),
 
     fsi_directive_decl: ($) =>
-      seq(choice("#r", "#load"), alias($._string_literal, $.string), /\n/),
+      seq(
+        choice("#r", "#load"),
+        optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
+        /\n/,
+      ),
 
     preproc_line: ($) =>
       seq(
