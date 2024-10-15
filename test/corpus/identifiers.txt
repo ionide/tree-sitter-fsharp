@@ -61,12 +61,11 @@ do _yo
 ================================================================================
 long ident
 ================================================================================
-module test = foo.bar.baz
+module foo.bar.baz
 --------------------------------------------------------------------------------
 
 (file
-  (module_abbrev
-    (identifier)
+  (named_module
     (long_identifier
       (identifier)
       (identifier)
@@ -75,12 +74,11 @@ module test = foo.bar.baz
 ================================================================================
 long ident with tick
 ================================================================================
-module _ = foo.bar.``baz``
+module foo.bar.``baz``
 --------------------------------------------------------------------------------
 
 (file
-  (module_abbrev
-    (identifier)
+  (named_module
     (long_identifier
       (identifier)
       (identifier)
