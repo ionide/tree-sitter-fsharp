@@ -1700,6 +1700,11 @@ module.exports = grammar({
       ),
 
     // Identifiers:
+    identifier: (_) =>
+      token(
+        choice(/[_\p{XID_Start}][_'\p{XID_Continue}]*/, /``([^`\n\r\t])+``/),
+      ),
+
     long_identifier: ($) =>
       prec.right(seq($.identifier, repeat(seq(".", $.identifier)))),
 
@@ -1813,11 +1818,6 @@ module.exports = grammar({
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
     line_comment: (_) => token(/\/\/+[^\n\r]*/),
-
-    identifier: (_) =>
-      token(
-        choice(/[_\p{XID_Start}][_'\p{XID_Continue}]*/, /``([^`\n\r\t])+``/),
-      ),
 
     // preprocessors
     compiler_directive_decl: ($) =>

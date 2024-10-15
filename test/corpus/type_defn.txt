@@ -2556,7 +2556,7 @@ module Tests
 
 module ``Basic should`` =
     [<Fact>]
-    let ``Pass basic test``() = Assert.True(true)
+    let ``Pass basic test`` () = Assert.True(true)
 
 type ``X Should``() =
     [<Fact>]
@@ -2565,6 +2565,7 @@ type ``X Should``() =
     [<Theory>]
     [<InlineData(1, 2, 3)>]
     member _.``Pass cool test parametrized``(x) = Assert.True(x > 0)
+
 --------------------------------------------------------------------------------
 
 (file

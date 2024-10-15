@@ -1465,6 +1465,7 @@
   {
     "type": "file",
     "named": true,
+    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -2697,10 +2698,6 @@
         },
         {
           "type": "class_inherits_decl",
-          "named": true
-        },
-        {
-          "type": "member_defn",
           "named": true
         },
         {
@@ -4356,10 +4353,6 @@
   },
   {
     "type": "global",
-    "named": false
-  },
-  {
-    "type": "id",
     "named": false
   },
   {
