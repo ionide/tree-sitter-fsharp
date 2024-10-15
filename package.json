@@ -33,38 +33,14 @@
   },
   "scripts": {
     "install": "node-gyp-build",
-    "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate --no-bindings; cd -; done",
+    "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate; cd -; done",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "node --test bindings/node/*_test.js"
   },
-  "tree-sitter": [
-    {
-      "scope": "source.fsharp",
-      "path": "fsharp",
-      "file-types": [
-        "fs",
-        "fsx"
-      ],
-      "injection-regex": "^fsharp$",
-      "highlights": "queries/highlights.scm",
-      "injections": "queries/injections.scm",
-      "tags": "queries/tags.scm"
-    },
-    {
-      "scope": "source.fsharp.signature",
-      "path": "fsharp_signature",
-      "file-types": [
-        "fsi"
-      ],
-      "injection-regex": "^fsharp_signature$",
-      "highlights": "queries/highlights.scm",
-      "injections": "queries/injections.scm",
-      "tags": "queries/tags.scm"
-    }
-  ],
   "dependencies": {
     "node-addon-api": "^8.1.0",
     "node-gyp-build": "^4.8.2"
   }
 }
+

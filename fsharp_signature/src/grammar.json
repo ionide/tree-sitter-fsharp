@@ -1,4 +1,5 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "fsharp_signature",
   "inherits": "fsharp",
   "word": "identifier",
@@ -7172,6 +7173,22 @@
         }
       ]
     },
+    "identifier": {
+      "type": "TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[_\\p{XID_Start}][_'\\p{XID_Continue}]*"
+          },
+          {
+            "type": "PATTERN",
+            "value": "``([^`\\n\\r\\t])+``"
+          }
+        ]
+      }
+    },
     "long_identifier": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -7965,22 +7982,6 @@
       "content": {
         "type": "PATTERN",
         "value": "\\/\\/+[^\\n\\r]*"
-      }
-    },
-    "identifier": {
-      "type": "TOKEN",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "[_\\p{XID_Start}][_'\\p{XID_Continue}]*"
-          },
-          {
-            "type": "PATTERN",
-            "value": "``([^`\\n\\r\\t])+``"
-          }
-        ]
       }
     },
     "compiler_directive_decl": {
