@@ -573,7 +573,7 @@ module.exports = grammar({
       prec(
         PREC.DO_EXPR + 1,
         seq(
-          "while",
+          choice("while", "while!"),
           $._expression,
           "do",
           $._expression_block,

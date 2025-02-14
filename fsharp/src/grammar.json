@@ -2122,8 +2122,17 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "while"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "while"
+              },
+              {
+                "type": "STRING",
+                "value": "while!"
+              }
+            ]
           },
           {
             "type": "SYMBOL",
@@ -8671,5 +8680,6 @@
     "_type",
     "_type_defn_body",
     "_static_parameter"
-  ]
+  ],
+  "reserved": {}
 }
