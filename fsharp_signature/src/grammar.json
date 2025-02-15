@@ -8742,5 +8742,6 @@
   ],
   "supertypes": [
     "_module_signature_elements"
-  ]
+  ],
+  "reserved": {}
 }
