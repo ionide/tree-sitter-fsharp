@@ -38,7 +38,7 @@ class EggInfo(egg_info):
     def find_sources(self):
         super().find_sources()
         self.filelist.recursive_include("queries", "*.scm")
-        self.filelist.include("grammars/ocaml/src/tree_sitter/*.h")
+        self.filelist.include("fsharp/src/tree_sitter/*.h")
 
 setup(
     packages=find_packages("bindings/python"),
