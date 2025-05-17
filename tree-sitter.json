@@ -38,9 +38,9 @@
   },
   "bindings": {
     "c": true,
-    "go": true,
     "node": true,
     "rust": true,
+    "go": false,
     "swift": false,
     "python": false
   }

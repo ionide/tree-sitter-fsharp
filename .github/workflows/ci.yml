@@ -26,7 +26,8 @@ jobs:
           generate: false
           test-rust: ${{ runner.os == 'Linux' }}
           test-node: true
-          test-go: true
+          test-c: true
+          test-go: false
           test-swift: false
           test-python: false
 
