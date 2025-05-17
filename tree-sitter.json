@@ -40,8 +40,8 @@
     "c": true,
     "go": true,
     "node": true,
-    "python": true,
     "rust": true,
-    "swift": true
+    "swift": false,
+    "python": false
   }
 }
