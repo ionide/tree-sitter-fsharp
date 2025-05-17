@@ -9,3 +9,7 @@ binding.gyp linguist-vendored
 setup.py linguist-vendored
 Makefile linguist-vendored
 Package.swift linguist-vendored
+
+# Zig bindings
+build.zig linguist-generated
+build.zig.zon linguist-generated
