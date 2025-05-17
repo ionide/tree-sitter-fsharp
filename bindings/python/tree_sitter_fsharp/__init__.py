@@ -2,7 +2,7 @@
 
 from importlib.resources import files as _files
 
-from ._binding import fsharp, signature
+from ._binding import language_fsharp, language_fsharp_signature
 
 
 def _get_query(name, file):
@@ -23,8 +23,8 @@ def __getattr__(name):
 
 
 __all__ = [
-    "fsharp",
-    "signature",
+    "language_fsharp",
+    "language_fsharp_signature",
     "HIGHLIGHTS_QUERY",
     "LOCALS_QUERY",
     "TAGS_QUERY",

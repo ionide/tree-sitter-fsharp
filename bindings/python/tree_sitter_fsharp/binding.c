@@ -7,12 +7,13 @@ TSLanguage *tree_sitter_fsharp_signature(void);
 
 static PyObject *_binding_language_fsharp(PyObject *Py_UNUSED(self),
                                           PyObject *Py_UNUSED(args)) {
-  return PyLong_FromVoidPtr(tree_sitter_fsharp());
+  return PyCapsule_New(tree_sitter_fsharp(), "tree_sitter.Language", NULL);
 }
 
 static PyObject *_binding_language_fsharp_signature(PyObject *Py_UNUSED(self),
                                                     PyObject *Py_UNUSED(args)) {
-  return PyLong_FromVoidPtr(tree_sitter_fsharp_signature());
+  return PyCapsule_New(tree_sitter_fsharp_signature(), "tree_sitter.Language",
+                       NULL);
 }
 
 static struct PyModuleDef_Slot slots[] = {
@@ -22,10 +23,10 @@ static struct PyModuleDef_Slot slots[] = {
     {0, NULL}};
 
 static PyMethodDef methods[] = {
-    {"fsharp", _binding_language_fsharp, METH_NOARGS,
+    {"language_fsharp", _binding_language_fsharp, METH_NOARGS,
      "Get the tree-sitter language for FSharp."},
-    {"signature", _binding_language_fsharp_signature, METH_NOARGS,
-     "Get the tree-sitter language for FSharp interfaces."},
+    {"language_fsharp_signature", _binding_language_fsharp_signature,
+     METH_NOARGS, "Get the tree-sitter language for FSharp interfaces."},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef module = {
