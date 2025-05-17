@@ -15,6 +15,12 @@ static PyObject *_binding_language_fsharp_signature(PyObject *Py_UNUSED(self),
   return PyLong_FromVoidPtr(tree_sitter_fsharp_signature());
 }
 
+static struct PyModuleDef_Slot slots[] = {
+#ifdef Py_GIL_DISABLED
+    {Py_mod_gil, Py_MOD_GIL_NOT_USED},
+#endif
+    {0, NULL}};
+
 static PyMethodDef methods[] = {
     {"fsharp", _binding_language_fsharp, METH_NOARGS,
      "Get the tree-sitter language for FSharp."},
@@ -22,10 +28,13 @@ static PyMethodDef methods[] = {
      "Get the tree-sitter language for FSharp interfaces."},
     {NULL, NULL, 0, NULL}};
 
-static struct PyModuleDef module = {.m_base = PyModuleDef_HEAD_INIT,
-                                    .m_name = "_binding",
-                                    .m_doc = NULL,
-                                    .m_size = -1,
-                                    .m_methods = methods};
+static struct PyModuleDef module = {
+    .m_base = PyModuleDef_HEAD_INIT,
+    .m_name = "_binding",
+    .m_doc = NULL,
+    .m_size = 0,
+    .m_methods = methods,
+    .m_slots = slots,
+};
 
-PyMODINIT_FUNC PyInit__binding(void) { return PyModule_Create(&module); }
+PyMODINIT_FUNC PyInit__binding(void) { return PyModuleDef_Init(&module); }

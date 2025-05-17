@@ -7,7 +7,7 @@ let package = Package(
         .library(name: "TreeSitterFSharp", targets: ["TreeSitterFSharp"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/ChimeHQ/SwiftTreeSitter", from: "0.8.0"),
+        .package(url: "https://github.com/tree-sitter/swift-tree-sitter", from: "0.8.0"),
     ],
     targets: [
         .target(
@@ -51,7 +51,7 @@ let package = Package(
         .testTarget(
             name: "TreeSitterFSharpTests",
             dependencies: [
-                "SwiftTreeSitter",
+                .product(name: "SwiftTreeSitter", package: "swift-tree-sitter"),
                 "TreeSitterFSharp",
             ],
             path: "bindings/swift/TreeSitterFSharpTests"
