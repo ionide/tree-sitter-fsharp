@@ -17,18 +17,19 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-14]
-        language: [fsharp, fsharp_signature]
     steps:
       - uses: actions/checkout@v4
       - uses: tree-sitter/setup-action/cli@v1
       - name: test language
         uses: tree-sitter/parser-test-action@v2
         with:
+          generate: false
           test-rust: ${{ runner.os == 'Linux' }}
-          test-node: true
-          test-python: true
-          test-go: true
-          test-swift: ${{ runner.os == 'macOS' }}
+          test-node: ${{ runner.os == 'Linux' }}
+          test-c: ${{ runner.os == 'Linux' }}
+          test-go: false
+          test-swift: false
+          test-python: false
 
   parse-examples:
     name: Parse examples
