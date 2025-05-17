@@ -132,18 +132,6 @@ static inline bool is_bracket_end(TSLexer *lexer) {
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[ERROR_SENTINEL]) {
-    if (scanner->indents.size > 1) {
-      array_pop(&scanner->indents);
-      lexer->result_symbol = DEDENT;
-      return true;
-    }
-
-    if (scanner->preprocessor_indents.size > 0) {
-      array_pop(&scanner->preprocessor_indents);
-      lexer->result_symbol = PREPROC_END;
-      return true;
-    }
-
     return false;
   }
 
