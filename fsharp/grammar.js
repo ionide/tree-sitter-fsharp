@@ -1179,9 +1179,14 @@ module.exports = grammar({
       seq(
         optional($.attributes),
         "exception",
+        optional($.access_modifier),
         field("exception_name", $.long_identifier),
-        "of",
-        $._type,
+        optional(
+          seq(
+            "of",
+            $._type,
+          )
+        ),
       ),
 
     type_definition: ($) =>

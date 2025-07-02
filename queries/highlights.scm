@@ -28,6 +28,7 @@
 ;; Punctuation
 
 (type_name type_name: (_) @type.definition)
+(exception_definition exception_name: (_) @type.definition)
 
 [
  (_type)
@@ -299,6 +300,7 @@
 [
   "enum"
   "type"
+  "exception"
   "inherit"
   "interface"
   "and"
