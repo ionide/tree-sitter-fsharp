@@ -987,7 +987,7 @@ module.exports = grammar({
         ),
       ),
 
-    slice_range: ($) => choice($._slice_range_special, $._expression, "*"),
+    slice_range: ($) => choice($._slice_range_special, $._expression, alias("*", $.wildcard_slice)),
 
     //
     // Computation expression (END)
