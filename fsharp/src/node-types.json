@@ -3160,6 +3160,10 @@
         {
           "type": "_expression",
           "named": true
+        },
+        {
+          "type": "wildcard_slice",
+          "named": true
         }
       ]
     }
@@ -4522,11 +4526,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
@@ -4574,6 +4578,10 @@
   },
   {
     "type": "wildcard_pattern",
+    "named": true
+  },
+  {
+    "type": "wildcard_slice",
     "named": true
   },
   {

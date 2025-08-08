@@ -3780,3 +3780,74 @@ let setDefaultColors fg bg sp =
                 (int))))))
       (block_comment
         (block_comment_content)))))
+================================================================================
+Wildcard slice (all elements)
+================================================================================
+
+let all = arr.[*]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (slice_ranges
+          (slice_range
+            (wildcard_slice)))))))
+
+================================================================================
+2D array row slice
+================================================================================
+
+let row = matrix.[0.., *]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (slice_ranges
+          (slice_range
+            (const
+              (int)))
+          (slice_range
+            (wildcard_slice)))))))
+
+================================================================================
+2D array column slice  
+================================================================================
+
+let col = matrix.[*, 0..]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (slice_ranges
+          (slice_range
+            (wildcard_slice))
+          (slice_range
+            (const
+              (int))))))))
