@@ -28,7 +28,7 @@ This document tracks the implementation status of F# language features in the tr
 | Query expressions `query { ... }` | ❌ | | LINQ-style queries |
 | Object expressions `{ new IFoo with ... }` | ✅ | `expr.txt:2163` | |
 | Lambda expressions `fun x -> x` | ✅ | `expr.txt:1443` | |
-| Function expressions `function | ... -> ...` | ✅ | `expr.txt:2856` | |
+| Function expressions `function \| ... -> ...` | ✅ | `expr.txt:2856` | |
 | Match expressions | ✅ | `expr.txt:2039` | |
 | Try-with/Try-finally | ✅ | `expr.txt:1883` | |
 | If-then-else expressions | ✅ | `expr.txt:1108` | |
