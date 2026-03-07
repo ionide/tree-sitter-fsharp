@@ -13,7 +13,7 @@ Each parser directory contains:
 
 - `grammar.js` - The grammar definition (written in JavaScript)
 - `src/grammar.json` - Generated grammar in JSON format
-- `src/parser.c` - Generated C parser code
+- `src/parser.c` - Generated C parser code (This file should never edited directly)
 - `src/scanner.c` - External scanner for handling complex tokenization
 
 ## Workflow for Adding a New Feature
@@ -110,6 +110,10 @@ cd fsharp && npx tree-sitter test
 cd fsharp_signature && npx tree-sitter test
 ```
 
+### 6. Repeat as Necessary
+
+If the test still fails, review your implementation and the expected parse tree. Make sure your grammar rules correctly capture the syntax of the new feature.
+
 ## References
 
 - **Tree-sitter Documentation**: https://tree-sitter.github.io/tree-sitter/creating-parsers/index.html
@@ -120,6 +124,9 @@ cd fsharp_signature && npx tree-sitter test
 1. **Always add tests first** - This ensures you understand the expected behavior and can verify your implementation.
 
 2. **Use `tree-sitter test` to validate** - Don't assume the feature works; run the tests to confirm.
+   - If the test run does not exit relatively fast it is likely you have an infinite loop in your grammar.
+     This is most likely an issue with the `c` parser injecting tokens into the grammar without consuming any tokens. If you have a infinite loop you should cancel the test run and review your grammar rules and scanner logic.
+   - A test is **only** considered passing if the expected parse tree matches the actual parse tree exactly. Even a small difference in node names or structure should be considered a failure and should be investigated.
 
 3. **Check the F# spec** - When in doubt about language syntax, refer to https://fsharp.github.io/fslang-spec/
 
