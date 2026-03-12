@@ -133,3 +133,5 @@ If the test still fails, review your implementation and the expected parse tree.
 4. **Two parsers need to be in sync** - If you're adding a feature that applies to both `.fs` and `.fsi` files, you need to implement and test it in both `fsharp/` and `fsharp_signature/` directories.
 
 5. **Grammar.js vs parser.c** - You should only edit `grammar.js`. The `parser.c` file is auto-generated and will be overwritten when you run `tree-sitter generate`.
+
+**IMPORTANT**: You may never change the expected parse tree of an existing test without consulting the user first. If a test fails to parse it is because the parser is broken.
