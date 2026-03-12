@@ -35,6 +35,7 @@ The user provides:
 After a new test is written and (expectedly) fails, use the following orchestration:
 
 - Spawn a subagent (with the `tree-sitter-parse-testing` skill) to iterate on parser and grammar _only for the failing example_ until it parses as required.
+  - IMPORTANT: The subagent must focus on fixing that single test case. The subagent should never call `npx tree-sitter test` or attempt to fix multiple cases. It is strictly one subagent per failing test.
 - Once that test parses, run the entire test suite (`npx tree-sitter test`).
 - For every other test that fails, spawn a new subagent, each focusing solely on its failing case.
 - Continue this loop, always re-running and spawning as needed, until **all** tests pass.
