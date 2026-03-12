@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
 
 concurrency:
@@ -10,64 +10,55 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-parsers:
+  test:
     name: Test parser
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-14]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: tree-sitter/setup-action/cli@v1
-      - name: test language
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up tree-sitter
+        uses: tree-sitter/setup-action/cli@v2
+      - name: Run parser and binding tests
         uses: tree-sitter/parser-test-action@v2
         with:
-          generate: false
-          test-rust: ${{ runner.os == 'Linux' }}
-          test-node: ${{ runner.os == 'Linux' }}
-          test-c: ${{ runner.os == 'Linux' }}
-          test-go: false
-          test-swift: false
-          test-python: false
-
-  parse-examples:
-    name: Parse examples
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-14]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: tree-sitter/setup-action/cli@v1
+          test-rust: true
       - name: Parse sample files
         uses: tree-sitter/parse-action@v4
         id: parse-files
-        continue-on-error: true
         with:
-          files-list: test/files.txt
-          invalid-files-list: test/invalid-files.txt
+          files: examples/**
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
         with:
           name: failures-${{runner.os}}
           path: ${{steps.parse-files.outputs.failures}}
-
   fuzz:
-    name: Fuzz fsharp
+    name: Fuzz scanner
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        language: [fsharp, fsharp_signature]
+        language: [fsharp, fsharp_signatures]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Fuzz parser
+        with:
+          fetch-depth: 2
+      - name: Check for scanner changes
+        id: scanner-check
+        run: |-
+          if git diff --quiet HEAD^ -- src/scanner.c; then
+            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run the fuzzer
         uses: tree-sitter/fuzz-action@v4
+        if: steps.scanner-check.outputs.changed == 'true'
         with:
           directory: ${{matrix.language}}
