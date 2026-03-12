@@ -15,11 +15,12 @@
     "fsharp/src/**",
     "fsharp_signature/src/**",
     "queries/*",
-    "*.wasm"
+    "wasm/*"
   ],
   "devDependencies": {
     "eslint": "^9.27.0",
     "eslint-config-google": "^0.14.0",
+    "node-gyp": "^12.1.0",
     "prebuildify": "^6.0.1",
     "tree-sitter-cli": "^0.26.6"
   },
@@ -33,6 +34,10 @@
   },
   "scripts": {
     "install": "node-gyp-build",
+    "build:native": "node-gyp rebuild",
+    "build:wasm": "npm run build:wasm:fsharp && npm run build:wasm:signature",
+    "build:wasm:fsharp": "cd fsharp && tree-sitter build --wasm && move tree-sitter-fsharp.wasm ..\\wasm\\ 2>nul || mv tree-sitter-fsharp.wasm ../wasm/ 2>/dev/null || true",
+    "build:wasm:signature": "cd fsharp_signature && tree-sitter build --wasm && move tree-sitter-fsharp_signature.wasm ..\\wasm\\ 2>nul || mv tree-sitter-fsharp_signature.wasm ../wasm/ 2>/dev/null || true",
     "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate; cd -; done",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",

@@ -52,9 +52,38 @@ parser_config.fsharp = {
 The `package.json` defines some helpful targets for developing the grammar:
 
 - `npm run generate` rebuilds all parser.
+- `npm run build:wasm` builds WASM modules for both parsers (requires Docker or Emscripten).
+- `npm run build:wasm:fsharp` builds only the fsharp WASM module.
+- `npm run build:wasm:signature` builds only the fsharp_signature WASM module.
 - `npx tree-sitter test` runs all tests for both parsers.
 - `npx tree-sitter parse $file` run the `fsharp` parser on `$file` and outputs the parse tree.
 - `npx tree-sitter parse -d $file` run the `fsharp` parser on `$file` and prints debug information.
+
+### Building WASM
+
+To build WebAssembly modules, you need either Docker or Emscripten installed:
+
+**Option 1: Using Docker (recommended)**
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
+2. Start Docker Desktop
+3. Run `npm run build:wasm`
+
+**Option 2: Using Emscripten**
+1. Install the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html)
+2. Activate Emscripten in your terminal
+3. Run `npm run build:wasm`
+
+**Option 3: Using WSL (Windows)**
+The repository includes `build-wasm.sh` which can be run with WSL:
+```bash
+wsl bash build-wasm.sh
+```
+
+This will generate WASM files in the wasm/ directory:
+- `wasm/tree-sitter-fsharp.wasm` - Main F# grammar
+- `wasm/tree-sitter-fsharp_signature.wasm` - F# signature (.fsi) grammar
+
+**Note**: WASM files are included in the repository for convenience.
 
 ## How to contribute
 
