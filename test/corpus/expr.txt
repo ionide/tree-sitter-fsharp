@@ -2894,6 +2894,102 @@ module A =
                   (identifier))))))))))
 
 ================================================================================
+function expression de-indented
+================================================================================
+
+let v =
+    function
+    | _ -> ()
+
+    test
+
+--------------------------------------------------------------------------------
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (sequential_expression
+        (function_expression
+          block: (rules
+            (rule
+              pattern: (wildcard_pattern)
+              block: (const
+                (unit)))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+================================================================================
+function expressions without indent
+================================================================================
+
+let v =
+    function
+    | _ -> ()
+
+    function
+    | _ -> ()
+
+--------------------------------------------------------------------------------
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (sequential_expression
+      (function_expression
+        block: (rules
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (unit)))))
+      (function_expression
+        block: (rules
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (unit)))))
+      )
+      )))
+================================================================================
+function expressions as list items
+================================================================================
+
+let v =
+    [
+    function
+    | _ -> ()
+
+    function
+    | _ -> ()
+    ]
+
+--------------------------------------------------------------------------------
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (list_expression
+        (function_expression
+          (rules
+            (rule
+              (wildcard_pattern)
+              (const
+                (unit)))))
+        (function_expression
+          (rules
+            (rule
+              (wildcard_pattern)
+              (const
+                (unit)))))))))
+================================================================================
 address of expression inside application
 ================================================================================
 
