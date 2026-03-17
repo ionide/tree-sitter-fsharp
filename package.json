@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-fsharp",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "description": "",
   "repository": "https://github.com/tree-sitter/tree-sitter-fsharp",
   "license": "MIT",
@@ -18,11 +18,11 @@
     "wasm/*"
   ],
   "devDependencies": {
-    "eslint": "^9.27.0",
+    "eslint": "^10.0.3",
     "eslint-config-google": "^0.14.0",
     "node-gyp": "^12.1.0",
     "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.25.4"
+    "tree-sitter-cli": "^0.26.6"
   },
   "peerDependencies": {
     "tree-sitter": "^0.22.4"

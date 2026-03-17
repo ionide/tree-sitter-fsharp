@@ -755,6 +755,7 @@
   {
     "type": "block_comment",
     "named": true,
+    "extra": true,
     "fields": {},
     "children": {
       "multiple": false,
@@ -888,6 +889,7 @@
   {
     "type": "compiler_directive_decl",
     "named": true,
+    "extra": true,
     "fields": {},
     "children": {
       "multiple": false,
@@ -1575,6 +1577,7 @@
   {
     "type": "fsi_directive_decl",
     "named": true,
+    "extra": true,
     "fields": {},
     "children": {
       "multiple": false,
@@ -2758,6 +2761,7 @@
   {
     "type": "preproc_line",
     "named": true,
+    "extra": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -4522,11 +4526,11 @@
   },
   {
     "type": "unit",
-    "named": true
+    "named": false
   },
   {
     "type": "unit",
-    "named": false
+    "named": true
   },
   {
     "type": "unmanaged",
