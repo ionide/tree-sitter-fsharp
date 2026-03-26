@@ -154,18 +154,13 @@ static inline bool is_bracket_end(TSLexer *lexer) {
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[ERROR_SENTINEL]) {
-    if (scanner->indents.size > 1) {
-      array_pop(&scanner->indents);
-      lexer->result_symbol = DEDENT;
-      return true;
-    }
-
-    if (scanner->preprocessor_indents.size > 0) {
-      array_pop(&scanner->preprocessor_indents);
-      lexer->result_symbol = PREPROC_END;
-      return true;
-    }
-
+    // During error recovery, all valid_symbols are true and tree-sitter
+    // restores scanner state before each attempt. Emitting zero-length
+    // tokens (DEDENT/PREPROC_END) here causes infinite loops: the parser
+    // can't use the token, recovers, restores state (undoing the pop),
+    // and the scanner emits the same token again forever.
+    // Return false to let tree-sitter's built-in error recovery skip
+    // the problematic character and move on.
     return false;
   }
 

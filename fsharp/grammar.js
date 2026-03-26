@@ -404,7 +404,15 @@ module.exports = grammar({
         seq(
           "{",
           $.field_pattern,
-          repeat(seq($._newline, $.field_pattern)),
+          choice(
+            repeat(seq($._newline, $.field_pattern)),
+            seq(
+              $._indent,
+              $.field_pattern,
+              repeat(seq($._newline, $.field_pattern)),
+              $._dedent,
+            ),
+          ),
           "}",
         ),
       ),
