@@ -218,7 +218,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (application_expression
               (long_identifier_or_op
                 (identifier))
@@ -257,7 +257,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (application_expression
               (long_identifier_or_op
                 (identifier))
@@ -302,7 +302,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (sequential_expression
               (application_expression
                 (long_identifier_or_op
@@ -500,6 +500,104 @@ let f =
           (identifier)
           (const
             (int)))))))
+
+================================================================================
+preproc_if with negation
+================================================================================
+
+#if !DEBUG
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with and condition
+================================================================================
+
+#if A && B
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_and_expression
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with or condition
+================================================================================
+
+#if A || B
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_or_expression
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with complex condition
+================================================================================
+
+#if (A || B) && !C
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_and_expression
+      (preproc_if_or_expression
+        (identifier)
+        (identifier))
+      (preproc_if_not_expression
+        (identifier)))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
 
 ================================================================================
 attributes with target

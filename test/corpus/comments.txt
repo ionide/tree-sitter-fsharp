@@ -92,7 +92,7 @@ let x = 1
 --------------------------------------------------------------------------------
 
 (file
-  (line_comment)
+  (xml_doc)
   (declaration_expression
     (function_or_value_defn
       (value_declaration_left
@@ -210,9 +210,9 @@ let f x = x + 1
 --------------------------------------------------------------------------------
 
 (file
-  (line_comment)
-  (line_comment)
-  (line_comment)
+  (xml_doc)
+  (xml_doc)
+  (xml_doc)
   (declaration_expression
     (function_or_value_defn
       (function_declaration_left
@@ -277,13 +277,13 @@ namespace test
 module Json =
   let myPayloadBuilder x =
     $"""
-    {
+    {{
       "prop1": []
-      "prop2": {
+      "prop2": {{
         "prop3": {x},
         "prop4": 1,
-      },
-    }
+      }},
+    }}
     """
 
 --------------------------------------------------------------------------------
@@ -303,7 +303,10 @@ module Json =
                 (identifier))))
           (const
             (triple_quoted_string
-              (format_triple_quoted_string))))))))
+              (format_triple_quoted_string
+                (format_string_eval
+                  (long_identifier_or_op
+                    (identifier)))))))))))
 
 ================================================================================
 empty line comment

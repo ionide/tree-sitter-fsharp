@@ -250,3 +250,79 @@ module Program =
                 (identifier))))
           (const
             (unit)))))))
+
+================================================================================
+SRTP when constraint on return type (simple)
+================================================================================
+
+let inline f x : ^a when ^a : comparison = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (type_argument
+        (identifier))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+SRTP when constraint on return type (trait member)
+================================================================================
+
+let inline add (x: ^a) (y: ^a) : ^a when ^a : (static member (+) : ^a * ^a -> ^a) = x + y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      (type_argument
+        (identifier))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier))
+          (trait_member_constraint
+            (op_identifier)
+            (compound_type
+              (type_argument
+                (identifier))
+              (function_type
+                (type_argument
+                  (identifier))
+                (type_argument
+                  (identifier)))))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))

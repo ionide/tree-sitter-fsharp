@@ -21,3 +21,15 @@ open Mod.Test
 (file
   (import_decl
     (long_identifier (identifier) (identifier))))
+
+===
+open type
+===
+
+open type System.Math
+
+---
+
+(file
+  (import_decl
+    (long_identifier (identifier) (identifier))))

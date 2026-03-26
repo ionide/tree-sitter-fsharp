@@ -3,11 +3,11 @@
 
 [
   (line_comment)
+  (xml_doc)
   (block_comment)
 ] @comment @spell
 
-((line_comment) @comment.documentation @spell
- (#not-match? @comment.documentation "^///"))
+(xml_doc) @comment.documentation @spell
 
 (const
   [
@@ -169,6 +169,8 @@
   (triple_quoted_string)
   (verbatim_string)
   (char)
+  (format_string)
+  (format_triple_quoted_string)
 ] @spell @string)
 
 (compiler_directive_decl) @keyword.directive
@@ -280,6 +282,7 @@
 [
   "abstract"
   "delegate"
+  "extern"
   "static"
   "inline"
   "mutable"
@@ -294,6 +297,7 @@
   "let!"
   "use"
   "use!"
+  "and!"
   "member"
 ] @keyword.function
 

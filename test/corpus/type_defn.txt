@@ -1447,19 +1447,19 @@ type A = {
 --------------------------------------------------------------------------------
 
 (file
-  (line_comment)
+  (xml_doc)
   (type_definition
     (record_type_defn
       (type_name
         (identifier))
-      (line_comment)
+      (xml_doc)
       (record_fields
         (record_field
           (identifier)
           (simple_type
             (long_identifier
               (identifier))))
-        (line_comment)
+        (xml_doc)
         (record_field
           (identifier)
           (simple_type
@@ -2063,9 +2063,11 @@ exception MyError of string
   (exception_definition
     (long_identifier
       (identifier))
-    (simple_type
-      (long_identifier
-        (identifier)))))
+    (union_type_fields
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))))
 
 ================================================================================
 exception defn 2
@@ -2079,13 +2081,15 @@ exception MyError of string * int
   (exception_definition
     (long_identifier
       (identifier))
-    (compound_type
-      (simple_type
-        (long_identifier
-          (identifier)))
-      (simple_type
-        (long_identifier
-          (identifier))))))
+    (union_type_fields
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier))))
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))))
 
 ================================================================================
 exception defn 3
@@ -2141,9 +2145,58 @@ exception private MyError of string
     (access_modifier)
     (long_identifier
       (identifier))
-    (simple_type
-      (long_identifier
-        (identifier)))))
+    (union_type_fields
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+exception defn with named fields
+================================================================================
+
+exception ValidationError of field:string * message:string
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (union_type_fields
+      (union_type_field
+        (identifier)
+        (simple_type
+          (long_identifier
+            (identifier))))
+      (union_type_field
+        (identifier)
+        (simple_type
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+exception defn with mixed named and unnamed fields
+================================================================================
+
+exception MyError of code:int * string
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (long_identifier
+      (identifier))
+    (union_type_fields
+      (union_type_field
+        (identifier)
+        (simple_type
+          (long_identifier
+            (identifier))))
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))))
 
 ================================================================================
 member val with get, set
@@ -2492,6 +2545,43 @@ type A = A
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+================================================================================
+secondary constructor with then expression
+================================================================================
+
+type Foo(x: int) =
+  new() = Foo(0) then printfn "created"
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (typed_pattern
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (additional_constr_defn
+            (const
+              (unit))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (const
+                (int)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (const
+                (string)))))))))
 
 ================================================================================
 record with mutable properties

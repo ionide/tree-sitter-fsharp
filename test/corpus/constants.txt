@@ -554,7 +554,68 @@ let x =
             (identifier))))
       (const
         (triple_quoted_string
-          (format_triple_quoted_string))))))
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
+
+================================================================================
+multi-dollar triple quoted format string
+================================================================================
+
+let x =
+  $$"""int: {{2 + 2}}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
+
+================================================================================
+triple-dollar triple quoted format string
+================================================================================
+
+let x =
+  $$$"""int: {{{2 + 2}}}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
 
 ================================================================================
 underscores in numeric literal

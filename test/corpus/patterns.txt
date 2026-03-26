@@ -524,3 +524,37 @@ do
               (wildcard_pattern))
             (const
               (unit))))))))
+
+================================================================================
+type test pattern
+================================================================================
+
+do
+  match x with
+  | :? string -> true
+  | :? int as i -> false
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (type_check_pattern
+              (atomic_type
+                (long_identifier
+                  (identifier))))
+            (const
+              (bool)))
+          (rule
+            (type_check_pattern
+              (atomic_type
+                (long_identifier
+                  (identifier)))
+              (identifier))
+            (const
+              (bool))))))))

@@ -3780,3 +3780,452 @@ let setDefaultColors fg bg sp =
                 (int))))))
       (block_comment
         (block_comment_content)))))
+
+================================================================================
+pipeline with lambda and comparison operators
+================================================================================
+
+let result = items |> List.filter (fun p -> p.Age >= minAge && p.Age <= maxAge)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier))))
+        (paren_expression
+          (fun_expression
+            (argument_patterns
+              (long_identifier
+                (identifier)))
+            (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (infix_op)
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+query expression with where and select
+================================================================================
+
+let results =
+  query {
+    for student in db.Student do
+    where (student.Age > 18)
+    select student
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (paren_expression
+                (infix_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (infix_op)
+                  (const
+                    (int)))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+trait call expression with member
+================================================================================
+
+let inline f x = (^a : (member Name : string) x)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (paren_expression
+        (trait_call_expression
+          (identifier)
+          (trait_member_constraint
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+trait call expression with static member
+================================================================================
+
+let inline f (x: ^a) = (^a : (static member Zero : ^a) ())
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      (paren_expression
+        (trait_call_expression
+          (identifier)
+          (trait_member_constraint
+            (identifier)
+            (type_argument
+              (identifier)))
+          (const
+            (unit)))))))
+
+================================================================================
+fixed expression
+================================================================================
+
+let x = fixed &buf
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (prefixed_expression
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+quotation splicing with %%
+================================================================================
+
+let x = <@@ %%expr @@>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (literal_expression
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+quotation with lambda
+================================================================================
+
+let x = <@ fun y -> y @>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (literal_expression
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+range expression in computation expression
+================================================================================
+
+let x = seq { 1..10 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (range_expression
+          (const
+            (int))
+          (const
+            (int)))))))
+
+================================================================================
+range expression with step in computation expression
+================================================================================
+
+let x = seq { 1..2..10 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (range_expression
+          (const
+            (int))
+          (const
+            (int))
+          (const
+            (int)))))))
+
+================================================================================
+extern declaration
+================================================================================
+
+[<DllImport("kernel32.dll")>]
+extern bool CloseHandle(nativeint handle)
+
+--------------------------------------------------------------------------------
+
+(file
+  (extern_binding
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string)))))
+    (simple_type
+      (long_identifier
+        (identifier)))
+    (identifier)
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))))
+
+================================================================================
+extern declaration with multiple parameters
+================================================================================
+
+[<DllImport("user32.dll")>]
+extern int SendMessage(nativeint hWnd, int msg, nativeint wParam, nativeint lParam)
+
+--------------------------------------------------------------------------------
+
+(file
+  (extern_binding
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string)))))
+    (simple_type
+      (long_identifier
+        (identifier)))
+    (identifier)
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))))
+
+================================================================================
+and! in computation expression
+================================================================================
+
+do
+  task {
+    let! x = getX()
+    and! y = getY()
+    return x + y
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (unit)))
+          (and_bang
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (unit)))
+          (prefixed_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+struct tuple type annotation
+================================================================================
+
+let f (x: struct (int * int)) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (struct_type
+              (paren_type
+                (compound_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))
+                   (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+struct anonymous record type annotation
+================================================================================
+
+let f (x: struct {| Name: string |}) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (anon_record_type
+              (record_fields
+                (record_field
+                  (identifier)
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      (long_identifier_or_op
+        (long_identifier
+          (identifier))))))

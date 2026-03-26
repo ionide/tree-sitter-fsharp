@@ -16,27 +16,49 @@ enum TokenType {
   PREPROC_ELSE,
   PREPROC_END,
   CLASS,
+  BEGIN,
   STRUCT,
   INTERFACE,
   END,
   AND,
   WITH,
   TRIPLE_QUOTE_CONTENT,
+  FORMAT_TRIPLE_QUOTE_CONTENT,
   BLOCK_COMMENT_CONTENT,
   INSIDE_STRING,
   NEWLINE_NO_ALIGNED,
   TUPLE_MARKER,
+  QUOTED_CLOSE,
+  UNTYPED_QUOTED_CLOSE,
+  MULTI_DOLLAR_TRIPLE_QUOTE_START,
+  MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT,
+  MULTI_DOLLAR_INTERP_START,
+  MULTI_DOLLAR_INTERP_END,
+  MULTI_DOLLAR_TRIPLE_QUOTE_END,
   ERROR_SENTINEL
 };
 
 typedef struct {
   Array(uint16_t) indents;
   Array(uint16_t) preprocessor_indents;
+  uint8_t multi_dollar_count;
 } Scanner;
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+
+static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
+  lexer->mark_end(lexer);
+  for (uint8_t i = 0; i < count; i++) {
+    if (lexer->lookahead != ch) {
+      return false;
+    }
+    advance(lexer);
+  }
+  lexer->mark_end(lexer);
+  return true;
+}
 
 static inline bool scan_block_comment(TSLexer *lexer) {
   lexer->mark_end(lexer);
@@ -151,28 +173,113 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return false;
   }
 
-  if (valid_symbols[TRIPLE_QUOTE_CONTENT]) {
+  if (!valid_symbols[ERROR_SENTINEL] && scanner->multi_dollar_count > 1) {
+    if (valid_symbols[MULTI_DOLLAR_INTERP_START] && lexer->lookahead == '{') {
+      if (scan_n_chars(lexer, '{', scanner->multi_dollar_count)) {
+        lexer->result_symbol = MULTI_DOLLAR_INTERP_START;
+        return true;
+      }
+    }
+
+    if (valid_symbols[MULTI_DOLLAR_INTERP_END] && lexer->lookahead == '}') {
+      if (scan_n_chars(lexer, '}', scanner->multi_dollar_count)) {
+        lexer->result_symbol = MULTI_DOLLAR_INTERP_END;
+        return true;
+      }
+    }
+
+    if (valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTE_END] && lexer->lookahead == '"') {
+      if (scan_n_chars(lexer, '"', 3)) {
+        scanner->multi_dollar_count = 0;
+        lexer->result_symbol = MULTI_DOLLAR_TRIPLE_QUOTE_END;
+        return true;
+      }
+    }
+  }
+
+  if (valid_symbols[TRIPLE_QUOTE_CONTENT] || valid_symbols[FORMAT_TRIPLE_QUOTE_CONTENT] ||
+      valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT]) {
+    bool is_format = valid_symbols[FORMAT_TRIPLE_QUOTE_CONTENT];
+    bool is_multi_dollar = valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT];
+    bool has_content = false;
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
         break;
       }
+      if ((is_format || is_multi_dollar) && lexer->lookahead == '{') {
+        // In format triple-quoted strings, stop at '{' to allow interpolation.
+        // Multi-dollar interpolated strings require N braces, where N is the
+        // number of leading '$' characters.
+        uint8_t brace_count = is_multi_dollar ? scanner->multi_dollar_count : 1;
+        lexer->mark_end(lexer);
+
+        if (!is_multi_dollar) {
+          advance(lexer);
+          if (lexer->lookahead == '{') {
+            advance(lexer);
+            lexer->mark_end(lexer);
+            has_content = true;
+            continue;
+          }
+          if (!has_content) {
+            return false;
+          }
+          break;
+        }
+
+        bool matches_interp_start = true;
+        for (uint8_t i = 0; i < brace_count; i++) {
+          if (lexer->lookahead != '{') {
+            matches_interp_start = false;
+            break;
+          }
+          advance(lexer);
+        }
+        if (matches_interp_start) {
+          if (!has_content) {
+            return false;
+          }
+          break;
+        }
+        has_content = true;
+        lexer->mark_end(lexer);
+        continue;
+      }
       if (lexer->lookahead != '"') {
         advance(lexer);
+        has_content = true;
       } else {
-        lexer->mark_end(lexer);
-        skip(lexer);
-        if (lexer->lookahead == '"') {
+        if (is_multi_dollar) {
+          advance(lexer);
+          if (lexer->lookahead == '"') {
+            advance(lexer);
+            if (lexer->lookahead == '"') {
+              break;
+            }
+          }
+          has_content = true;
+          lexer->mark_end(lexer);
+        } else {
+          lexer->mark_end(lexer);
           skip(lexer);
           if (lexer->lookahead == '"') {
             skip(lexer);
-            break;
+            if (lexer->lookahead == '"') {
+              skip(lexer);
+              break;
+            }
           }
         }
+        has_content = true;
         lexer->mark_end(lexer);
       }
     }
-    lexer->result_symbol = TRIPLE_QUOTE_CONTENT;
+    if (is_multi_dollar) {
+      lexer->result_symbol = MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT;
+    } else {
+      lexer->result_symbol = is_format ? FORMAT_TRIPLE_QUOTE_CONTENT : TRIPLE_QUOTE_CONTENT;
+    }
     return true;
   }
 
@@ -316,6 +423,57 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  // Handle @> and @@> as external tokens to prevent them from being
+  // tokenized as infix operators inside quotation expressions.
+  // If a dedent is pending for a same-line expression block (e.g. fun x -> x),
+  // emit the dedent first and leave the quote closer for the next scan.
+  if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '@') {
+    lexer->mark_end(lexer);
+    advance(lexer);
+    if (lexer->lookahead == '@') {
+      advance(lexer);
+      if (lexer->lookahead == '>') {
+        if (valid_symbols[DEDENT] && scanner->indents.size > 1) {
+          array_pop(&scanner->indents);
+          lexer->result_symbol = DEDENT;
+          return true;
+        }
+        advance(lexer);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = UNTYPED_QUOTED_CLOSE;
+        return true;
+      }
+    } else if (lexer->lookahead == '>') {
+      if (valid_symbols[DEDENT] && scanner->indents.size > 1) {
+        array_pop(&scanner->indents);
+        lexer->result_symbol = DEDENT;
+        return true;
+      }
+      advance(lexer);
+      lexer->mark_end(lexer);
+      lexer->result_symbol = QUOTED_CLOSE;
+      return true;
+    }
+  }
+
+  if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '$') {
+    lexer->mark_end(lexer);
+
+    if (valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTE_START]) {
+      uint8_t dollar_count = 0;
+      while (lexer->lookahead == '$' && dollar_count < UINT8_MAX) {
+        advance(lexer);
+        dollar_count++;
+      }
+      if (dollar_count > 1 && scan_n_chars(lexer, '"', 3)) {
+        scanner->multi_dollar_count = dollar_count;
+        lexer->result_symbol = MULTI_DOLLAR_TRIPLE_QUOTE_START;
+        return true;
+      }
+      return false;
+    }
+  }
+
   if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
     lexer->mark_end(lexer);
     indent_length = lexer->get_column(lexer);
@@ -330,6 +488,25 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             advance(lexer);
             lexer->mark_end(lexer);
             lexer->result_symbol = CLASS;
+            return true;
+          }
+        }
+      }
+    }
+  } else if (valid_symbols[BEGIN] && lexer->lookahead == 'b') {
+    lexer->mark_end(lexer);
+    indent_length = lexer->get_column(lexer);
+    advance(lexer);
+    if (lexer->lookahead == 'e') {
+      advance(lexer);
+      if (lexer->lookahead == 'g') {
+        advance(lexer);
+        if (lexer->lookahead == 'i') {
+          advance(lexer);
+          if (lexer->lookahead == 'n') {
+            advance(lexer);
+            lexer->mark_end(lexer);
+            lexer->result_symbol = BEGIN;
             return true;
           }
         }
@@ -702,12 +879,14 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 static unsigned serialize(Scanner *scanner, char *buffer) {
   size_t size = 0;
 
+  buffer[size++] = (char)scanner->multi_dollar_count;
+
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
     preprocessor_count = UINT8_MAX;
   }
 
-  buffer[size++] = (char)scanner->preprocessor_indents.size;
+  buffer[size++] = (char)preprocessor_count;
 
   for (size_t iter = 0; iter < preprocessor_count &&
                         size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
@@ -731,19 +910,23 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_push(&scanner->indents, 0);
 
   array_delete(&scanner->preprocessor_indents);
+  scanner->multi_dollar_count = 0;
   if (length > 0) {
     size_t size = 0;
+    scanner->multi_dollar_count = (uint8_t)buffer[size++];
+
+    if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];
 
-    for (; size <= preprocessor_count; size++) {
+    size_t preproc_end = size + preprocessor_count;
+    if (preproc_end > length) preproc_end = length;
+    for (; size < preproc_end; size++) {
       array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
     }
 
     for (; size < length; size++) {
       array_push(&scanner->indents, (unsigned char)buffer[size]);
     }
-
-    assert(size == length);
   }
 }
 

@@ -267,7 +267,7 @@ open System.Collections.Generic
 --------------------------------------------------------------------------------
 
 (file
-  (line_comment)
+  (xml_doc)
   (named_module
     (attributes
       (attribute
@@ -345,3 +345,69 @@ module A =
         (union_type_cases
           (union_type_case
             (identifier)))))))
+
+================================================================================
+recursive module definition
+================================================================================
+
+module rec MyModule =
+  let x = 1
+  let y = x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+module with begin...end
+================================================================================
+
+module M =
+  begin
+    let x = 1
+    let y = 2
+  end
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
