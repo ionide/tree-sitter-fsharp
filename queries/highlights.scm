@@ -116,7 +116,35 @@
 
 (application_expression
   .
-  (_) @function.call
+  (long_identifier_or_op
+    (identifier) @function.call)
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (dot_expression
+    field: (long_identifier_or_op
+      (identifier) @function.call))
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (typed_expression
+    (long_identifier_or_op
+      (identifier) @function.call)
+    (_))
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (typed_expression
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call))
+    (_))
   .
   (_) @variable)
 
@@ -239,6 +267,9 @@
    "<"
    ">"
   ] @punctuation.bracket)
+
+(typed_expression
+  ">" @punctuation.bracket)
 
 [
   "if"
