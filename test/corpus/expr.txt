@@ -476,6 +476,44 @@ do [2; 3; 4]
           (int))))))
 
 ================================================================================
+list expression with trailing semicolon
+================================================================================
+
+do [2; 3; 4;]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (list_expression
+        (const
+          (int))
+        (const
+          (int))
+        (const
+          (int))))))
+
+================================================================================
+array expression with trailing semicolon
+================================================================================
+
+do [|2; 3; 4;|]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (array_expression
+        (const
+          (int))
+        (const
+          (int))
+        (const
+          (int))))))
+
+================================================================================
 index list expressions
 ================================================================================
 
@@ -3195,6 +3233,30 @@ do
           (int))))))
 
 ================================================================================
+infix expression inside paren with underindentation
+================================================================================
+
+do
+  f (a ||
+    b)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (paren_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (long_identifier_or_op
+              (identifier))))))))
+
+================================================================================
 literal expressions inside paren
 ================================================================================
 
@@ -3873,6 +3935,470 @@ let results =
                   (infix_op)
                   (const
                     (int)))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+query expression with sortBy and thenBy
+================================================================================
+
+let x =
+    query {
+        for student in db.Student do
+        sortBy student.Name
+        thenBy student.Age
+        select student
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier))))
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+query expression with groupBy into
+================================================================================
+
+let x =
+  query {
+    for student in db.Student do
+    groupBy student.Age into g
+    select g
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+query expression with join on
+================================================================================
+
+let x =
+  query {
+    for student in db.Student do
+    join course in db.Course on (student.CourseId = course.Id)
+    select (student, course)
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier)))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (long_identifier_or_op
+                  (identifier)))
+              (paren_expression
+                (infix_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (paren_expression
+                (tuple_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))))))))))
+
+================================================================================
+query expression with additional custom operations
+================================================================================
+
+let q =
+  query {
+    for student in db.Student do
+    distinct
+    sortByDescending student.Name
+    thenByDescending student.Age
+    skip 10
+    take 5
+    select student
+  }
+
+let c =
+  query {
+    for student in db.Student do
+    contains student
+  }
+
+let h =
+  query {
+    for student in db.Student do
+    headOrDefault
+  }
+
+let n =
+  query {
+    for student in db.Student do
+    nth 3
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (long_identifier_or_op
+              (identifier))
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (sequential_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (sequential_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (const
+                      (int)))
+                  (sequential_expression
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (const
+                        (int)))
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier))))))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (int))))))))
+
+================================================================================
+query expression with groupJoin into and leftOuterJoin into
+================================================================================
+
+let q1 =
+  query {
+    for student in db.Student do
+    groupJoin course in db.Course on (student.CourseId = course.Id) into matches
+    select matches
+  }
+
+let q2 =
+  query {
+    for student in db.Student do
+    leftOuterJoin course in db.Course on (student.CourseId = course.Id) into matches
+    select matches
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (application_expression
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))
+                        (long_identifier_or_op
+                          (identifier)))
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier)))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (application_expression
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))
+                        (long_identifier_or_op
+                          (identifier)))
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier)))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
             (application_expression
               (long_identifier_or_op
                 (identifier))

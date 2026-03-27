@@ -9,25 +9,25 @@
 (value_declaration_left
   .
   [
-   (_ (identifier) @local.definition.var)
-   (_ (_ (identifier) @local.definition.var))
-   (_ (_ (_ (identifier) @local.definition.var)))
-   (_ (_ (_ (_ (identifier) @local.definition.var))))
-   (_ (_ (_ (_ (_ (identifier) @local.definition.var)))))
-   (_ (_ (_ (_ (_ (_ (identifier) @local.definition.var))))))
+   (_ (identifier) @local.definition)
+   (_ (_ (identifier) @local.definition))
+   (_ (_ (_ (identifier) @local.definition)))
+   (_ (_ (_ (_ (identifier) @local.definition))))
+   (_ (_ (_ (_ (_ (identifier) @local.definition)))))
+   (_ (_ (_ (_ (_ (_ (identifier) @local.definition))))))
   ])
 
 (function_declaration_left
   .
-  ((_) @local.definition.function
+  ((_) @local.definition
    (#set! "definition.function.scope" "parent"))
   ((argument_patterns
-    [
-     (_ (identifier) @local.definition.parameter)
-     (_ (_ (identifier) @local.definition.parameter))
-     (_ (_ (_ (identifier) @local.definition.parameter)))
-     (_ (_ (_ (_ (identifier) @local.definition.parameter))))
-     (_ (_ (_ (_ (_ (identifier) @local.definition.parameter)))))
-     (_ (_ (_ (_ (_ (_ (identifier) @local.definition.parameter))))))
-    ])
+     [
+      (_ (identifier) @local.definition)
+      (_ (_ (identifier) @local.definition))
+      (_ (_ (_ (identifier) @local.definition)))
+      (_ (_ (_ (_ (identifier) @local.definition))))
+      (_ (_ (_ (_ (_ (identifier) @local.definition)))))
+      (_ (_ (_ (_ (_ (_ (identifier) @local.definition))))))
+     ])
   ))

@@ -248,6 +248,10 @@
         "named": true
       },
       {
+        "type": "typed_const_pattern",
+        "named": true
+      },
+      {
         "type": "typed_pattern",
         "named": true
       },
@@ -2306,6 +2310,94 @@
     }
   },
   {
+    "type": "measure",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "measure",
+          "named": true
+        },
+        {
+          "type": "measure_power",
+          "named": true
+        },
+        {
+          "type": "measure_quotient",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "measure_atom",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "measure",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "measure_power",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "int",
+          "named": true
+        },
+        {
+          "type": "measure_atom",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "measure_quotient",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "compound_type",
+          "named": true
+        },
+        {
+          "type": "measure_atom",
+          "named": true
+        },
+        {
+          "type": "measure_power",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "member_defn",
     "named": true,
     "fields": {},
@@ -2859,6 +2951,10 @@
           "named": true
         },
         {
+          "type": "named_module",
+          "named": true
+        },
+        {
           "type": "type_extension_elements",
           "named": true
         }
@@ -2924,6 +3020,10 @@
         },
         {
           "type": "class_inherits_decl",
+          "named": true
+        },
+        {
+          "type": "named_module",
           "named": true
         },
         {
@@ -3625,6 +3725,10 @@
           {
             "type": "_type",
             "named": true
+          },
+          {
+            "type": "measure",
+            "named": true
           }
         ]
       }
@@ -3722,6 +3826,10 @@
         },
         {
           "type": "_type",
+          "named": true
+        },
+        {
+          "type": "measure",
           "named": true
         }
       ]
@@ -3927,6 +4035,29 @@
     }
   },
   {
+    "type": "typed_const_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "const",
+          "named": true
+        },
+        {
+          "type": "measure",
+          "named": true
+        },
+        {
+          "type": "types",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "typed_expression",
     "named": true,
     "fields": {},
@@ -3936,6 +4067,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "measure",
           "named": true
         },
         {
@@ -4447,6 +4582,14 @@
   },
   {
     "type": ".[",
+    "named": false
+  },
+  {
+    "type": "/",
+    "named": false
+  },
+  {
+    "type": "1",
     "named": false
   },
   {

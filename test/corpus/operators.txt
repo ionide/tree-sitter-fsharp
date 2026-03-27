@@ -97,3 +97,26 @@ let (?->) x = x
       (long_identifier_or_op
         (long_identifier
           (identifier))))))
+
+================================================================================
+comparison without spaces in parens
+================================================================================
+
+let x = (l<r)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (paren_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (identifier)))))))

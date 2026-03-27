@@ -329,3 +329,40 @@ val singleton : value:'T -> list<'T>
             (type_attribute
               (type_argument
                 (identifier)))))))))
+
+===
+val with measure type
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+val speed : float<m/s>
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (measure
+                (measure_quotient
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier))))
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))))

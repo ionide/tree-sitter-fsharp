@@ -600,6 +600,29 @@ let x = 1
           (int))))))
 
 ================================================================================
+preproc_if around top-level module
+================================================================================
+
+#if !INTERACTIVE
+module ExpressionOptimizer
+#endif
+
+open System
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (named_module
+      (long_identifier
+        (identifier))))
+  (import_decl
+    (long_identifier
+      (identifier))))
+
+================================================================================
 attributes with target
 ================================================================================
 

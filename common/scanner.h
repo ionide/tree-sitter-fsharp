@@ -35,11 +35,14 @@ enum TokenType {
   MULTI_DOLLAR_INTERP_START,
   MULTI_DOLLAR_INTERP_END,
   MULTI_DOLLAR_TRIPLE_QUOTE_END,
+  TYAPP_OPEN,
+  PAREN_INDENT,
   ERROR_SENTINEL
 };
 
 typedef struct {
   Array(uint16_t) indents;
+  Array(bool) paren_indents;
   Array(uint16_t) preprocessor_indents;
   uint8_t multi_dollar_count;
 } Scanner;
@@ -47,6 +50,113 @@ typedef struct {
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+
+static inline bool is_word_char(int32_t c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+         (c >= '0' && c <= '9') || c == '_' || c == '\'';
+}
+
+static inline void push_indent(Scanner *scanner, uint16_t indent_length,
+                               bool is_paren_indent) {
+  array_push(&scanner->indents, indent_length);
+  array_push(&scanner->paren_indents, is_paren_indent);
+}
+
+static inline void pop_indent(Scanner *scanner) {
+  if (scanner->indents.size > 0) {
+    array_pop(&scanner->indents);
+  }
+  if (scanner->paren_indents.size > 0) {
+    array_pop(&scanner->paren_indents);
+  }
+}
+
+static inline uint16_t peek_indent_length(Scanner *scanner) {
+  return *array_back(&scanner->indents);
+}
+
+static inline bool peek_is_paren_indent(Scanner *scanner) {
+  return scanner->paren_indents.size > 0 && *array_back(&scanner->paren_indents);
+}
+
+// Check if the content after '<' looks like type arguments per F# spec Section 15.3.
+// Valid type argument content: identifiers, whitespace, and type-syntax characters
+// like ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}'.
+// Returns true if the '<' should be treated as a type application opener.
+static inline bool is_type_application_open(TSLexer *lexer) {
+  // We've already seen '<', now peek forward.
+  // If immediately '>' this is '<>' (empty type args).
+  // Track angle bracket depth to find the matching '>'.
+  int angle_depth = 1;
+  int paren_depth = 0;
+
+  while (!lexer->eof(lexer) && angle_depth > 0) {
+    int32_t c = lexer->lookahead;
+
+    if (c == '\n' || c == '\r') {
+      // Newline inside type args is not valid for type application lexical analysis
+      return false;
+    }
+
+    // Valid type argument characters
+    if (is_word_char(c) || c == ' ' || c == '\t' || c == ',' || c == '*' ||
+        c == '.' || c == ':' || c == '#' || c == '^' || c == '/' || c == '|' ||
+        c == '{' || c == '}' || c == '[' || c == ']') {
+      advance(lexer);
+      continue;
+    }
+
+    if (c == '(') {
+      paren_depth++;
+      advance(lexer);
+      continue;
+    }
+
+    if (c == ')') {
+      if (paren_depth <= 0) {
+        // Unbalanced ')' - not type args (e.g., "(l<r)")
+        return false;
+      }
+      paren_depth--;
+      advance(lexer);
+      continue;
+    }
+
+    if (c == '<') {
+      angle_depth++;
+      advance(lexer);
+      continue;
+    }
+
+    if (c == '>') {
+      angle_depth--;
+      if (angle_depth == 0) {
+        // Found matching '>' - this is a type application
+        return true;
+      }
+      advance(lexer);
+      continue;
+    }
+
+    if (c == '-') {
+      // '->' is valid in function types, but '-' alone followed by
+      // a digit or other op char is not type syntax
+      advance(lexer);
+      if (lexer->lookahead == '>') {
+        advance(lexer);
+        continue;
+      }
+      // Bare '-' is not valid in type args
+      return false;
+    }
+
+    // Any other character is not valid in type arguments
+    // This catches: '&', '!', '=', '+', ';', '@', '$', '%', '?', etc.
+    return false;
+  }
+
+  return false;
+}
 
 static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
   lexer->mark_end(lexer);
@@ -168,6 +278,29 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return false;
   }
 
+  // Type application '<' disambiguation (F# spec Section 15.3).
+  // When the grammar expects TYAPP_OPEN (i.e., a '<' immediately after an expression),
+  // peek ahead to determine if the content between '<' and '>' looks like type arguments.
+  // If not (e.g., it's a comparison operator like l<r), return false so the grammar
+  // falls through to infix_op.
+  if (valid_symbols[TYAPP_OPEN] && lexer->lookahead == '<') {
+    lexer->mark_end(lexer);
+    advance(lexer);
+    // Mark end right after '<' - this is what we want the token to contain
+    lexer->mark_end(lexer);
+    // Now peek ahead (advancing further) to check if content looks like type args.
+    // Even though we advance past the type content, mark_end is already set to
+    // just after '<', so the emitted token will be exactly '<'.
+    if (is_type_application_open(lexer)) {
+      lexer->result_symbol = TYAPP_OPEN;
+      return true;
+    }
+    // Not a type application - don't consume the '<', let grammar handle it as infix_op.
+    // But we already advanced past '<' and potentially more. That's OK because
+    // we return false and tree-sitter will reset the lexer position.
+    return false;
+  }
+
   if (!valid_symbols[ERROR_SENTINEL] && scanner->multi_dollar_count > 1) {
     if (valid_symbols[MULTI_DOLLAR_INTERP_START] && lexer->lookahead == '{') {
       if (scan_n_chars(lexer, '{', scanner->multi_dollar_count)) {
@@ -283,6 +416,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool found_end_of_line = false;
   bool found_end_of_line_semi_colon = false;
   bool found_start_of_infix_op = false;
+  bool found_same_line_pipe_infix = false;
   bool found_bracket_end = false;
   bool found_preprocessor_end = false;
   bool found_preproc_if = false;
@@ -333,12 +467,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                 found_preprocessor_end = true;
                 if (scanner->indents.size > 0 &&
                     scanner->preprocessor_indents.size > 0) {
-                  uint16_t current_indent_length =
-                      *array_back(&scanner->indents);
+                  uint16_t current_indent_length = peek_indent_length(scanner);
                   uint16_t current_preproc_length =
                       *array_back(&scanner->preprocessor_indents);
                   if (current_preproc_length < current_indent_length) {
-                    array_pop(&scanner->indents);
+                    pop_indent(scanner);
                     lexer->result_symbol = DEDENT;
                     return true;
                   }
@@ -362,11 +495,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               advance(lexer);
               if (scanner->indents.size > 0 &&
                   scanner->preprocessor_indents.size > 0) {
-                uint16_t current_indent_length = *array_back(&scanner->indents);
+                uint16_t current_indent_length = peek_indent_length(scanner);
                 uint16_t current_preproc_length =
                     *array_back(&scanner->preprocessor_indents);
                 if (current_preproc_length < current_indent_length) {
-                  array_pop(&scanner->indents);
+                  pop_indent(scanner);
                   lexer->result_symbol = DEDENT;
                   return true;
                 }
@@ -391,11 +524,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           } else {
             if (scanner->indents.size > 0) {
               if (valid_symbols[PREPROC_IF]) {
-                uint16_t current_indent_length = *array_back(&scanner->indents);
+                uint16_t current_indent_length = peek_indent_length(scanner);
                 array_push(&scanner->preprocessor_indents,
                            current_indent_length);
               } else {
-                array_pop(&scanner->indents);
+                pop_indent(scanner);
                 lexer->result_symbol = DEDENT;
                 return true;
               }
@@ -429,7 +562,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       advance(lexer);
       if (lexer->lookahead == '>') {
         if (valid_symbols[DEDENT] && scanner->indents.size > 1) {
-          array_pop(&scanner->indents);
+          pop_indent(scanner);
           lexer->result_symbol = DEDENT;
           return true;
         }
@@ -440,7 +573,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       }
     } else if (lexer->lookahead == '>') {
       if (valid_symbols[DEDENT] && scanner->indents.size > 1) {
-        array_pop(&scanner->indents);
+        pop_indent(scanner);
         lexer->result_symbol = DEDENT;
         return true;
       }
@@ -481,9 +614,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           advance(lexer);
           if (lexer->lookahead == 's') {
             advance(lexer);
-            lexer->mark_end(lexer);
-            lexer->result_symbol = CLASS;
-            return true;
+            if (!is_word_char(lexer->lookahead)) {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = CLASS;
+              return true;
+            }
           }
         }
       }
@@ -500,9 +635,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           advance(lexer);
           if (lexer->lookahead == 'n') {
             advance(lexer);
-            lexer->mark_end(lexer);
-            lexer->result_symbol = BEGIN;
-            return true;
+            if (!is_word_char(lexer->lookahead)) {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = BEGIN;
+              return true;
+            }
           }
         }
       }
@@ -521,9 +658,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             advance(lexer);
             if (lexer->lookahead == 't') {
               advance(lexer);
-              lexer->mark_end(lexer);
-              lexer->result_symbol = STRUCT;
-              return true;
+              if (!is_word_char(lexer->lookahead)) {
+                lexer->mark_end(lexer);
+                lexer->result_symbol = STRUCT;
+                return true;
+              }
             }
           }
         }
@@ -549,9 +688,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                   advance(lexer);
                   if (lexer->lookahead == 'e') {
                     advance(lexer);
-                    lexer->mark_end(lexer);
-                    lexer->result_symbol = INTERFACE;
-                    return true;
+                    if (!is_word_char(lexer->lookahead)) {
+                      lexer->mark_end(lexer);
+                      lexer->result_symbol = INTERFACE;
+                      return true;
+                    }
                   }
                 }
               }
@@ -587,17 +728,19 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         if (lexer->lookahead == 'n') {
           advance(lexer);
-          // the 'THEN' token is only valid if we have popped the appropriate
-          // amount of dedent tokens.
-          // If 'THEN' is not valid we just continue to pop dedent tokens.
-          if (valid_symbols[THEN]) {
-            lexer->mark_end(lexer);
-            lexer->result_symbol = THEN;
-            return true;
-          } else {
-            array_pop(&scanner->indents);
-            lexer->result_symbol = DEDENT;
-            return true;
+          if (!is_word_char(lexer->lookahead)) {
+            // the 'THEN' token is only valid if we have popped the appropriate
+            // amount of dedent tokens.
+            // If 'THEN' is not valid we just continue to pop dedent tokens.
+            if (valid_symbols[THEN]) {
+              lexer->mark_end(lexer);
+              lexer->result_symbol = THEN;
+              return true;
+            } else {
+              pop_indent(scanner);
+              lexer->result_symbol = DEDENT;
+              return true;
+            }
           }
         }
       }
@@ -618,7 +761,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             lexer->result_symbol = AND;
             return true;
           } else {
-            array_pop(&scanner->indents);
+            pop_indent(scanner);
             lexer->result_symbol = DEDENT;
             return true;
           }
@@ -643,7 +786,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = WITH;
               return true;
             } else {
-              array_pop(&scanner->indents);
+              pop_indent(scanner);
               lexer->result_symbol = DEDENT;
               return true;
             }
@@ -663,41 +806,42 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         if (lexer->lookahead == 'e') {
           advance(lexer);
-          if (valid_symbols[ELSE]) {
-            if (scanner->indents.size > 0 &&
-                token_indent_level < *array_back(&scanner->indents)) {
-              array_pop(&scanner->indents);
-              lexer->result_symbol = DEDENT;
-              return true;
-            } else {
-              lexer->mark_end(lexer);
-              for (;;) {
-                if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
-                    lexer->lookahead == '\r' || lexer->lookahead == '\t') {
-                  advance(lexer);
-                } else {
-                  break;
-                }
-              }
-              if (lexer->lookahead == 'i') {
-                advance(lexer);
-                if (lexer->lookahead == 'f') {
-                  advance(lexer);
+          if (!is_word_char(lexer->lookahead)) {
+            if (valid_symbols[ELSE]) {
+              if (scanner->indents.size > 0 &&
+                  token_indent_level < peek_indent_length(scanner)) {
+                pop_indent(scanner);
+                lexer->result_symbol = DEDENT;
+                return true;
+              } else {
+                lexer->mark_end(lexer);
+                for (;;) {
                   if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
-                      lexer->lookahead == '\t') {
-                    lexer->mark_end(lexer);
-                    lexer->result_symbol = ELIF;
-                    return true;
+                      lexer->lookahead == '\r' || lexer->lookahead == '\t') {
+                    advance(lexer);
+                  } else {
+                    break;
                   }
                 }
+                if (lexer->lookahead == 'i') {
+                  advance(lexer);
+                  if (lexer->lookahead == 'f') {
+                    advance(lexer);
+                    if (!is_word_char(lexer->lookahead)) {
+                      lexer->mark_end(lexer);
+                      lexer->result_symbol = ELIF;
+                      return true;
+                    }
+                  }
+                }
+                lexer->result_symbol = ELSE;
+                return true;
               }
-              lexer->result_symbol = ELSE;
+            } else {
+              pop_indent(scanner);
+              lexer->result_symbol = DEDENT;
               return true;
             }
-          } else {
-            array_pop(&scanner->indents);
-            lexer->result_symbol = DEDENT;
-            return true;
           }
         }
       } else if (lexer->lookahead == 'i' &&
@@ -705,21 +849,23 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         if (lexer->lookahead == 'f') {
           advance(lexer);
-          if (valid_symbols[ELIF]) {
-            if (scanner->indents.size > 0 &&
-                token_indent_level < *array_back(&scanner->indents)) {
-              array_pop(&scanner->indents);
+          if (!is_word_char(lexer->lookahead)) {
+            if (valid_symbols[ELIF]) {
+              if (scanner->indents.size > 0 &&
+                  token_indent_level < peek_indent_length(scanner)) {
+                pop_indent(scanner);
+                lexer->result_symbol = DEDENT;
+                return true;
+              } else {
+                lexer->mark_end(lexer);
+                lexer->result_symbol = ELIF;
+                return true;
+              }
+            } else {
+              pop_indent(scanner);
               lexer->result_symbol = DEDENT;
               return true;
-            } else {
-              lexer->mark_end(lexer);
-              lexer->result_symbol = ELIF;
-              return true;
             }
-          } else {
-            array_pop(&scanner->indents);
-            lexer->result_symbol = DEDENT;
-            return true;
           }
         }
       }
@@ -728,14 +874,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
-        if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
-            lexer->eof(lexer)) {
+        if (!is_word_char(lexer->lookahead)) {
           if (valid_symbols[END]) {
             lexer->mark_end(lexer);
             lexer->result_symbol = END;
             return true;
           } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
-            array_pop(&scanner->indents);
+            pop_indent(scanner);
             lexer->result_symbol = DEDENT;
             return true;
           }
@@ -757,11 +902,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       found_start_of_infix_op = true;
       break;
     case ' ':
+      if (!found_end_of_line) {
+        found_start_of_infix_op = true;
+        found_same_line_pipe_infix = true;
+        break;
+      }
       if (indent_length == 0) {
         indent_length = 1;
       }
       if (scanner->indents.size > 0) {
-        uint16_t current_indent_length = *array_back(&scanner->indents);
+        uint16_t current_indent_length = peek_indent_length(scanner);
         if (found_end_of_line && indent_length == current_indent_length &&
             indent_length > 0 && !found_start_of_infix_op &&
             !found_bracket_end) {
@@ -789,17 +939,29 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
-  if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end) {
-    array_push(&scanner->indents, indent_length);
+  if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end &&
+      !found_same_line_pipe_infix) {
+    push_indent(scanner, indent_length, false);
     lexer->result_symbol = INDENT;
     return true;
   }
 
+  if (valid_symbols[PAREN_INDENT] && !found_bracket_end &&
+      !found_preprocessor_end && !found_same_line_pipe_infix) {
+    // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
+    // logic can be more lenient inside parenthesized expressions, where the
+    // closing ')' determines scope rather than indentation alone.
+    push_indent(scanner, indent_length, true);
+    lexer->result_symbol = PAREN_INDENT;
+    return true;
+  }
+
   if (scanner->indents.size > 0) {
-    uint16_t current_indent_length = *array_back(&scanner->indents);
+    bool is_paren_indent = peek_is_paren_indent(scanner);
+    uint16_t current_indent_length = peek_indent_length(scanner);
 
     if (found_bracket_end && valid_symbols[DEDENT]) {
-      array_pop(&scanner->indents);
+      pop_indent(scanner);
       lexer->result_symbol = DEDENT;
       return true;
     }
@@ -832,10 +994,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         can_dedent_infix_op = true;
       }
 
+      // Inside paren-indented blocks, avoid DEDENT on ordinary under-indented
+      // continuation lines. But still allow it at true EOF / column 0 so a
+      // paren indent can't get stranded forever if its closing bracket was
+      // consumed by the grammar rather than seen here at the start of a line.
+      bool can_dedent_paren_indent = !is_paren_indent || indent_length == 0 || lexer->eof(lexer);
+
       if (indent_length < current_indent_length && !found_bracket_end &&
           can_dedent_preproc && can_dedent_infix_op &&
-          !valid_symbols[TUPLE_MARKER]) {
-        array_pop(&scanner->indents);
+          !valid_symbols[TUPLE_MARKER] && can_dedent_paren_indent) {
+        pop_indent(scanner);
         lexer->result_symbol = DEDENT;
         return true;
       }
@@ -890,11 +1058,32 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = e;
   }
 
+  size_t indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
+  if (indent_count > UINT8_MAX) {
+    indent_count = UINT8_MAX;
+  }
+  buffer[size++] = (char)indent_count;
+
   uint32_t iter = 1;
-  for (; iter < scanner->indents.size &&
-         size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-       ++iter) {
+  for (; iter <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
     buffer[size++] = (char)*array_get(&scanner->indents, iter);
+  }
+
+  size_t paren_bytes = (indent_count + 7) / 8;
+  for (size_t byte_index = 0;
+       byte_index < paren_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
+       byte_index++) {
+    uint8_t bits = 0;
+    for (size_t bit = 0; bit < 8; bit++) {
+      size_t indent_index = byte_index * 8 + bit + 1;
+      if (indent_index > indent_count) {
+        break;
+      }
+      if (*array_get(&scanner->paren_indents, indent_index)) {
+        bits |= (uint8_t)(1u << bit);
+      }
+    }
+    buffer[size++] = (char)bits;
   }
 
   return size;
@@ -903,6 +1092,8 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_delete(&scanner->indents);
   array_push(&scanner->indents, 0);
+  array_delete(&scanner->paren_indents);
+  array_push(&scanner->paren_indents, false);
 
   array_delete(&scanner->preprocessor_indents);
   scanner->multi_dollar_count = 0;
@@ -919,15 +1110,33 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
     }
 
-    for (; size < length; size++) {
+    if (size >= length) return;
+    size_t indent_count = (uint8_t)buffer[size++];
+    size_t indent_bytes_end = size + indent_count;
+    if (indent_bytes_end > length) indent_bytes_end = length;
+    for (; size < indent_bytes_end; size++) {
       array_push(&scanner->indents, (unsigned char)buffer[size]);
     }
+
+    size_t actual_indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
+    size_t paren_bytes = (actual_indent_count + 7) / 8;
+    for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
+      size_t byte_offset = indent_index / 8;
+      bool is_paren_indent = false;
+      if (size + byte_offset < length) {
+        uint8_t bits = (uint8_t)buffer[size + byte_offset];
+        is_paren_indent = ((bits >> (indent_index % 8)) & 1u) != 0;
+      }
+      array_push(&scanner->paren_indents, is_paren_indent);
+    }
+    size += paren_bytes;
   }
 }
 
 static Scanner *create() {
   Scanner *scanner = ts_calloc(1, sizeof(Scanner));
   array_init(&scanner->indents);
+  array_init(&scanner->paren_indents);
   array_init(&scanner->preprocessor_indents);
   deserialize(scanner, NULL, 0);
   return scanner;
@@ -935,6 +1144,7 @@ static Scanner *create() {
 
 static void destroy(Scanner *scanner) {
   array_delete(&scanner->indents);
+  array_delete(&scanner->paren_indents);
   array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }

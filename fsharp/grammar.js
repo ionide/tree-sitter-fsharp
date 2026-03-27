@@ -93,6 +93,8 @@ module.exports = grammar({
     $._multi_dollar_interp_start,
     $._multi_dollar_interp_end,
     $._multi_dollar_triple_quote_end,
+    $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
+    $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -143,6 +145,16 @@ module.exports = grammar({
       ),
 
     named_module: ($) =>
+      seq(
+        optional($.attributes),
+        "module",
+        optional($.access_modifier),
+        optional("rec"),
+        field("name", $.long_identifier),
+        repeat($._module_elem),
+      ),
+
+    _preproc_toplevel_module: ($) =>
       seq(
         optional($.attributes),
         "module",
@@ -323,6 +335,7 @@ module.exports = grammar({
       choice(
         "null",
         alias("_", $.wildcard_pattern),
+        $.typed_const_pattern,
         $.const,
         $.as_pattern,
         $.disjunct_pattern,
@@ -365,18 +378,34 @@ module.exports = grammar({
         ),
       ),
 
+    typed_const_pattern: ($) =>
+      prec(
+        PREC.PAREN_EXPR,
+        seq(
+          $.const,
+          $._tyapp_open,
+          optional(choice($.types, $.measure)),
+          prec(PREC.PAREN_EXPR, ">"),
+        ),
+      ),
+
     argument_patterns: ($) =>
       // argument patterns are generally no different from normal patterns.
       // however, any time an argument pattern is a valid node, (i.e. inside a beginning fun decl)
       // it is always the correct node to construct.
       prec.left(1000, repeat1($._atomic_pattern)),
 
-    field_pattern: ($) => prec(1, seq($.long_identifier, "=", $._pattern)),
+    field_pattern: ($) =>
+      prec(
+        1,
+        seq($.long_identifier, "=", $._pattern),
+      ),
 
     _atomic_pattern: ($) =>
       choice(
         "null",
         "_",
+        $.typed_const_pattern,
         $.const,
         $.long_identifier,
         $.list_pattern,
@@ -405,11 +434,15 @@ module.exports = grammar({
           "{",
           $.field_pattern,
           choice(
-            repeat(seq($._newline, $.field_pattern)),
+            seq(
+              repeat(seq($._newline, $.field_pattern)),
+              optional($._newline),
+            ),
             seq(
               $._indent,
               $.field_pattern,
               repeat(seq($._newline, $.field_pattern)),
+              optional($._newline),
               $._dedent,
             ),
           ),
@@ -443,6 +476,8 @@ module.exports = grammar({
     //
 
     _expression_block: ($) => seq($._indent, $._expression, $._dedent),
+
+    _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
 
     _expression: ($) =>
       choice(
@@ -705,8 +740,8 @@ module.exports = grammar({
         PREC.PAREN_EXPR,
         seq(
           $._expression,
-          token.immediate(prec(PREC.PAREN_EXPR, "<")),
-          optional($.types),
+          $._tyapp_open,
+          optional(choice($.types, $.measure)),
           prec(PREC.PAREN_EXPR, ">"),
         ),
       ),
@@ -741,6 +776,7 @@ module.exports = grammar({
               seq(alias($._newline, ";"), $._expression),
             ),
           ),
+          optional($._newline),
         ),
       ),
 
@@ -792,7 +828,7 @@ module.exports = grammar({
       ),
 
     paren_expression: ($) =>
-      prec(PREC.PAREN_EXPR, seq("(", $._expression_block, ")")),
+      prec(PREC.PAREN_EXPR, seq("(", $._paren_expression_block, ")")),
 
     _high_prec_app: ($) =>
       prec.left(
@@ -801,7 +837,7 @@ module.exports = grammar({
           $._expression,
           choice(
             $.unit,
-            seq(token.immediate(prec(10000, "(")), $._expression_block, ")"),
+            seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
           ),
         ),
       ),
@@ -1081,6 +1117,28 @@ module.exports = grammar({
         ),
       ),
 
+    measure_atom: ($) =>
+      choice(
+        $.simple_type,
+        $.type_argument,
+        seq("(", $.measure, ")"),
+        "_",
+        "1",
+      ),
+
+    measure_power: ($) => prec.right(6, seq($.measure_atom, "^", $.int)),
+
+    _measure_operand: ($) =>
+      choice(
+        $.measure_power,
+        $.measure_atom,
+        $.compound_type,
+      ),
+
+    measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
+
+    measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
+
     simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
     generic_type: ($) =>
       prec.right(
@@ -1116,7 +1174,7 @@ module.exports = grammar({
       choice(
         $._type,
         $._static_parameter,
-        // measure
+        $.measure,
       ),
 
     type_attributes: ($) =>
@@ -1318,6 +1376,7 @@ module.exports = grammar({
             $._indent,
             choice(
               $._type,
+              $.measure,
               alias($._multiline_generic_type, $.generic_type),
             ),
             $._dedent,
@@ -1698,7 +1757,11 @@ module.exports = grammar({
     field_initializers: ($) =>
       prec(
         10000000,
-        seq($.field_initializer, repeat(seq($._newline, $.field_initializer))),
+        seq(
+          $.field_initializer,
+          repeat(seq($._newline, $.field_initializer)),
+          optional($._newline),
+        ),
       ),
 
     //
@@ -1999,7 +2062,7 @@ module.exports = grammar({
     preproc_if_or_expression: ($) =>
       prec.left(1, seq($._preproc_expression, "||", $._preproc_expression)),
 
-    ...preprocIf("", ($) => $._module_elem),
+    ...preprocIf("", ($) => choice($._module_elem, alias($._preproc_toplevel_module, $.named_module))),
     ...preprocIf(
       "_in_expression",
       ($) => repeat(seq(optional($._newline), $._expression)),
