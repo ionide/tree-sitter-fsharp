@@ -1,8 +1,11 @@
 * text eol=lf
 
-src/*.json linguist-generated
-src/parser.c linguist-generated
-src/tree_sitter/* linguist-generated
+fsharp/src/*.json linguist-generated
+fsharp/src/parser.c linguist-generated
+fsharp/src/tree_sitter/* linguist-generated
+fsharp_signature/src/*.json linguist-generated
+fsharp_signature/src/parser.c linguist-generated
+fsharp_signature/src/tree_sitter/* linguist-generated
 
 bindings/** linguist-vendored
 binding.gyp linguist-vendored
