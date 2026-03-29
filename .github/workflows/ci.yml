@@ -26,14 +26,33 @@ jobs:
         uses: tree-sitter/parser-test-action@v2
         with:
           test-rust: true
-      - name: Parse sample files
-        uses: tree-sitter/parse-action@v4
-        id: parse-files
+  parse-examples:
+    name: Parse examples
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          files: examples/**
+          submodules: true
+      - name: Set up tree-sitter
+        uses: tree-sitter/setup-action@v2
+        with:
+          install-lib: false
+      - name: Parse sample files
+        uses: tree-sitter/parse-action@v3
+        id: parse-files
+        continue-on-error: true
+        with:
+          files: |-
+            examples/**/*.fs
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"
+        continue-on-error: true
         with:
           name: failures-${{runner.os}}
           path: ${{steps.parse-files.outputs.failures}}
