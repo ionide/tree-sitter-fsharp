@@ -204,19 +204,9 @@ static inline bool scan_block_comment(TSLexer *lexer) {
 static inline bool is_infix_op_start(TSLexer *lexer) {
   switch (lexer->lookahead) {
   case '+':
-    skip(lexer);
-    return lexer->lookahead != '0' && lexer->lookahead != '1' &&
-           lexer->lookahead != '2' && lexer->lookahead != '3' &&
-           lexer->lookahead != '4' && lexer->lookahead != '5' &&
-           lexer->lookahead != '6' && lexer->lookahead != '7' &&
-           lexer->lookahead != '8' && lexer->lookahead != '9';
   case '-':
     skip(lexer);
-    return lexer->lookahead != '0' && lexer->lookahead != '1' &&
-           lexer->lookahead != '2' && lexer->lookahead != '3' &&
-           lexer->lookahead != '4' && lexer->lookahead != '5' &&
-           lexer->lookahead != '6' && lexer->lookahead != '7' &&
-           lexer->lookahead != '8' && lexer->lookahead != '9';
+    return !(lexer->lookahead >= '0' && lexer->lookahead <= '9');
   case '%':
   case '&':
   case '=':
@@ -260,7 +250,49 @@ static inline bool is_bracket_end(TSLexer *lexer) {
   default:
     return false;
   }
-}
+  }
+
+  // Match remaining characters of a keyword after the first character.
+  // Returns true if the rest of the keyword matches and is followed by a non-word char.
+  static inline bool match_keyword_rest(TSLexer *lexer, const char *rest) {
+    for (; *rest; rest++) {
+      if (lexer->lookahead != *rest) return false;
+      advance(lexer);
+    }
+    return !is_word_char(lexer->lookahead);
+  }
+
+  // Table-driven block opener matching for class/begin/struct/interface.
+  typedef struct {
+    char first_char;
+    const char *rest;
+    enum TokenType token;
+  } BlockOpener;
+
+  static const BlockOpener block_openers[] = {
+    {'c', "lass",      CLASS},
+    {'b', "egin",      BEGIN},
+    {'s', "truct",     STRUCT},
+    {'i', "nterface",  INTERFACE},
+  };
+
+  // Check if a preprocessor directive requires emitting DEDENT before itself.
+  // Used by both #endif and #else handlers to pop indent when the preprocessor
+  // indent is less than the current block indent.
+  static inline bool try_dedent_for_preproc(Scanner *scanner, TSLexer *lexer) {
+    if (scanner->indents.size > 0 &&
+        scanner->preprocessor_indents.size > 0) {
+      uint16_t current_indent_length = peek_indent_length(scanner);
+      uint16_t current_preproc_length =
+          *array_back(&scanner->preprocessor_indents);
+      if (current_preproc_length < current_indent_length) {
+        pop_indent(scanner);
+        lexer->result_symbol = DEDENT;
+        return true;
+      }
+    }
+    return false;
+  }
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[ERROR_SENTINEL]) {
@@ -439,6 +471,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       skip(lexer);
     } else if (lexer->eof(lexer)) {
       found_end_of_line = true;
+      indent_length = 0;
       break;
     } else if (lexer->lookahead == '/') {
       skip(lexer);
@@ -465,16 +498,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               if (lexer->lookahead == 'f') {
                 advance(lexer);
                 found_preprocessor_end = true;
-                if (scanner->indents.size > 0 &&
-                    scanner->preprocessor_indents.size > 0) {
-                  uint16_t current_indent_length = peek_indent_length(scanner);
-                  uint16_t current_preproc_length =
-                      *array_back(&scanner->preprocessor_indents);
-                  if (current_preproc_length < current_indent_length) {
-                    pop_indent(scanner);
-                    lexer->result_symbol = DEDENT;
-                    return true;
-                  }
+                if (try_dedent_for_preproc(scanner, lexer)) {
+                  return true;
                 }
                 if (valid_symbols[PREPROC_END]) {
                   if (scanner->preprocessor_indents.size > 0) {
@@ -493,16 +518,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             advance(lexer);
             if (lexer->lookahead == 'e') {
               advance(lexer);
-              if (scanner->indents.size > 0 &&
-                  scanner->preprocessor_indents.size > 0) {
-                uint16_t current_indent_length = peek_indent_length(scanner);
-                uint16_t current_preproc_length =
-                    *array_back(&scanner->preprocessor_indents);
-                if (current_preproc_length < current_indent_length) {
-                  pop_indent(scanner);
-                  lexer->result_symbol = DEDENT;
-                  return true;
-                }
+              if (try_dedent_for_preproc(scanner, lexer)) {
+                return true;
               }
               if (valid_symbols[PREPROC_ELSE]) {
                 lexer->mark_end(lexer);
@@ -602,103 +619,19 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
-  if (valid_symbols[CLASS] && lexer->lookahead == 'c') {
-    lexer->mark_end(lexer);
-    indent_length = lexer->get_column(lexer);
-    advance(lexer);
-    if (lexer->lookahead == 'l') {
-      advance(lexer);
-      if (lexer->lookahead == 'a') {
+  {
+    for (size_t i = 0; i < sizeof(block_openers) / sizeof(block_openers[0]); i++) {
+      const BlockOpener *op = &block_openers[i];
+      if (valid_symbols[op->token] && lexer->lookahead == op->first_char) {
+        lexer->mark_end(lexer);
+        indent_length = lexer->get_column(lexer);
         advance(lexer);
-        if (lexer->lookahead == 's') {
-          advance(lexer);
-          if (lexer->lookahead == 's') {
-            advance(lexer);
-            if (!is_word_char(lexer->lookahead)) {
-              lexer->mark_end(lexer);
-              lexer->result_symbol = CLASS;
-              return true;
-            }
-          }
+        if (match_keyword_rest(lexer, op->rest)) {
+          lexer->mark_end(lexer);
+          lexer->result_symbol = op->token;
+          return true;
         }
-      }
-    }
-  } else if (valid_symbols[BEGIN] && lexer->lookahead == 'b') {
-    lexer->mark_end(lexer);
-    indent_length = lexer->get_column(lexer);
-    advance(lexer);
-    if (lexer->lookahead == 'e') {
-      advance(lexer);
-      if (lexer->lookahead == 'g') {
-        advance(lexer);
-        if (lexer->lookahead == 'i') {
-          advance(lexer);
-          if (lexer->lookahead == 'n') {
-            advance(lexer);
-            if (!is_word_char(lexer->lookahead)) {
-              lexer->mark_end(lexer);
-              lexer->result_symbol = BEGIN;
-              return true;
-            }
-          }
-        }
-      }
-    }
-  } else if (valid_symbols[STRUCT] && lexer->lookahead == 's') {
-    lexer->mark_end(lexer);
-    indent_length = lexer->get_column(lexer);
-    advance(lexer);
-    if (lexer->lookahead == 't') {
-      advance(lexer);
-      if (lexer->lookahead == 'r') {
-        advance(lexer);
-        if (lexer->lookahead == 'u') {
-          advance(lexer);
-          if (lexer->lookahead == 'c') {
-            advance(lexer);
-            if (lexer->lookahead == 't') {
-              advance(lexer);
-              if (!is_word_char(lexer->lookahead)) {
-                lexer->mark_end(lexer);
-                lexer->result_symbol = STRUCT;
-                return true;
-              }
-            }
-          }
-        }
-      }
-    }
-  } else if (valid_symbols[INTERFACE] && lexer->lookahead == 'i') {
-    lexer->mark_end(lexer);
-    indent_length = lexer->get_column(lexer);
-    advance(lexer);
-    if (lexer->lookahead == 'n') {
-      advance(lexer);
-      if (lexer->lookahead == 't') {
-        advance(lexer);
-        if (lexer->lookahead == 'e') {
-          advance(lexer);
-          if (lexer->lookahead == 'r') {
-            advance(lexer);
-            if (lexer->lookahead == 'f') {
-              advance(lexer);
-              if (lexer->lookahead == 'a') {
-                advance(lexer);
-                if (lexer->lookahead == 'c') {
-                  advance(lexer);
-                  if (lexer->lookahead == 'e') {
-                    advance(lexer);
-                    if (!is_word_char(lexer->lookahead)) {
-                      lexer->mark_end(lexer);
-                      lexer->result_symbol = INTERFACE;
-                      return true;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        break;
       }
     }
   }

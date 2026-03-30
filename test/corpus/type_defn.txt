@@ -359,6 +359,22 @@ type A() =
       (primary_constr_args))))
 
 ================================================================================
+comment-only empty class body
+================================================================================
+
+type NonComp() = //class end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (line_comment))))
+
+================================================================================
 empty class with class end construct 1
 ================================================================================
 
@@ -1785,6 +1801,32 @@ type sql = SqlProvider<
               (static_parameter_value
                 (const
                   (string))))))))))
+
+================================================================================
+type abbreviation with generic function type
+================================================================================
+
+type F = List<int> -> string
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_abbrev_defn
+      (type_name
+        type_name: (identifier))
+      block: (function_type
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (simple_type
+          (long_identifier
+            (identifier)))))))
 
 ================================================================================
 record definition with trailing semicolon

@@ -16,10 +16,6 @@ module.exports = grammar(require("../fsharp/grammar"), {
 
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
-    [$.type_argument, $.simple_type],
-    [$.rules],
-    [$.prefixed_expression, $._low_prec_app, $.infix_expression],
-    [$.preproc_if, $.preproc_if_in_expression],
   ],
 
   supertypes: ($) => [$._module_signature_elements],
@@ -89,6 +85,18 @@ module.exports = grammar(require("../fsharp/grammar"), {
           optional(seq("=", field("body", $._expression_block))),
         ),
       ),
+
+    _expression_block: ($, _original) =>
+      choice(seq($._indent, $._expression, $._dedent), $._expression),
+
+    _expression: ($, _original) =>
+      choice("null", $.const, $.long_identifier_or_op, $.paren_expression),
+
+    paren_expression: ($, _original) =>
+      prec(1, seq("(", choice($.tuple_expression, $._expression), ")")),
+
+    tuple_expression: ($, _original) =>
+      prec.left(seq($._expression, ",", $._expression, repeat(seq(",", $._expression)))),
   },
 });
 

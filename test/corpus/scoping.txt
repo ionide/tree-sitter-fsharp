@@ -279,6 +279,93 @@ do
                 (infix_op)
                 (long_identifier_or_op
                   (identifier)))
-              (infix_op)
+               (infix_op)
+               (long_identifier_or_op
+                 (identifier)))))))))
+
+================================================================================
+match assigned then continued statements
+================================================================================
+
+let f originType =
+  let b = BehaviorOptions()
+  b.Origin <-
+    match originType with
+    | A bucket -> foo bucket :> IOrigin
+    | B origin -> origin
+  b.ViewerProtocolPolicy <- defaultArg viewerProtocolPolicy ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+  b
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
               (long_identifier_or_op
-                (identifier)))))))))
+                (identifier))))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (unit)))
+        (sequential_expression
+          (mutate_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (match_expression
+              (long_identifier_or_op
+                (identifier))
+              (rules
+                (rule
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  (typecast_expression
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier)))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (rule
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  (long_identifier_or_op
+                    (identifier)))))
+           (sequential_expression
+             (mutate_expression
+               (long_identifier_or_op
+                 (long_identifier
+                   (identifier)
+                  (identifier)))
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))))
+            (long_identifier_or_op
+              (identifier)))))))

@@ -103,6 +103,11 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
     [$.preproc_if, $.preproc_if_in_expression],
+    [$._module_elem, $.preproc_if_in_expression],
+    [$._module_expression, $._expression],
+    [$.declaration_expression, $._comp_or_range_expression],
+    [$.preproc_if_in_expression, $.preproc_if_in_module_body],
+    [$.preproc_else_in_expression, $.preproc_else_in_module_body],
     [$.rules],
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
   ],
@@ -110,7 +115,6 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   inline: ($) => [
-    $._module_elem,
     $._expression_or_range,
     $._object_expression_inner,
     $._record_type_defn_inner,
@@ -132,7 +136,7 @@ module.exports = grammar({
     // Top-level rules (BEGIN)
     //
     file: ($) =>
-      choice($.named_module, repeat1($.namespace), repeat($._module_elem)),
+      choice(repeat1($.namespace), prec(-1, repeat($._module_elem)), prec(1, $.named_module)),
 
     namespace: ($) =>
       seq(
@@ -162,6 +166,55 @@ module.exports = grammar({
         optional("rec"),
         field("name", $.long_identifier),
         repeat($._module_elem),
+      ),
+
+    _module_body_elem: ($) =>
+      choice(
+        alias($.value_declaration, $.declaration_expression),
+        $.module_defn,
+        $.module_abbrev,
+        $.import_decl,
+        $.fsi_directive_decl,
+        $.type_definition,
+        $.exception_definition,
+        $.extern_binding,
+        alias($.preproc_if_in_module_body, $.preproc_if),
+        $._module_expression,
+        // $.exception_defn
+      ),
+
+    _module_expression: ($) =>
+      choice(
+        "null",
+        $.const,
+        $.paren_expression,
+        $.begin_end_expression,
+        $.long_identifier_or_op,
+        $.typed_expression,
+        $.infix_expression,
+        $.index_expression,
+        $.mutate_expression,
+        $.list_expression,
+        $.array_expression,
+        $.ce_expression,
+        $.prefixed_expression,
+        $.brace_expression,
+        $.anon_record_expression,
+        $.typecast_expression,
+        $.do_expression,
+        $.fun_expression,
+        $.function_expression,
+        $.if_expression,
+        $.while_expression,
+        $.for_expression,
+        $.match_expression,
+        $.try_expression,
+        $.literal_expression,
+        $.tuple_expression,
+        $.application_expression,
+        $.dot_expression,
+        $.trait_call_expression,
+        // (static-typars : (member-sig) expr)
       ),
 
     _module_elem: ($) =>
@@ -210,13 +263,13 @@ module.exports = grammar({
 
     _module_body: ($) =>
       seq(
-        $._module_elem,
+        $._module_body_elem,
         repeat(
           prec(
             // Make sure to parse a module node before a sequential expression
             // NOTE: This removes all sequential expressions from module bodies
             PREC.SEQ_EXPR + 1,
-            seq(alias($._newline, ";"), $._module_elem),
+            seq(alias($._newline, ";"), $._module_body_elem),
           ),
         ),
       ),
@@ -479,6 +532,8 @@ module.exports = grammar({
 
     _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
 
+    _mutable_expression: ($) => choice($.long_identifier_or_op, $.index_expression, $.dot_expression),
+
     _expression: ($) =>
       choice(
         "null",
@@ -718,9 +773,9 @@ module.exports = grammar({
       prec.right(
         PREC.LARROW,
         seq(
-          field("assignee", $._expression),
+          field("assignee", $._mutable_expression),
           "<-",
-          field("value", $._expression),
+          field("value", choice(prec(1, $._expression_block), $._expression)),
         ),
       ),
 
@@ -879,9 +934,15 @@ module.exports = grammar({
         seq(
           prec(-1, $._expression),
           "{",
-          scoped($._comp_or_range_expression, $._indent, $._dedent),
+          scoped($._comp_expression_block, $._indent, $._dedent),
           "}",
         ),
+      ),
+
+    _comp_expression_block: ($) =>
+      seq(
+        $._comp_or_range_expression,
+        repeat(seq(alias($._newline, ";"), $._comp_or_range_expression)),
       ),
 
     sequential_expression: ($) =>
@@ -908,9 +969,22 @@ module.exports = grammar({
 
     _comp_or_range_expression: ($) =>
       choice(
-        $._expression,
+        alias($.comp_declaration_expression, $.declaration_expression),
         $.short_comp_expression,
         $.range_expression,
+        $._expression,
+      ),
+
+    comp_declaration_expression: ($) =>
+      seq(
+        choice(
+          seq(choice("use", "use!"), $.identifier, "=", $._expression_block),
+          seq(
+            $.function_or_value_defn,
+            repeat($.and_bang),
+          ),
+        ),
+        field("in", $._comp_or_range_expression),
       ),
 
     // _comp_expressions: $ =>
@@ -1190,6 +1264,20 @@ module.exports = grammar({
         seq($.long_identifier, "<", $._indent, optional($.type_attributes), ">", $._dedent),
       ),
 
+    _multiline_generic_type_head: ($) =>
+      prec.right(5, seq($.long_identifier, "<", $._indent, optional($.type_attributes), ">")),
+
+    _multiline_generic_function_type: ($) =>
+      prec.right(
+        6,
+        seq(
+          alias($._multiline_generic_type_head, $.generic_type),
+          "->",
+          $._type,
+          $._dedent,
+        ),
+      ),
+
     atomic_type: ($) =>
       prec.right(
         choice(
@@ -1375,6 +1463,7 @@ module.exports = grammar({
           seq(
             $._indent,
             choice(
+              alias($._multiline_generic_function_type, $.function_type),
               $._type,
               $.measure,
               alias($._multiline_generic_type, $.generic_type),
@@ -1506,10 +1595,11 @@ module.exports = grammar({
           optional($.primary_constr_args),
           "=",
           choice(
+            alias($.inline_line_comment, $.line_comment),
             scoped($._class_type_body, $._indent, $._dedent),
             seq(
               choice("begin", "class"),
-              scoped(optional($._class_type_body), $._indent, $._dedent),
+              scoped(optional(seq(optional($._newline), optional($._class_type_body))), $._indent, $._dedent),
               "end",
             ),
             seq(
@@ -1941,7 +2031,8 @@ module.exports = grammar({
         choice(
           $._infix_or_prefix_op,
           token.immediate(prec(1, /[+-]/)),
-          /[-+<>|&^*/'%@?][!%&*+./<=>@^|~?-]*/,
+          /[-+=<>|&^*'%@?][!%&*+./<=>@^|~?-]*/,
+          /\/[!%&*+.<=>@^|~?-]*/,
           "=",
           "!=",
           ":=",
@@ -2006,6 +2097,13 @@ module.exports = grammar({
     //
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
+    inline_line_comment: (_) =>
+      token.immediate(
+        choice(
+          /[ \t]*\/\/([^/\n\r][^\n\r]*)?/,
+          /[ \t]*\/{4,}[^\n\r]*/,
+        ),
+      ),
     line_comment: (_) =>
       token(
         choice(
@@ -2022,9 +2120,10 @@ module.exports = grammar({
         choice(
           seq(
             "#nowarn",
-            alias($._string_literal, $.string),
+            choice(alias($._string_literal, $.string), $.int),
             $._newline_not_aligned,
           ),
+          seq("#warnon", $.int, $._newline_not_aligned),
           seq("#light", $._newline_not_aligned),
         ),
       ),
@@ -2062,10 +2161,18 @@ module.exports = grammar({
     preproc_if_or_expression: ($) =>
       prec.left(1, seq($._preproc_expression, "||", $._preproc_expression)),
 
-    ...preprocIf("", ($) => choice($._module_elem, alias($._preproc_toplevel_module, $.named_module))),
+    ...preprocIf(
+      "",
+      ($) => choice($._module_elem, alias($._preproc_toplevel_module, $.named_module)),
+    ),
     ...preprocIf(
       "_in_expression",
       ($) => repeat(seq(optional($._newline), $._expression)),
+      -2,
+    ),
+    ...preprocIf(
+      "_in_module_body",
+      ($) => repeat(seq(optional($._newline), $._module_body_elem)),
       -2,
     ),
     ...preprocIf(

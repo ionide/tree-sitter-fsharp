@@ -34,6 +34,31 @@ do ()
           (unit))))))
 
 ================================================================================
+numeric compiler directives
+================================================================================
+
+module A
+#nowarn 20
+#nowarn 20
+#warnon 20
+1
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (compiler_directive_decl
+      (int))
+    (compiler_directive_decl
+      (int))
+    (compiler_directive_decl
+      (int))
+    (const
+      (int))))
+
+================================================================================
 line compiler directive
 ================================================================================
 
@@ -655,3 +680,52 @@ let f = ()
             (identifier))))
       (const
         (unit)))))
+
+================================================================================
+preproc_if in module with pipe in else branch
+================================================================================
+
+module M =
+#if A
+    let x = "y"
+#else
+    let x = "a" |> id
+#endif
+    let y = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (preproc_if
+      condition: (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (string))))
+      alternative: (preproc_else
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (infix_expression
+              (const
+                (string))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))

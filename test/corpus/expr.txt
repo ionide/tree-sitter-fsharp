@@ -342,7 +342,7 @@ do test <- 2
 chain mutate expression
 ================================================================================
 
-do test <- 2 <- 4
+do test <- other <- 4
 
 --------------------------------------------------------------------------------
 
@@ -353,8 +353,8 @@ do test <- 2 <- 4
         (long_identifier_or_op
           (identifier))
         (mutate_expression
-          (const
-            (int))
+          (long_identifier_or_op
+            (identifier))
           (const
             (int)))))))
 
@@ -4577,6 +4577,109 @@ let x = seq { 1..2..10 }
             (int))
           (const
             (int)))))))
+
+================================================================================
+short for expression in computation expression
+================================================================================
+
+let x =
+    seq {
+        for key in vars.Keys -> string key, string vars[key]
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (short_comp_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (tuple_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))
+                (list_expression
+                  (long_identifier_or_op
+                    (identifier))))))))))
+
+================================================================================
+let then short for expression in computation expression
+================================================================================
+
+let x =
+    seq {
+        let vars = Environment.GetEnvironmentVariables()
+        for key in vars.Keys -> string key, string vars[key]
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        block: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (application_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (unit)))
+          in: (short_comp_expression
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (tuple_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))
+                (list_expression
+                  (long_identifier_or_op
+                    (identifier)))))))))))
 
 ================================================================================
 extern declaration

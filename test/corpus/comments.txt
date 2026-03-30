@@ -384,3 +384,23 @@ do
         (const
           (int))
         (line_comment)))))
+
+================================================================================
+bare xml doc comment
+================================================================================
+
+///
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (xml_doc)
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
