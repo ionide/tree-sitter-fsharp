@@ -108,6 +108,10 @@
         "named": true
       },
       {
+        "type": "srtp_call_expression",
+        "named": true
+      },
+      {
         "type": "try_expression",
         "named": true
       },
@@ -3178,6 +3182,29 @@
       "types": [
         {
           "type": "slice_range",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "srtp_call_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "trait_member_constraint",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         }
       ]

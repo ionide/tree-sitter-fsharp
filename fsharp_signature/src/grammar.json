@@ -1595,6 +1595,10 @@
           },
           "named": true,
           "value": "preproc_if"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "srtp_call_expression"
         }
       ]
     },
@@ -2957,6 +2961,55 @@
           {
             "type": "SYMBOL",
             "name": "_expression_block"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          }
+        ]
+      }
+    },
+    "srtp_call_expression": {
+      "type": "PREC",
+      "value": 21,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_indent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_argument"
+          },
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "trait_member_constraint"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_dedent"
           },
           {
             "type": "STRING",

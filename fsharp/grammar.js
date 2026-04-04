@@ -445,7 +445,7 @@ module.exports = grammar({
         $.application_expression,
         $.dot_expression,
         alias($.preproc_if_in_expression, $.preproc_if),
-        // (static-typars : (member-sig) expr)
+        $.srtp_call_expression,
       ),
 
     literal_expression: ($) =>
@@ -738,6 +738,23 @@ module.exports = grammar({
 
     paren_expression: ($) =>
       prec(PREC.PAREN_EXPR, seq("(", $._expression_block, ")")),
+
+    srtp_call_expression: ($) =>
+      prec(
+        PREC.PAREN_EXPR,
+        seq(
+          "(",
+          $._indent,
+          $.type_argument,
+          ":",
+          "(",
+          $.trait_member_constraint,
+          ")",
+          $._expression,
+          $._dedent,
+          ")",
+        ),
+      ),
 
     _high_prec_app: ($) =>
       prec.left(

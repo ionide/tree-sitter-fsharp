@@ -2608,6 +2608,103 @@ type T = U
           (identifier))))))
 
 ================================================================================
+Test statically resolved type parameters
+================================================================================
+
+let inline f (x: ^T when ^T : (static member Parse: string -> ^T)) =
+  (^T : (static member Parse: string -> ^T) "42")
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier))
+            constraints: (type_argument_constraints
+              (constraint
+                (type_argument
+                  (identifier))
+                (trait_member_constraint
+                  (identifier)
+                  (function_type
+                    (simple_type
+                      (long_identifier
+                        (identifier)))
+                    (type_argument
+                      (identifier)))))))))
+      body: (srtp_call_expression
+        (type_argument
+          (identifier))
+        (trait_member_constraint
+          (identifier)
+          (function_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (type_argument
+              (identifier))))
+        (const
+          (string))))))
+
+================================================================================
+Test SRTP with multiple arguments
+================================================================================
+
+let inline create (a: int) (b: string) =
+  (^T : (static member Create: int -> string -> ^T) a b)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      body: (srtp_call_expression
+        (type_argument
+          (identifier))
+        (trait_member_constraint
+          (identifier)
+          (function_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (function_type
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (type_argument
+                (identifier)))))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
 test class with text names
 ================================================================================
 module Tests
