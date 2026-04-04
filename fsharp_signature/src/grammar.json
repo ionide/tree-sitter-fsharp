@@ -3376,6 +3376,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "measure_op_type"
+          },
+          {
+            "type": "SYMBOL",
             "name": "postfix_type"
           },
           {
@@ -3518,6 +3522,27 @@
                 ]
               }
             }
+          }
+        ]
+      }
+    },
+    "measure_op_type": {
+      "type": "PREC_LEFT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_type"
+          },
+          {
+            "type": "STRING",
+            "value": "/"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_type"
           }
         ]
       }
@@ -4735,6 +4760,23 @@
         {
           "type": "SYMBOL",
           "name": "type_extension"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_declaration"
+        }
+      ]
+    },
+    "type_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "type_name"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_decl_newline"
         }
       ]
     },
@@ -8760,6 +8802,10 @@
     {
       "type": "SYMBOL",
       "name": "_tuple_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_decl_newline"
     },
     {
       "type": "SYMBOL",

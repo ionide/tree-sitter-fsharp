@@ -547,6 +547,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -931,6 +935,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -1082,6 +1090,10 @@
         },
         {
           "type": "match_expression",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -1784,6 +1796,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -2112,6 +2128,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -2168,6 +2188,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -2235,6 +2259,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -3607,6 +3635,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -4366,6 +4398,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -4426,6 +4462,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -5504,6 +5544,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -5783,6 +5827,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -6128,6 +6176,69 @@
     }
   },
   {
+    "type": "measure_op_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "compound_type",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
+          "named": true
+        },
+        {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
+          "type": "function_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "member_defn",
     "named": true,
     "fields": {},
@@ -6257,6 +6368,10 @@
         },
         {
           "type": "match_expression",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -6569,6 +6684,10 @@
           },
           {
             "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "measure_op_type",
             "named": true
           },
           {
@@ -6896,6 +7015,10 @@
         },
         {
           "type": "match_expression",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -7888,6 +8011,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -7948,6 +8075,10 @@
         },
         {
           "type": "long_identifier",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -8541,6 +8672,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "mutate_expression",
           "named": true
         },
@@ -8824,6 +8959,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -10260,6 +10399,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -10343,6 +10486,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -10758,6 +10905,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "named_static_parameter",
           "named": true
         },
@@ -10936,6 +11087,10 @@
         },
         {
           "type": "match_expression",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -11220,6 +11375,10 @@
           "named": true
         },
         {
+          "type": "measure_op_type",
+          "named": true
+        },
+        {
           "type": "named_field_pattern",
           "named": true
         },
@@ -11308,6 +11467,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -11688,6 +11851,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "measure_op_type",
           "named": true
         },
         {
@@ -12138,6 +12305,10 @@
   },
   {
     "type": ".[",
+    "named": false
+  },
+  {
+    "type": "/",
     "named": false
   },
   {

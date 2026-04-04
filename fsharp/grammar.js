@@ -81,6 +81,7 @@ module.exports = grammar({
     $._inside_string_marker,
     $._newline_not_aligned,
     $._tuple_marker,
+    $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -1005,6 +1006,7 @@ module.exports = grammar({
           $.paren_type,
           $.function_type,
           $.compound_type,
+          $.measure_op_type,
           $.postfix_type,
           $.list_type,
           $.static_type,
@@ -1025,6 +1027,7 @@ module.exports = grammar({
     function_type: ($) => prec.right(seq($._type, "->", $._type)),
     compound_type: ($) =>
       prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
+    measure_op_type: ($) => prec.left(1, seq($._type, "/", $._type)),
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
     list_type: ($) => seq($._type, "[]"),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
@@ -1209,7 +1212,12 @@ module.exports = grammar({
         $.enum_type_defn,
         $.type_abbrev_defn,
         $.type_extension,
+        $.type_declaration,
       ),
+
+    // Bare type declaration with no body, used for e.g. [<Measure>] type kg
+    // _type_decl_newline fires only at end-of-line, making this unambiguous with anon_type_defn
+    type_declaration: ($) => seq($.type_name, $._type_decl_newline),
 
     type_name: ($) =>
       prec(

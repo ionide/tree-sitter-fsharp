@@ -296,6 +296,10 @@
         "named": true
       },
       {
+        "type": "measure_op_type",
+        "named": true
+      },
+      {
         "type": "paren_type",
         "named": true
       },
@@ -343,6 +347,10 @@
       },
       {
         "type": "type_abbrev_defn",
+        "named": true
+      },
+      {
+        "type": "type_declaration",
         "named": true
       },
       {
@@ -2159,6 +2167,21 @@
     }
   },
   {
+    "type": "measure_op_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "member_defn",
     "named": true,
     "fields": {},
@@ -3456,6 +3479,21 @@
     }
   },
   {
+    "type": "type_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "type_definition",
     "named": true,
     "fields": {},
@@ -4117,6 +4155,10 @@
   },
   {
     "type": ".[",
+    "named": false
+  },
+  {
+    "type": "/",
     "named": false
   },
   {
