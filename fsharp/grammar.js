@@ -90,6 +90,8 @@ module.exports = grammar({
     [$.simple_type, $.type_argument],
     [$.preproc_if, $.preproc_if_in_expression],
     [$.rules],
+    [$._type, $._argument_type],
+    [$._type, $._curried_return_type],
   ],
 
   word: ($) => $.identifier,
@@ -1015,6 +1017,49 @@ module.exports = grammar({
         ),
       ),
 
+    // Like _type but excludes compound_type and function_type, used in member
+    // signature argument positions. Per F# spec, T * T before -> is always two
+    // separate positional arguments (not a tuple-typed arg); tuple/function-typed
+    // arguments must be parenthesized: (T * T) or (T -> T).
+    _argument_type: ($) =>
+      prec(
+        4,
+        choice(
+          $.simple_type,
+          $.generic_type,
+          $.paren_type,
+          $.postfix_type,
+          $.list_type,
+          $.static_type,
+          $.type_argument,
+          $.constrained_type,
+          $.flexible_type,
+          $.anon_record_type,
+        ),
+      ),
+
+    // Like _type but excludes function_type, used as the return type in
+    // curried_spec so that -> is always consumed by the arguments_spec repeat
+    // rather than being parsed as part of a function_type. Function return types
+    // must be parenthesized: (T -> T).
+    _curried_return_type: ($) =>
+      prec(
+        4,
+        choice(
+          $.simple_type,
+          $.generic_type,
+          $.paren_type,
+          $.compound_type,
+          $.postfix_type,
+          $.list_type,
+          $.static_type,
+          $.type_argument,
+          $.constrained_type,
+          $.flexible_type,
+          $.anon_record_type,
+        ),
+      ),
+
     simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
     generic_type: ($) =>
       prec.right(
@@ -1152,11 +1197,11 @@ module.exports = grammar({
         ),
       ),
 
-    curried_spec: ($) => seq(repeat(seq($.arguments_spec, "->")), $._type),
+    curried_spec: ($) => seq(repeat(seq($.arguments_spec, "->")), $._curried_return_type),
 
     argument_spec: ($) =>
       prec.left(
-        seq(optional($.attributes), optional($.argument_name_spec), $._type),
+        seq(optional($.attributes), optional($.argument_name_spec), $._argument_type),
       ),
 
     arguments_spec: ($) =>

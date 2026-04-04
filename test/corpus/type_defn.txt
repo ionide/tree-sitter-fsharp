@@ -2608,6 +2608,171 @@ type T = U
           (identifier))))))
 
 ================================================================================
+Test abstract member with tuple return type
+================================================================================
+
+type IMetaQuery =
+    abstract member Query : string -> string * string
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (compound_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+Test abstract member with list tuple return type
+================================================================================
+
+type IFoo =
+    abstract member Bar : string -> string list * string
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (compound_type
+                (postfix_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))
+                  (long_identifier
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+Test abstract tuple only
+================================================================================
+
+type IFoo =
+    abstract member Bar : int * int
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (compound_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+Test curried member with multiple arrows and tuple return
+================================================================================
+
+type IFoo =
+    abstract member Baz : int -> string -> int * string
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (compound_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+Test member with parenthesized function return type
+================================================================================
+
+type IFoo =
+    abstract member Baz : int -> (int -> int)
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (paren_type
+                (function_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))))))
+
+================================================================================
 test class with text names
 ================================================================================
 module Tests

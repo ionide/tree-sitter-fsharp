@@ -3437,6 +3437,108 @@
         ]
       }
     },
+    "_argument_type": {
+      "type": "PREC",
+      "value": 4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "simple_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "generic_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "paren_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "postfix_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "list_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "static_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_argument"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "constrained_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "flexible_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "anon_record_type"
+          }
+        ]
+      }
+    },
+    "_curried_return_type": {
+      "type": "PREC",
+      "value": 4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "simple_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "generic_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "paren_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "compound_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "postfix_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "list_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "static_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_argument"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "constrained_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "flexible_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "anon_record_type"
+          }
+        ]
+      }
+    },
     "simple_type": {
       "type": "CHOICE",
       "members": [
@@ -4458,7 +4560,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_type"
+          "name": "_curried_return_type"
         }
       ]
     },
@@ -4494,7 +4596,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "_type"
+            "name": "_argument_type"
           }
         ]
       }
@@ -8601,6 +8703,14 @@
     ],
     [
       "rules"
+    ],
+    [
+      "_type",
+      "_argument_type"
+    ],
+    [
+      "_type",
+      "_curried_return_type"
     ]
   ],
   "precedences": [],
