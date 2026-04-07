@@ -296,17 +296,29 @@ static inline bool is_bracket_end(TSLexer *lexer) {
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[ERROR_SENTINEL]) {
-    // During error recovery, all valid_symbols are true and tree-sitter
-    // restores scanner state before each attempt. Emitting zero-length
-    // tokens (DEDENT/PREPROC_END) here causes infinite loops: the parser
-    // can't use the token, recovers, restores state (undoing the pop),
-    // and the scanner emits the same token again forever.
-    // Return false to let tree-sitter's built-in error recovery skip
-    // the problematic character and move on.
-    return false;
+    // During error recovery, all valid_symbols are true. Tree-sitter's error
+    // recovery mechanism cannot emit external scanner tokens, so we must still
+    // produce tokens like DEDENT and PREPROC_END when we can identify them.
+    // This enables partial parse tree recovery -- e.g., "match x with" needs
+    // DEDENT to be recognized as a partially correct match-statement for
+    // syntax highlighting purposes.
+
+    // At EOF, emit DEDENT to drain the indent stack. This is critical for
+    // closing partial parse trees at end of input.
+    if (lexer->eof(lexer) && scanner->indents.size > 1) {
+      pop_indent(scanner);
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
+
+    // For non-EOF cases, fall through to normal scanning logic below.
+    // The normal path handles whitespace consumption and emits DEDENT/NEWLINE
+    // based on actual indentation levels. Features that should not run during
+    // error recovery (multi-dollar strings, quotation closers, etc.) are
+    // already guarded by !valid_symbols[ERROR_SENTINEL] checks.
   }
 
-  if (valid_symbols[INSIDE_STRING]) {
+  if (valid_symbols[INSIDE_STRING] && !valid_symbols[ERROR_SENTINEL]) {
     return false;
   }
 
@@ -315,7 +327,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // peek ahead to determine if the content between '<' and '>' looks like type arguments.
   // If not (e.g., it's a comparison operator like l<r), return false so the grammar
   // falls through to infix_op.
-  if (valid_symbols[TYAPP_OPEN] && lexer->lookahead == '<') {
+  if (valid_symbols[TYAPP_OPEN] && !valid_symbols[ERROR_SENTINEL] &&
+      lexer->lookahead == '<') {
     lexer->mark_end(lexer);
     advance(lexer);
     // Mark end right after '<' - this is what we want the token to contain
@@ -357,8 +370,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
-  if (valid_symbols[TRIPLE_QUOTE_CONTENT] || valid_symbols[FORMAT_TRIPLE_QUOTE_CONTENT] ||
-      valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT]) {
+  if (!valid_symbols[ERROR_SENTINEL] &&
+      (valid_symbols[TRIPLE_QUOTE_CONTENT] || valid_symbols[FORMAT_TRIPLE_QUOTE_CONTENT] ||
+       valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT])) {
     bool is_format = valid_symbols[FORMAT_TRIPLE_QUOTE_CONTENT];
     bool is_multi_dollar = valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTED_CONTENT];
     bool has_content = false;
@@ -872,14 +886,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
-  if (valid_symbols[INDENT] && !found_bracket_end && !found_preprocessor_end &&
+  if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix) {
     push_indent(scanner, indent_length, false);
     lexer->result_symbol = INDENT;
     return true;
   }
 
-  if (valid_symbols[PAREN_INDENT] && !found_bracket_end &&
+  if (valid_symbols[PAREN_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end &&
       !found_preprocessor_end && !found_same_line_pipe_infix) {
     // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
     // logic can be more lenient inside parenthesized expressions, where the
@@ -935,7 +951,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
       if (indent_length < current_indent_length && !found_bracket_end &&
           can_dedent_preproc && can_dedent_infix_op &&
-          !valid_symbols[TUPLE_MARKER] && can_dedent_paren_indent) {
+          (!valid_symbols[TUPLE_MARKER] || valid_symbols[ERROR_SENTINEL]) && can_dedent_paren_indent) {
         pop_indent(scanner);
         lexer->result_symbol = DEDENT;
         return true;
@@ -943,7 +959,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
-  if (valid_symbols[BLOCK_COMMENT_CONTENT]) {
+  if (valid_symbols[BLOCK_COMMENT_CONTENT] && !valid_symbols[ERROR_SENTINEL]) {
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
