@@ -1949,6 +1949,7 @@ module.exports = grammar({
     _unicodegraph_short: (_) => /\\u[0-9a-fA-F]{4}/,
     _unicodegraph_long: (_) => /\\u[0-9a-fA-F]{8}/,
     _trigraph: (_) => /\\[0-9]{3}/,
+    _hexgraph_short: (_) => /\\x[0-9a-fA-F]{2}/,
 
     _char_char: ($) =>
       choice(
@@ -1956,6 +1957,7 @@ module.exports = grammar({
         $._escape_char,
         $._trigraph,
         $._unicodegraph_short,
+        $._hexgraph_short,
       ),
 
     // note: \n is allowed in strings
@@ -1971,6 +1973,7 @@ module.exports = grammar({
         $._escape_char,
         $._trigraph,
         $._unicodegraph_short,
+        $._hexgraph_short,
         $._non_escape_char,
         $._unicodegraph_long,
       ),
@@ -1978,7 +1981,7 @@ module.exports = grammar({
     char: (_) =>
       prec(
         -1,
-        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|(\\\\))?'B?/,
+        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|(\\\\))?'B?/,
       ),
 
     format_string_eval: ($) =>

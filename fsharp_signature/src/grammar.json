@@ -8179,6 +8179,10 @@
       "type": "PATTERN",
       "value": "\\\\[0-9]{3}"
     },
+    "_hexgraph_short": {
+      "type": "PATTERN",
+      "value": "\\\\x[0-9a-fA-F]{2}"
+    },
     "_char_char": {
       "type": "CHOICE",
       "members": [
@@ -8197,6 +8201,10 @@
         {
           "type": "SYMBOL",
           "name": "_unicodegraph_short"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_hexgraph_short"
         }
       ]
     },
@@ -8241,6 +8249,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "_hexgraph_short"
+        },
+        {
+          "type": "SYMBOL",
           "name": "_non_escape_char"
         },
         {
@@ -8254,7 +8266,7 @@
       "value": -1,
       "content": {
         "type": "PATTERN",
-        "value": "'([^\\n\\t\\r\\u0008\\a\\f\\v\\\\]|\\\\[\"\\'ntbrafv]|\\\\[0-9]{3}|\\\\u[0-9a-fA-F]{4}|(\\\\\\\\))?'B?"
+        "value": "'([^\\n\\t\\r\\u0008\\a\\f\\v\\\\]|\\\\[\"\\'ntbrafv]|\\\\[0-9]{3}|\\\\u[0-9a-fA-F]{4}|\\\\x[0-9a-fA-F]{2}|(\\\\\\\\))?'B?"
       }
     },
     "format_string_eval": {
