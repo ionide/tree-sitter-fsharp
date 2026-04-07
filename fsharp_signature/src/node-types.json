@@ -5431,6 +5431,21 @@
     }
   },
   {
+    "type": "type_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "type_definition",
     "named": true,
     "fields": {},
@@ -5464,6 +5479,10 @@
         },
         {
           "type": "type_abbrev_defn",
+          "named": true
+        },
+        {
+          "type": "type_declaration",
           "named": true
         },
         {

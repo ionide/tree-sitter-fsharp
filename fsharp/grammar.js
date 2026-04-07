@@ -95,6 +95,7 @@ module.exports = grammar({
     $._multi_dollar_triple_quote_end,
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -1492,7 +1493,12 @@ module.exports = grammar({
         $.enum_type_defn,
         $.type_abbrev_defn,
         $.type_extension,
+        $.type_declaration,
       ),
+
+    // Bare type declaration with no body, used for e.g. [<Measure>] type kg
+    // _type_decl_newline fires only at end-of-line, making this unambiguous with anon_type_defn
+    type_declaration: ($) => seq($.type_name, $._type_decl_newline),
 
     type_name: ($) =>
       prec(

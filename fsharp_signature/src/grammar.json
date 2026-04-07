@@ -369,7 +369,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "trait_call_expression"
+          "name": "srtp_call_expression"
         }
       ]
     },
@@ -2020,9 +2020,47 @@
         ]
       }
     },
-    "trait_call_expression": {
+    "srtp_call_expression": {
       "type": "PREC_RIGHT",
       "value": 21,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_srtp_type_argument"
+            },
+            "named": true,
+            "value": "type_argument"
+          },
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "trait_member_constraint"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        ]
+      }
+    },
+    "_srtp_type_argument": {
+      "type": "PREC",
+      "value": 10,
       "content": {
         "type": "SEQ",
         "members": [
@@ -2053,26 +2091,6 @@
                 }
               ]
             }
-          },
-          {
-            "type": "STRING",
-            "value": ":"
-          },
-          {
-            "type": "STRING",
-            "value": "("
-          },
-          {
-            "type": "SYMBOL",
-            "name": "trait_member_constraint"
-          },
-          {
-            "type": "STRING",
-            "value": ")"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_expression"
           }
         ]
       }
@@ -5850,6 +5868,23 @@
         {
           "type": "SYMBOL",
           "name": "type_extension"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_declaration"
+        }
+      ]
+    },
+    "type_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "type_name"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_decl_newline"
         }
       ]
     },
@@ -10568,6 +10603,10 @@
     {
       "type": "SYMBOL",
       "name": "_paren_indent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_decl_newline"
     },
     {
       "type": "SYMBOL",

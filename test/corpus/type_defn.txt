@@ -3039,6 +3039,110 @@ let inline create (a: int) (b: string) =
                 (identifier)))))))))
 
 ================================================================================
+Test measure type
+================================================================================
+
+[<Measure>] type Dollars
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_declaration
+      (type_name
+        (identifier)))))
+
+================================================================================
+Test measure type followed by type with body
+================================================================================
+
+[<Measure>] type Dollars
+
+type CsvFile =
+    { Lines: string list }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_declaration
+      (type_name
+        (identifier))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+Test measure type division
+================================================================================
+
+[<Measure>] type A
+[<Measure>] type B
+
+[<Measure>] type C = A / B
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_declaration
+      (type_name
+        (identifier))))
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_declaration
+      (type_name
+        (identifier))))
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_abbrev_defn
+      (type_name
+        (identifier))
+      (measure
+        (measure_quotient
+          (measure_atom
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (measure_atom
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
 test class with text names
 ================================================================================
 module Tests

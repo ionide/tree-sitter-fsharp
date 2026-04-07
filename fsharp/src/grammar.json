@@ -6014,6 +6014,23 @@
         {
           "type": "SYMBOL",
           "name": "type_extension"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_declaration"
+        }
+      ]
+    },
+    "type_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "type_name"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_decl_newline"
         }
       ]
     },
@@ -10669,6 +10686,10 @@
     {
       "type": "SYMBOL",
       "name": "_paren_indent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_decl_newline"
     },
     {
       "type": "SYMBOL",

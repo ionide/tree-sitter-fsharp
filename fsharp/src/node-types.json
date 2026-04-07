@@ -362,6 +362,10 @@
         "named": true
       },
       {
+        "type": "type_declaration",
+        "named": true
+      },
+      {
         "type": "type_extension",
         "named": true
       },
@@ -4134,6 +4138,21 @@
         },
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_name",
           "named": true
         }
       ]

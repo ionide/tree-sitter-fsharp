@@ -37,6 +37,7 @@ enum TokenType {
   MULTI_DOLLAR_TRIPLE_QUOTE_END,
   TYAPP_OPEN,
   PAREN_INDENT,
+  TYPE_DECL_NEWLINE,
   ERROR_SENTINEL
 };
 
@@ -456,6 +457,52 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       lexer->result_symbol = is_format ? FORMAT_TRIPLE_QUOTE_CONTENT : TRIPLE_QUOTE_CONTENT;
     }
     return true;
+  }
+
+  if (valid_symbols[TYPE_DECL_NEWLINE]) {
+    // Only fire at EOF or newline; if the current character is something else
+    // (e.g. '=' during GLR exploration), fall through to general scanning —
+    // the lexer position is unchanged so this is safe.
+    if (lexer->eof(lexer)) {
+      lexer->result_symbol = TYPE_DECL_NEWLINE;
+      return true;
+    }
+    if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+      // Peek ahead: skip newlines/whitespace to find indentation of next content.
+      // If next content is NOT more indented than current scope, this is a bare
+      // type declaration (e.g. [<Measure>] type Dollars).
+      // If next content IS more indented, the type has a body (e.g. type CsvFile
+      //   private (...) = ...) and TYPE_DECL_NEWLINE should not fire.
+      uint32_t next_indent = 0;
+      for (;;) {
+        if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+          next_indent = 0;
+          skip(lexer);
+        } else if (lexer->lookahead == ' ') {
+          next_indent++;
+          skip(lexer);
+        } else if (lexer->lookahead == '\t') {
+          next_indent += 8;
+          skip(lexer);
+        } else {
+          break;
+        }
+      }
+      if (lexer->eof(lexer)) {
+        lexer->result_symbol = TYPE_DECL_NEWLINE;
+        return true;
+      }
+      uint32_t scope_indent = (scanner->indents.size > 0)
+        ? (uint32_t)*array_back(&scanner->indents)
+        : 0;
+      if (next_indent <= scope_indent) {
+        // Next line is at same or lower indentation — bare type declaration
+        lexer->result_symbol = TYPE_DECL_NEWLINE;
+        return true;
+      }
+      // else: next line is more indented — type has a body, don't fire
+      return false;
+    }
   }
 
   lexer->mark_end(lexer);
