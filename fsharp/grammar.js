@@ -96,6 +96,7 @@ module.exports = grammar({
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
+    $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -337,7 +338,7 @@ module.exports = grammar({
         optional(seq(":", $._type)),
         optional($.type_argument_constraints),
         "=",
-        field("body", $._expression_block),
+        field("body", $._expression_block_for_let),
       ),
 
     function_declaration_left: ($) =>
@@ -532,6 +533,12 @@ module.exports = grammar({
     //
 
     _expression_block: ($) => seq($._indent, $._expression, $._dedent),
+
+    // Like _expression_block, but also allows the block to be terminated by
+    // the 'in' keyword instead of a dedent.  Used for let/use bindings so that
+    // single-line  let x = 1 in x  works (where no newline → no DEDENT).
+    _expression_block_for_let: ($) =>
+      seq($._indent, $._expression, choice($._dedent, $._in)),
 
     _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
 
@@ -816,7 +823,7 @@ module.exports = grammar({
     declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block),
+          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -826,7 +833,7 @@ module.exports = grammar({
       ),
 
     and_bang: ($) =>
-      seq("and!", $._pattern, "=", $._expression_block),
+      seq("and!", $._pattern, "=", $._expression_block_for_let),
 
     do_expression: ($) =>
       prec(PREC.DO_EXPR, seq(choice("do", "do!"), $._expression_block)),
@@ -990,7 +997,7 @@ module.exports = grammar({
     comp_declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block),
+          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),

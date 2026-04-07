@@ -38,6 +38,7 @@ enum TokenType {
   TYAPP_OPEN,
   PAREN_INDENT,
   TYPE_DECL_NEWLINE,
+  IN,
   ERROR_SENTINEL
 };
 
@@ -805,6 +806,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             }
           }
         }
+      }
+    }
+  } else if (lexer->lookahead == 'i' && valid_symbols[IN]) {
+    advance(lexer);
+    if (lexer->lookahead == 'n') {
+      advance(lexer);
+      if (!is_word_char(lexer->lookahead)) {
+        // Produce the IN token to close an _expression_block_for_let.
+        // Pop the indent that was pushed by the matching INDENT, since
+        // _in replaces _dedent as the block terminator.
+        pop_indent(scanner);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = IN;
+        return true;
       }
     }
   } else if (lexer->lookahead == 'e' &&

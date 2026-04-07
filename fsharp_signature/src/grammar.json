@@ -902,7 +902,7 @@
           "name": "body",
           "content": {
             "type": "SYMBOL",
-            "name": "_expression_block"
+            "name": "_expression_block_for_let"
           }
         }
       ]
@@ -1919,6 +1919,32 @@
         {
           "type": "SYMBOL",
           "name": "_expression"
+        }
+      ]
+    },
+    "_expression_block_for_let": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_indent"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_expression"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_dedent"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_in"
+            }
+          ]
         }
       ]
     },
@@ -3049,7 +3075,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "_expression_block"
+                  "name": "_expression_block_for_let"
                 }
               ]
             },
@@ -3098,7 +3124,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_expression_block"
+          "name": "_expression_block_for_let"
         }
       ]
     },
@@ -3860,7 +3886,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "_expression_block"
+                  "name": "_expression_block_for_let"
                 }
               ]
             },
@@ -10607,6 +10633,10 @@
     {
       "type": "SYMBOL",
       "name": "_type_decl_newline"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_in"
     },
     {
       "type": "SYMBOL",
