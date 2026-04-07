@@ -215,7 +215,7 @@ module.exports = grammar({
         $.tuple_expression,
         $.application_expression,
         $.dot_expression,
-        $.trait_call_expression,
+        $.srtp_call_expression,
         // (static-typars : (member-sig) expr)
       ),
 
@@ -569,8 +569,7 @@ module.exports = grammar({
         $.application_expression,
         $.dot_expression,
         alias($.preproc_if_in_expression, $.preproc_if),
-        $.trait_call_expression,
-        // (static-typars : (member-sig) expr)
+        $.srtp_call_expression,
       ),
 
     literal_expression: ($) =>
@@ -582,18 +581,28 @@ module.exports = grammar({
         ),
       ),
 
-    trait_call_expression: ($) =>
+    srtp_call_expression: ($) =>
       prec.right(
         PREC.PAREN_EXPR,
         seq(
-          "^",
-          $.identifier,
-          repeat(seq("or", "^", $.identifier)),
+          alias($._srtp_type_argument, $.type_argument),
           ":",
           "(",
           $.trait_member_constraint,
           ")",
           $._expression,
+        ),
+      ),
+
+    // Like type_argument but restricted to ^-prefixed identifiers (not '-prefixed)
+    // to avoid ambiguity with char literals in expression context.
+    _srtp_type_argument: ($) =>
+      prec(
+        10,
+        seq(
+          "^",
+          $.identifier,
+          repeat(seq("or", "^", $.identifier)),
         ),
       ),
 

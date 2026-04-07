@@ -346,19 +346,11 @@
           "named": true
         },
         {
-          "type": "compound_type",
-          "named": true
-        },
-        {
           "type": "constrained_type",
           "named": true
         },
         {
           "type": "flexible_type",
-          "named": true
-        },
-        {
-          "type": "function_type",
           "named": true
         },
         {
@@ -1516,10 +1508,6 @@
         },
         {
           "type": "flexible_type",
-          "named": true
-        },
-        {
-          "type": "function_type",
           "named": true
         },
         {

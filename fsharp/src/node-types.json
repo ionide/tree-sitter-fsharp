@@ -108,7 +108,7 @@
         "named": true
       },
       {
-        "type": "trait_call_expression",
+        "type": "srtp_call_expression",
         "named": true
       },
       {
@@ -586,7 +586,7 @@
       "required": true,
       "types": [
         {
-          "type": "_type",
+          "type": "anon_record_type",
           "named": true
         },
         {
@@ -595,6 +595,46 @@
         },
         {
           "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
+          "named": true
+        },
+        {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
+          "type": "struct_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         }
       ]
@@ -1156,11 +1196,55 @@
       "required": true,
       "types": [
         {
-          "type": "_type",
+          "type": "anon_record_type",
           "named": true
         },
         {
           "type": "arguments_spec",
+          "named": true
+        },
+        {
+          "type": "compound_type",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
+          "named": true
+        },
+        {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
+          "type": "struct_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         }
       ]
@@ -2754,7 +2838,7 @@
             "named": true
           },
           {
-            "type": "trait_call_expression",
+            "type": "srtp_call_expression",
             "named": true
           },
           {
@@ -3738,6 +3822,29 @@
     }
   },
   {
+    "type": "srtp_call_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "trait_member_constraint",
+          "named": true
+        },
+        {
+          "type": "type_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "static_parameter_value",
     "named": true,
     "fields": {},
@@ -3796,29 +3903,6 @@
       "types": [
         {
           "type": "paren_type",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "trait_call_expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "trait_member_constraint",
           "named": true
         }
       ]

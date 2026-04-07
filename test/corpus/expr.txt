@@ -4422,8 +4422,9 @@ let inline f x = (^a : (member Name : string) x)
           (long_identifier
             (identifier))))
       (paren_expression
-        (trait_call_expression
-          (identifier)
+        (srtp_call_expression
+          (type_argument
+            (identifier))
           (trait_member_constraint
             (identifier)
             (simple_type
@@ -4453,8 +4454,9 @@ let inline f (x: ^a) = (^a : (static member Zero : ^a) ())
             (type_argument
               (identifier)))))
       (paren_expression
-        (trait_call_expression
-          (identifier)
+        (srtp_call_expression
+          (type_argument
+            (identifier))
           (trait_member_constraint
             (identifier)
             (type_argument
