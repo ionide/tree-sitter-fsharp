@@ -207,6 +207,7 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
   case '-':
     skip(lexer);
     return !(lexer->lookahead >= '0' && lexer->lookahead <= '9');
+  case '*':
   case '%':
   case '&':
   case '=':
@@ -628,6 +629,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         scanner->multi_dollar_count = dollar_count;
         lexer->result_symbol = MULTI_DOLLAR_TRIPLE_QUOTE_START;
         return true;
+      }
+      // Not a multi-dollar string. Before bailing out, check if DEDENT or
+      // NEWLINE should be emitted -- the '$' might be the start of an
+      // interpolated string on a new, less-indented line.
+      if (found_end_of_line && scanner->indents.size > 0) {
+        uint16_t current_indent_length = peek_indent_length(scanner);
+        if (valid_symbols[DEDENT] && indent_length < current_indent_length) {
+          bool can_dedent_paren_indent = !peek_is_paren_indent(scanner) || indent_length == 0 || lexer->eof(lexer);
+          if (can_dedent_paren_indent) {
+            pop_indent(scanner);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
+        }
+        if (valid_symbols[NEWLINE] && indent_length == current_indent_length && indent_length > 0) {
+          lexer->result_symbol = NEWLINE;
+          return true;
+        }
       }
       return false;
     }

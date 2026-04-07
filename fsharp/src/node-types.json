@@ -3690,6 +3690,16 @@
           }
         ]
       },
+      "step": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
       "to": {
         "multiple": false,
         "required": false,

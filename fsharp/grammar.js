@@ -1159,6 +1159,13 @@ module.exports = grammar({
             token(prec(PREC.DOTDOT, "..")),
             field("to", $._expression),
           ),
+          seq(
+            field("from", $._expression),
+            token(prec(PREC.DOTDOT, "..")),
+            field("step", $._expression),
+            token(prec(PREC.DOTDOT, "..")),
+            field("to", $._expression),
+          ),
         ),
       ),
 
