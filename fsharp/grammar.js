@@ -1454,7 +1454,14 @@ module.exports = grammar({
         ),
       ),
 
-    type_extension: ($) => seq($.type_name, $.type_extension_elements),
+    type_extension: ($) =>
+      seq(
+        $.type_name,
+        alias($._type_extension_with, $.type_extension_elements),
+      ),
+
+    _type_extension_with: ($) =>
+      seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
 
     delegate_type_defn: ($) =>
       seq($.type_name, "=", scoped($.delegate_signature, $._indent, $._dedent)),
@@ -1630,11 +1637,9 @@ module.exports = grammar({
 
     type_extension_elements: ($) =>
       prec.left(
-        seq(
-          choice(
-            seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
-            $._type_extension_inner,
-          ),
+        choice(
+          seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+          $._type_extension_inner,
         ),
       ),
 
