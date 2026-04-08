@@ -10619,10 +10619,6 @@
       "type_argument"
     ],
     [
-      "preproc_if",
-      "preproc_if_in_expression"
-    ],
-    [
       "_module_elem",
       "preproc_if_in_expression"
     ],

@@ -104,7 +104,6 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
-    [$.preproc_if, $.preproc_if_in_expression],
     [$._module_elem, $.preproc_if_in_expression],
     [$._module_expression, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],

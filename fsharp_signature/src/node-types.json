@@ -1577,11 +1577,23 @@
           "named": true
         },
         {
+          "type": "const",
+          "named": true
+        },
+        {
           "type": "do",
           "named": true
         },
         {
           "type": "function_or_value_defn",
+          "named": true
+        },
+        {
+          "type": "long_identifier_or_op",
+          "named": true
+        },
+        {
+          "type": "paren_expression",
           "named": true
         }
       ]

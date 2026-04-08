@@ -420,8 +420,34 @@
         {
           "type": "SYMBOL",
           "name": "preproc_if"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_attribute_expression"
+          },
+          "named": true,
+          "value": "declaration_expression"
         }
       ]
+    },
+    "_attribute_expression": {
+      "type": "PREC",
+      "value": 9,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "attributes"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        ]
+      }
     },
     "module_abbrev": {
       "type": "SEQ",
@@ -3231,12 +3257,46 @@
               "name": "_list_elements"
             },
             {
-              "type": "SYMBOL",
-              "name": "_comp_or_range_expression"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_newline"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_comp_or_range_expression"
+                }
+              ]
             },
             {
-              "type": "SYMBOL",
-              "name": "slice_ranges"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_newline"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "slice_ranges"
+                }
+              ]
             }
           ]
         },
