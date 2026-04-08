@@ -635,6 +635,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // tokenized as infix operators inside quotation expressions.
   // If a dedent is pending for a same-line expression block (e.g. fun x -> x),
   // emit the dedent first and leave the quote closer for the next scan.
+  bool failed_at_sign_match = false;
   if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '@') {
     lexer->mark_end(lexer);
     advance(lexer);
@@ -651,6 +652,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         lexer->result_symbol = UNTYPED_QUOTED_CLOSE;
         return true;
       }
+      // @@ not followed by > -- this is an infix operator, not a quotation closer.
+      // The lexer has advanced past both @ chars; flag so we skip the keyword chain
+      // and treat this like an infix op.
+      failed_at_sign_match = true;
+      found_start_of_infix_op = true;
     } else if (lexer->lookahead == '>') {
       if (valid_symbols[DEDENT] && scanner->indents.size > 1) {
         pop_indent(scanner);
@@ -661,6 +667,12 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       lexer->mark_end(lexer);
       lexer->result_symbol = QUOTED_CLOSE;
       return true;
+    } else {
+      // @ not followed by > or @ -- this is an infix operator, not a quotation closer.
+      // The lexer has advanced past @; flag so we skip the keyword chain
+      // and treat this like an infix op.
+      failed_at_sign_match = true;
+      found_start_of_infix_op = true;
     }
   }
 
@@ -700,6 +712,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  bool failed_block_opener = false;
   {
     for (size_t i = 0; i < sizeof(block_openers) / sizeof(block_openers[0]); i++) {
       const BlockOpener *op = &block_openers[i];
@@ -712,6 +725,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           lexer->result_symbol = op->token;
           return true;
         }
+        failed_block_opener = true;
         break;
       }
     }
@@ -722,6 +736,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     lexer->result_symbol = NEWLINE_NO_ALIGNED;
     return true;
   }
+
+  if (!failed_block_opener && !failed_at_sign_match) {
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
@@ -961,8 +977,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  } // end of !failed_block_opener && !failed_at_sign_match
+
   if (valid_symbols[NEWLINE] && found_end_of_line_semi_colon &&
-      !found_comment_start) {
+      !found_comment_start && !found_bracket_end) {
     lexer->result_symbol = NEWLINE;
     return true;
   }

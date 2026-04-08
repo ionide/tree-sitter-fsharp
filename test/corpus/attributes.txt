@@ -262,3 +262,36 @@ module Impl =
             (long_identifier_or_op
               (long_identifier
                 (identifier)))))))))
+
+================================================================================
+assembly attribute with expression
+================================================================================
+
+namespace FSharp.Finance.Personal
+
+[<assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tests")>]
+()
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    (long_identifier
+      (identifier)
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (attributes
+        (attribute
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)
+              (identifier)
+              (identifier)
+              (identifier)))
+          (paren_expression
+            (const
+              (string)))))
+      (const
+        (unit)))))

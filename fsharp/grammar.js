@@ -233,8 +233,12 @@ module.exports = grammar({
         $.extern_binding,
         $._expression,
         $.preproc_if,
+        alias($._attribute_expression, $.declaration_expression),
         // $.exception_defn
       ),
+
+    _attribute_expression: ($) =>
+      prec(PREC.DO_DECL - 1, seq($.attributes, $._expression)),
 
     module_abbrev: ($) =>
       seq(
@@ -857,7 +861,11 @@ module.exports = grammar({
     _list_element: ($) =>
       seq(
         $._indent,
-        choice($._list_elements, $._comp_or_range_expression, $.slice_ranges),
+        choice(
+          $._list_elements,
+          seq(optional($._newline), $._comp_or_range_expression),
+          seq(optional($._newline), $.slice_ranges),
+        ),
         $._dedent,
       ),
 
