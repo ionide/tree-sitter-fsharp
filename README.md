@@ -51,10 +51,12 @@ parser_config.fsharp = {
 
 The `package.json` defines some helpful targets for developing the grammar:
 
-- `npm run generate` rebuilds all parser.
+- Run commands from the repository root so tree-sitter picks up both grammars from `tree-sitter.json`.
+- `npm run generate` rebuilds both parsers.
 - `npx tree-sitter test` runs all tests for both parsers.
-- `npx tree-sitter parse $file` run the `fsharp` parser on `$file` and outputs the parse tree.
-- `npx tree-sitter parse -d $file` run the `fsharp` parser on `$file` and prints debug information.
+- `npx tree-sitter parse $file` runs the `fsharp` parser on `$file` and outputs the parse tree.
+- `npx tree-sitter parse -d $file` runs the `fsharp` parser on `$file` and prints debug information.
+- For `.fsi` files, use `npx tree-sitter parse -p fsharp_signature $file` because `tree-sitter parse` does not reliably select the signature parser automatically.
 
 ## How to contribute
 

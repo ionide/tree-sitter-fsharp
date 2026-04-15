@@ -27,6 +27,8 @@ const PREC = {
   ELSE_EXPR: 11,
   INTERFACE: 12,
   COMMA: 13,
+  INFIX_OR: 13,
+  INFIX_AND: 14,
   PREFIX_EXPR: 15,
   SPECIAL_INFIX: 16,
   LARROW: 16,
@@ -52,6 +54,7 @@ module.exports = grammar({
     /[ \s\f\uFEFF\u2060\u200B]|\\\r?n/,
     $.block_comment,
     $.line_comment,
+    $.xml_doc,
     $.preproc_line,
     $.compiler_directive_decl,
     $.fsi_directive_decl,
@@ -71,16 +74,29 @@ module.exports = grammar({
     "#else",
     "#endif",
     "class",
+    "begin",
     $._struct_begin,
     $._interface_begin,
     "end",
     "and",
     "with",
     $._triple_quoted_content,
+    $._format_triple_quoted_content,
     $.block_comment_content,
     $._inside_string_marker,
     $._newline_not_aligned,
     $._tuple_marker,
+    $._quoted_close,
+    $._untyped_quoted_close,
+    $._multi_dollar_triple_quote_start,
+    $._multi_dollar_triple_quoted_content,
+    $._multi_dollar_interp_start,
+    $._multi_dollar_interp_end,
+    $._multi_dollar_triple_quote_end,
+    $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
+    $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
+    $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -88,14 +104,20 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
-    [$.preproc_if, $.preproc_if_in_expression],
+    [$._module_elem, $.preproc_if_in_expression],
+    [$._module_expression, $._expression],
+    [$.declaration_expression, $._comp_or_range_expression],
+    [$.preproc_if_in_expression, $.preproc_if_in_module_body],
+    [$.preproc_else_in_expression, $.preproc_else_in_module_body],
     [$.rules],
+    [$.prefixed_expression, $._low_prec_app, $.infix_expression],
+    [$._type, $._argument_type],
+    [$._type, $._curried_return_type],
   ],
 
   word: ($) => $.identifier,
 
   inline: ($) => [
-    $._module_elem,
     $._expression_or_range,
     $._object_expression_inner,
     $._record_type_defn_inner,
@@ -117,7 +139,7 @@ module.exports = grammar({
     // Top-level rules (BEGIN)
     //
     file: ($) =>
-      choice($.named_module, repeat1($.namespace), repeat($._module_elem)),
+      choice(repeat1($.namespace), prec(-1, repeat($._module_elem)), prec(1, $.named_module)),
 
     namespace: ($) =>
       seq(
@@ -134,8 +156,68 @@ module.exports = grammar({
         optional($.attributes),
         "module",
         optional($.access_modifier),
+        optional("rec"),
         field("name", $.long_identifier),
         repeat($._module_elem),
+      ),
+
+    _preproc_toplevel_module: ($) =>
+      seq(
+        optional($.attributes),
+        "module",
+        optional($.access_modifier),
+        optional("rec"),
+        field("name", $.long_identifier),
+        repeat($._module_elem),
+      ),
+
+    _module_body_elem: ($) =>
+      choice(
+        alias($.value_declaration, $.declaration_expression),
+        $.module_defn,
+        $.module_abbrev,
+        $.import_decl,
+        $.fsi_directive_decl,
+        $.type_definition,
+        $.exception_definition,
+        $.extern_binding,
+        alias($.preproc_if_in_module_body, $.preproc_if),
+        $._module_expression,
+        // $.exception_defn
+      ),
+
+    _module_expression: ($) =>
+      choice(
+        "null",
+        $.const,
+        $.paren_expression,
+        $.begin_end_expression,
+        $.long_identifier_or_op,
+        $.typed_expression,
+        $.infix_expression,
+        $.index_expression,
+        $.mutate_expression,
+        $.list_expression,
+        $.array_expression,
+        $.ce_expression,
+        $.prefixed_expression,
+        $.brace_expression,
+        $.anon_record_expression,
+        $.typecast_expression,
+        $.do_expression,
+        $.fun_expression,
+        $.function_expression,
+        $.if_expression,
+        $.while_expression,
+        $.for_expression,
+        $.match_expression,
+        $.try_expression,
+        $.literal_expression,
+        $.tuple_expression,
+        $.application_expression,
+        $.dot_expression,
+        $.srtp_call_expression,
+        // (static-typars : (member-sig) expr)
       ),
 
     _module_elem: ($) =>
@@ -147,10 +229,15 @@ module.exports = grammar({
         $.fsi_directive_decl,
         $.type_definition,
         $.exception_definition,
+        $.extern_binding,
         $._expression,
         $.preproc_if,
+        alias($._attribute_expression, $.declaration_expression),
         // $.exception_defn
       ),
+
+    _attribute_expression: ($) =>
+      prec(PREC.DO_DECL - 1, seq($.attributes, $._expression)),
 
     module_abbrev: ($) =>
       seq(
@@ -167,26 +254,34 @@ module.exports = grammar({
           optional($.attributes),
           "module",
           optional($.access_modifier),
+          optional("rec"),
           $.identifier,
           "=",
-          scoped($._module_body, $._indent, $._dedent),
+          choice(
+            scoped($._module_body, $._indent, $._dedent),
+            seq(
+              "begin",
+              scoped(optional($._module_body), $._indent, $._dedent),
+              "end",
+            ),
+          ),
         ),
       ),
 
     _module_body: ($) =>
       seq(
-        $._module_elem,
+        $._module_body_elem,
         repeat(
           prec(
             // Make sure to parse a module node before a sequential expression
             // NOTE: This removes all sequential expressions from module bodies
             PREC.SEQ_EXPR + 1,
-            seq(alias($._newline, ";"), $._module_elem),
+            seq(alias($._newline, ";"), $._module_body_elem),
           ),
         ),
       ),
 
-    import_decl: ($) => seq("open", $.long_identifier),
+    import_decl: ($) => seq("open", optional("type"), $.long_identifier),
 
     //
     // Attributes (BEGIN)
@@ -244,8 +339,9 @@ module.exports = grammar({
       seq(
         choice($.function_declaration_left, $.value_declaration_left),
         optional(seq(":", $._type)),
+        optional($.type_argument_constraints),
         "=",
-        field("body", $._expression_block),
+        field("body", $._expression_block_for_let),
       ),
 
     function_declaration_left: ($) =>
@@ -299,6 +395,7 @@ module.exports = grammar({
       choice(
         "null",
         alias("_", $.wildcard_pattern),
+        $.typed_const_pattern,
         $.const,
         $.as_pattern,
         $.disjunct_pattern,
@@ -341,25 +438,41 @@ module.exports = grammar({
         ),
       ),
 
+    typed_const_pattern: ($) =>
+      prec(
+        PREC.PAREN_EXPR,
+        seq(
+          $.const,
+          $._tyapp_open,
+          optional(choice($.types, $.measure)),
+          prec(PREC.PAREN_EXPR, ">"),
+        ),
+      ),
+
     argument_patterns: ($) =>
       // argument patterns are generally no different from normal patterns.
       // however, any time an argument pattern is a valid node, (i.e. inside a beginning fun decl)
       // it is always the correct node to construct.
       prec.left(1000, repeat1($._atomic_pattern)),
 
-    field_pattern: ($) => prec(1, seq($.long_identifier, "=", $._pattern)),
+    field_pattern: ($) =>
+      prec(
+        1,
+        seq($.long_identifier, "=", $._pattern),
+      ),
 
     _atomic_pattern: ($) =>
       choice(
         "null",
         "_",
+        $.typed_const_pattern,
         $.const,
         $.long_identifier,
         $.list_pattern,
         $.record_pattern,
         $.array_pattern,
         seq("(", $._pattern, ")"),
-        // :? atomic_type
+        $.type_check_pattern,
       ),
 
     _list_pattern_content: ($) =>
@@ -380,7 +493,19 @@ module.exports = grammar({
         seq(
           "{",
           $.field_pattern,
-          repeat(seq($._newline, $.field_pattern)),
+          choice(
+            seq(
+              repeat(seq($._newline, $.field_pattern)),
+              optional($._newline),
+            ),
+            seq(
+              $._indent,
+              $.field_pattern,
+              repeat(seq($._newline, $.field_pattern)),
+              optional($._newline),
+              $._dedent,
+            ),
+          ),
           "}",
         ),
       ),
@@ -411,6 +536,16 @@ module.exports = grammar({
     //
 
     _expression_block: ($) => seq($._indent, $._expression, $._dedent),
+
+    // Like _expression_block, but also allows the block to be terminated by
+    // the 'in' keyword instead of a dedent.  Used for let/use bindings so that
+    // single-line  let x = 1 in x  works (where no newline → no DEDENT).
+    _expression_block_for_let: ($) =>
+      seq($._indent, $._expression, choice($._dedent, $._in)),
+
+    _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
+
+    _mutable_expression: ($) => choice($.long_identifier_or_op, $.index_expression, $.dot_expression),
 
     _expression: ($) =>
       choice(
@@ -445,15 +580,40 @@ module.exports = grammar({
         $.application_expression,
         $.dot_expression,
         alias($.preproc_if_in_expression, $.preproc_if),
-        // (static-typars : (member-sig) expr)
+        $.srtp_call_expression,
       ),
 
     literal_expression: ($) =>
       prec(
         PREC.PAREN_EXPR,
         choice(
-          seq("<@", $._expression, "@>"),
-          seq("<@@", $._expression, "@@>"),
+          seq("<@", $._expression, $._quoted_close),
+          seq("<@@", $._expression, $._untyped_quoted_close),
+        ),
+      ),
+
+    srtp_call_expression: ($) =>
+      prec.right(
+        PREC.PAREN_EXPR,
+        seq(
+          alias($._srtp_type_argument, $.type_argument),
+          ":",
+          "(",
+          $.trait_member_constraint,
+          ")",
+          $._expression,
+        ),
+      ),
+
+    // Like type_argument but restricted to ^-prefixed identifiers (not '-prefixed)
+    // to avoid ambiguity with char literals in expression context.
+    _srtp_type_argument: ($) =>
+      prec(
+        10,
+        seq(
+          "^",
+          $.identifier,
+          repeat(seq("or", "^", $.identifier)),
         ),
       ),
 
@@ -537,6 +697,7 @@ module.exports = grammar({
           "upcast",
           "downcast",
           "new",
+          "fixed",
           $.prefix_op,
         ),
         prec.right(PREC.PREFIX_EXPR, $._expression),
@@ -634,9 +795,9 @@ module.exports = grammar({
       prec.right(
         PREC.LARROW,
         seq(
-          field("assignee", $._expression),
+          field("assignee", $._mutable_expression),
           "<-",
-          field("value", $._expression),
+          field("value", choice(prec(1, $._expression_block), $._expression)),
         ),
       ),
 
@@ -656,8 +817,8 @@ module.exports = grammar({
         PREC.PAREN_EXPR,
         seq(
           $._expression,
-          token.immediate(prec(PREC.PAREN_EXPR, "<")),
-          optional($.types),
+          $._tyapp_open,
+          optional(choice($.types, $.measure)),
           prec(PREC.PAREN_EXPR, ">"),
         ),
       ),
@@ -665,11 +826,17 @@ module.exports = grammar({
     declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block),
-          $.function_or_value_defn,
+          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
+          seq(
+            $.function_or_value_defn,
+            repeat($.and_bang),
+          ),
         ),
         field("in", $._expression),
       ),
+
+    and_bang: ($) =>
+      seq("and!", $._pattern, "=", $._expression_block_for_let),
 
     do_expression: ($) =>
       prec(PREC.DO_EXPR, seq(choice("do", "do!"), $._expression_block)),
@@ -686,13 +853,18 @@ module.exports = grammar({
               seq(alias($._newline, ";"), $._expression),
             ),
           ),
+          optional($._newline),
         ),
       ),
 
     _list_element: ($) =>
       seq(
         $._indent,
-        choice($._list_elements, $._comp_or_range_expression, $.slice_ranges),
+        choice(
+          $._list_elements,
+          seq(optional($._newline), $._comp_or_range_expression),
+          seq(optional($._newline), $.slice_ranges),
+        ),
         $._dedent,
       ),
 
@@ -737,7 +909,7 @@ module.exports = grammar({
       ),
 
     paren_expression: ($) =>
-      prec(PREC.PAREN_EXPR, seq("(", $._expression_block, ")")),
+      prec(PREC.PAREN_EXPR, seq("(", $._paren_expression_block, ")")),
 
     _high_prec_app: ($) =>
       prec.left(
@@ -746,7 +918,7 @@ module.exports = grammar({
           $._expression,
           choice(
             $.unit,
-            seq(token.immediate(prec(10000, "(")), $._expression_block, ")"),
+            seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
           ),
         ),
       ),
@@ -767,9 +939,19 @@ module.exports = grammar({
       ),
 
     infix_expression: ($) =>
-      prec.left(
-        PREC.SPECIAL_INFIX,
-        seq($._expression, $.infix_op, $._expression),
+      choice(
+        prec.left(
+          PREC.INFIX_OR,
+          seq($._expression, alias(choice("||", "or"), $.infix_op), $._expression),
+        ),
+        prec.left(
+          PREC.INFIX_AND,
+          seq($._expression, alias("&&", $.infix_op), $._expression),
+        ),
+        prec.left(
+          PREC.SPECIAL_INFIX,
+          seq($._expression, $.infix_op, $._expression),
+        ),
       ),
 
     ce_expression: ($) =>
@@ -778,9 +960,15 @@ module.exports = grammar({
         seq(
           prec(-1, $._expression),
           "{",
-          scoped($._comp_or_range_expression, $._indent, $._dedent),
+          scoped($._comp_expression_block, $._indent, $._dedent),
           "}",
         ),
+      ),
+
+    _comp_expression_block: ($) =>
+      seq(
+        $._comp_or_range_expression,
+        repeat(seq(alias($._newline, ";"), $._comp_or_range_expression)),
       ),
 
     sequential_expression: ($) =>
@@ -807,9 +995,22 @@ module.exports = grammar({
 
     _comp_or_range_expression: ($) =>
       choice(
-        $._expression,
+        alias($.comp_declaration_expression, $.declaration_expression),
         $.short_comp_expression,
-        // $.range_expression, TODO
+        $.range_expression,
+        $._expression,
+      ),
+
+    comp_declaration_expression: ($) =>
+      seq(
+        choice(
+          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
+          seq(
+            $.function_or_value_defn,
+            repeat($.and_bang),
+          ),
+        ),
+        field("in", $._comp_or_range_expression),
       ),
 
     // _comp_expressions: $ =>
@@ -984,6 +1185,13 @@ module.exports = grammar({
             token(prec(PREC.DOTDOT, "..")),
             field("to", $._expression),
           ),
+          seq(
+            field("from", $._expression),
+            token(prec(PREC.DOTDOT, "..")),
+            field("step", $._expression),
+            token(prec(PREC.DOTDOT, "..")),
+            field("to", $._expression),
+          ),
         ),
       ),
 
@@ -1012,8 +1220,76 @@ module.exports = grammar({
           $.constrained_type,
           $.flexible_type,
           $.anon_record_type,
+          $.struct_type,
         ),
       ),
+
+    // Like _type but excludes compound_type and function_type, used in member
+    // signature argument positions. Per F# spec, T * T before -> is always two
+    // separate positional arguments (not a tuple-typed arg); tuple/function-typed
+    // arguments must be parenthesized: (T * T) or (T -> T).
+    _argument_type: ($) =>
+      prec(
+        4,
+        choice(
+          $.simple_type,
+          $.generic_type,
+          $.paren_type,
+          $.postfix_type,
+          $.list_type,
+          $.static_type,
+          $.type_argument,
+          $.constrained_type,
+          $.flexible_type,
+          $.anon_record_type,
+          $.struct_type,
+        ),
+      ),
+
+    // Like _type but excludes function_type, used as the return type in
+    // curried_spec so that -> is always consumed by the arguments_spec repeat
+    // rather than being parsed as part of a function_type. Function return types
+    // must be parenthesized: (T -> T).
+    _curried_return_type: ($) =>
+      prec(
+        4,
+        choice(
+          $.simple_type,
+          $.generic_type,
+          $.paren_type,
+          $.compound_type,
+          $.postfix_type,
+          $.list_type,
+          $.static_type,
+          $.type_argument,
+          $.constrained_type,
+          $.flexible_type,
+          $.anon_record_type,
+          $.struct_type,
+        ),
+      ),
+
+    measure_atom: ($) =>
+      choice(
+        $.simple_type,
+        $.type_argument,
+        seq("(", $.measure, ")"),
+        "_",
+        "1",
+      ),
+
+    measure_power: ($) => prec.right(6, seq($.measure_atom, "^", $.int)),
+
+    _measure_operand: ($) =>
+      choice(
+        $.measure_power,
+        $.measure_atom,
+        $.compound_type,
+      ),
+
+    measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
+
+    measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
 
     simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
     generic_type: ($) =>
@@ -1025,13 +1301,14 @@ module.exports = grammar({
     function_type: ($) => prec.right(seq($._type, "->", $._type)),
     compound_type: ($) =>
       prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
+    struct_type: ($) => seq("struct", $.paren_type),
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
     list_type: ($) => seq($._type, "[]"),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
     anon_record_type: ($) =>
-      seq("{|", scoped($.record_fields, $._indent, $._dedent), "|}"),
+      seq(optional("struct"), "{|", scoped($.record_fields, $._indent, $._dedent), "|}"),
     types: ($) =>
       seq($._type, repeat(prec.left(PREC.COMMA - 1, seq(",", $._type)))),
 
@@ -1049,13 +1326,34 @@ module.exports = grammar({
       choice(
         $._type,
         $._static_parameter,
-        // measure
+        $.measure,
       ),
 
     type_attributes: ($) =>
       seq(
         $.type_attribute,
         repeat(prec.right(PREC.COMMA, seq(",", $.type_attribute))),
+      ),
+
+
+    _multiline_generic_type: ($) =>
+      prec.right(
+        5,
+        seq($.long_identifier, "<", $._indent, optional($.type_attributes), ">", $._dedent),
+      ),
+
+    _multiline_generic_type_head: ($) =>
+      prec.right(5, seq($.long_identifier, "<", $._indent, optional($.type_attributes), ">")),
+
+    _multiline_generic_function_type: ($) =>
+      prec.right(
+        6,
+        seq(
+          alias($._multiline_generic_type_head, $.generic_type),
+          "->",
+          $._type,
+          $._dedent,
+        ),
       ),
 
     atomic_type: ($) =>
@@ -1152,11 +1450,11 @@ module.exports = grammar({
         ),
       ),
 
-    curried_spec: ($) => seq(repeat(seq($.arguments_spec, "->")), $._type),
+    curried_spec: ($) => seq(repeat(seq($.arguments_spec, "->")), $._curried_return_type),
 
     argument_spec: ($) =>
       prec.left(
-        seq(optional($.attributes), optional($.argument_name_spec), $._type),
+        seq(optional($.attributes), optional($.argument_name_spec), $._argument_type),
       ),
 
     arguments_spec: ($) =>
@@ -1184,7 +1482,7 @@ module.exports = grammar({
         optional(
           seq(
             "of",
-            $._type,
+            $.union_type_fields,
           )
         ),
       ),
@@ -1209,7 +1507,12 @@ module.exports = grammar({
         $.enum_type_defn,
         $.type_abbrev_defn,
         $.type_extension,
+        $.type_declaration,
       ),
+
+    // Bare type declaration with no body, used for e.g. [<Measure>] type kg
+    // _type_decl_newline fires only at end-of-line, making this unambiguous with anon_type_defn
+    type_declaration: ($) => seq($.type_name, $._type_decl_newline),
 
     type_name: ($) =>
       prec(
@@ -1227,7 +1530,14 @@ module.exports = grammar({
         ),
       ),
 
-    type_extension: ($) => seq($.type_name, $.type_extension_elements),
+    type_extension: ($) =>
+      seq(
+        $.type_name,
+        alias($._type_extension_with, $.type_extension_elements),
+      ),
+
+    _type_extension_with: ($) =>
+      seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
 
     delegate_type_defn: ($) =>
       seq($.type_name, "=", scoped($.delegate_signature, $._indent, $._dedent)),
@@ -1235,7 +1545,23 @@ module.exports = grammar({
     delegate_signature: ($) => seq("delegate", "of", $._type),
 
     type_abbrev_defn: ($) =>
-      seq($.type_name, "=", scoped($._type, $._indent, $._dedent)),
+      seq(
+        $.type_name,
+        "=",
+        field(
+          "block",
+          seq(
+            $._indent,
+            choice(
+              alias($._multiline_generic_function_type, $.function_type),
+              $._type,
+              $.measure,
+              alias($._multiline_generic_type, $.generic_type),
+            ),
+            $._dedent,
+          ),
+        ),
+      ),
 
     _class_type_body_inner: ($) =>
       choice($.class_inherits_decl, $.type_extension_elements),
@@ -1359,10 +1685,11 @@ module.exports = grammar({
           optional($.primary_constr_args),
           "=",
           choice(
+            alias($.inline_line_comment, $.line_comment),
             scoped($._class_type_body, $._indent, $._dedent),
             seq(
               choice("begin", "class"),
-              scoped(optional($._class_type_body), $._indent, $._dedent),
+              scoped(optional(seq(optional($._newline), optional($._class_type_body))), $._indent, $._dedent),
               "end",
             ),
             seq(
@@ -1386,11 +1713,9 @@ module.exports = grammar({
 
     type_extension_elements: ($) =>
       prec.left(
-        seq(
-          choice(
-            seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
-            $._type_extension_inner,
-          ),
+        choice(
+          seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+          $._type_extension_inner,
         ),
       ),
 
@@ -1547,6 +1872,7 @@ module.exports = grammar({
         $._pattern,
         "=",
         $._expression_block,
+        optional(seq("then", $._expression_block)),
       ),
 
     // additional_constr_expr: $ =>
@@ -1564,6 +1890,29 @@ module.exports = grammar({
     //     // seq('{', $.class_inherits_decl, $.field_initializers, '}'),
     //     $._expression,
     //   ),
+
+    extern_binding: ($) =>
+      seq(
+        optional($.attributes),
+        "extern",
+        field("return_type", $._type),
+        field("name", $.identifier),
+        "(",
+        field(
+          "parameters",
+          optional(
+            seq($.extern_param, repeat(seq(",", $.extern_param))),
+          ),
+        ),
+        ")",
+      ),
+
+    extern_param: ($) =>
+      seq(
+        optional($.attributes),
+        field("type", $._type),
+        field("name", $.identifier),
+      ),
 
     class_inherits_decl: ($) =>
       prec.left(
@@ -1586,7 +1935,11 @@ module.exports = grammar({
     field_initializers: ($) =>
       prec(
         10000000,
-        seq($.field_initializer, repeat(seq($._newline, $.field_initializer))),
+        seq(
+          $.field_initializer,
+          repeat(seq($._newline, $.field_initializer)),
+          optional($._newline),
+        ),
       ),
 
     //
@@ -1603,6 +1956,7 @@ module.exports = grammar({
     _unicodegraph_short: (_) => /\\u[0-9a-fA-F]{4}/,
     _unicodegraph_long: (_) => /\\u[0-9a-fA-F]{8}/,
     _trigraph: (_) => /\\[0-9]{3}/,
+    _hexgraph_short: (_) => /\\x[0-9a-fA-F]{2}/,
 
     _char_char: ($) =>
       choice(
@@ -1610,6 +1964,7 @@ module.exports = grammar({
         $._escape_char,
         $._trigraph,
         $._unicodegraph_short,
+        $._hexgraph_short,
       ),
 
     // note: \n is allowed in strings
@@ -1625,6 +1980,7 @@ module.exports = grammar({
         $._escape_char,
         $._trigraph,
         $._unicodegraph_short,
+        $._hexgraph_short,
         $._non_escape_char,
         $._unicodegraph_long,
       ),
@@ -1632,11 +1988,14 @@ module.exports = grammar({
     char: (_) =>
       prec(
         -1,
-        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|(\\\\))?'B?/,
+        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|(\\\\))?'B?/,
       ),
 
     format_string_eval: ($) =>
-      seq(token.immediate(prec(1000, "{")), $._expression, "}"),
+      choice(
+        seq(token.immediate(prec(1000, "{")), $._expression, "}"),
+        seq($._multi_dollar_interp_start, $._expression, $._multi_dollar_interp_end),
+      ),
 
     format_string: ($) =>
       seq(
@@ -1658,11 +2017,19 @@ module.exports = grammar({
       seq('@"', repeat($._verbatim_string_char), token.immediate('"B')),
 
     format_triple_quoted_string: ($) =>
-      seq(
-        token(prec(100, '$"""')),
-        // repeat(choice($.format_string_eval, $._string_char)),
-        $._triple_quoted_content,
-        '"""',
+      choice(
+        seq(
+          token(prec(100, '$"""')),
+          optional($._format_triple_quoted_content),
+          repeat(seq($.format_string_eval, optional($._format_triple_quoted_content))),
+          '"""',
+        ),
+        seq(
+          $._multi_dollar_triple_quote_start,
+          optional($._multi_dollar_triple_quoted_content),
+          repeat(seq($.format_string_eval, optional($._multi_dollar_triple_quoted_content))),
+          $._multi_dollar_triple_quote_end,
+        ),
       ),
 
     triple_quoted_string: ($) =>
@@ -1742,11 +2109,11 @@ module.exports = grammar({
     _identifier_or_op: ($) =>
       choice($.identifier, $.op_identifier, $.active_pattern),
 
-    _infix_or_prefix_op: (_) => choice("+", "-", "+.", "-.", "%", "&", "&&"),
+    _infix_or_prefix_op: (_) => choice("+", "-", "+.", "-.", "%", "&"),
 
     prefix_op: ($) =>
       prec.left(
-        choice($._infix_or_prefix_op, repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
+        choice($._infix_or_prefix_op, "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
       ),
 
     infix_op: ($) =>
@@ -1755,14 +2122,13 @@ module.exports = grammar({
         choice(
           $._infix_or_prefix_op,
           token.immediate(prec(1, /[+-]/)),
-          /[-+<>|&^*/'%@?][!%&*+./<=>@^|~?-]*/,
-          "||",
+          /[-+=<>|&^*'%@?][!%&*+./<=>@^|~?-]*/,
+          /\/[!%&*+.<=>@^|~?-]*/,
           "=",
           "!=",
           ":=",
           "::",
           "$",
-          "or",
           "?",
           "?",
           "?<-",
@@ -1822,7 +2188,21 @@ module.exports = grammar({
     //
     block_comment: ($) =>
       seq("(*", $.block_comment_content, token.immediate("*)")),
-    line_comment: (_) => token(/\/\/+[^\n\r]*/),
+    inline_line_comment: (_) =>
+      token.immediate(
+        choice(
+          /[ \t]*\/\/([^/\n\r][^\n\r]*)?/,
+          /[ \t]*\/{4,}[^\n\r]*/,
+        ),
+      ),
+    line_comment: (_) =>
+      token(
+        choice(
+          /\/\/([^/\n\r][^\n\r]*)?/,
+          /\/{4,}[^\n\r]*/,
+        ),
+      ),
+    xml_doc: (_) => token(/\/\/\/([^/\n\r][^\n\r]*)?/),
 
     // preprocessors
     compiler_directive_decl: ($) =>
@@ -1831,16 +2211,17 @@ module.exports = grammar({
         choice(
           seq(
             "#nowarn",
-            alias($._string_literal, $.string),
+            choice(alias($._string_literal, $.string), $.int),
             $._newline_not_aligned,
           ),
+          seq("#warnon", $.int, $._newline_not_aligned),
           seq("#light", $._newline_not_aligned),
         ),
       ),
 
     fsi_directive_decl: ($) =>
       seq(
-        choice("#r", "#load"),
+        choice("#r", "#load", "#time", "#I", "#help", "#quit"),
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
         /\n/,
       ),
@@ -1853,10 +2234,36 @@ module.exports = grammar({
         $._newline_not_aligned,
       ),
 
-    ...preprocIf("", ($) => $._module_elem),
+    _preproc_expression: ($) =>
+      choice(
+        $.identifier,
+        $.bool,
+        $.preproc_if_not_expression,
+        $.preproc_if_and_expression,
+        $.preproc_if_or_expression,
+        seq("(", $._preproc_expression, ")"),
+      ),
+
+    preproc_if_not_expression: ($) => seq("!", $._preproc_expression),
+
+    preproc_if_and_expression: ($) =>
+      prec.left(2, seq($._preproc_expression, "&&", $._preproc_expression)),
+
+    preproc_if_or_expression: ($) =>
+      prec.left(1, seq($._preproc_expression, "||", $._preproc_expression)),
+
+    ...preprocIf(
+      "",
+      ($) => choice($._module_elem, alias($._preproc_toplevel_module, $.named_module)),
+    ),
     ...preprocIf(
       "_in_expression",
       ($) => repeat(seq(optional($._newline), $._expression)),
+      -2,
+    ),
+    ...preprocIf(
+      "_in_module_body",
+      ($) => repeat(seq(optional($._newline), $._module_body_elem)),
       -2,
     ),
     ...preprocIf(
@@ -1912,7 +2319,7 @@ function preprocIf(suffix, content, precedence = 0) {
         precedence,
         seq(
           "#if",
-          field("condition", $.identifier),
+          field("condition", $._preproc_expression),
           $._newline_not_aligned,
           content($),
           field("alternative", optional(alternativeBlock($))),

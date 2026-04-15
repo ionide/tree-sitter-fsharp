@@ -3,11 +3,11 @@
 
 [
   (line_comment)
+  (xml_doc)
   (block_comment)
 ] @comment @spell
 
-((line_comment) @comment.documentation @spell
- (#not-match? @comment.documentation "^///"))
+(xml_doc) @comment.documentation @spell
 
 (const
   [
@@ -116,7 +116,35 @@
 
 (application_expression
   .
-  (_) @function.call
+  (long_identifier_or_op
+    (identifier) @function.call)
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (dot_expression
+    field: (long_identifier_or_op
+      (identifier) @function.call))
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (typed_expression
+    (long_identifier_or_op
+      (identifier) @function.call)
+    (_))
+  .
+  (_) @variable)
+
+(application_expression
+  .
+  (typed_expression
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call))
+    (_))
   .
   (_) @variable)
 
@@ -169,6 +197,8 @@
   (triple_quoted_string)
   (verbatim_string)
   (char)
+  (format_string)
+  (format_triple_quoted_string)
 ] @spell @string)
 
 (compiler_directive_decl) @keyword.directive
@@ -238,6 +268,9 @@
    ">"
   ] @punctuation.bracket)
 
+(typed_expression
+  ">" @punctuation.bracket)
+
 [
   "if"
   "then"
@@ -280,6 +313,7 @@
 [
   "abstract"
   "delegate"
+  "extern"
   "static"
   "inline"
   "mutable"
@@ -294,6 +328,7 @@
   "let!"
   "use"
   "use!"
+  "and!"
   "member"
 ] @keyword.function
 

@@ -250,3 +250,206 @@ module Program =
                 (identifier))))
           (const
             (unit)))))))
+
+================================================================================
+SRTP when constraint on return type (simple)
+================================================================================
+
+let inline f x : ^a when ^a : comparison = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (type_argument
+        (identifier))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+SRTP when constraint on return type (trait member)
+================================================================================
+
+let inline add (x: ^a) (y: ^a) : ^a when ^a : (static member (+) : ^a * ^a -> ^a) = x + y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      (type_argument
+        (identifier))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier))
+          (trait_member_constraint
+            (op_identifier)
+            (compound_type
+              (type_argument
+                (identifier))
+              (function_type
+                (type_argument
+                  (identifier))
+                (type_argument
+                  (identifier)))))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+typed value with quotient measure
+================================================================================
+
+let speed: float<m/s> = 1.0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (measure
+              (measure_quotient
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier))))
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      body: (const
+        (float)))))
+
+================================================================================
+typed value with power measure
+================================================================================
+
+let area: float<cm^2> = 1.0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (measure
+              (measure_power
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier))))
+                (int))))))
+      body: (const
+        (float)))))
+
+================================================================================
+typed value with parenthesized measure
+================================================================================
+
+let speed: float<(m/s)> = 1.0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (measure
+              (measure
+                (measure_quotient
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier))))
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier))))))))))
+      body: (const
+        (float)))))
+
+================================================================================
+typed value with dimensionless reciprocal measure
+================================================================================
+
+let freq: float<1/s> = 1.0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (generic_type
+        (long_identifier
+          (identifier))
+        (type_attributes
+          (type_attribute
+            (measure
+              (measure_quotient
+                (measure_atom)
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      body: (const
+        (float)))))

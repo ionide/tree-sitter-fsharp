@@ -10,9 +10,8 @@ let x = ResizeArray<string>()
 //<- keyword.function
 //  ^ variable
 //      ^ function.call
-//                 ^ operator
 //                  ^ type.builtin
-//                        ^ operator
+//                        ^ punctuation.bracket
 //                         ^ variable
 //                          ^ variable
 
@@ -20,9 +19,8 @@ let x = ResizeArray<A>()
 //<- keyword.function
 //  ^ variable
 //      ^ function.call
-//                 ^ operator
 //                  ^ type
-//                   ^ operator
+//                   ^ punctuation.bracket
 //                    ^ variable
 //                     ^ variable
 
@@ -30,7 +28,6 @@ let x = ResizeArray<{|word: string |}>()
 //<- keyword.function
 //  ^ variable
 //      ^ function.call
-//                 ^ operator
 //                  ^ punctuation.bracket
 //                   ^ punctuation.bracket
 //                    ^ property

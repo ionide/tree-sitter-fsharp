@@ -554,7 +554,68 @@ let x =
             (identifier))))
       (const
         (triple_quoted_string
-          (format_triple_quoted_string))))))
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
+
+================================================================================
+multi-dollar triple quoted format string
+================================================================================
+
+let x =
+  $$"""int: {{2 + 2}}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
+
+================================================================================
+triple-dollar triple quoted format string
+================================================================================
+
+let x =
+  $$$"""int: {{{2 + 2}}}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (infix_expression
+                (const
+                  (int))
+                (infix_op)
+                (const
+                  (int))))))))))
 
 ================================================================================
 underscores in numeric literal
@@ -733,3 +794,83 @@ do
               (char))
             (const
               (char))))))))
+
+================================================================================
+float with measure literal
+================================================================================
+
+let x = 1.0<cm>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (typed_expression
+        (const
+          (float))
+        (types
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+float with quotient and power measure literal
+================================================================================
+
+let x = 9.81<m/s^2>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (typed_expression
+        (const
+          (float))
+        (measure
+          (measure_quotient
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (measure_power
+              (measure_atom
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (int))))))))
+
+================================================================================
+float with dimensionless reciprocal measure literal
+================================================================================
+
+let x = 5.0<1/s>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (typed_expression
+        (const
+          (float))
+        (measure
+          (measure_quotient
+            (measure_atom)
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))))))))

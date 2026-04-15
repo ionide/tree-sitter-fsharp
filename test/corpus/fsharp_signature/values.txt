@@ -19,8 +19,350 @@ val myVal : string = "test"
       (identifier_pattern
         (long_identifier_or_op
           (identifier))))
-    (simple_type
-      (long_identifier
-        (identifier)))
+    (curried_spec
+      (simple_type
+        (long_identifier
+          (identifier))))
     (const
       (string))))
+
+===
+val with function type
+:language(fsharp_signature)
+===
+
+val add : int -> int -> int
+
+---
+
+(file
+  (value_definition
+    (value_declaration_left
+      (identifier_pattern
+        (long_identifier_or_op
+          (identifier))))
+    (curried_spec
+      (arguments_spec
+        (argument_spec
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (arguments_spec
+        (argument_spec
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (simple_type
+        (long_identifier
+          (identifier))))))
+
+===
+namespace with open and val
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+open System
+
+val add : int -> int -> int
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (import_decl
+      (long_identifier
+        (identifier)))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (arguments_spec
+          (argument_spec
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (simple_type
+          (long_identifier
+            (identifier)))))))
+
+===
+top-level module signature
+:language(fsharp_signature)
+===
+
+module MyLib
+
+val add : int -> int -> int
+
+---
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (arguments_spec
+          (argument_spec
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (simple_type
+          (long_identifier
+            (identifier)))))))
+
+===
+union type definition in signature
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+type Color = Red | Green | Blue
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)))))))
+
+===
+exception definition in signature
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+exception MyError of string
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (exception_definition
+      exception_name: (long_identifier
+        (identifier))
+      (union_type_fields
+        (union_type_field
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+===
+sub-module in signature
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+module Sub =
+    val x : int
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (module_defn
+      (identifier)
+      block: (value_definition
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (curried_spec
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+===
+record type in signature
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+type Point = { X: float; Y: float }
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+===
+interface type in signature
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+type IRepository<'T> =
+    abstract member GetAll : unit -> 'T list
+    abstract member Save : 'T -> unit
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (long_identifier
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (postfix_type
+                  (type_argument
+                    (identifier))
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (type_argument
+                      (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+===
+val with named parameters
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+val singleton : value:'T -> list<'T>
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (argument_name_spec
+              name: (identifier))
+            (type_argument
+              (identifier))))
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (type_argument
+                (identifier)))))))))
+
+===
+val with measure type
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+val speed : float<m/s>
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (measure
+                (measure_quotient
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier))))
+                  (measure_atom
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))))

@@ -97,3 +97,64 @@ let (?->) x = x
       (long_identifier_or_op
         (long_identifier
           (identifier))))))
+
+================================================================================
+comparison without spaces in parens
+================================================================================
+
+let x = (l<r)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (paren_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+custom operator starting with equals
+================================================================================
+
+let (=>) a b = (a, b)
+let x = 1 => 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (op_identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))))
+      body: (paren_expression
+        (tuple_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (const
+          (int))
+        (infix_op)
+        (const
+          (int))))))
