@@ -26,6 +26,10 @@ type IWorker =
   abstract member Work : unit -> unit
   //              ^^^^ definition.method
 
+[<Measure>]
+type kg
+//   ^^ definition.class
+
 module Inner =
 //     ^^^^^ definition.module
   let innerVal = 42
