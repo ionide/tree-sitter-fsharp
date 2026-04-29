@@ -33,6 +33,9 @@
     (type_extension
       (type_name
         type_name: (_) @name))
+    (type_declaration
+      (type_name
+        type_name: (_) @name))
   ]) @definition.class
 
 (exception_definition
