@@ -98,12 +98,14 @@ static inline bool peek_is_type_app_indent(Scanner *scanner) {
          *array_back(&scanner->type_app_indents);
 }
 
-// Look ahead from the position after '<' to the matching '>' and report whether
-// the content is type-arg-shaped AND a newline appears before the close. Used
-// to recognize multi-line type apps where the first arg is on the same line as
-// '<' (e.g., `T<First,\n  Second>`); the simpler `found_end_of_line` test only
-// catches the case where '<' itself ends the line.
-static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
+// Peek forward from after a '<' to its matching '>' and check that the content
+// is type-arg-shaped per F# spec Section 15.3 (identifiers, whitespace, and
+// ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}').
+// If `out_saw_newline` is non-NULL, also reports whether a newline appeared
+// before the close — used to distinguish multi-line type apps where the first
+// arg sits on the same line as '<' (which `found_end_of_line` alone misses).
+static inline bool is_type_application_open_ex(TSLexer *lexer,
+                                               bool *out_saw_newline) {
   int angle_depth = 1;
   int paren_depth = 0;
   bool saw_newline = false;
@@ -126,104 +128,40 @@ static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
 
     if (c == '(') { paren_depth++; advance(lexer); continue; }
     if (c == ')') {
+      // Unbalanced ')' rules out type args (e.g. `(l<r)`).
       if (paren_depth <= 0) return false;
       paren_depth--; advance(lexer); continue;
     }
     if (c == '<') { angle_depth++; advance(lexer); continue; }
     if (c == '>') {
       angle_depth--;
-      if (angle_depth == 0) return saw_newline;
-      advance(lexer);
-      continue;
-    }
-    if (c == '-') {
-      advance(lexer);
-      if (lexer->lookahead == '>') { advance(lexer); continue; }
-      return false;
-    }
-    return false;
-  }
-  return false;
-}
-
-// Check if the content after '<' looks like type arguments per F# spec Section 15.3.
-// Valid type argument content: identifiers, whitespace, and type-syntax characters
-// like ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}'.
-// Returns true if the '<' should be treated as a type application opener.
-static inline bool is_type_application_open(TSLexer *lexer) {
-  // We've already seen '<', now peek forward.
-  // If immediately '>' this is '<>' (empty type args).
-  // Track angle bracket depth to find the matching '>'.
-  int angle_depth = 1;
-  int paren_depth = 0;
-
-  while (!lexer->eof(lexer) && angle_depth > 0) {
-    int32_t c = lexer->lookahead;
-
-    if (c == '\n' || c == '\r') {
-      // Allow newlines in multi-line type argument lists
-      advance(lexer);
-      continue;
-    }
-
-    // Valid type argument characters
-    if (is_word_char(c) || c == ' ' || c == '\t' || c == ',' || c == '*' ||
-        c == '.' || c == ':' || c == '#' || c == '^' || c == '/' || c == '|' ||
-        c == '{' || c == '}' || c == '[' || c == ']') {
-      advance(lexer);
-      continue;
-    }
-
-    if (c == '(') {
-      paren_depth++;
-      advance(lexer);
-      continue;
-    }
-
-    if (c == ')') {
-      if (paren_depth <= 0) {
-        // Unbalanced ')' - not type args (e.g., "(l<r)")
-        return false;
-      }
-      paren_depth--;
-      advance(lexer);
-      continue;
-    }
-
-    if (c == '<') {
-      angle_depth++;
-      advance(lexer);
-      continue;
-    }
-
-    if (c == '>') {
-      angle_depth--;
       if (angle_depth == 0) {
-        // Found matching '>' - this is a type application
+        if (out_saw_newline) *out_saw_newline = saw_newline;
         return true;
       }
       advance(lexer);
       continue;
     }
-
     if (c == '-') {
-      // '->' is valid in function types, but '-' alone followed by
-      // a digit or other op char is not type syntax
+      // '->' is valid in function types, bare '-' is not.
       advance(lexer);
-      if (lexer->lookahead == '>') {
-        advance(lexer);
-        continue;
-      }
-      // Bare '-' is not valid in type args
+      if (lexer->lookahead == '>') { advance(lexer); continue; }
       return false;
     }
-
-    // Any other character is not valid in type arguments
-    // This catches: '&', '!', '=', '+', ';', '@', '$', '%', '?', etc.
+    // Anything else (`&`, `!`, `=`, `+`, `;`, `@`, `$`, `%`, `?`, …) rules out type args.
     return false;
   }
 
   return false;
+}
+
+static inline bool is_type_application_open(TSLexer *lexer) {
+  return is_type_application_open_ex(lexer, NULL);
+}
+
+static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
+  bool saw_newline = false;
+  return is_type_application_open_ex(lexer, &saw_newline) && saw_newline;
 }
 
 static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
@@ -1105,12 +1043,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
-  // Like PAREN_INDENT, but only emitted for multi-line generic type arguments
-  // (e.g., `T<\n  Arg1,\n  Arg2>` or `T<First,\n  Second>`). The closing '>'
-  // triggers DEDENT via scanner's bracket-end-style handling. Fires either
-  // when the whitespace just consumed contained a newline, or when peek-ahead
-  // shows a newline before the matching '>' (variant where the first arg sits
-  // on the same line as '<').
+  // Fires after '<' if the type args span multiple lines — either we just
+  // consumed a newline, or peek-ahead shows one before the matching '>' (the
+  // variant where the first arg shares the line with '<').
   if (valid_symbols[TYPE_APP_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end &&
       !found_preprocessor_end && !found_same_line_pipe_infix) {
@@ -1126,10 +1061,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     bool is_paren_indent = peek_is_paren_indent(scanner);
     uint16_t current_indent_length = peek_indent_length(scanner);
 
-    // Allow '>' to close a TYPE_APP_INDENT scope. When the parser is finishing
-    // multi-line generic type args, '>' acts like ')' for indent-popping
-    // purposes. Only fires when the top-of-stack indent was specifically pushed
-    // for a multi-line type app — not all paren indents.
+    // '>' closes a TYPE_APP_INDENT the same way ')' closes a PAREN_INDENT —
+    // gated on the type-app bit so we don't pop ordinary paren scopes here.
     bool found_type_app_close = peek_is_type_app_indent(scanner) &&
                                 lexer->lookahead == '>' &&
                                 valid_symbols[DEDENT];
@@ -1260,7 +1193,6 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)bits;
   }
 
-  // Serialize type_app_indents alongside paren_indents using the same bit-packing.
   for (size_t byte_index = 0;
        byte_index < paren_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
        byte_index++) {
@@ -1313,7 +1245,7 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     }
 
     size_t actual_indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
-    size_t paren_bytes = (actual_indent_count + 7) / 8;
+    size_t flag_bytes = (actual_indent_count + 7) / 8;
     for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
       size_t byte_offset = indent_index / 8;
       bool is_paren_indent = false;
@@ -1323,9 +1255,8 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       }
       array_push(&scanner->paren_indents, is_paren_indent);
     }
-    size += paren_bytes;
+    size += flag_bytes;
 
-    // Deserialize type_app_indents (same bit-packing as paren_indents).
     for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
       size_t byte_offset = indent_index / 8;
       bool is_type_app_indent = false;
@@ -1335,7 +1266,7 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       }
       array_push(&scanner->type_app_indents, is_type_app_indent);
     }
-    size += paren_bytes;
+    size += flag_bytes;
   }
 }
 
