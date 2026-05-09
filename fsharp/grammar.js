@@ -95,6 +95,7 @@ module.exports = grammar({
     $._multi_dollar_triple_quote_end,
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._type_app_indent, // like _paren_indent but only fires after a newline; closed by '>' (used for multi-line generic type args)
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
 
@@ -414,7 +415,7 @@ module.exports = grammar({
         $.named_field_pattern,
       ),
 
-    optional_pattern: ($) => prec.left(seq("?", $._pattern)),
+    optional_pattern: ($) => prec.left(3, seq("?", $._pattern)),
 
     type_check_pattern: ($) =>
       prec.right(seq(":?", $.atomic_type, optional(seq("as", $.identifier)))),
@@ -429,7 +430,7 @@ module.exports = grammar({
     conjunct_pattern: ($) => prec.left(0, seq($._pattern, "&", $._pattern)),
     typed_pattern: ($) =>
       prec.left(
-        -1,
+        2,
         seq(
           $._pattern,
           ":",
@@ -1497,7 +1498,7 @@ module.exports = grammar({
           optional($.attributes),
           "type",
           $._type_defn_body,
-          repeat(seq(optional($.attributes), "and", $._type_defn_body)),
+          repeat(seq("and", optional($.attributes), $._type_defn_body)),
         ),
       ),
 
@@ -1522,7 +1523,6 @@ module.exports = grammar({
       prec(
         2,
         seq(
-          optional($.attributes),
           optional($.access_modifier),
           choice(
             seq(
@@ -1922,7 +1922,35 @@ module.exports = grammar({
       prec.left(
         seq(
           "inherit",
-          scoped(seq($._type, optional($._expression)), $._indent, $._dedent),
+          scoped(
+            seq(
+              choice(
+                $._type,
+                alias($._inline_multiline_generic_type, $.generic_type),
+              ),
+              optional($._expression),
+            ),
+            $._indent,
+            $._dedent,
+          ),
+        ),
+      ),
+
+    // Multi-line generic type used in class_inherits_decl. The opening '<' is
+    // followed by a newline + indent which is tracked as a paren_indent in
+    // the scanner; the closing '>' triggers DEDENT (like a bracket end), so
+    // the type args can span multiple lines and '>' on the final line closes
+    // the scope without needing a NEWLINE first.
+    _inline_multiline_generic_type: ($) =>
+      prec.right(
+        5,
+        seq(
+          $.long_identifier,
+          "<",
+          $._type_app_indent,
+          $.type_attributes,
+          $._dedent,
+          ">",
         ),
       ),
 
