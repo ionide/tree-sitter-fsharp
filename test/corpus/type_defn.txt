@@ -1169,21 +1169,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (typed_pattern
-          (repeat_pattern
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
-                  (identifier))))
+        (repeat_pattern
+          (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
                 (identifier))))
-          (simple_type
-            (long_identifier
-              (identifier)))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
       (type_extension_elements
         (member_defn
           (additional_constr_defn
@@ -1232,21 +1232,21 @@ type A(x:int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (typed_pattern
-          (repeat_pattern
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
-                  (identifier))))
+        (repeat_pattern
+          (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
                 (identifier))))
-          (simple_type
-            (long_identifier
-              (identifier)))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
       (type_extension_elements
         (member_defn
           (method_or_prop_defn
@@ -1287,21 +1287,21 @@ type A(x: int, y:int) =
       (type_name
         (identifier))
       (primary_constr_args
-        (typed_pattern
-          (repeat_pattern
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
-                  (identifier))))
+        (repeat_pattern
+          (typed_pattern
             (identifier_pattern
               (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
                 (identifier))))
-          (simple_type
-            (long_identifier
-              (identifier)))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
       (type_extension_elements
         (interface_implementation
           (generic_type
@@ -2581,46 +2581,37 @@ type A = A
         (identifier))
       (union_type_cases
         (union_type_case
-          (identifier)))))
-  (infix_expression
-    (application_expression
-      (application_expression
-        (application_expression
-          (application_expression
-            (application_expression
-              (long_identifier_or_op
-                (identifier))
-              (long_identifier_or_op
-                (identifier)))
-            (long_identifier_or_op
-              (identifier)))
-          (long_identifier_or_op
-            (identifier)))
-        (long_identifier_or_op
-          (op_identifier)))
-      (paren_expression
-        (tuple_expression
-          (typecast_expression
-            (long_identifier_or_op
-              (identifier))
-            (simple_type
-              (long_identifier
-                (identifier))))
-          (long_identifier_or_op
-            (identifier)))))
-    (infix_op)
-    (fun_expression
-      (argument_patterns
-        (long_identifier
           (identifier)))
-      (application_expression
-        (long_identifier_or_op
-          (long_identifier
-            (identifier)
-            (identifier)))
-        (long_identifier_or_op
-          (long_identifier
-            (identifier)))))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (op_identifier))
+            (paren_pattern
+              (repeat_pattern
+                (typed_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier))))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))))
+            (fun_expression
+              (argument_patterns
+                (long_identifier
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))))))))))
+
 ================================================================================
 secondary constructor with then expression
 ================================================================================
@@ -3534,7 +3525,7 @@ module M =
     with
       static member (+) (a: R, b: R) = { Name = "" }
 
-    type AfterR = { X: int }
+  type AfterR = { X: int }
 
 --------------------------------------------------------------------------------
 
@@ -3611,19 +3602,17 @@ module Entry =
     (identifier)
     (declaration_expression
       (function_or_value_defn
-        (value_declaration_left
+        (function_declaration_left
           (access_modifier)
-          (identifier_pattern
-            (long_identifier_or_op
-              (identifier))
-            (paren_pattern
-              (typed_pattern
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier)))
-                (simple_type
-                  (long_identifier
-                    (identifier)))))))
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))))
         (mutate_expression
           (long_identifier_or_op
             (long_identifier
