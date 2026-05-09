@@ -453,3 +453,59 @@ let freq: float<1/s> = 1.0
                       (identifier)))))))))
       body: (const
         (float)))))
+
+================================================================================
+Semicolon in module let body
+================================================================================
+
+module OpenTelemetry =
+
+  let private setOtlp (e: OtlpExporterOptions) =
+    e.Endpoint <- new Uri("https://example.com");
+
+[<RequiredQualifiedAccess>]
+module Entry =
+
+  type private Dummy = interface end
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (access_modifier)
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (mutate_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (const
+                (string))))))))
+  (module_defn
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (identifier)
+    (type_definition
+      (interface_type_defn
+        (type_name
+          (access_modifier)
+          (identifier))))))
