@@ -782,7 +782,11 @@ module.exports = grammar({
         $._expression,
         optional($._newline),
         "with",
-        choice(seq($._newline, $.rules), scoped($.rules, $._indent, $._dedent)),
+        choice(
+          seq($._newline, $.rules),
+          scoped($.rules, $._indent, $._dedent),
+          $.rules,
+        ),
       ),
 
     function_expression: ($) =>
@@ -2170,12 +2174,21 @@ module.exports = grammar({
       prec.right(
         alias(
           choice(
-            seq($.int, token.immediate("."), optional($.int)),
             seq(
               $.int,
-              optional(seq(token.immediate("."), $.int)),
-              token.immediate(/[eE][+-]?/),
+              token.immediate("."),
+              optional(token.immediate(/[0-9]([0-9]_?)*/)),
+            ),
+            seq(
               $.int,
+              optional(
+                seq(
+                  token.immediate("."),
+                  token.immediate(/[0-9]([0-9]_?)*/),
+                ),
+              ),
+              token.immediate(/[eE][+-]?/),
+              token.immediate(/[0-9]([0-9]_?)*/),
             ),
           ),
           "float",
