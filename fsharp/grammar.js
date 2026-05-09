@@ -1936,11 +1936,9 @@ module.exports = grammar({
         ),
       ),
 
-    // Multi-line generic type used in class_inherits_decl. The opening '<' is
-    // followed by a newline + indent which is tracked as a paren_indent in
-    // the scanner; the closing '>' triggers DEDENT (like a bracket end), so
-    // the type args can span multiple lines and '>' on the final line closes
-    // the scope without needing a NEWLINE first.
+    // The DEDENT precedes '>': the scanner emits it on seeing '>' (as a
+    // bracket-end-style close of the TYPE_APP_INDENT), so '>' on the same
+    // line as the last arg closes the scope without needing a NEWLINE first.
     _inline_multiline_generic_type: ($) =>
       prec.right(
         5,
