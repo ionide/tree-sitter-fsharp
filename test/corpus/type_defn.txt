@@ -3516,6 +3516,106 @@ module Definitions =
                 (identifier)))))))))
 
 ================================================================================
+Multi line inherit generic with closing angle on own line
+================================================================================
+
+module M =
+
+  type X () =
+    inherit BaseDefinition<
+      FirstDef,
+      Payload.A,
+      Factor.A
+      >()
+    interface IDef
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (anon_type_defn
+        (type_name
+          (identifier))
+        (primary_constr_args)
+        (class_inherits_decl
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier))))))
+          (const
+            (unit)))
+        (type_extension_elements
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Multi line inherit generic with first arg on same line
+================================================================================
+
+module M =
+
+  type X () =
+    inherit BaseDefinition<FirstDef,
+      Payload.A,
+      Factor.A>()
+    interface IDef
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (anon_type_defn
+        (type_name
+          (identifier))
+        (primary_constr_args)
+        (class_inherits_decl
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier))))))
+          (const
+            (unit)))
+        (type_extension_elements
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
 record with static operator
 ================================================================================
 
