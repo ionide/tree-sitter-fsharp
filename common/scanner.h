@@ -98,6 +98,54 @@ static inline bool peek_is_type_app_indent(Scanner *scanner) {
          *array_back(&scanner->type_app_indents);
 }
 
+// Look ahead from the position after '<' to the matching '>' and report whether
+// the content is type-arg-shaped AND a newline appears before the close. Used
+// to recognize multi-line type apps where the first arg is on the same line as
+// '<' (e.g., `T<First,\n  Second>`); the simpler `found_end_of_line` test only
+// catches the case where '<' itself ends the line.
+static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
+  int angle_depth = 1;
+  int paren_depth = 0;
+  bool saw_newline = false;
+
+  while (!lexer->eof(lexer) && angle_depth > 0) {
+    int32_t c = lexer->lookahead;
+
+    if (c == '\n' || c == '\r') {
+      saw_newline = true;
+      advance(lexer);
+      continue;
+    }
+
+    if (is_word_char(c) || c == ' ' || c == '\t' || c == ',' || c == '*' ||
+        c == '.' || c == ':' || c == '#' || c == '^' || c == '/' || c == '|' ||
+        c == '{' || c == '}' || c == '[' || c == ']') {
+      advance(lexer);
+      continue;
+    }
+
+    if (c == '(') { paren_depth++; advance(lexer); continue; }
+    if (c == ')') {
+      if (paren_depth <= 0) return false;
+      paren_depth--; advance(lexer); continue;
+    }
+    if (c == '<') { angle_depth++; advance(lexer); continue; }
+    if (c == '>') {
+      angle_depth--;
+      if (angle_depth == 0) return saw_newline;
+      advance(lexer);
+      continue;
+    }
+    if (c == '-') {
+      advance(lexer);
+      if (lexer->lookahead == '>') { advance(lexer); continue; }
+      return false;
+    }
+    return false;
+  }
+  return false;
+}
+
 // Check if the content after '<' looks like type arguments per F# spec Section 15.3.
 // Valid type argument content: identifiers, whitespace, and type-syntax characters
 // like ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}'.
@@ -1057,15 +1105,21 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
-  // Like PAREN_INDENT, but only emitted after a newline (multi-line case).
-  // Used for multi-line generic type arguments (e.g., `T<\n  Arg1,\n  Arg2>`).
-  // The closing '>' triggers DEDENT via scanner's bracket-end-style handling.
+  // Like PAREN_INDENT, but only emitted for multi-line generic type arguments
+  // (e.g., `T<\n  Arg1,\n  Arg2>` or `T<First,\n  Second>`). The closing '>'
+  // triggers DEDENT via scanner's bracket-end-style handling. Fires either
+  // when the whitespace just consumed contained a newline, or when peek-ahead
+  // shows a newline before the matching '>' (variant where the first arg sits
+  // on the same line as '<').
   if (valid_symbols[TYPE_APP_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
-      found_end_of_line && !found_bracket_end &&
+      !found_bracket_end &&
       !found_preprocessor_end && !found_same_line_pipe_infix) {
-    push_indent_full(scanner, indent_length, true, true);
-    lexer->result_symbol = TYPE_APP_INDENT;
-    return true;
+    bool is_multiline = found_end_of_line || is_multiline_type_app_ahead(lexer);
+    if (is_multiline) {
+      push_indent_full(scanner, indent_length, true, true);
+      lexer->result_symbol = TYPE_APP_INDENT;
+      return true;
+    }
   }
 
   if (scanner->indents.size > 0) {
