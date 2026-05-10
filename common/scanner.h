@@ -43,10 +43,15 @@ enum TokenType {
   ERROR_SENTINEL
 };
 
+typedef enum {
+  INDENT_NORMAL = 0,
+  INDENT_PAREN = 1,
+  INDENT_TYPE_APP = 2,
+} IndentKind;
+
 typedef struct {
   Array(uint16_t) indents;
-  Array(bool) paren_indents;
-  Array(bool) type_app_indents;
+  Array(uint8_t) indent_kinds;
   Array(uint16_t) preprocessor_indents;
   uint8_t multi_dollar_count;
 } Scanner;
@@ -60,28 +65,18 @@ static inline bool is_word_char(int32_t c) {
          (c >= '0' && c <= '9') || c == '_' || c == '\'';
 }
 
-static inline void push_indent_full(Scanner *scanner, uint16_t indent_length,
-                                    bool is_paren_indent,
-                                    bool is_type_app_indent) {
-  array_push(&scanner->indents, indent_length);
-  array_push(&scanner->paren_indents, is_paren_indent);
-  array_push(&scanner->type_app_indents, is_type_app_indent);
-}
-
 static inline void push_indent(Scanner *scanner, uint16_t indent_length,
-                               bool is_paren_indent) {
-  push_indent_full(scanner, indent_length, is_paren_indent, false);
+                               IndentKind kind) {
+  array_push(&scanner->indents, indent_length);
+  array_push(&scanner->indent_kinds, (uint8_t)kind);
 }
 
 static inline void pop_indent(Scanner *scanner) {
   if (scanner->indents.size > 0) {
     array_pop(&scanner->indents);
   }
-  if (scanner->paren_indents.size > 0) {
-    array_pop(&scanner->paren_indents);
-  }
-  if (scanner->type_app_indents.size > 0) {
-    array_pop(&scanner->type_app_indents);
+  if (scanner->indent_kinds.size > 0) {
+    array_pop(&scanner->indent_kinds);
   }
 }
 
@@ -89,13 +84,17 @@ static inline uint16_t peek_indent_length(Scanner *scanner) {
   return *array_back(&scanner->indents);
 }
 
+static inline IndentKind peek_indent_kind(Scanner *scanner) {
+  if (scanner->indent_kinds.size == 0) return INDENT_NORMAL;
+  return (IndentKind)*array_back(&scanner->indent_kinds);
+}
+
 static inline bool peek_is_paren_indent(Scanner *scanner) {
-  return scanner->paren_indents.size > 0 && *array_back(&scanner->paren_indents);
+  return peek_indent_kind(scanner) != INDENT_NORMAL;
 }
 
 static inline bool peek_is_type_app_indent(Scanner *scanner) {
-  return scanner->type_app_indents.size > 0 &&
-         *array_back(&scanner->type_app_indents);
+  return peek_indent_kind(scanner) == INDENT_TYPE_APP;
 }
 
 // Peek forward from after a '<' to its matching '>' and check that the content
@@ -821,18 +820,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         if (lexer->lookahead == 'h') {
           advance(lexer);
           if (!is_word_char(lexer->lookahead)) {
-            // If NEWLINE should be emitted first (when 'with' is at the same
-            // indentation as the current scope AND WITH is not yet valid),
-            // emit NEWLINE before WITH. This handles the case where 'with'
-            // appears after a class body member that was itself preceded by
-            // a NEWLINE, e.g.:
-            //   type C() =
-            //       inherit T()
-            //       with       <- same indent as 'inherit', needs NEWLINE first
-            //           member...
-            // We only emit NEWLINE if WITH is not yet valid (meaning the
-            // grammar hasn't reached the position where WITH is directly
-            // expected, e.g. after union_type_cases optional extension).
+            // If 'with' sits at the same indent as the current scope and the
+            // grammar isn't yet expecting WITH, emit NEWLINE first so the
+            // preceding statement closes before the augmentation opens.
             if (valid_symbols[NEWLINE] && found_end_of_line &&
                 !valid_symbols[WITH] &&
                 scanner->indents.size > 0 &&
@@ -840,9 +830,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = NEWLINE;
               return true;
             }
-            // the 'WITH' token is only valid if we have popped the appropriate
-            // amount of dedent tokens.
-            // If 'WITH' is not valid we just continue to pop dedent tokens.
+            // WITH only valid once the right number of DEDENTs have popped.
             if (valid_symbols[WITH]) {
               lexer->mark_end(lexer);
               lexer->result_symbol = WITH;
@@ -1027,7 +1015,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix) {
-    push_indent(scanner, indent_length, false);
+    push_indent(scanner, indent_length, INDENT_NORMAL);
     lexer->result_symbol = INDENT;
     return true;
   }
@@ -1038,7 +1026,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
     // logic can be more lenient inside parenthesized expressions, where the
     // closing ')' determines scope rather than indentation alone.
-    push_indent(scanner, indent_length, true);
+    push_indent(scanner, indent_length, INDENT_PAREN);
     lexer->result_symbol = PAREN_INDENT;
     return true;
   }
@@ -1051,7 +1039,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       !found_preprocessor_end && !found_same_line_pipe_infix) {
     bool is_multiline = found_end_of_line || is_multiline_type_app_ahead(lexer);
     if (is_multiline) {
-      push_indent_full(scanner, indent_length, true, true);
+      push_indent(scanner, indent_length, INDENT_TYPE_APP);
       lexer->result_symbol = TYPE_APP_INDENT;
       return true;
     }
@@ -1176,38 +1164,10 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)*array_get(&scanner->indents, iter);
   }
 
-  size_t paren_bytes = (indent_count + 7) / 8;
-  for (size_t byte_index = 0;
-       byte_index < paren_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-       byte_index++) {
-    uint8_t bits = 0;
-    for (size_t bit = 0; bit < 8; bit++) {
-      size_t indent_index = byte_index * 8 + bit + 1;
-      if (indent_index > indent_count) {
-        break;
-      }
-      if (*array_get(&scanner->paren_indents, indent_index)) {
-        bits |= (uint8_t)(1u << bit);
-      }
-    }
-    buffer[size++] = (char)bits;
-  }
-
-  for (size_t byte_index = 0;
-       byte_index < paren_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-       byte_index++) {
-    uint8_t bits = 0;
-    for (size_t bit = 0; bit < 8; bit++) {
-      size_t indent_index = byte_index * 8 + bit + 1;
-      if (indent_index > indent_count) {
-        break;
-      }
-      if (indent_index < scanner->type_app_indents.size &&
-          *array_get(&scanner->type_app_indents, indent_index)) {
-        bits |= (uint8_t)(1u << bit);
-      }
-    }
-    buffer[size++] = (char)bits;
+  // One byte per indent kind. Stack depth is bounded by source nesting (~10),
+  // so the extra bytes vs bit-packing are negligible.
+  for (uint32_t i = 1; i <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++i) {
+    buffer[size++] = (char)*array_get(&scanner->indent_kinds, i);
   }
 
   return size;
@@ -1216,10 +1176,8 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_delete(&scanner->indents);
   array_push(&scanner->indents, 0);
-  array_delete(&scanner->paren_indents);
-  array_push(&scanner->paren_indents, false);
-  array_delete(&scanner->type_app_indents);
-  array_push(&scanner->type_app_indents, false);
+  array_delete(&scanner->indent_kinds);
+  array_push(&scanner->indent_kinds, (uint8_t)INDENT_NORMAL);
 
   array_delete(&scanner->preprocessor_indents);
   scanner->multi_dollar_count = 0;
@@ -1245,36 +1203,17 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     }
 
     size_t actual_indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
-    size_t flag_bytes = (actual_indent_count + 7) / 8;
-    for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
-      size_t byte_offset = indent_index / 8;
-      bool is_paren_indent = false;
-      if (size + byte_offset < length) {
-        uint8_t bits = (uint8_t)buffer[size + byte_offset];
-        is_paren_indent = ((bits >> (indent_index % 8)) & 1u) != 0;
-      }
-      array_push(&scanner->paren_indents, is_paren_indent);
+    for (size_t i = 0; i < actual_indent_count; i++) {
+      uint8_t kind = (size < length) ? (uint8_t)buffer[size++] : (uint8_t)INDENT_NORMAL;
+      array_push(&scanner->indent_kinds, kind);
     }
-    size += flag_bytes;
-
-    for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
-      size_t byte_offset = indent_index / 8;
-      bool is_type_app_indent = false;
-      if (size + byte_offset < length) {
-        uint8_t bits = (uint8_t)buffer[size + byte_offset];
-        is_type_app_indent = ((bits >> (indent_index % 8)) & 1u) != 0;
-      }
-      array_push(&scanner->type_app_indents, is_type_app_indent);
-    }
-    size += flag_bytes;
   }
 }
 
 static Scanner *create() {
   Scanner *scanner = ts_calloc(1, sizeof(Scanner));
   array_init(&scanner->indents);
-  array_init(&scanner->paren_indents);
-  array_init(&scanner->type_app_indents);
+  array_init(&scanner->indent_kinds);
   array_init(&scanner->preprocessor_indents);
   deserialize(scanner, NULL, 0);
   return scanner;
@@ -1282,8 +1221,7 @@ static Scanner *create() {
 
 static void destroy(Scanner *scanner) {
   array_delete(&scanner->indents);
-  array_delete(&scanner->paren_indents);
-  array_delete(&scanner->type_app_indents);
+  array_delete(&scanner->indent_kinds);
   array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }
