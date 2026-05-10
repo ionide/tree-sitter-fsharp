@@ -389,6 +389,11 @@ module.exports = grammar({
     //
     // Pattern rules (BEGIN)
 
+    // Pattern precedence (used by repeat_pattern, typed_pattern, optional_pattern):
+    //   optional_pattern (3) > typed_pattern (2) > comma-element (1).
+    // This ensures `?x: T` parses as `(typed (optional x) T)` and `(a: T, b: T)`
+    // parses as a repeat of two typed_patterns rather than a typed_pattern over
+    // the whole repeat.
     repeat_pattern: ($) =>
       prec.right(seq($._pattern, repeat1(prec(1, seq(",", $._pattern))))),
 
@@ -2203,18 +2208,18 @@ module.exports = grammar({
             seq(
               $.int,
               token.immediate("."),
-              optional(token.immediate(/[0-9]([0-9]_?)*/)),
+              optional(token.immediate(/([0-9]_?)+/)),
             ),
             seq(
               $.int,
               optional(
                 seq(
                   token.immediate("."),
-                  token.immediate(/[0-9]([0-9]_?)*/),
+                  token.immediate(/([0-9]_?)+/),
                 ),
               ),
               token.immediate(/[eE][+-]?/),
-              token.immediate(/[0-9]([0-9]_?)*/),
+              token.immediate(/([0-9]_?)+/),
             ),
           ),
           "float",
