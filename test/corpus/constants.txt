@@ -470,6 +470,7 @@ do
   1e+12
   1e-12
   1.2e+12
+  1_000.500_5e+1_0
 
 --------------------------------------------------------------------------------
 
@@ -488,8 +489,11 @@ do
             (sequential_expression
               (const
                 (float))
-              (const
-                (float)))))))))
+              (sequential_expression
+                (const
+                  (float))
+                (const
+                  (float))))))))))
 
 ================================================================================
 string with escaped quote
@@ -874,3 +878,43 @@ let x = 5.0<1/s>
               (simple_type
                 (long_identifier
                   (identifier))))))))))
+
+================================================================================
+Trailing dot float before type
+================================================================================
+
+module M =
+
+  let y = f 100. 5000.
+
+  type PsvDelayer = { Queue : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (application_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (float)))
+          (const
+            (float)))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
