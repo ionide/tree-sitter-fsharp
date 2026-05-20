@@ -109,17 +109,16 @@
 
 
 (dot_expression
-  .
-  (_) @variable.member
-  .
-  (_))
+  base: (_) @variable.member
+  field: (long_identifier_or_op
+    (identifier) @property))
 
 (application_expression
   .
   (long_identifier_or_op
     (identifier) @function.call)
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -127,7 +126,7 @@
     field: (long_identifier_or_op
       (identifier) @function.call))
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -136,7 +135,7 @@
       (identifier) @function.call)
     (_))
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -146,7 +145,7 @@
         (identifier) @function.call))
     (_))
   .
-  (_) @variable)
+  (_))
 
 ((infix_expression
   .
@@ -154,14 +153,50 @@
   .
   (infix_op) @operator
   .
-  (_) @function.call
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
   )
  (#eq? @operator "|>")
  )
 
 ((infix_expression
   .
-  (_) @function.call
+  (_)
+  .
+  (infix_op) @operator
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
+  )
+ (#eq? @operator "|>")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
+  .
+  (infix_op) @operator
+  .
+  (_)
+  )
+ (#eq? @operator "<|")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
   .
   (infix_op) @operator
   .
