@@ -95,6 +95,7 @@ module.exports = grammar({
     $._multi_dollar_triple_quote_end,
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._type_app_indent, // like _paren_indent but only fires after a newline; closed by '>' (used for multi-line generic type args)
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
 
@@ -388,6 +389,11 @@ module.exports = grammar({
     //
     // Pattern rules (BEGIN)
 
+    // Pattern precedence (used by repeat_pattern, typed_pattern, optional_pattern):
+    //   optional_pattern (3) > typed_pattern (2) > comma-element (1).
+    // This ensures `?x: T` parses as `(typed (optional x) T)` and `(a: T, b: T)`
+    // parses as a repeat of two typed_patterns rather than a typed_pattern over
+    // the whole repeat.
     repeat_pattern: ($) =>
       prec.right(seq($._pattern, repeat1(prec(1, seq(",", $._pattern))))),
 
@@ -414,7 +420,7 @@ module.exports = grammar({
         $.named_field_pattern,
       ),
 
-    optional_pattern: ($) => prec.left(seq("?", $._pattern)),
+    optional_pattern: ($) => prec.left(3, seq("?", $._pattern)),
 
     type_check_pattern: ($) =>
       prec.right(seq(":?", $.atomic_type, optional(seq("as", $.identifier)))),
@@ -429,7 +435,7 @@ module.exports = grammar({
     conjunct_pattern: ($) => prec.left(0, seq($._pattern, "&", $._pattern)),
     typed_pattern: ($) =>
       prec.left(
-        -1,
+        2,
         seq(
           $._pattern,
           ":",
@@ -782,7 +788,11 @@ module.exports = grammar({
         $._expression,
         optional($._newline),
         "with",
-        choice(seq($._newline, $.rules), scoped($.rules, $._indent, $._dedent)),
+        choice(
+          seq($._newline, $.rules),
+          scoped($.rules, $._indent, $._dedent),
+          $.rules,
+        ),
       ),
 
     function_expression: ($) =>
@@ -1493,7 +1503,7 @@ module.exports = grammar({
           optional($.attributes),
           "type",
           $._type_defn_body,
-          repeat(seq(optional($.attributes), "and", $._type_defn_body)),
+          repeat(seq("and", optional($.attributes), $._type_defn_body)),
         ),
       ),
 
@@ -1518,7 +1528,6 @@ module.exports = grammar({
       prec(
         2,
         seq(
-          optional($.attributes),
           optional($.access_modifier),
           choice(
             seq(
@@ -1918,7 +1927,33 @@ module.exports = grammar({
       prec.left(
         seq(
           "inherit",
-          scoped(seq($._type, optional($._expression)), $._indent, $._dedent),
+          scoped(
+            seq(
+              choice(
+                $._type,
+                alias($._inline_multiline_generic_type, $.generic_type),
+              ),
+              optional($._expression),
+            ),
+            $._indent,
+            $._dedent,
+          ),
+        ),
+      ),
+
+    // The DEDENT precedes '>': the scanner emits it on seeing '>' (as a
+    // bracket-end-style close of the TYPE_APP_INDENT), so '>' on the same
+    // line as the last arg closes the scope without needing a NEWLINE first.
+    _inline_multiline_generic_type: ($) =>
+      prec.right(
+        5,
+        seq(
+          $.long_identifier,
+          "<",
+          $._type_app_indent,
+          $.type_attributes,
+          $._dedent,
+          ">",
         ),
       ),
 
@@ -2170,12 +2205,21 @@ module.exports = grammar({
       prec.right(
         alias(
           choice(
-            seq($.int, token.immediate("."), optional($.int)),
             seq(
               $.int,
-              optional(seq(token.immediate("."), $.int)),
-              token.immediate(/[eE][+-]?/),
+              token.immediate("."),
+              optional(token.immediate(/([0-9]_?)+/)),
+            ),
+            seq(
               $.int,
+              optional(
+                seq(
+                  token.immediate("."),
+                  token.immediate(/([0-9]_?)+/),
+                ),
+              ),
+              token.immediate(/[eE][+-]?/),
+              token.immediate(/([0-9]_?)+/),
             ),
           ),
           "float",
