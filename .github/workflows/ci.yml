@@ -42,12 +42,12 @@ jobs:
         uses: tree-sitter/setup-action@v2
         with:
           install-lib: false
-      - name: Generate parsers
-        run: |-
-          cd fsharp
-          tree-sitter generate
-          cd ../fsharp_signature
-          tree-sitter generate
+      - name: Generate fsharp parser
+        run: tree-sitter generate
+        working-directory: fsharp
+      - name: Generate fsharp_signature parser
+        run: tree-sitter generate
+        working-directory: fsharp_signature
       - name: Parse sample files
         uses: tree-sitter/parse-action@v3
         id: parse-files
@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [fsharp, fsharp_signatures]
+        language: [fsharp, fsharp_signature]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
