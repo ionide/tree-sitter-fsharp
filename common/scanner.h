@@ -37,14 +37,21 @@ enum TokenType {
   MULTI_DOLLAR_TRIPLE_QUOTE_END,
   TYAPP_OPEN,
   PAREN_INDENT,
+  TYPE_APP_INDENT,
   TYPE_DECL_NEWLINE,
   IN,
   ERROR_SENTINEL
 };
 
+typedef enum {
+  INDENT_NORMAL = 0,
+  INDENT_PAREN = 1,
+  INDENT_TYPE_APP = 2,
+} IndentKind;
+
 typedef struct {
   Array(uint16_t) indents;
-  Array(bool) paren_indents;
+  Array(uint8_t) indent_kinds;
   Array(uint16_t) preprocessor_indents;
   uint8_t multi_dollar_count;
 } Scanner;
@@ -59,17 +66,17 @@ static inline bool is_word_char(int32_t c) {
 }
 
 static inline void push_indent(Scanner *scanner, uint16_t indent_length,
-                               bool is_paren_indent) {
+                               IndentKind kind) {
   array_push(&scanner->indents, indent_length);
-  array_push(&scanner->paren_indents, is_paren_indent);
+  array_push(&scanner->indent_kinds, (uint8_t)kind);
 }
 
 static inline void pop_indent(Scanner *scanner) {
   if (scanner->indents.size > 0) {
     array_pop(&scanner->indents);
   }
-  if (scanner->paren_indents.size > 0) {
-    array_pop(&scanner->paren_indents);
+  if (scanner->indent_kinds.size > 0) {
+    array_pop(&scanner->indent_kinds);
   }
 }
 
@@ -77,30 +84,40 @@ static inline uint16_t peek_indent_length(Scanner *scanner) {
   return *array_back(&scanner->indents);
 }
 
-static inline bool peek_is_paren_indent(Scanner *scanner) {
-  return scanner->paren_indents.size > 0 && *array_back(&scanner->paren_indents);
+static inline IndentKind peek_indent_kind(Scanner *scanner) {
+  if (scanner->indent_kinds.size == 0) return INDENT_NORMAL;
+  return (IndentKind)*array_back(&scanner->indent_kinds);
 }
 
-// Check if the content after '<' looks like type arguments per F# spec Section 15.3.
-// Valid type argument content: identifiers, whitespace, and type-syntax characters
-// like ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}'.
-// Returns true if the '<' should be treated as a type application opener.
-static inline bool is_type_application_open(TSLexer *lexer) {
-  // We've already seen '<', now peek forward.
-  // If immediately '>' this is '<>' (empty type args).
-  // Track angle bracket depth to find the matching '>'.
+static inline bool peek_is_paren_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) != INDENT_NORMAL;
+}
+
+static inline bool peek_is_type_app_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) == INDENT_TYPE_APP;
+}
+
+// Peek forward from after a '<' to its matching '>' and check that the content
+// is type-arg-shaped per F# spec Section 15.3 (identifiers, whitespace, and
+// ',', '*', '->', '(', ')', '[', ']', '<', '>', '^', '#', ':', '{|', '|}').
+// If `out_saw_newline` is non-NULL, also reports whether a newline appeared
+// before the close — used to distinguish multi-line type apps where the first
+// arg sits on the same line as '<' (which `found_end_of_line` alone misses).
+static inline bool is_type_application_open_ex(TSLexer *lexer,
+                                               bool *out_saw_newline) {
   int angle_depth = 1;
   int paren_depth = 0;
+  bool saw_newline = false;
 
   while (!lexer->eof(lexer) && angle_depth > 0) {
     int32_t c = lexer->lookahead;
 
     if (c == '\n' || c == '\r') {
-      // Newline inside type args is not valid for type application lexical analysis
-      return false;
+      saw_newline = true;
+      advance(lexer);
+      continue;
     }
 
-    // Valid type argument characters
     if (is_word_char(c) || c == ' ' || c == '\t' || c == ',' || c == '*' ||
         c == '.' || c == ':' || c == '#' || c == '^' || c == '/' || c == '|' ||
         c == '{' || c == '}' || c == '[' || c == ']') {
@@ -108,56 +125,42 @@ static inline bool is_type_application_open(TSLexer *lexer) {
       continue;
     }
 
-    if (c == '(') {
-      paren_depth++;
-      advance(lexer);
-      continue;
-    }
-
+    if (c == '(') { paren_depth++; advance(lexer); continue; }
     if (c == ')') {
-      if (paren_depth <= 0) {
-        // Unbalanced ')' - not type args (e.g., "(l<r)")
-        return false;
-      }
-      paren_depth--;
-      advance(lexer);
-      continue;
+      // Unbalanced ')' rules out type args (e.g. `(l<r)`).
+      if (paren_depth <= 0) return false;
+      paren_depth--; advance(lexer); continue;
     }
-
-    if (c == '<') {
-      angle_depth++;
-      advance(lexer);
-      continue;
-    }
-
+    if (c == '<') { angle_depth++; advance(lexer); continue; }
     if (c == '>') {
       angle_depth--;
       if (angle_depth == 0) {
-        // Found matching '>' - this is a type application
+        if (out_saw_newline) *out_saw_newline = saw_newline;
         return true;
       }
       advance(lexer);
       continue;
     }
-
     if (c == '-') {
-      // '->' is valid in function types, but '-' alone followed by
-      // a digit or other op char is not type syntax
+      // '->' is valid in function types, bare '-' is not.
       advance(lexer);
-      if (lexer->lookahead == '>') {
-        advance(lexer);
-        continue;
-      }
-      // Bare '-' is not valid in type args
+      if (lexer->lookahead == '>') { advance(lexer); continue; }
       return false;
     }
-
-    // Any other character is not valid in type arguments
-    // This catches: '&', '!', '=', '+', ';', '@', '$', '%', '?', etc.
+    // Anything else (`&`, `!`, `=`, `+`, `;`, `@`, `$`, `%`, `?`, …) rules out type args.
     return false;
   }
 
   return false;
+}
+
+static inline bool is_type_application_open(TSLexer *lexer) {
+  return is_type_application_open_ex(lexer, NULL);
+}
+
+static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
+  bool saw_newline = false;
+  return is_type_application_open_ex(lexer, &saw_newline) && saw_newline;
 }
 
 static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
@@ -741,12 +744,21 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
+    lexer->mark_end(lexer);  // Token = just ';'; chars after are returned to input
+    bool saw_newline = false;
     while (lexer->lookahead == ' ' || lexer->lookahead == '\n') {
-      advance(lexer);
+      if (lexer->lookahead == '\n') {
+        saw_newline = true;
+        indent_length = 0;
+      } else if (saw_newline) {
+        indent_length++;
+      }
+      advance(lexer);  // Beyond mark_end: returned to input for next token
     }
-    found_end_of_line = true;
+    if (saw_newline) {
+      found_end_of_line = true;
+    }
     found_end_of_line_semi_colon = true;
-    lexer->mark_end(lexer);
   }
 
   if (lexer->lookahead == 't' &&
@@ -807,10 +819,18 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         if (lexer->lookahead == 'h') {
           advance(lexer);
-          if (lexer->lookahead == ' ') {
-            // the 'WITH' token is only valid if we have popped the appropriate
-            // amount of dedent tokens.
-            // If 'WITH' is not valid we just continue to pop dedent tokens.
+          if (!is_word_char(lexer->lookahead)) {
+            // If 'with' sits at the same indent as the current scope and the
+            // grammar isn't yet expecting WITH, emit NEWLINE first so the
+            // preceding statement closes before the augmentation opens.
+            if (valid_symbols[NEWLINE] && found_end_of_line &&
+                !valid_symbols[WITH] &&
+                scanner->indents.size > 0 &&
+                indent_length == (uint32_t)peek_indent_length(scanner)) {
+              lexer->result_symbol = NEWLINE;
+              return true;
+            }
+            // WITH only valid once the right number of DEDENTs have popped.
             if (valid_symbols[WITH]) {
               lexer->mark_end(lexer);
               lexer->result_symbol = WITH;
@@ -981,14 +1001,21 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[NEWLINE] && found_end_of_line_semi_colon &&
       !found_comment_start && !found_bracket_end) {
-    lexer->result_symbol = NEWLINE;
-    return true;
+    // If semicolon was followed by newlines that drop the indentation,
+    // fall through to DEDENT logic instead of emitting NEWLINE
+    bool needs_dedent = found_end_of_line && valid_symbols[DEDENT] &&
+                        scanner->indents.size > 0 &&
+                        indent_length < (uint32_t)peek_indent_length(scanner);
+    if (!needs_dedent) {
+      lexer->result_symbol = NEWLINE;
+      return true;
+    }
   }
 
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix) {
-    push_indent(scanner, indent_length, false);
+    push_indent(scanner, indent_length, INDENT_NORMAL);
     lexer->result_symbol = INDENT;
     return true;
   }
@@ -999,16 +1026,36 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
     // logic can be more lenient inside parenthesized expressions, where the
     // closing ')' determines scope rather than indentation alone.
-    push_indent(scanner, indent_length, true);
+    push_indent(scanner, indent_length, INDENT_PAREN);
     lexer->result_symbol = PAREN_INDENT;
     return true;
+  }
+
+  // Fires after '<' if the type args span multiple lines — either we just
+  // consumed a newline, or peek-ahead shows one before the matching '>' (the
+  // variant where the first arg shares the line with '<').
+  if (valid_symbols[TYPE_APP_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end &&
+      !found_preprocessor_end && !found_same_line_pipe_infix) {
+    bool is_multiline = found_end_of_line || is_multiline_type_app_ahead(lexer);
+    if (is_multiline) {
+      push_indent(scanner, indent_length, INDENT_TYPE_APP);
+      lexer->result_symbol = TYPE_APP_INDENT;
+      return true;
+    }
   }
 
   if (scanner->indents.size > 0) {
     bool is_paren_indent = peek_is_paren_indent(scanner);
     uint16_t current_indent_length = peek_indent_length(scanner);
 
-    if (found_bracket_end && valid_symbols[DEDENT]) {
+    // '>' closes a TYPE_APP_INDENT the same way ')' closes a PAREN_INDENT —
+    // gated on the type-app bit so we don't pop ordinary paren scopes here.
+    bool found_type_app_close = peek_is_type_app_indent(scanner) &&
+                                lexer->lookahead == '>' &&
+                                valid_symbols[DEDENT];
+
+    if ((found_bracket_end || found_type_app_close) && valid_symbols[DEDENT]) {
       pop_indent(scanner);
       lexer->result_symbol = DEDENT;
       return true;
@@ -1117,21 +1164,10 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)*array_get(&scanner->indents, iter);
   }
 
-  size_t paren_bytes = (indent_count + 7) / 8;
-  for (size_t byte_index = 0;
-       byte_index < paren_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-       byte_index++) {
-    uint8_t bits = 0;
-    for (size_t bit = 0; bit < 8; bit++) {
-      size_t indent_index = byte_index * 8 + bit + 1;
-      if (indent_index > indent_count) {
-        break;
-      }
-      if (*array_get(&scanner->paren_indents, indent_index)) {
-        bits |= (uint8_t)(1u << bit);
-      }
-    }
-    buffer[size++] = (char)bits;
+  // One byte per indent kind. Stack depth is bounded by source nesting (~10),
+  // so the extra bytes vs bit-packing are negligible.
+  for (uint32_t i = 1; i <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++i) {
+    buffer[size++] = (char)*array_get(&scanner->indent_kinds, i);
   }
 
   return size;
@@ -1140,8 +1176,8 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_delete(&scanner->indents);
   array_push(&scanner->indents, 0);
-  array_delete(&scanner->paren_indents);
-  array_push(&scanner->paren_indents, false);
+  array_delete(&scanner->indent_kinds);
+  array_push(&scanner->indent_kinds, (uint8_t)INDENT_NORMAL);
 
   array_delete(&scanner->preprocessor_indents);
   scanner->multi_dollar_count = 0;
@@ -1167,24 +1203,17 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     }
 
     size_t actual_indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
-    size_t paren_bytes = (actual_indent_count + 7) / 8;
-    for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
-      size_t byte_offset = indent_index / 8;
-      bool is_paren_indent = false;
-      if (size + byte_offset < length) {
-        uint8_t bits = (uint8_t)buffer[size + byte_offset];
-        is_paren_indent = ((bits >> (indent_index % 8)) & 1u) != 0;
-      }
-      array_push(&scanner->paren_indents, is_paren_indent);
+    for (size_t i = 0; i < actual_indent_count; i++) {
+      uint8_t kind = (size < length) ? (uint8_t)buffer[size++] : (uint8_t)INDENT_NORMAL;
+      array_push(&scanner->indent_kinds, kind);
     }
-    size += paren_bytes;
   }
 }
 
 static Scanner *create() {
   Scanner *scanner = ts_calloc(1, sizeof(Scanner));
   array_init(&scanner->indents);
-  array_init(&scanner->paren_indents);
+  array_init(&scanner->indent_kinds);
   array_init(&scanner->preprocessor_indents);
   deserialize(scanner, NULL, 0);
   return scanner;
@@ -1192,7 +1221,7 @@ static Scanner *create() {
 
 static void destroy(Scanner *scanner) {
   array_delete(&scanner->indents);
-  array_delete(&scanner->paren_indents);
+  array_delete(&scanner->indent_kinds);
   array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }

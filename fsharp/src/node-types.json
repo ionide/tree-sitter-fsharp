@@ -4290,10 +4290,6 @@
           "named": true
         },
         {
-          "type": "attributes",
-          "named": true
-        },
-        {
           "type": "type_argument",
           "named": true
         },
