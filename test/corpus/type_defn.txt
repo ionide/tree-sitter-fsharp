@@ -3735,3 +3735,72 @@ exception MyError of string with member this.Msg = "e"
             (identifier))
           (const
             (string)))))))
+
+================================================================================
+union type cases aligned with type keyword in module
+================================================================================
+
+module M =
+
+    type FiltersType =
+    | Customer
+
+    type Recurrence =
+    | OneTime
+    | Recurring
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier)))))
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)))))))
+
+================================================================================
+multidimensional array types
+================================================================================
+
+let f (x: float[,]) : float[,,,] =
+    x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)))
+          (typed_pattern
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (list_type
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))
+            (list_type
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      (long_identifier_or_op
+        (identifier)))))

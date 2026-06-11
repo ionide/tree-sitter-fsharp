@@ -121,7 +121,10 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
 
     if (is_word_char(c) || c == ' ' || c == '\t' || c == ',' || c == '*' ||
         c == '.' || c == ':' || c == '#' || c == '^' || c == '/' || c == '|' ||
-        c == '{' || c == '}' || c == '[' || c == ']') {
+        c == '{' || c == '}' || c == '[' || c == ']' ||
+        // Backtick-quoted measure/type names may contain '%' and '`',
+        // e.g. 0.95m<``Risk %``>.
+        c == '`' || c == '%') {
       advance(lexer);
       continue;
     }
@@ -221,6 +224,9 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
   case '<':
   case '>':
   case '^':
+  // A line-leading ',' continues the previous line (leading-comma style in
+  // multiline tuples / named arguments), exactly like an infix operator.
+  case ',':
     return true;
   case '/':
     skip(lexer);
@@ -464,7 +470,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
-  if (valid_symbols[TYPE_DECL_NEWLINE]) {
+  if (valid_symbols[TYPE_DECL_NEWLINE] && !valid_symbols[ERROR_SENTINEL]) {
     // Only fire at EOF or newline; if the current character is something else
     // (e.g. '=' during GLR exploration), fall through to general scanning —
     // the lexer position is unchanged so this is safe.
@@ -601,7 +607,58 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         if (lexer->lookahead == 'f') {
           advance(lexer);
           found_preproc_if = true;
-          if (valid_symbols[NEWLINE] || valid_symbols[INDENT]) {
+          // If an indented block is still open above this line AND the first
+          // content line after the '#if' sits outside that block (less
+          // indented), close the block before treating the directive —
+          // otherwise the skip-line path below starves the parse that needs
+          // the '#if' token after the dedent (e.g. a record '}' followed by
+          // '#if' around a top-level binding). When the branch content stays
+          // at block depth, keep the directive indentation-transparent.
+          if (found_end_of_line && valid_symbols[DEDENT] &&
+              scanner->indents.size > 1 &&
+              indent_length < (uint32_t)peek_indent_length(scanner) &&
+              (!peek_is_paren_indent(scanner) || indent_length == 0)) {
+            while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+              advance(lexer);
+            }
+            uint32_t content_indent = 0;
+            bool has_content = false;
+            while (!lexer->eof(lexer)) {
+              if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+                content_indent = 0;
+                advance(lexer);
+              } else if (lexer->lookahead == ' ') {
+                content_indent++;
+                advance(lexer);
+              } else if (lexer->lookahead == '\t') {
+                content_indent += 8;
+                advance(lexer);
+              } else if (lexer->lookahead == '/') {
+                advance(lexer);
+                if (lexer->lookahead != '/') { has_content = true; break; }
+                while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                  advance(lexer);
+                }
+              } else {
+                has_content = true;
+                break;
+              }
+            }
+            if (has_content &&
+                content_indent < (uint32_t)peek_indent_length(scanner)) {
+              pop_indent(scanner);
+              lexer->result_symbol = DEDENT;
+              return true;
+            }
+            // Branch content stays at block depth: treat the directive lines
+            // as whitespace. The peek already consumed up to the content
+            // char, so resume the whitespace loop from there.
+            found_end_of_line = true;
+            indent_length = content_indent;
+            continue;
+          }
+          if ((valid_symbols[NEWLINE] || valid_symbols[INDENT]) &&
+              !valid_symbols[PREPROC_IF]) {
             while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
               skip(lexer);
             }
@@ -624,9 +681,29 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           }
         }
       } else {
-        if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED]) {
-          lexer->result_symbol = NEWLINE_NO_ALIGNED;
-          return true;
+        if (found_end_of_line) {
+          if (valid_symbols[NEWLINE_NO_ALIGNED]) {
+            lexer->result_symbol = NEWLINE_NO_ALIGNED;
+            return true;
+          }
+          // '#line N' / '#N' / '#light' are extras, transparent for
+          // indentation: leave the position untouched so the internal lexer
+          // consumes them in place.
+          if (lexer->lookahead == 'l') {
+            advance(lexer);
+            if (lexer->lookahead == 'i') {
+              return false;
+            }
+          } else if (lexer->lookahead >= '0' && lexer->lookahead <= '9') {
+            return false;
+          }
+          // Other directive lines (#r, #load, #nowarn, ...) are real syntax
+          // nodes: fall through so an open indented block can DEDENT before
+          // the directive token is lexed internally. Flag like a preproc line
+          // so INDENT/NEWLINE stay suppressed (INDENT must fire at the next
+          // real line instead).
+          found_preprocessor_end = true;
+          break;
         }
         return false;
       }
@@ -680,10 +757,32 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
-  if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '$') {
+  // Emit any pending DEDENT/NEWLINE before probing for multi-dollar strings:
+  // the probe's mark_end moves the token end past the consumed whitespace, so
+  // a DEDENT emitted from inside it swallows the newline and starves the
+  // remaining DEDENT/NEWLINE this line break still owes (e.g. before $"...").
+  if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '$' &&
+      found_end_of_line && scanner->indents.size > 0) {
+    uint16_t current_indent_length = peek_indent_length(scanner);
+    if (valid_symbols[DEDENT] && indent_length < current_indent_length &&
+        (!peek_is_paren_indent(scanner) || indent_length == 0 ||
+         lexer->eof(lexer))) {
+      pop_indent(scanner);
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
+    if (valid_symbols[NEWLINE] && indent_length == current_indent_length &&
+        indent_length > 0) {
+      lexer->result_symbol = NEWLINE;
+      return true;
+    }
+  }
+
+  if (!valid_symbols[ERROR_SENTINEL] && lexer->lookahead == '$' &&
+      valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTE_START]) {
     lexer->mark_end(lexer);
 
-    if (valid_symbols[MULTI_DOLLAR_TRIPLE_QUOTE_START]) {
+    {
       uint8_t dollar_count = 0;
       while (lexer->lookahead == '$' && dollar_count < UINT8_MAX) {
         advance(lexer);
@@ -721,7 +820,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     for (size_t i = 0; i < sizeof(block_openers) / sizeof(block_openers[0]); i++) {
       const BlockOpener *op = &block_openers[i];
       if (valid_symbols[op->token] && lexer->lookahead == op->first_char) {
-        lexer->mark_end(lexer);
+        // No mark_end before the keyword is confirmed: a failed probe must
+        // leave the token end at the scan start so a later zero-width DEDENT
+        // doesn't consume the newline (which the next scan still needs for
+        // NEWLINE/DEDENT decisions). The success path marks below.
         indent_length = lexer->get_column(lexer);
         advance(lexer);
         if (match_keyword_rest(lexer, op->rest)) {
@@ -735,10 +837,22 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  // Not gated on found_preprocessor_end: when '#endif' follows, this point is
+  // only reached if PREPROC_END was not a valid symbol (a valid one returns
+  // above), and the pending NEWLINE_NO_ALIGNED (e.g. an fsi directive's
+  // terminator) must close its rule first. It IS deferred while inner indented
+  // blocks still need to close — DEDENT comes first then.
   if (found_end_of_line && valid_symbols[NEWLINE_NO_ALIGNED] &&
-      !found_start_of_infix_op && !found_preprocessor_end) {
-    lexer->result_symbol = NEWLINE_NO_ALIGNED;
-    return true;
+      !found_start_of_infix_op) {
+    bool dedent_first =
+        valid_symbols[DEDENT] && scanner->indents.size > 1 &&
+        indent_length < (uint32_t)peek_indent_length(scanner) &&
+        (!peek_is_paren_indent(scanner) || indent_length == 0 ||
+         lexer->eof(lexer));
+    if (!dedent_first) {
+      lexer->result_symbol = NEWLINE_NO_ALIGNED;
+      return true;
+    }
   }
 
   if (!failed_block_opener && !failed_at_sign_match) {
@@ -747,10 +861,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     advance(lexer);
     lexer->mark_end(lexer);  // Token = just ';'; chars after are returned to input
     bool saw_newline = false;
-    while (lexer->lookahead == ' ' || lexer->lookahead == '\n') {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
+           lexer->lookahead == '\r') {
       if (lexer->lookahead == '\n') {
         saw_newline = true;
         indent_length = 0;
+      } else if (lexer->lookahead == '\r') {
+        // CRLF: skip without counting toward indentation.
       } else if (saw_newline) {
         indent_length++;
       }
@@ -884,7 +1001,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           advance(lexer);
           if (!is_word_char(lexer->lookahead)) {
             if (valid_symbols[ELSE]) {
+              // Don't pop paren-kind scopes: an if/else inside a call's
+              // parens may sit at any indentation; ')' closes that scope.
               if (scanner->indents.size > 0 &&
+                  !peek_is_paren_indent(scanner) &&
                   token_indent_level < peek_indent_length(scanner)) {
                 pop_indent(scanner);
                 lexer->result_symbol = DEDENT;
@@ -928,6 +1048,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           if (!is_word_char(lexer->lookahead)) {
             if (valid_symbols[ELIF]) {
               if (scanner->indents.size > 0 &&
+                  !peek_is_paren_indent(scanner) &&
                   token_indent_level < peek_indent_length(scanner)) {
                 pop_indent(scanner);
                 lexer->result_symbol = DEDENT;
@@ -1017,7 +1138,27 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     // fall through to DEDENT logic instead of emitting NEWLINE
     bool needs_dedent = found_end_of_line && valid_symbols[DEDENT] &&
                         scanner->indents.size > 0 &&
-                        indent_length < (uint32_t)peek_indent_length(scanner);
+                        indent_length < (uint32_t)peek_indent_length(scanner) &&
+                        // Paren-kind scopes don't dedent on under-indented
+                        // lines, so don't withhold the NEWLINE for them.
+                        (!peek_is_paren_indent(scanner) ||
+                         indent_length == 0 || lexer->eof(lexer));
+    if (needs_dedent && indent_length > 0) {
+      // Only defer to DEDENT when the next line lands exactly on an open
+      // indentation level. A line "between" levels (e.g. record fields
+      // wrapped at an arbitrary lower indent after `A = "x";`) continues
+      // the current construct instead.
+      bool has_matching_level = false;
+      for (uint32_t lvl = 0; lvl + 1 < scanner->indents.size; lvl++) {
+        if (*array_get(&scanner->indents, lvl) == indent_length) {
+          has_matching_level = true;
+          break;
+        }
+      }
+      if (!has_matching_level) {
+        needs_dedent = false;
+      }
+    }
     if (!needs_dedent) {
       lexer->result_symbol = NEWLINE;
       return true;
