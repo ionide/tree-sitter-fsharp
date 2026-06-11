@@ -98,6 +98,7 @@ module.exports = grammar({
     $._type_app_indent, // like _paren_indent but only fires after a newline; closed by '>' (used for multi-line generic type args)
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
+    $._do_keyword, // external 'do' terminating a while/for header; distinct from do_expression's 'do' so `while a && b do` reduces the condition instead of shifting 'do' as an application argument
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -494,26 +495,19 @@ module.exports = grammar({
 
     list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
+    // The whole field list sits in one indent scope opened right after '{'
+    // (like field_initializers in brace_expression). Opening the scope before
+    // the first field keeps _indent from becoming valid mid-field, where a
+    // zero-width INDENT would cut off field values like `A.B` or `Some y`.
     record_pattern: ($) =>
-      prec.left(
-        seq(
-          "{",
-          $.field_pattern,
-          choice(
-            seq(
-              repeat(seq($._newline, $.field_pattern)),
-              optional($._newline),
-            ),
-            seq(
-              $._indent,
-              $.field_pattern,
-              repeat(seq($._newline, $.field_pattern)),
-              optional($._newline),
-              $._dedent,
-            ),
-          ),
-          "}",
-        ),
+      seq(
+        "{",
+        $._indent,
+        $.field_pattern,
+        repeat(seq($._newline, $.field_pattern)),
+        optional($._newline),
+        $._dedent,
+        "}",
       ),
 
     named_field: ($) => seq(optional(seq($.identifier, "=")), $._pattern),
@@ -730,7 +724,7 @@ module.exports = grammar({
               $._expression,
             ),
           ),
-          "do",
+          alias($._do_keyword, "do"),
           $._expression_block,
           optional("done"),
         ),
@@ -742,7 +736,7 @@ module.exports = grammar({
         seq(
           choice("while", "while!"),
           $._expression,
-          "do",
+          alias($._do_keyword, "do"),
           $._expression_block,
           optional("done"),
         ),
@@ -1495,6 +1489,7 @@ module.exports = grammar({
             $.union_type_fields,
           )
         ),
+        optional(alias($._type_extension_with, $.type_extension_elements)),
       ),
 
     type_definition: ($) =>

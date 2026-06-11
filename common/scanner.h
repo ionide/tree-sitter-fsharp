@@ -40,6 +40,7 @@ enum TokenType {
   TYPE_APP_INDENT,
   TYPE_DECL_NEWLINE,
   IN,
+  DO_KEYWORD,
   ERROR_SENTINEL
 };
 
@@ -842,6 +843,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             }
           }
         }
+      }
+    }
+  } else if (lexer->lookahead == 'd' && valid_symbols[DO_KEYWORD]) {
+    advance(lexer);
+    if (lexer->lookahead == 'o') {
+      advance(lexer);
+      // Exclude 'do!' so computation-expression do-bang is never claimed.
+      if (!is_word_char(lexer->lookahead) && lexer->lookahead != '!') {
+        lexer->mark_end(lexer);
+        lexer->result_symbol = DO_KEYWORD;
+        return true;
       }
     }
   } else if (lexer->lookahead == 'i' && valid_symbols[IN]) {

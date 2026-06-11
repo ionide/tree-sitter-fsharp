@@ -1886,6 +1886,10 @@
           "named": true
         },
         {
+          "type": "type_extension_elements",
+          "named": true
+        },
+        {
           "type": "union_type_fields",
           "named": true
         }
