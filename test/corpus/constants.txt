@@ -918,3 +918,53 @@ module M =
             (simple_type
               (long_identifier
                 (identifier)))))))))
+================================================================================
+verbatim interpolated string
+================================================================================
+
+let a = $@"[<JsonPropertyName(""{s}"")>] {s |> pascalCasify}"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))
+            (format_string_eval
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+interpolated string with brace escapes
+================================================================================
+
+let y = $"{{literal}} and {hole} end}}"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))

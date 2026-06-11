@@ -2313,7 +2313,6 @@
   {
     "type": "fsi_directive_decl",
     "named": true,
-    "extra": true,
     "fields": {},
     "children": {
       "multiple": false,
@@ -4177,6 +4176,10 @@
       "required": false,
       "types": [
         {
+          "type": "attributes",
+          "named": true
+        },
+        {
           "type": "class_inherits_decl",
           "named": true
         },
@@ -4292,6 +4295,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "attributes",
+          "named": true
+        },
         {
           "type": "class_inherits_decl",
           "named": true
