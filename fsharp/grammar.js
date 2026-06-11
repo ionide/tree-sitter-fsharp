@@ -114,6 +114,8 @@ module.exports = grammar({
     [$._module_body_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $.preproc_else_in_expression],
     [$.rules],
+    // Singleton: union_type_cases conflicts with itself (shift the optional
+    // _newline before the next '|' case vs. reduce), like [$.rules] above.
     [$.union_type_cases],
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
     [$._type, $._argument_type],
@@ -769,7 +771,7 @@ module.exports = grammar({
     fun_expression: ($) =>
       prec.right(
         PREC.FUN_EXPR,
-        seq("fun", $.argument_patterns, token(prec(2, "->")), $._expression_block),
+        seq("fun", $.argument_patterns, arrow(), $._expression_block),
       ),
 
     try_expression: ($) =>
@@ -914,10 +916,7 @@ module.exports = grammar({
         seq(
           field("pattern", $._pattern),
           optional(seq("when", field("guard", $._expression))),
-          // Lexical prec 2 so `guard->` (no space) beats infix_op's
-          // token.immediate(prec(1, /[+-]/)), which would otherwise lex the
-          // '-' alone and error on '>'.
-          token(prec(2, "->")),
+          arrow(),
           field("block", $._expression_block),
         ),
       ),
@@ -1179,7 +1178,7 @@ module.exports = grammar({
     //   ),
 
     short_comp_expression: ($) =>
-      seq("for", $._pattern, "in", $._expression_or_range, token(prec(2, "->")), $._expression),
+      seq("for", $._pattern, "in", $._expression_or_range, arrow(), $._expression),
 
     // comp_rule: $ =>
     //   seq(
@@ -1325,7 +1324,7 @@ module.exports = grammar({
         seq($.long_identifier, "<", optional($.type_attributes), ">"),
       ),
     paren_type: ($) => seq("(", $._type, ")"),
-    function_type: ($) => prec.right(seq($._type, token(prec(2, "->")), $._type)),
+    function_type: ($) => prec.right(seq($._type, arrow(), $._type)),
     compound_type: ($) =>
       prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
     struct_type: ($) => seq("struct", $.paren_type),
@@ -1379,7 +1378,7 @@ module.exports = grammar({
         6,
         seq(
           alias($._multiline_generic_type_head, $.generic_type),
-          token(prec(2, "->")),
+          arrow(),
           $._type,
           $._dedent,
         ),
@@ -1408,7 +1407,7 @@ module.exports = grammar({
             "(",
             choice(
               $.trait_member_constraint,
-              seq("new", ":", "unit", token(prec(2, "->")), $._type),
+              seq("new", ":", "unit", arrow(), $._type),
             ),
             ")",
           ),
@@ -1479,7 +1478,7 @@ module.exports = grammar({
         ),
       ),
 
-    curried_spec: ($) => seq(repeat(seq($.arguments_spec, token(prec(2, "->")))), $._curried_return_type),
+    curried_spec: ($) => seq(repeat(seq($.arguments_spec, arrow())), $._curried_return_type),
 
     argument_spec: ($) =>
       prec.left(
@@ -2415,6 +2414,19 @@ module.exports = grammar({
  */
 function scoped(rule, indent, dedent) {
   return field("block", seq(indent, rule, dedent));
+}
+
+/**
+ * The '->' token with lexical precedence 2, so that `expr->` (no space, e.g.
+ * a when-guard ending `isPfOwned->`) beats infix_op's token.immediate
+ * (prec 1, /[+-]/), which would otherwise lex the '-' alone and error on '>'.
+ * All occurrences must share this one definition: identical token specs merge
+ * into a single lexer token, while diverging precedences would split it.
+ *
+ * @return {RuleOrLiteral}
+ */
+function arrow() {
+  return token(prec(2, "->"));
 }
 
 /**

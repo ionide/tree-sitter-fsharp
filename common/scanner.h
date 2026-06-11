@@ -609,7 +609,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           found_preproc_if = true;
           // If an indented block is still open above this line AND the first
           // content line after the '#if' sits outside that block (less
-          // indented), close the block before treating the directive —
+          // indented), close the block before treating the directive.
+          // The peek below only advances past mark_end (still at the scan
+          // start), so the emitted DEDENT is zero-width and the directive
+          // text is re-read by the next scan — nothing is consumed. Same
+          // technique as is_type_application_open above. Otherwise —
           // otherwise the skip-line path below starves the parse that needs
           // the '#if' token after the dedent (e.g. a record '}' followed by
           // '#if' around a top-level binding). When the branch content stays
@@ -687,8 +691,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             return true;
           }
           // '#line N' / '#N' / '#light' are extras, transparent for
-          // indentation: leave the position untouched so the internal lexer
-          // consumes them in place.
+          // indentation. Returning false resets the lexer to the scan start
+          // (chars advanced past mark_end are returned to the input), so the
+          // internal lexer re-reads and consumes the directive in place.
           if (lexer->lookahead == 'l') {
             advance(lexer);
             if (lexer->lookahead == 'i') {
