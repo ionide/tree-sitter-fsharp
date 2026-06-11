@@ -18,6 +18,7 @@ module.exports = grammar(require("../fsharp/grammar"), {
     [$.long_identifier, $._identifier_or_op],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
+    [$.union_type_cases],
   ],
 
   supertypes: ($) => [$._module_signature_elements],

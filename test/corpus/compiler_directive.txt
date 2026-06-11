@@ -729,3 +729,248 @@ module M =
               (identifier))))
         body: (const
           (int))))))
+
+================================================================================
+preproc_if with negated condition and load directive
+================================================================================
+
+#if !FAKE
+#load "intellisense.fsx"
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (fsi_directive_decl
+      (string))))
+
+================================================================================
+preproc_if with empty branches
+================================================================================
+
+#if INTERACTIVE
+#else
+[<EntryPoint>]
+#endif
+let main args = 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (identifier)
+    (preproc_else
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+preproc_if with multiple opens in branches
+================================================================================
+
+module M
+#if A
+open C.D
+#else
+open E.F
+open G.H
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (preproc_if
+      (identifier)
+      (import_decl
+        (long_identifier
+          (identifier)
+          (identifier)))
+      (preproc_else
+        (import_decl
+          (long_identifier
+            (identifier)
+            (identifier)))
+        (import_decl
+          (long_identifier
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+preproc_if with attributes before directive
+================================================================================
+
+[<Literal>]
+#if !offline
+let connStr = "a"
+#else
+let connStr = "b"
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (preproc_if
+      (preproc_if_not_expression
+        (identifier))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (string))))
+      (preproc_else
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (const
+              (string))))))))
+
+================================================================================
+preproc_if with dangling let in expression branches
+================================================================================
+
+let getRooted path =
+    if isRooted path then
+        path
+    else
+        let parsed = path |> combine
+#if INTERACTIVE
+        let basePath = __SOURCE_DIRECTORY__
+#else
+        let basePath = asmLocation |> dirName
+#endif
+        combine2 basePath parsed
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (if_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))
+        (long_identifier_or_op
+          (identifier))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier))))
+          (sequential_expression
+            (preproc_if
+              (identifier)
+              (declaration_expression
+                (function_or_value_defn
+                  (value_declaration_left
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  (long_identifier_or_op
+                    (identifier))))
+              (preproc_else
+                (declaration_expression
+                  (function_or_value_defn
+                    (value_declaration_left
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier))))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (identifier)))))))
+            (application_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+preproc_if after record type definition
+================================================================================
+
+type T = {
+    A: int
+}
+
+#if !NETSTANDARD
+let messageBuffer = GlobalHost.Configuration.Max
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (dot_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))))))
