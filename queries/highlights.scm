@@ -381,6 +381,21 @@
 ((identifier) @keyword.exception
  (#any-of? @keyword.exception "failwith" "failwithf" "raise" "reraise"))
 
+;; `query { ... }` custom operations whose names are unambiguous (they are not
+;; ordinary F# functions/values). Scoped to unqualified identifiers so qualified
+;; module calls like `List.sortByDescending` are left untouched. Common-named
+;; operations (zip, head, count, where, select, sortBy, groupBy, ...) are
+;; intentionally omitted: they cannot be scoped to a `query` builder with the
+;; current query language without highlighting the same names everywhere.
+((long_identifier_or_op (identifier) @keyword.operator)
+ (#any-of? @keyword.operator
+   "leftOuterJoin" "groupJoin" "groupValBy"
+   "sortByDescending" "thenBy" "thenByDescending"
+   "sortByNullable" "sortByNullableDescending"
+   "thenByNullable" "thenByNullableDescending"
+   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"
+   "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"))
+
 [
   "as"
   "assert"
