@@ -382,18 +382,28 @@
  (#any-of? @keyword.exception "failwith" "failwithf" "raise" "reraise"))
 
 ;; `query { ... }` custom operations whose names are unambiguous (they are not
-;; ordinary F# functions/values). Scoped to unqualified identifiers so qualified
-;; module calls like `List.sortByDescending` are left untouched. Common-named
-;; operations (zip, head, count, where, select, sortBy, groupBy, ...) are
-;; intentionally omitted: they cannot be scoped to a `query` builder with the
-;; current query language without highlighting the same names everywhere.
-((long_identifier_or_op (identifier) @keyword.operator)
+;; ordinary F# functions/values). Common-named operations (zip, head, count,
+;; where, select, sortBy, groupBy, ...) are intentionally omitted: they cannot
+;; be scoped to a `query` builder with the current query language without
+;; highlighting the same names everywhere.
+
+;; Operations that take an argument: matched only as an application head, so
+;; module-qualified names (List.sortByDescending) and member access on an
+;; expression ((expr).sortByDescending) are left untouched.
+((application_expression
+   .
+   (long_identifier_or_op (identifier) @keyword.operator))
  (#any-of? @keyword.operator
    "leftOuterJoin" "groupJoin" "groupValBy"
    "sortByDescending" "thenBy" "thenByDescending"
    "sortByNullable" "sortByNullableDescending"
    "thenByNullable" "thenByNullableDescending"
-   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"
+   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"))
+
+;; Zero-argument terminal operations: matched only as a bare statement inside a
+;; computation-expression body, which likewise excludes member access.
+((sequential_expression (long_identifier_or_op (identifier) @keyword.operator))
+ (#any-of? @keyword.operator
    "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"))
 
 [
