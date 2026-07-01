@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [fsharp, fsharp_signatures]
+        language: [fsharp, fsharp_signature]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
       - name: Check for scanner changes
         id: scanner-check
         run: |-
-          if git diff --quiet HEAD^ -- src/scanner.c; then
+          if git diff --quiet HEAD^ -- ${{matrix.language}}/src/scanner.c; then
             printf 'changed=false\n' >> "$GITHUB_OUTPUT"
           else
             printf 'changed=true\n' >> "$GITHUB_OUTPUT"
