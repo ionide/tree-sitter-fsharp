@@ -4860,3 +4860,522 @@ let f (x: struct {| Name: string |}) = x
       (long_identifier_or_op
         (long_identifier
           (identifier))))))
+
+================================================================================
+while expression with boolean infix condition
+================================================================================
+
+while a && b do
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (while_expression
+    (infix_expression
+      (long_identifier_or_op
+        (identifier))
+      (infix_op)
+      (long_identifier_or_op
+        (identifier)))
+    (const
+      (unit))))
+
+================================================================================
+for expression with boolean infix enumerable
+================================================================================
+
+for x in a && b do
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (for_expression
+    (identifier_pattern
+      (long_identifier_or_op
+        (identifier)))
+    (infix_expression
+      (long_identifier_or_op
+        (identifier))
+      (infix_op)
+      (long_identifier_or_op
+        (identifier)))
+    (const
+      (unit))))
+
+================================================================================
+pipe into function expression
+================================================================================
+
+let a = ps |> function | Card c -> Some c | _ -> None
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (function_expression
+          (rules
+            (rule
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (infix_expression
+                (infix_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+when guard with infix and arrow without space
+================================================================================
+
+let f x =
+    match x with
+    | y when y > 0 || isPfOwned-> 1
+    | _ -> 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (const
+                  (int)))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))
+            (const
+              (int)))
+          (rule
+            (wildcard_pattern)
+            (const
+              (int))))))))
+
+================================================================================
+leading comma argument continuation
+================================================================================
+
+let opts =
+    Options(
+        ExcludeEnvironment = false
+        ,ExcludeCli = true
+        ,ExcludeManaged = false
+    )
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (tuple_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (bool)))
+          (tuple_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (bool)))
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (bool)))))))))
+
+================================================================================
+under-indented list continuation after semicolon
+================================================================================
+
+let dchars = ["a";"b";
+     "c";"d"] |> Set.ofList
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (list_expression
+          (const
+            (string))
+          (const
+            (string))
+          (const
+            (string))
+          (const
+            (string)))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+operator section as immediate application argument
+================================================================================
+
+let r = (a, b) ||> List.fold(Option.fold(+))
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (paren_expression
+          (tuple_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier))))
+        (infix_op)
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (long_identifier_or_op
+              (op_identifier))))))))
+
+================================================================================
+nested for comprehension with arrow
+================================================================================
+
+let e = [ for l in 0..3 do for h in 0..3 -> (l, h) ]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (list_expression
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (range_expression
+            (const
+              (int))
+            (const
+              (int)))
+          (short_comp_expression
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (range_expression
+              (const
+                (int))
+              (const
+                (int)))
+            (paren_expression
+              (tuple_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+interpolated string after let with if body in lambda
+================================================================================
+
+let r =
+    values
+    |> Array.map(fun v ->
+        let req = if v.Required then "" else " option"
+        $"{v.Name}{req}"
+    )
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (fun_expression
+            (argument_patterns
+              (long_identifier
+                (identifier)))
+            (declaration_expression
+              (function_or_value_defn
+                (value_declaration_left
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))))
+                (if_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (const
+                    (string))
+                  (const
+                    (string))))
+              (const
+                (string
+                  (format_string
+                    (format_string_eval
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (format_string_eval
+                      (long_identifier_or_op
+                        (identifier)))))))))))))
+
+================================================================================
+if else inside named argument
+================================================================================
+
+let f sender =
+    let client = new SmtpClient(host, 8080,
+                        EnableSsl = true, Credentials =
+                            if ok then Cred(sender, b.Replace("a", ""))
+                            else Cred(sender)
+                    )
+    client
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (tuple_expression
+                (long_identifier_or_op
+                  (identifier))
+                (tuple_expression
+                  (const
+                    (int))
+                  (tuple_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (bool)))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (if_expression
+                        (long_identifier_or_op
+                          (identifier))
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (tuple_expression
+                            (long_identifier_or_op
+                              (identifier))
+                            (application_expression
+                              (long_identifier_or_op
+                                (long_identifier
+                                  (identifier)
+                                  (identifier)))
+                              (tuple_expression
+                                (const
+                                  (string))
+                                (const
+                                  (string))))))
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))))))))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+statement after pipe chain in if branch
+================================================================================
+
+let f () =
+    let basicCheck =
+        if c then
+            eventWarn("x")
+            |> writeLog
+            simpleError "CVC"
+        else moreChecks
+    basicCheck
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (if_expression
+            (long_identifier_or_op
+              (identifier))
+            (sequential_expression
+              (infix_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (const
+                    (string)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))
+            (long_identifier_or_op
+              (identifier))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+measure literal with backtick-quoted unit
+================================================================================
+
+let confidenceLimited =
+    if confidence > 0.95m<``Risk %``> then 0.95m
+    else confidence/1m<``Risk %``>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (if_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (typed_expression
+            (const
+              (decimal
+                (float)))
+            (types
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (const
+          (decimal
+            (float)))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (typed_expression
+            (const
+              (decimal
+                (int)))
+            (types
+              (simple_type
+                (long_identifier
+                  (identifier))))))))))

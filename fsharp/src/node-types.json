@@ -108,6 +108,10 @@
         "named": true
       },
       {
+        "type": "short_comp_expression",
+        "named": true
+      },
+      {
         "type": "srtp_call_expression",
         "named": true
       },
@@ -676,10 +680,6 @@
           "named": true
         },
         {
-          "type": "short_comp_expression",
-          "named": true
-        },
-        {
           "type": "slice_ranges",
           "named": true
         }
@@ -921,10 +921,6 @@
           },
           {
             "type": "range_expression",
-            "named": true
-          },
-          {
-            "type": "short_comp_expression",
             "named": true
           }
         ]
@@ -1288,10 +1284,6 @@
           {
             "type": "range_expression",
             "named": true
-          },
-          {
-            "type": "short_comp_expression",
-            "named": true
           }
         ]
       }
@@ -1554,6 +1546,10 @@
         },
         {
           "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "type_extension_elements",
           "named": true
         },
         {
@@ -1828,7 +1824,6 @@
   {
     "type": "fsi_directive_decl",
     "named": true,
-    "extra": true,
     "fields": {},
     "children": {
       "multiple": false,
@@ -1905,7 +1900,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "rules",
@@ -1913,6 +1908,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "rules",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2286,10 +2291,6 @@
         },
         {
           "type": "range_expression",
-          "named": true
-        },
-        {
-          "type": "short_comp_expression",
           "named": true
         },
         {
@@ -3211,6 +3212,10 @@
           "named": true
         },
         {
+          "type": "attributes",
+          "named": true
+        },
+        {
           "type": "class_inherits_decl",
           "named": true
         },
@@ -3280,6 +3285,10 @@
       "types": [
         {
           "type": "_module_elem",
+          "named": true
+        },
+        {
+          "type": "attributes",
           "named": true
         },
         {
@@ -4287,10 +4296,6 @@
       "types": [
         {
           "type": "access_modifier",
-          "named": true
-        },
-        {
-          "type": "attributes",
           "named": true
         },
         {

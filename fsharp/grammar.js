@@ -57,7 +57,6 @@ module.exports = grammar({
     $.xml_doc,
     $.preproc_line,
     $.compiler_directive_decl,
-    $.fsi_directive_decl,
     ";",
   ],
 
@@ -95,8 +94,10 @@ module.exports = grammar({
     $._multi_dollar_triple_quote_end,
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._type_app_indent, // like _paren_indent but only fires after a newline; closed by '>' (used for multi-line generic type args)
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
+    $._do_keyword, // external 'do' terminating a while/for header; distinct from do_expression's 'do' so `while a && b do` reduces the condition instead of shifting 'do' as an application argument
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -109,7 +110,13 @@ module.exports = grammar({
     [$.declaration_expression, $._comp_or_range_expression],
     [$.preproc_if_in_expression, $.preproc_if_in_module_body],
     [$.preproc_else_in_expression, $.preproc_else_in_module_body],
+    [$._module_elem, $.preproc_else_in_expression],
+    [$._module_body_elem, $.preproc_if_in_expression],
+    [$._module_body_elem, $.preproc_else_in_expression],
     [$.rules],
+    // Singleton: union_type_cases conflicts with itself (shift the optional
+    // _newline before the next '|' case vs. reduce), like [$.rules] above.
+    [$.union_type_cases],
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
@@ -388,6 +395,11 @@ module.exports = grammar({
     //
     // Pattern rules (BEGIN)
 
+    // Pattern precedence (used by repeat_pattern, typed_pattern, optional_pattern):
+    //   optional_pattern (3) > typed_pattern (2) > comma-element (1).
+    // This ensures `?x: T` parses as `(typed (optional x) T)` and `(a: T, b: T)`
+    // parses as a repeat of two typed_patterns rather than a typed_pattern over
+    // the whole repeat.
     repeat_pattern: ($) =>
       prec.right(seq($._pattern, repeat1(prec(1, seq(",", $._pattern))))),
 
@@ -414,7 +426,7 @@ module.exports = grammar({
         $.named_field_pattern,
       ),
 
-    optional_pattern: ($) => prec.left(seq("?", $._pattern)),
+    optional_pattern: ($) => prec.left(3, seq("?", $._pattern)),
 
     type_check_pattern: ($) =>
       prec.right(seq(":?", $.atomic_type, optional(seq("as", $.identifier)))),
@@ -429,7 +441,7 @@ module.exports = grammar({
     conjunct_pattern: ($) => prec.left(0, seq($._pattern, "&", $._pattern)),
     typed_pattern: ($) =>
       prec.left(
-        -1,
+        2,
         seq(
           $._pattern,
           ":",
@@ -488,26 +500,19 @@ module.exports = grammar({
 
     list_pattern: ($) => seq("[", optional($._list_pattern_content), "]"),
     array_pattern: ($) => seq("[|", optional($._list_pattern_content), "|]"),
+    // The whole field list sits in one indent scope opened right after '{'
+    // (like field_initializers in brace_expression). Opening the scope before
+    // the first field keeps _indent from becoming valid mid-field, where a
+    // zero-width INDENT would cut off field values like `A.B` or `Some y`.
     record_pattern: ($) =>
-      prec.left(
-        seq(
-          "{",
-          $.field_pattern,
-          choice(
-            seq(
-              repeat(seq($._newline, $.field_pattern)),
-              optional($._newline),
-            ),
-            seq(
-              $._indent,
-              $.field_pattern,
-              repeat(seq($._newline, $.field_pattern)),
-              optional($._newline),
-              $._dedent,
-            ),
-          ),
-          "}",
-        ),
+      seq(
+        "{",
+        $._indent,
+        $.field_pattern,
+        repeat(seq($._newline, $.field_pattern)),
+        optional($._newline),
+        $._dedent,
+        "}",
       ),
 
     named_field: ($) => seq(optional(seq($.identifier, "=")), $._pattern),
@@ -573,6 +578,10 @@ module.exports = grammar({
         $.if_expression,
         $.while_expression,
         $.for_expression,
+        // Short-form comprehension `for x in xs -> e` so nested comprehensions
+        // like `[ for l in 0..3 do for h in 0..3 -> (l, h) ]` parse — the
+        // do-form body is a plain expression block.
+        $.short_comp_expression,
         $.match_expression,
         $.try_expression,
         $.literal_expression,
@@ -724,7 +733,7 @@ module.exports = grammar({
               $._expression,
             ),
           ),
-          "do",
+          alias($._do_keyword, "do"),
           $._expression_block,
           optional("done"),
         ),
@@ -736,7 +745,7 @@ module.exports = grammar({
         seq(
           choice("while", "while!"),
           $._expression,
-          "do",
+          alias($._do_keyword, "do"),
           $._expression_block,
           optional("done"),
         ),
@@ -762,7 +771,7 @@ module.exports = grammar({
     fun_expression: ($) =>
       prec.right(
         PREC.FUN_EXPR,
-        seq("fun", $.argument_patterns, "->", $._expression_block),
+        seq("fun", $.argument_patterns, arrow(), $._expression_block),
       ),
 
     try_expression: ($) =>
@@ -782,13 +791,27 @@ module.exports = grammar({
         $._expression,
         optional($._newline),
         "with",
-        choice(seq($._newline, $.rules), scoped($.rules, $._indent, $._dedent)),
+        choice(
+          seq($._newline, $.rules),
+          scoped($.rules, $._indent, $._dedent),
+          $.rules,
+        ),
       ),
 
     function_expression: ($) =>
       prec(
         PREC.MATCH_EXPR,
-        seq("function", scoped($.rules, $._indent, $._dedent)),
+        seq(
+          "function",
+          // Same alternatives as match_expression: rules may sit in an indent
+          // scope, follow a newline, or share the line (e.g. `|> function | A -> ...`,
+          // where the mid-line '| ' suppresses the zero-width INDENT).
+          choice(
+            seq($._newline, $.rules),
+            scoped($.rules, $._indent, $._dedent),
+            $.rules,
+          ),
+        ),
       ),
 
     mutate_expression: ($) =>
@@ -857,9 +880,12 @@ module.exports = grammar({
         ),
       ),
 
+    // _paren_indent (not _indent): the scope is delimited by the closing
+    // bracket, so under-indented continuation lines (e.g. `["a";"b";`
+    // followed by a less-indented line) must not DEDENT the list shut.
     _list_element: ($) =>
       seq(
-        $._indent,
+        $._paren_indent,
         choice(
           $._list_elements,
           seq(optional($._newline), $._comp_or_range_expression),
@@ -890,7 +916,7 @@ module.exports = grammar({
         seq(
           field("pattern", $._pattern),
           optional(seq("when", field("guard", $._expression))),
-          "->",
+          arrow(),
           field("block", $._expression_block),
         ),
       ),
@@ -996,7 +1022,7 @@ module.exports = grammar({
     _comp_or_range_expression: ($) =>
       choice(
         alias($.comp_declaration_expression, $.declaration_expression),
-        $.short_comp_expression,
+        // short_comp_expression is reachable via _expression now.
         $.range_expression,
         $._expression,
       ),
@@ -1152,7 +1178,7 @@ module.exports = grammar({
     //   ),
 
     short_comp_expression: ($) =>
-      seq("for", $._pattern, "in", $._expression_or_range, "->", $._expression),
+      seq("for", $._pattern, "in", $._expression_or_range, arrow(), $._expression),
 
     // comp_rule: $ =>
     //   seq(
@@ -1298,12 +1324,14 @@ module.exports = grammar({
         seq($.long_identifier, "<", optional($.type_attributes), ">"),
       ),
     paren_type: ($) => seq("(", $._type, ")"),
-    function_type: ($) => prec.right(seq($._type, "->", $._type)),
+    function_type: ($) => prec.right(seq($._type, arrow(), $._type)),
     compound_type: ($) =>
       prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
     struct_type: ($) => seq("struct", $.paren_type),
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
-    list_type: ($) => seq($._type, "[]"),
+    // '[]', '[,]', '[,,]', ... — multidimensional array suffixes share the
+    // token so 'float[,]' lexes as one postfix rather than index syntax.
+    list_type: ($) => seq($._type, alias(token(/\[,*\]/), "[]")),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
@@ -1350,7 +1378,7 @@ module.exports = grammar({
         6,
         seq(
           alias($._multiline_generic_type_head, $.generic_type),
-          "->",
+          arrow(),
           $._type,
           $._dedent,
         ),
@@ -1379,7 +1407,7 @@ module.exports = grammar({
             "(",
             choice(
               $.trait_member_constraint,
-              seq("new", ":", "unit", "->", $._type),
+              seq("new", ":", "unit", arrow(), $._type),
             ),
             ")",
           ),
@@ -1450,7 +1478,7 @@ module.exports = grammar({
         ),
       ),
 
-    curried_spec: ($) => seq(repeat(seq($.arguments_spec, "->")), $._curried_return_type),
+    curried_spec: ($) => seq(repeat(seq($.arguments_spec, arrow())), $._curried_return_type),
 
     argument_spec: ($) =>
       prec.left(
@@ -1485,6 +1513,7 @@ module.exports = grammar({
             $.union_type_fields,
           )
         ),
+        optional(alias($._type_extension_with, $.type_extension_elements)),
       ),
 
     type_definition: ($) =>
@@ -1493,7 +1522,7 @@ module.exports = grammar({
           optional($.attributes),
           "type",
           $._type_defn_body,
-          repeat(seq(optional($.attributes), "and", $._type_defn_body)),
+          repeat(seq("and", optional($.attributes), $._type_defn_body)),
         ),
       ),
 
@@ -1518,7 +1547,6 @@ module.exports = grammar({
       prec(
         2,
         seq(
-          optional($.attributes),
           optional($.access_modifier),
           choice(
             seq(
@@ -1626,7 +1654,7 @@ module.exports = grammar({
       seq(
         optional($.access_modifier),
         $.union_type_cases,
-        optional($.type_extension_elements),
+        optional(seq(optional($._newline), $.type_extension_elements)),
       ),
 
     union_type_defn: ($) =>
@@ -1637,6 +1665,11 @@ module.exports = grammar({
           choice(
             scoped($._union_type_defn_inner, $._indent, $._dedent),
             $._union_type_defn_inner,
+            // Cases aligned with the enclosing scope (same column as 'type'),
+            // mirroring match_expression's `seq(_newline, rules)` branch:
+            //   type T =
+            //   | A
+            seq($._newline, $._union_type_defn_inner),
           ),
         ),
       ),
@@ -1645,7 +1678,7 @@ module.exports = grammar({
       seq(
         optional("|"),
         $.union_type_case,
-        repeat(seq("|", $.union_type_case)),
+        repeat(seq(optional($._newline), "|", $.union_type_case)),
       ),
 
     union_type_case: ($) =>
@@ -1918,7 +1951,33 @@ module.exports = grammar({
       prec.left(
         seq(
           "inherit",
-          scoped(seq($._type, optional($._expression)), $._indent, $._dedent),
+          scoped(
+            seq(
+              choice(
+                $._type,
+                alias($._inline_multiline_generic_type, $.generic_type),
+              ),
+              optional($._expression),
+            ),
+            $._indent,
+            $._dedent,
+          ),
+        ),
+      ),
+
+    // The DEDENT precedes '>': the scanner emits it on seeing '>' (as a
+    // bracket-end-style close of the TYPE_APP_INDENT), so '>' on the same
+    // line as the last arg closes the scope without needing a NEWLINE first.
+    _inline_multiline_generic_type: ($) =>
+      prec.right(
+        5,
+        seq(
+          $.long_identifier,
+          "<",
+          $._type_app_indent,
+          $.type_attributes,
+          $._dedent,
+          ">",
         ),
       ),
 
@@ -1998,10 +2057,33 @@ module.exports = grammar({
       ),
 
     format_string: ($) =>
-      seq(
-        token(prec(100, '$"')),
-        repeat(choice($.format_string_eval, $._string_char)),
-        '"',
+      choice(
+        seq(
+          token(prec(100, '$"')),
+          repeat(
+            choice(
+              $.format_string_eval,
+              // '{{' / '}}' are literal-brace escapes; must outrank the
+              // interpolation-hole '{' (prec 1000).
+              token.immediate(prec(1001, /\{\{|\}\}/)),
+              $._string_char,
+            ),
+          ),
+          '"',
+        ),
+        // Verbatim interpolated: $@"..." / @$"..." — backslashes are literal,
+        // '""' is an escaped quote, {expr} holes still apply.
+        seq(
+          token(prec(100, choice('$@"', '@$"'))),
+          repeat(
+            choice(
+              $.format_string_eval,
+              token.immediate(prec(1001, /\{\{|\}\}/)),
+              $._verbatim_string_char,
+            ),
+          ),
+          token.immediate('"'),
+        ),
       ),
 
     _string_literal: ($) => seq('"', repeat($._string_char), '"'),
@@ -2095,7 +2177,9 @@ module.exports = grammar({
     op_identifier: (_) =>
       token(
         prec(
-          1000,
+          // Above the 10000 of _high_prec_app's immediate '(' so a section
+          // like f(+) lexes as an operator reference, not application-paren.
+          100001,
           seq(
             "(",
             /\s*/,
@@ -2170,12 +2254,21 @@ module.exports = grammar({
       prec.right(
         alias(
           choice(
-            seq($.int, token.immediate("."), optional($.int)),
             seq(
               $.int,
-              optional(seq(token.immediate("."), $.int)),
-              token.immediate(/[eE][+-]?/),
+              token.immediate("."),
+              optional(token.immediate(/([0-9]_?)+/)),
+            ),
+            seq(
               $.int,
+              optional(
+                seq(
+                  token.immediate("."),
+                  token.immediate(/([0-9]_?)+/),
+                ),
+              ),
+              token.immediate(/[eE][+-]?/),
+              token.immediate(/([0-9]_?)+/),
             ),
           ),
           "float",
@@ -2223,7 +2316,10 @@ module.exports = grammar({
       seq(
         choice("#r", "#load", "#time", "#I", "#help", "#quit"),
         optional(choice(alias($._string_literal, $.string), $.verbatim_string)),
-        /\n/,
+        // _newline_not_aligned instead of a literal /\n/ so the directive can
+        // close right before '#endif' (the scanner eats the raw newline while
+        // peeking at '#') and at EOF. Also gives extras a definite ending.
+        $._newline_not_aligned,
       ),
 
     preproc_line: ($) =>
@@ -2254,11 +2350,42 @@ module.exports = grammar({
 
     ...preprocIf(
       "",
-      ($) => choice($._module_elem, alias($._preproc_toplevel_module, $.named_module)),
+      // Optional: branches may be empty (e.g. `#if INTERACTIVE\n#else ...`),
+      // and an fsi directive consumed as an extra must not leave the branch
+      // unparseable.
+      ($) =>
+        optional(
+          choice(
+            // Optional trailing attributes: a branch may end with attributes
+            // that decorate the declaration following #endif, e.g.
+            //   #if !NETSTANDARD
+            //   [<HubName("CompanyHub")>]
+            //   #endif
+            //   type CompanyHub() = ...
+            seq(
+              repeat1(seq($._module_elem, optional($._newline))),
+              optional($.attributes),
+            ),
+            $.attributes,
+            alias($._preproc_toplevel_module, $.named_module),
+          ),
+        ),
     ),
     ...preprocIf(
       "_in_expression",
-      ($) => repeat(seq(optional($._newline), $._expression)),
+      // Besides expressions, allow body-less let bindings: a branch often
+      // ends with `let x = ...` whose body is the code following #endif
+      // (the classic `#if INTERACTIVE` pattern).
+      ($) =>
+        repeat(
+          seq(
+            optional($._newline),
+            choice(
+              $._expression,
+              alias($.value_declaration, $.declaration_expression),
+            ),
+          ),
+        ),
       -2,
     ),
     ...preprocIf(
@@ -2290,6 +2417,19 @@ function scoped(rule, indent, dedent) {
 }
 
 /**
+ * The '->' token with lexical precedence 2, so that `expr->` (no space, e.g.
+ * a when-guard ending `isPfOwned->`) beats infix_op's token.immediate
+ * (prec 1, /[+-]/), which would otherwise lex the '-' alone and error on '>'.
+ * All occurrences must share this one definition: identical token specs merge
+ * into a single lexer token, while diverging precedences would split it.
+ *
+ * @return {RuleOrLiteral}
+ */
+function arrow() {
+  return token(prec(2, "->"));
+}
+
+/**
  *
  * @param {string} suffix
  *
@@ -2318,6 +2458,10 @@ function preprocIf(suffix, content, precedence = 0) {
       prec(
         precedence,
         seq(
+          // Top-level only: attributes may precede the #if when the directive
+          // wraps the attributed declaration, e.g. `[<Literal>]` / `#if X` /
+          // `let c = ...`. Other variants get ambiguous with attribute rules.
+          ...(suffix === "" ? [optional($.attributes)] : []),
           "#if",
           field("condition", $._preproc_expression),
           $._newline_not_aligned,
