@@ -81,21 +81,21 @@ let name (x: int, y: string) = 1, "test"
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (repeat_pattern
-              (typed_pattern
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier)))
-                (simple_type
-                  (long_identifier
-                    (identifier))))
+          (repeat_pattern
+            (typed_pattern
               (identifier_pattern
                 (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
                   (identifier))))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
       (tuple_expression
         (const
           (int))
@@ -611,3 +611,62 @@ do
               (identifier))
             (const
               (bool))))))))
+
+================================================================================
+record pattern with qualified identifiers and union case field values
+================================================================================
+
+match x with
+| { Bar = A.B } -> 1
+| { Foo.Bar = Some y } -> y
+| { Bar = Foo.Baz y } -> y
+
+--------------------------------------------------------------------------------
+
+(file
+  (match_expression
+    (long_identifier_or_op
+      (identifier))
+    (rules
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier))))))
+        (const
+          (int)))
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier)
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (long_identifier_or_op
+          (identifier)))
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))

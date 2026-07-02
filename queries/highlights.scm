@@ -109,17 +109,16 @@
 
 
 (dot_expression
-  .
-  (_) @variable.member
-  .
-  (_))
+  base: (_) @variable.member
+  field: (long_identifier_or_op
+    (identifier) @property))
 
 (application_expression
   .
   (long_identifier_or_op
     (identifier) @function.call)
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -127,7 +126,7 @@
     field: (long_identifier_or_op
       (identifier) @function.call))
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -136,7 +135,7 @@
       (identifier) @function.call)
     (_))
   .
-  (_) @variable)
+  (_))
 
 (application_expression
   .
@@ -146,7 +145,7 @@
         (identifier) @function.call))
     (_))
   .
-  (_) @variable)
+  (_))
 
 ((infix_expression
   .
@@ -154,14 +153,50 @@
   .
   (infix_op) @operator
   .
-  (_) @function.call
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
   )
  (#eq? @operator "|>")
  )
 
 ((infix_expression
   .
-  (_) @function.call
+  (_)
+  .
+  (infix_op) @operator
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
+  )
+ (#eq? @operator "|>")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
+  .
+  (infix_op) @operator
+  .
+  (_)
+  )
+ (#eq? @operator "<|")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
   .
   (infix_op) @operator
   .
@@ -345,6 +380,31 @@
 
 ((identifier) @keyword.exception
  (#any-of? @keyword.exception "failwith" "failwithf" "raise" "reraise"))
+
+;; `query { ... }` custom operations whose names are unambiguous (they are not
+;; ordinary F# functions/values). Common-named operations (zip, head, count,
+;; where, select, sortBy, groupBy, ...) are intentionally omitted: they cannot
+;; be scoped to a `query` builder with the current query language without
+;; highlighting the same names everywhere.
+
+;; Operations that take an argument: matched only as an application head, so
+;; module-qualified names (List.sortByDescending) and member access on an
+;; expression ((expr).sortByDescending) are left untouched.
+((application_expression
+   .
+   (long_identifier_or_op (identifier) @keyword.operator))
+ (#any-of? @keyword.operator
+   "leftOuterJoin" "groupJoin" "groupValBy"
+   "sortByDescending" "thenBy" "thenByDescending"
+   "sortByNullable" "sortByNullableDescending"
+   "thenByNullable" "thenByNullableDescending"
+   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"))
+
+;; Zero-argument terminal operations: matched only as a bare statement inside a
+;; computation-expression body, which likewise excludes member access.
+((sequential_expression (long_identifier_or_op (identifier) @keyword.operator))
+ (#any-of? @keyword.operator
+   "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"))
 
 [
   "as"

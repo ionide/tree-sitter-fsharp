@@ -37,3 +37,4 @@ dsl.d.ts
 *.wasm
 *.obj
 *.o
+/**/src/parser.c
