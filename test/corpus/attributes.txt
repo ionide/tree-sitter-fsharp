@@ -363,8 +363,8 @@ type AfterShapes = { X : int }
                         (identifier))))
                   (long_identifier_or_op
                     (long_identifier
-                      (identifier))
-                    (identifier)))))))))
+                      (identifier)
+                      (identifier))))))))))
     (record_type_defn
       (type_name
         (attributes
