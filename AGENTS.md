@@ -13,8 +13,24 @@ Each parser directory contains:
 
 - `grammar.js` - The grammar definition (written in JavaScript)
 - `src/grammar.json` - Generated grammar in JSON format
-- `src/parser.c` - Generated C parser code (This file should never edited directly)
-- `src/scanner.c` - External scanner for handling complex tokenization
+- `src/parser.c` - Generated C parser code (never edit this file directly)
+- `src/scanner.c` - Thin per-parser shim that `#include`s the shared scanner
+
+The **real** external scanner logic lives in a single shared header at
+[`common/scanner.h`](./common/scanner.h). Both `fsharp/src/scanner.c` and
+`fsharp_signature/src/scanner.c` are just three-function shims that delegate
+to functions defined in that header. If you need to change tokenization
+behavior (indent/dedent, keyword handling, string interpolation, etc.),
+edit `common/scanner.h` — never the per-parser `scanner.c` shim.
+
+## Running the CLI
+
+The `tree-sitter` CLI is installed as a local devDependency (`node_modules/.bin/tree-sitter`), not globally. Pick one:
+
+- `npx tree-sitter <command>` — resolves the local binary automatically.
+- `source ./activate` (from the repo root) — puts `node_modules/.bin` on `$PATH` for the current shell, so plain `tree-sitter <command>` works. Run `deactivate` to undo. See the README for details.
+
+All examples in this document use `npx tree-sitter ...`; if you have sourced `./activate` you can drop the `npx` prefix.
 
 ## Workflow for Adding a New Feature
 
@@ -72,30 +88,53 @@ where sample if the code you want to parse.
 
 ### 2. Run the Test
 
-Run the test to see the current failure:
+From the repo root (so `tree-sitter.json` picks up both parsers):
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter test
+npx tree-sitter test
+```
 
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter test
+To limit to a single test file or a single test name:
+
+```bash
+npx tree-sitter test --file-name attributes.txt
+npx tree-sitter test -i "top-level module attribute"
+npx tree-sitter test --overview-only   # pass/fail summary only
+```
+
+To parse a single file (useful for iterating on real F# samples):
+
+```bash
+npx tree-sitter parse path/to/file.fs
+# .fsi files need the signature parser selected explicitly:
+npx tree-sitter parse -p fsharp_signature path/to/file.fsi
 ```
 
 ### 3. Implement the Feature
 
-Update `grammar.js` in the appropriate parser directory to add the new grammar rule. If you need to add special tokenization logic (like handling keywords that can be used as identifiers), you may need to modify `src/scanner.c`.
+Update `grammar.js` in the appropriate parser directory to add the new grammar rule. If a feature applies to both `.fs` and `.fsi`, update **both** `fsharp/grammar.js` and `fsharp_signature/grammar.js`.
+
+If you need to add special tokenization logic (indent/dedent behavior, keyword handling that competes with identifiers, string interpolation, etc.), edit the shared scanner at `common/scanner.h` — not the per-parser `src/scanner.c` shim.
 
 ### 4. Regenerate the Parser
 
-After modifying `grammar.js`, regenerate `grammar.json` and `parser.c`:
+After modifying `grammar.js`, regenerate `grammar.json` and `parser.c` for both parsers:
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter generate
+npm run generate
+```
 
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter generate
+Under the hood this runs `tree-sitter generate` inside each parser directory. If you only touched one grammar you can regenerate that one directly with an explicit output path (avoids stray files at the repo root):
+
+```bash
+npx tree-sitter generate --output fsharp/src fsharp/grammar.js
+npx tree-sitter generate --output fsharp_signature/src fsharp_signature/grammar.js
+```
+
+Changes to `common/scanner.h` do **not** require regeneration — they're picked up automatically on the next build. But you do need `-r` on the next test run to force a rebuild of the compiled scanner:
+
+```bash
+npx tree-sitter test -r
 ```
 
 ### 5. Run Tests Again
@@ -103,11 +142,7 @@ cd fsharp_signature && npx tree-sitter generate
 Validate the feature is working:
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter test
-
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter test
+npx tree-sitter test
 ```
 
 ### 6. Repeat as Necessary

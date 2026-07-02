@@ -1,0 +1,65 @@
+# shellcheck shell=bash
+# Source this file (do not execute it) to put the local tree-sitter CLI
+# and any other node_modules binaries on PATH for the current shell:
+#
+#     source ./activate
+#
+# Then plain `tree-sitter <command>` invokes ./node_modules/.bin/tree-sitter
+# without needing `npx`. Run `deactivate` to restore the previous PATH.
+#
+# Modeled on Python's `venv/bin/activate`.
+
+# Refuse to run if the file was executed instead of sourced. When executed,
+# BASH_SOURCE[0] equals $0; when sourced, they differ.
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    echo "activate: this script must be sourced, not executed." >&2
+    echo "  Run:  source ./activate" >&2
+    exit 1
+fi
+
+# Resolve the directory of this script so `source ./activate` works from
+# anywhere. Prefer BASH_SOURCE (bash); fall back to $0 (zsh sourced files).
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+    _tsfsharp_activate_src="${BASH_SOURCE[0]}"
+elif [ -n "${(%):-%x}" ] 2>/dev/null; then
+    # zsh: %x expands to the sourced file path.
+    _tsfsharp_activate_src="${(%):-%x}"
+else
+    _tsfsharp_activate_src="${0}"
+fi
+_tsfsharp_activate_dir="$(cd "$(dirname "${_tsfsharp_activate_src}")" && pwd)"
+_tsfsharp_bin="${_tsfsharp_activate_dir}/node_modules/.bin"
+
+if [ ! -d "${_tsfsharp_bin}" ]; then
+    echo "activate: ${_tsfsharp_bin} not found. Run 'npm install' first." >&2
+    unset _tsfsharp_activate_src _tsfsharp_activate_dir _tsfsharp_bin
+    return 1 2>/dev/null || exit 1
+fi
+
+# Save prior state so `deactivate` can restore it faithfully.
+_TSFSHARP_OLD_PATH="${PATH:-}"
+_TSFSHARP_OLD_PS1="${PS1:-}"
+export PATH="${_tsfsharp_bin}:${PATH}"
+
+# Prefix the shell prompt so it's visible that the env is active. Kept simple
+# to avoid interfering with fancy prompt setups; users with custom PS1 can
+# comment out this block.
+if [ -n "${PS1:-}" ]; then
+    PS1="(tree-sitter-fsharp) ${PS1}"
+    export PS1
+fi
+
+deactivate() {
+    if [ -n "${_TSFSHARP_OLD_PATH+x}" ]; then
+        export PATH="${_TSFSHARP_OLD_PATH}"
+        unset _TSFSHARP_OLD_PATH
+    fi
+    if [ -n "${_TSFSHARP_OLD_PS1+x}" ]; then
+        PS1="${_TSFSHARP_OLD_PS1}"
+        export PS1
+        unset _TSFSHARP_OLD_PS1
+    fi
+    unset -f deactivate
+}
+
+unset _tsfsharp_activate_src _tsfsharp_activate_dir _tsfsharp_bin
