@@ -39,12 +39,18 @@ enum TokenType {
   PAREN_INDENT,
   TYPE_DECL_NEWLINE,
   IN,
+  TRY_INDENT,
   ERROR_SENTINEL
 };
 
 typedef struct {
   Array(uint16_t) indents;
   Array(bool) paren_indents;
+  // Parallel to `indents`: marks an indentation scope that was opened for the
+  // body of a `try` expression. Such a scope is force-closed when its
+  // terminating `with`/`finally` sits at the same column as the body (where an
+  // ordinary indentation dedent would not fire).
+  Array(bool) try_indents;
   Array(uint16_t) preprocessor_indents;
   uint8_t multi_dollar_count;
 } Scanner;
@@ -59,9 +65,10 @@ static inline bool is_word_char(int32_t c) {
 }
 
 static inline void push_indent(Scanner *scanner, uint16_t indent_length,
-                               bool is_paren_indent) {
+                               bool is_paren_indent, bool is_try_indent) {
   array_push(&scanner->indents, indent_length);
   array_push(&scanner->paren_indents, is_paren_indent);
+  array_push(&scanner->try_indents, is_try_indent);
 }
 
 static inline void pop_indent(Scanner *scanner) {
@@ -71,6 +78,9 @@ static inline void pop_indent(Scanner *scanner) {
   if (scanner->paren_indents.size > 0) {
     array_pop(&scanner->paren_indents);
   }
+  if (scanner->try_indents.size > 0) {
+    array_pop(&scanner->try_indents);
+  }
 }
 
 static inline uint16_t peek_indent_length(Scanner *scanner) {
@@ -79,6 +89,10 @@ static inline uint16_t peek_indent_length(Scanner *scanner) {
 
 static inline bool peek_is_paren_indent(Scanner *scanner) {
   return scanner->paren_indents.size > 0 && *array_back(&scanner->paren_indents);
+}
+
+static inline bool peek_is_try_indent(Scanner *scanner) {
+  return scanner->try_indents.size > 0 && *array_back(&scanner->try_indents);
 }
 
 // Check if the content after '<' looks like type arguments per F# spec Section 15.3.
@@ -807,6 +821,19 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         advance(lexer);
         if (lexer->lookahead == 'h') {
           advance(lexer);
+          // Force-close a try-body scope whose terminating 'with' begins a new
+          // line at the same column as the body, so an ordinary indentation
+          // dedent won't fire. Only applies while the closing 'with' cannot yet
+          // be accepted (WITH not valid) but a DEDENT still is, and only for
+          // try-body scopes -- regular scopes (e.g. a class body followed by a
+          // 'with' type extension) fall through to the normal newline logic.
+          if (!is_word_char(lexer->lookahead) && lexer->lookahead != ' ' &&
+              valid_symbols[DEDENT] && !valid_symbols[WITH] &&
+              peek_is_try_indent(scanner)) {
+            pop_indent(scanner);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
           if (lexer->lookahead == ' ') {
             // the 'WITH' token is only valid if we have popped the appropriate
             // amount of dedent tokens.
@@ -985,10 +1012,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
+  if (valid_symbols[TRY_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end && !found_preprocessor_end &&
+      !found_same_line_pipe_infix) {
+    // Like INDENT, but tracked separately so the scope can be force-closed when
+    // its terminating `with`/`finally` sits at the same column as the body.
+    push_indent(scanner, indent_length, false, true);
+    lexer->result_symbol = TRY_INDENT;
+    return true;
+  }
+
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix) {
-    push_indent(scanner, indent_length, false);
+    push_indent(scanner, indent_length, false, false);
     lexer->result_symbol = INDENT;
     return true;
   }
@@ -999,7 +1036,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
     // logic can be more lenient inside parenthesized expressions, where the
     // closing ')' determines scope rather than indentation alone.
-    push_indent(scanner, indent_length, true);
+    push_indent(scanner, indent_length, true, false);
     lexer->result_symbol = PAREN_INDENT;
     return true;
   }
@@ -1134,6 +1171,23 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)bits;
   }
 
+  size_t try_bytes = (indent_count + 7) / 8;
+  for (size_t byte_index = 0;
+       byte_index < try_bytes && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
+       byte_index++) {
+    uint8_t bits = 0;
+    for (size_t bit = 0; bit < 8; bit++) {
+      size_t indent_index = byte_index * 8 + bit + 1;
+      if (indent_index > indent_count) {
+        break;
+      }
+      if (*array_get(&scanner->try_indents, indent_index)) {
+        bits |= (uint8_t)(1u << bit);
+      }
+    }
+    buffer[size++] = (char)bits;
+  }
+
   return size;
 }
 
@@ -1142,6 +1196,8 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_push(&scanner->indents, 0);
   array_delete(&scanner->paren_indents);
   array_push(&scanner->paren_indents, false);
+  array_delete(&scanner->try_indents);
+  array_push(&scanner->try_indents, false);
 
   array_delete(&scanner->preprocessor_indents);
   scanner->multi_dollar_count = 0;
@@ -1178,6 +1234,18 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       array_push(&scanner->paren_indents, is_paren_indent);
     }
     size += paren_bytes;
+
+    size_t try_bytes = (actual_indent_count + 7) / 8;
+    for (size_t indent_index = 0; indent_index < actual_indent_count; indent_index++) {
+      size_t byte_offset = indent_index / 8;
+      bool is_try_indent = false;
+      if (size + byte_offset < length) {
+        uint8_t bits = (uint8_t)buffer[size + byte_offset];
+        is_try_indent = ((bits >> (indent_index % 8)) & 1u) != 0;
+      }
+      array_push(&scanner->try_indents, is_try_indent);
+    }
+    size += try_bytes;
   }
 }
 
@@ -1185,6 +1253,7 @@ static Scanner *create() {
   Scanner *scanner = ts_calloc(1, sizeof(Scanner));
   array_init(&scanner->indents);
   array_init(&scanner->paren_indents);
+  array_init(&scanner->try_indents);
   array_init(&scanner->preprocessor_indents);
   deserialize(scanner, NULL, 0);
   return scanner;
@@ -1193,6 +1262,7 @@ static Scanner *create() {
 static void destroy(Scanner *scanner) {
   array_delete(&scanner->indents);
   array_delete(&scanner->paren_indents);
+  array_delete(&scanner->try_indents);
   array_delete(&scanner->preprocessor_indents);
   ts_free(scanner);
 }

@@ -97,6 +97,7 @@ module.exports = grammar({
     $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
+    $._try_indent, // like _indent, but opens a try-body scope that can be force-closed when its 'with'/'finally' sits at the same column as the body
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -642,6 +643,7 @@ module.exports = grammar({
               $.field_initializers,
               $.object_expression,
               $.with_field_expression,
+              seq($.class_inherits_decl, optional($._newline), $.field_initializers),
             ),
             $._indent,
             $._dedent,
@@ -770,7 +772,9 @@ module.exports = grammar({
         PREC.MATCH_EXPR,
         seq(
           "try",
-          $._expression_block,
+          // The body opens a dedicated try-scope so the closing 'with'/'finally'
+          // can force it shut even when it sits at the same column as the body.
+          seq($._try_indent, $._expression, $._dedent),
           optional($._newline),
           choice(seq("with", $.rules), seq("finally", $._expression_block)),
         ),
@@ -1757,7 +1761,7 @@ module.exports = grammar({
               optional($.access_modifier),
               $.member_signature,
             ),
-            seq("member", "val", $.property_or_ident, $._val_property_defn),
+            seq("member", "val", optional($.access_modifier), $.property_or_ident, $._val_property_defn),
             seq("override", optional($.access_modifier), $.method_or_prop_defn),
             seq("default", optional($.access_modifier), $.method_or_prop_defn),
             seq(
