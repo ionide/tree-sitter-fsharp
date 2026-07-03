@@ -38,12 +38,10 @@ edit `common/scanner.h` — never the per-parser `scanner.c` shim.
 
 ## Running the CLI
 
-The `tree-sitter` CLI is installed as a local devDependency (`node_modules/.bin/tree-sitter`), not globally. Pick one:
-
-- `npx tree-sitter <command>` — resolves the local binary automatically.
-- `source ./activate` (from the repo root) — puts `node_modules/.bin` on `$PATH` for the current shell, so plain `tree-sitter <command>` works. Run `deactivate` to undo. See the README for details.
-
-All examples in this document use `npx tree-sitter ...`; if you have sourced `./activate` you can drop the `npx` prefix.
+The `tree-sitter` CLI is installed as a local devDependency
+(`node_modules/.bin/tree-sitter`), not globally. Invoke it with
+`npx tree-sitter <command>`, which resolves the local binary
+automatically. All examples in this document use `npx tree-sitter ...`.
 
 ## Workflow for Adding a New Feature
 
