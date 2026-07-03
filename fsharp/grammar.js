@@ -1522,7 +1522,15 @@ module.exports = grammar({
           optional($.attributes),
           "type",
           $._type_defn_body,
-          repeat(seq("and", optional($.attributes), $._type_defn_body)),
+          repeat(
+            seq(
+              "and",
+              choice(
+                seq(optional($.attributes), $._type_defn_body),
+                seq($._indent, optional($.attributes), $._type_defn_body, $._dedent),
+              ),
+            ),
+          ),
         ),
       ),
 
