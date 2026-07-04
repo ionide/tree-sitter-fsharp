@@ -8809,38 +8809,6 @@
         }
       ]
     },
-    "_verbatim_string_char": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_inside_string_marker"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
-          "content": {
-            "type": "PREC",
-            "value": 1,
-            "content": {
-              "type": "PATTERN",
-              "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
-            }
-          }
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_non_escape_char"
-        },
-        {
-          "type": "STRING",
-          "value": "\\"
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\\"\\\""
-        }
-      ]
-    },
     "verbatim_string": {
       "type": "SEQ",
       "members": [
@@ -8851,8 +8819,36 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_verbatim_string_char"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_inside_string_marker"
+              },
+              {
+                "type": "IMMEDIATE_TOKEN",
+                "content": {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
+                  }
+                }
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_non_escape_char"
+              },
+              {
+                "type": "STRING",
+                "value": "\\"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\\"\\\""
+              }
+            ]
           }
         },
         {
@@ -8897,8 +8893,36 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_verbatim_string_char"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_inside_string_marker"
+              },
+              {
+                "type": "IMMEDIATE_TOKEN",
+                "content": {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
+                  }
+                }
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_non_escape_char"
+              },
+              {
+                "type": "STRING",
+                "value": "\\"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\\"\\\""
+              }
+            ]
           }
         },
         {

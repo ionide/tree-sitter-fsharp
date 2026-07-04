@@ -2063,13 +2063,11 @@ module.exports = grammar({
 
     string: ($) => choice($._string_literal, $.format_string),
 
-    _verbatim_string_char: ($) =>
-      choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/),
     verbatim_string: ($) =>
-      seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
+      seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"')),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
     verbatim_bytearray: ($) =>
-      seq('@"', repeat($._verbatim_string_char), token.immediate('"B')),
+      seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"B')),
 
     format_triple_quoted_string: ($) =>
       choice(
