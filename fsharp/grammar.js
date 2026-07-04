@@ -106,7 +106,7 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
     [$._module_elem, $.preproc_if_in_expression],
-    [$._module_expression, $._expression],
+    [$._module_body_elem, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
     [$.preproc_if_in_expression, $.preproc_if_in_module_body],
     [$.preproc_else_in_expression, $.preproc_else_in_module_body],
@@ -117,7 +117,7 @@ module.exports = grammar({
     // Singleton: union_type_cases conflicts with itself (shift the optional
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
     [$.union_type_cases],
-    [$.prefixed_expression, $._low_prec_app, $.infix_expression],
+    [$.prefixed_expression, $.application_expression, $.infix_expression],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
   ],
@@ -168,16 +168,6 @@ module.exports = grammar({
         repeat($._module_elem),
       ),
 
-    _preproc_toplevel_module: ($) =>
-      seq(
-        optional($.attributes),
-        "module",
-        optional($.access_modifier),
-        optional("rec"),
-        field("name", $.long_identifier),
-        repeat($._module_elem),
-      ),
-
     _module_body_elem: ($) =>
       choice(
         alias($.value_declaration, $.declaration_expression),
@@ -189,12 +179,7 @@ module.exports = grammar({
         $.exception_definition,
         $.extern_binding,
         alias($.preproc_if_in_module_body, $.preproc_if),
-        $._module_expression,
-        // $.exception_defn
-      ),
-
-    _module_expression: ($) =>
-      choice(
+        // inlined from former _module_expression (single-use hidden rule)
         "null",
         $.const,
         $.paren_expression,
@@ -224,7 +209,7 @@ module.exports = grammar({
         $.application_expression,
         $.dot_expression,
         $.srtp_call_expression,
-        // (static-typars : (member-sig) expr)
+        // $.exception_defn
       ),
 
     _module_elem: ($) =>
@@ -293,13 +278,16 @@ module.exports = grammar({
     //
     // Attributes (BEGIN)
     //
-    attributes: ($) => prec.left(repeat1($._attribute_set)),
-    _attribute_set: ($) =>
-      seq(
-        "[<",
-        $.attribute,
-        prec(PREC.SEQ_EXPR + 1, repeat(seq($._newline, $.attribute))),
-        ">]",
+    attributes: ($) =>
+      prec.left(
+        repeat1(
+          seq(
+            "[<",
+            $.attribute,
+            prec(PREC.SEQ_EXPR + 1, repeat(seq($._newline, $.attribute))),
+            ">]",
+          ),
+        ),
       ),
     attribute: ($) =>
       seq(
@@ -465,26 +453,28 @@ module.exports = grammar({
       // argument patterns are generally no different from normal patterns.
       // however, any time an argument pattern is a valid node, (i.e. inside a beginning fun decl)
       // it is always the correct node to construct.
-      prec.left(1000, repeat1($._atomic_pattern)),
+      prec.left(
+        1000,
+        repeat1(
+          choice(
+            "null",
+            "_",
+            $.typed_const_pattern,
+            $.const,
+            $.long_identifier,
+            $.list_pattern,
+            $.record_pattern,
+            $.array_pattern,
+            seq("(", $._pattern, ")"),
+            $.type_check_pattern,
+          ),
+        ),
+      ),
 
     field_pattern: ($) =>
       prec(
         1,
         seq($.long_identifier, "=", $._pattern),
-      ),
-
-    _atomic_pattern: ($) =>
-      choice(
-        "null",
-        "_",
-        $.typed_const_pattern,
-        $.const,
-        $.long_identifier,
-        $.list_pattern,
-        $.record_pattern,
-        $.array_pattern,
-        seq("(", $._pattern, ")"),
-        $.type_check_pattern,
       ),
 
     _list_pattern_content: ($) =>
@@ -549,8 +539,6 @@ module.exports = grammar({
       seq($._indent, $._expression, choice($._dedent, $._in)),
 
     _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
-
-    _mutable_expression: ($) => choice($.long_identifier_or_op, $.index_expression, $.dot_expression),
 
     _expression: ($) =>
       choice(
@@ -674,7 +662,7 @@ module.exports = grammar({
       ),
 
     _object_expression_inner: ($) =>
-      seq($._object_members, repeat($.interface_implementation)),
+      seq(seq("with", scoped($._member_defns, $._indent, $._dedent)), repeat($.interface_implementation)),
 
     object_expression: ($) =>
       prec(
@@ -751,21 +739,17 @@ module.exports = grammar({
         ),
       ),
 
-    _else_expression: ($) => seq("else", field("else", $._expression_block)),
-
     _then_expression: ($) => seq("then", field("then", $._expression_block)),
 
     elif_expression: ($) =>
       seq("elif", field("guard", $._expression_block), $._then_expression),
 
-    _if_branch: ($) => seq("if", field("guard", $._expression_block)),
-
     if_expression: ($) =>
       seq(
-        $._if_branch,
+        seq("if", field("guard", $._expression_block)),
         $._then_expression,
         repeat($.elif_expression),
-        optional($._else_expression),
+        optional(seq("else", field("else", $._expression_block))),
       ),
 
     fun_expression: ($) =>
@@ -818,7 +802,7 @@ module.exports = grammar({
       prec.right(
         PREC.LARROW,
         seq(
-          field("assignee", $._mutable_expression),
+          field("assignee", choice($.long_identifier_or_op, $.index_expression, $.dot_expression)),
           "<-",
           field("value", choice(prec(1, $._expression_block), $._expression)),
         ),
@@ -937,22 +921,20 @@ module.exports = grammar({
     paren_expression: ($) =>
       prec(PREC.PAREN_EXPR, seq("(", $._paren_expression_block, ")")),
 
-    _high_prec_app: ($) =>
-      prec.left(
-        PREC.DOT + 1,
-        seq(
-          $._expression,
-          choice(
-            $.unit,
-            seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
+    application_expression: ($) =>
+      choice(
+        prec.left(
+          PREC.DOT + 1,
+          seq(
+            $._expression,
+            choice(
+              $.unit,
+              seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
+            ),
           ),
         ),
+        prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
       ),
-
-    _low_prec_app: ($) =>
-      prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
-
-    application_expression: ($) => choice($._high_prec_app, $._low_prec_app),
 
     dot_expression: ($) =>
       prec.right(
@@ -1197,31 +1179,33 @@ module.exports = grammar({
 
     slice_ranges: ($) => seq($.slice_range, repeat(seq(",", $.slice_range))),
 
-    _slice_range_special: ($) =>
-      prec.left(
-        PREC.DOTDOT_SLICE,
-        choice(
-          seq(field("from", $._expression), token(prec(PREC.DOTDOT, ".."))),
-          seq(
-            token(prec(PREC.DOTDOT + 100000, "..")),
-            field("to", $._expression),
-          ),
-          seq(
-            field("from", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("to", $._expression),
-          ),
-          seq(
-            field("from", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("step", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("to", $._expression),
+    slice_range: ($) =>
+      choice(
+        prec.left(
+          PREC.DOTDOT_SLICE,
+          choice(
+            seq(field("from", $._expression), token(prec(PREC.DOTDOT, ".."))),
+            seq(
+              token(prec(PREC.DOTDOT + 100000, "..")),
+              field("to", $._expression),
+            ),
+            seq(
+              field("from", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("to", $._expression),
+            ),
+            seq(
+              field("from", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("step", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("to", $._expression),
+            ),
           ),
         ),
+        $._expression,
+        "*",
       ),
-
-    slice_range: ($) => choice($._slice_range_special, $._expression, "*"),
 
     //
     // Computation expression (END)
@@ -1306,14 +1290,15 @@ module.exports = grammar({
 
     measure_power: ($) => prec.right(6, seq($.measure_atom, "^", $.int)),
 
-    _measure_operand: ($) =>
-      choice(
-        $.measure_power,
-        $.measure_atom,
-        $.compound_type,
+    measure_quotient: ($) =>
+      prec.left(
+        5,
+        seq(
+          choice($.measure_power, $.measure_atom, $.compound_type),
+          "/",
+          choice($.measure_power, $.measure_atom, $.compound_type),
+        ),
       ),
-
-    measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
 
     measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
 
@@ -1599,13 +1584,15 @@ module.exports = grammar({
         ),
       ),
 
-    _class_type_body_inner: ($) =>
-      choice($.class_inherits_decl, $.type_extension_elements),
-
     _class_type_body: ($) =>
       seq(
-        $._class_type_body_inner,
-        repeat(seq($._newline, $._class_type_body_inner)),
+        choice($.class_inherits_decl, $.type_extension_elements),
+        repeat(
+          seq(
+            $._newline,
+            choice($.class_inherits_decl, $.type_extension_elements),
+          ),
+        ),
       ),
 
     _record_type_defn_inner: ($) =>
@@ -1713,7 +1700,7 @@ module.exports = grammar({
           "=",
           seq(
             alias($._interface_begin, "interface"),
-            scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+            scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
             "end",
           ),
         ),
@@ -1735,22 +1722,24 @@ module.exports = grammar({
             ),
             seq(
               alias($._struct_begin, "struct"),
-              scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+              scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
               "end",
             ),
           ),
         ),
       ),
 
-    _class_function_or_value_defn: ($) =>
-      seq(
-        optional($.attributes),
-        optional("static"),
-        choice($.function_or_value_defn, seq("do", $._expression_block)),
-      ),
-
     _type_extension_inner: ($) =>
-      repeat1(choice($._class_function_or_value_defn, $._type_defn_elements)),
+      repeat1(
+        choice(
+          seq(
+            optional($.attributes),
+            optional("static"),
+            choice($.function_or_value_defn, seq("do", $._expression_block)),
+          ),
+          choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if)),
+        ),
+      ),
 
     type_extension_elements: ($) =>
       prec.left(
@@ -1760,24 +1749,13 @@ module.exports = grammar({
         ),
       ),
 
-    _type_defn_elements: ($) =>
-      choice(
-        $.member_defn,
-        $.interface_implementation,
-        alias($.preproc_if_in_class_definition, $.preproc_if),
-        // $._interface_signature
-      ),
-
     interface_implementation: ($) =>
-      prec.left(seq("interface", $._type, optional($._object_members))),
+      prec.left(seq("interface", $._type, optional(seq("with", scoped($._member_defns, $._indent, $._dedent))))),
 
     _member_defns: ($) =>
       prec.left(
         seq($.member_defn, repeat(seq(optional($._newline), $.member_defn))),
       ),
-
-    _object_members: ($) =>
-      seq("with", scoped($._member_defns, $._indent, $._dedent)),
 
     member_defn: ($) =>
       prec(
@@ -1826,16 +1804,6 @@ module.exports = grammar({
         $._identifier_or_op,
       ),
 
-    _method_defn: ($) =>
-      choice(
-        seq(
-          optional($.type_arguments),
-          field("args", repeat1($._pattern)),
-          "=",
-          $._expression_block,
-        ),
-      ),
-
     _property_accessor_body: ($) =>
       seq(
         $.argument_patterns,
@@ -1846,28 +1814,6 @@ module.exports = grammar({
 
     property_accessor: ($) =>
       seq(choice("get", "set"), $._property_accessor_body),
-
-    _property_defn: ($) =>
-      prec.left(
-        PREC.APP_EXPR + 100001,
-        seq(
-          optional(seq(":", $._type)),
-          choice(
-            seq("=", $._expression_block),
-            seq(
-              "with",
-              scoped(
-                seq(
-                  $.property_accessor,
-                  repeat(seq("and", $.property_accessor)),
-                ),
-                $._indent,
-                $._dedent,
-              ),
-            ),
-          ),
-        ),
-      ),
 
     _val_property_defn: ($) =>
       prec.left(
@@ -1896,8 +1842,32 @@ module.exports = grammar({
         seq(
           field("name", $.property_or_ident),
           choice(
-            $._method_defn,
-            $._property_defn,
+            seq(
+              optional($.type_arguments),
+              field("args", repeat1($._pattern)),
+              "=",
+              $._expression_block,
+            ),
+            prec.left(
+              PREC.APP_EXPR + 100001,
+              seq(
+                optional(seq(":", $._type)),
+                choice(
+                  seq("=", $._expression_block),
+                  seq(
+                    "with",
+                    scoped(
+                      seq(
+                        $.property_accessor,
+                        repeat(seq("and", $.property_accessor)),
+                      ),
+                      $._indent,
+                      $._dedent,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             seq(
               "with",
               scoped($._function_or_value_defns, $._indent, $._dedent),
@@ -2034,23 +2004,6 @@ module.exports = grammar({
         $._hexgraph_short,
       ),
 
-    // note: \n is allowed in strings
-    _simple_string_char: ($) =>
-      choice(
-        $._inside_string_marker,
-        token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
-      ),
-
-    _string_char: ($) =>
-      choice(
-        $._simple_string_char,
-        $._escape_char,
-        $._trigraph,
-        $._unicodegraph_short,
-        $._hexgraph_short,
-        $._non_escape_char,
-        $._unicodegraph_long,
-      ),
 
     char: (_) =>
       prec(
@@ -2074,7 +2027,7 @@ module.exports = grammar({
               // '{{' / '}}' are literal-brace escapes; must outrank the
               // interpolation-hole '{' (prec 1000).
               token.immediate(prec(1001, /\{\{|\}\}/)),
-              $._string_char,
+              choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long),
             ),
           ),
           '"',
@@ -2087,24 +2040,22 @@ module.exports = grammar({
             choice(
               $.format_string_eval,
               token.immediate(prec(1001, /\{\{|\}\}/)),
-              $._verbatim_string_char,
+              choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/),
             ),
           ),
           token.immediate('"'),
         ),
       ),
 
-    _string_literal: ($) => seq('"', repeat($._string_char), '"'),
+    _string_literal: ($) => seq('"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long)), '"'),
 
     string: ($) => choice($._string_literal, $.format_string),
 
-    _verbatim_string_char: ($) =>
-      choice($._simple_string_char, $._non_escape_char, "\\", /\"\"/),
     verbatim_string: ($) =>
-      seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
-    bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
+      seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"')),
+    bytearray: ($) => seq('"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long)), token.immediate('"B')),
     verbatim_bytearray: ($) =>
-      seq('@"', repeat($._verbatim_string_char), token.immediate('"B')),
+      seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"B')),
 
     format_triple_quoted_string: ($) =>
       choice(
@@ -2201,18 +2152,16 @@ module.exports = grammar({
     _identifier_or_op: ($) =>
       choice($.identifier, $.op_identifier, $.active_pattern),
 
-    _infix_or_prefix_op: (_) => choice("+", "-", "+.", "-.", "%", "&"),
-
     prefix_op: ($) =>
       prec.left(
-        choice($._infix_or_prefix_op, "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
+        choice("+", "-", "+.", "-.", "%", "&", "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
       ),
 
     infix_op: ($) =>
       prec(
         PREC.INFIX_OP,
         choice(
-          $._infix_or_prefix_op,
+          "+", "-", "+.", "-.", "%", "&",
           token.immediate(prec(1, /[+-]/)),
           /[-+=<>|&^*'%@?][!%&*+./<=>@^|~?-]*/,
           /\/[!%&*+.<=>@^|~?-]*/,
@@ -2375,7 +2324,7 @@ module.exports = grammar({
               optional($.attributes),
             ),
             $.attributes,
-            alias($._preproc_toplevel_module, $.named_module),
+            $.named_module,
           ),
         ),
     ),
@@ -2403,7 +2352,13 @@ module.exports = grammar({
     ),
     ...preprocIf(
       "_in_class_definition",
-      ($) => repeat(seq(optional($._newline), $._class_type_body_inner)),
+      ($) =>
+        repeat(
+          seq(
+            optional($._newline),
+            choice($.class_inherits_decl, $.type_extension_elements),
+          ),
+        ),
       -2,
     ),
     ...preprocIf("_in_member_definition", ($) => repeat($.member_defn), -2),

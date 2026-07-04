@@ -3748,30 +3748,6 @@
         {
           "type": "attributes",
           "named": true
-        },
-        {
-          "type": "const",
-          "named": true
-        },
-        {
-          "type": "declaration_expression",
-          "named": true
-        },
-        {
-          "type": "extern_binding",
-          "named": true
-        },
-        {
-          "type": "fsi_directive_decl",
-          "named": true
-        },
-        {
-          "type": "long_identifier_or_op",
-          "named": true
-        },
-        {
-          "type": "paren_expression",
-          "named": true
         }
       ]
     }
