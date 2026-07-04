@@ -1178,31 +1178,33 @@ module.exports = grammar({
 
     slice_ranges: ($) => seq($.slice_range, repeat(seq(",", $.slice_range))),
 
-    _slice_range_special: ($) =>
-      prec.left(
-        PREC.DOTDOT_SLICE,
-        choice(
-          seq(field("from", $._expression), token(prec(PREC.DOTDOT, ".."))),
-          seq(
-            token(prec(PREC.DOTDOT + 100000, "..")),
-            field("to", $._expression),
-          ),
-          seq(
-            field("from", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("to", $._expression),
-          ),
-          seq(
-            field("from", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("step", $._expression),
-            token(prec(PREC.DOTDOT, "..")),
-            field("to", $._expression),
+    slice_range: ($) =>
+      choice(
+        prec.left(
+          PREC.DOTDOT_SLICE,
+          choice(
+            seq(field("from", $._expression), token(prec(PREC.DOTDOT, ".."))),
+            seq(
+              token(prec(PREC.DOTDOT + 100000, "..")),
+              field("to", $._expression),
+            ),
+            seq(
+              field("from", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("to", $._expression),
+            ),
+            seq(
+              field("from", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("step", $._expression),
+              token(prec(PREC.DOTDOT, "..")),
+              field("to", $._expression),
+            ),
           ),
         ),
+        $._expression,
+        "*",
       ),
-
-    slice_range: ($) => choice($._slice_range_special, $._expression, "*"),
 
     //
     // Computation expression (END)
