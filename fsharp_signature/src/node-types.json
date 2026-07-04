@@ -4931,10 +4931,6 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
           "type": "long_identifier",
           "named": true
         }

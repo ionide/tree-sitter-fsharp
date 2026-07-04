@@ -104,7 +104,6 @@ module.exports = grammar({
 
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
-    [$.simple_type, $.type_argument],
     [$._module_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
@@ -1295,7 +1294,7 @@ module.exports = grammar({
 
     measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
 
-    simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
+    simple_type: ($) => $.long_identifier,
     generic_type: ($) =>
       prec.right(
         5,
@@ -1413,7 +1412,7 @@ module.exports = grammar({
       seq("when", $.constraint, repeat(seq("and", $.constraint))),
 
     type_argument: ($) =>
-      prec(
+      prec.right(
         10,
         choice(
           "_",

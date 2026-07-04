@@ -4377,17 +4377,8 @@
       ]
     },
     "simple_type": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "long_identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_static_type_identifier"
-        }
-      ]
+      "type": "SYMBOL",
+      "name": "long_identifier"
     },
     "generic_type": {
       "type": "PREC_RIGHT",
@@ -5288,7 +5279,7 @@
       ]
     },
     "type_argument": {
-      "type": "PREC",
+      "type": "PREC_RIGHT",
       "value": 10,
       "content": {
         "type": "CHOICE",
