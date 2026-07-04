@@ -3051,6 +3051,10 @@
           "named": true
         },
         {
+          "type": "measure_atom",
+          "named": true
+        },
+        {
           "type": "measure_power",
           "named": true
         },
@@ -5661,6 +5665,10 @@
         },
         {
           "type": "type_argument",
+          "named": true
+        },
+        {
+          "type": "type_argument_constraints",
           "named": true
         },
         {
