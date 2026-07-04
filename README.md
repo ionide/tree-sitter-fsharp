@@ -6,22 +6,20 @@ and the [F# compiler parser](https://github.com/dotnet/fsharp/blob/main/src/Comp
 
 ## Getting started
 
-First, run `npm install` to install the `tree-sitter` CLI as a local devDependency (it lands at `node_modules/.bin/tree-sitter`, not on your global `$PATH`).
-
-Run the CLI with `npx tree-sitter <command>` — this resolves the local binary automatically. To regenerate both parsers use `npm run generate`.
-
-To parse a file: `npx tree-sitter parse <file>` (see the [Development](#development) section for more).
+First, run `npm install` to install the `tree-sitter cli`.
+Next, the grammar can be build using `npm run build`, or used to parse a file with `npm run parse $file`
 
 ### Project structure
 
-This project defines two parsers:
+This project defined two parser:
 
-- [./fsharp/grammar.js](./fsharp/grammar.js) — grammar for `.fs`/`.fsx` (source files).
-- [./fsharp_signature/grammar.js](./fsharp_signature/grammar.js) — grammar for `.fsi` (signature files). This is **not** a standalone grammar: it starts with `grammar(require("../fsharp/grammar"), { ... })` and overrides/adds a few rules on top of the base. Any change to `fsharp/grammar.js` also changes the derived signature grammar, so both parsers must be regenerated together (`npm run generate`).
+- [./fsharp/grammar.js](./fsharp/grammar.js)`fsharp` grammar.
+- [./fsharp_signature/grammar.js](./fsharp_signature/grammar.js) defines the grammar for signature files
 
-Both parsers share the external scanner at [./common/scanner.h](./common/scanner.h). The per-parser `src/scanner.c` files are thin shims that `#include` the header — real scanner logic (newlines, comments, indent/dedent bookkeeping) lives in the header. Each grammar starts with the `file` node.
+In addition to the `grammar.js` files each parser depends on a common external scanner found at [./common/scanner.h](./common/scanner.h).
+The external scanner is responsible for parsing newlines and comments and keeps track of indentation to open and close scopes.
 
-The generated `src/grammar.json` and `src/parser.c` files are checked into git and validated by CI. Do not hand-edit them; merge conflicts are resolved by re-running `npm run generate`. See [AGENTS.md](./AGENTS.md) for the full development workflow.
+each grammar starts with the `file` node at the beginning of the rules.
 
 ### Adding to neovim
 
@@ -53,12 +51,10 @@ parser_config.fsharp = {
 
 The `package.json` defines some helpful targets for developing the grammar:
 
-- Run commands from the repository root so tree-sitter picks up both grammars from `tree-sitter.json`.
-- `npm run generate` rebuilds both parsers.
+- `npm run generate` rebuilds all parser.
 - `npx tree-sitter test` runs all tests for both parsers.
-- `npx tree-sitter parse $file` runs the `fsharp` parser on `$file` and outputs the parse tree.
-- `npx tree-sitter parse -d $file` runs the `fsharp` parser on `$file` and prints debug information.
-- For `.fsi` files, use `npx tree-sitter parse -p fsharp_signature $file` because `tree-sitter parse` does not reliably select the signature parser automatically.
+- `npx tree-sitter parse $file` run the `fsharp` parser on `$file` and outputs the parse tree.
+- `npx tree-sitter parse -d $file` run the `fsharp` parser on `$file` and prints debug information.
 
 ## How to contribute
 
