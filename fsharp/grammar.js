@@ -535,8 +535,6 @@ module.exports = grammar({
 
     _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
 
-    _mutable_expression: ($) => choice($.long_identifier_or_op, $.index_expression, $.dot_expression),
-
     _expression: ($) =>
       choice(
         "null",
@@ -803,7 +801,7 @@ module.exports = grammar({
       prec.right(
         PREC.LARROW,
         seq(
-          field("assignee", $._mutable_expression),
+          field("assignee", choice($.long_identifier_or_op, $.index_expression, $.dot_expression)),
           "<-",
           field("value", choice(prec(1, $._expression_block), $._expression)),
         ),

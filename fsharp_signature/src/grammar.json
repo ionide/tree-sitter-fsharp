@@ -1871,23 +1871,6 @@
         }
       ]
     },
-    "_mutable_expression": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "long_identifier_or_op"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "index_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "dot_expression"
-        }
-      ]
-    },
     "_expression": {
       "type": "CHOICE",
       "members": [
@@ -2876,8 +2859,21 @@
             "type": "FIELD",
             "name": "assignee",
             "content": {
-              "type": "SYMBOL",
-              "name": "_mutable_expression"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "long_identifier_or_op"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "index_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "dot_expression"
+                }
+              ]
             }
           },
           {
