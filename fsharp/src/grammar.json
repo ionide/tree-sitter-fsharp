@@ -2675,23 +2675,6 @@
         ]
       }
     },
-    "_else_expression": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "else"
-        },
-        {
-          "type": "FIELD",
-          "name": "else",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_expression_block"
-          }
-        }
-      ]
-    },
     "_then_expression": {
       "type": "SEQ",
       "members": [
@@ -2765,8 +2748,21 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "_else_expression"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "else"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "else",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_expression_block"
+                  }
+                }
+              ]
             },
             {
               "type": "BLANK"
