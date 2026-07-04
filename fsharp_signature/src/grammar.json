@@ -6855,8 +6855,26 @@
                     {
                       "type": "REPEAT",
                       "content": {
-                        "type": "SYMBOL",
-                        "name": "_type_defn_elements"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "member_defn"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "interface_implementation"
+                          },
+                          {
+                            "type": "ALIAS",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "preproc_if_in_class_definition"
+                            },
+                            "named": true,
+                            "value": "preproc_if"
+                          }
+                        ]
                       }
                     },
                     {
@@ -7035,8 +7053,26 @@
                         {
                           "type": "REPEAT",
                           "content": {
-                            "type": "SYMBOL",
-                            "name": "_type_defn_elements"
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "member_defn"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "interface_implementation"
+                              },
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "preproc_if_in_class_definition"
+                                },
+                                "named": true,
+                                "value": "preproc_if"
+                              }
+                            ]
                           }
                         },
                         {
@@ -7114,8 +7150,26 @@
             ]
           },
           {
-            "type": "SYMBOL",
-            "name": "_type_defn_elements"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "member_defn"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "interface_implementation"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "preproc_if_in_class_definition"
+                },
+                "named": true,
+                "value": "preproc_if"
+              }
+            ]
           }
         ]
       }
@@ -7162,28 +7216,6 @@
           }
         ]
       }
-    },
-    "_type_defn_elements": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "member_defn"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "interface_implementation"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "preproc_if_in_class_definition"
-          },
-          "named": true,
-          "value": "preproc_if"
-        }
-      ]
     },
     "interface_implementation": {
       "type": "PREC_LEFT",

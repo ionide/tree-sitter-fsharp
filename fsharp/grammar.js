@@ -1700,7 +1700,7 @@ module.exports = grammar({
           "=",
           seq(
             alias($._interface_begin, "interface"),
-            scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+            scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
             "end",
           ),
         ),
@@ -1722,7 +1722,7 @@ module.exports = grammar({
             ),
             seq(
               alias($._struct_begin, "struct"),
-              scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+              scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
               "end",
             ),
           ),
@@ -1737,7 +1737,7 @@ module.exports = grammar({
             optional("static"),
             choice($.function_or_value_defn, seq("do", $._expression_block)),
           ),
-          $._type_defn_elements,
+          choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if)),
         ),
       ),
 
@@ -1747,14 +1747,6 @@ module.exports = grammar({
           seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
           $._type_extension_inner,
         ),
-      ),
-
-    _type_defn_elements: ($) =>
-      choice(
-        $.member_defn,
-        $.interface_implementation,
-        alias($.preproc_if_in_class_definition, $.preproc_if),
-        // $._interface_signature
       ),
 
     interface_implementation: ($) =>
