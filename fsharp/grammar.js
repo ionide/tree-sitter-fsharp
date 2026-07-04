@@ -2052,7 +2052,7 @@ module.exports = grammar({
             choice(
               $.format_string_eval,
               token.immediate(prec(1001, /\{\{|\}\}/)),
-              $._verbatim_string_char,
+              choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/),
             ),
           ),
           token.immediate('"'),
