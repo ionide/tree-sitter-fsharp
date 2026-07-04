@@ -292,11 +292,9 @@ module.exports = grammar({
     attribute: ($) =>
       seq(
         optional(seq(field("target", $.identifier), ":")),
-        $._object_construction,
+        // inlined from former single-use hidden rule _object_construction
+        prec.left(PREC.SEQ_EXPR + 1, seq($._type, optional($._expression))),
       ),
-
-    _object_construction: ($) =>
-      prec.left(PREC.SEQ_EXPR + 1, seq($._type, optional($._expression))),
 
     //
     // Attributes (END)
