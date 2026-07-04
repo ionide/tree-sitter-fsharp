@@ -126,8 +126,6 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   inline: ($) => [
-    $._object_expression_inner,
-    $._record_type_defn_inner,
     $._then_expression,
   ],
 
