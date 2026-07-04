@@ -828,17 +828,21 @@ module.exports = grammar({
         ),
       ),
 
-    declaration_expression: ($) =>
-      seq(
-        choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
-          seq(
-            $.function_or_value_defn,
-            repeat($.and_bang),
-          ),
+    // Shared binding prefix for declaration_expression and
+    // comp_declaration_expression (which differ only in their `in` field type).
+    // Hidden + non-aliased, so its children promote directly into either parent
+    // (tree-identical) while the binding sub-automaton is generated once, not twice.
+    _declaration_binding: ($) =>
+      choice(
+        seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
+        seq(
+          $.function_or_value_defn,
+          repeat($.and_bang),
         ),
-        field("in", $._expression),
       ),
+
+    declaration_expression: ($) =>
+      seq($._declaration_binding, field("in", $._expression)),
 
     and_bang: ($) =>
       seq("and!", $._pattern, "=", $._expression_block_for_let),
@@ -1008,16 +1012,7 @@ module.exports = grammar({
       ),
 
     comp_declaration_expression: ($) =>
-      seq(
-        choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
-          seq(
-            $.function_or_value_defn,
-            repeat($.and_bang),
-          ),
-        ),
-        field("in", $._comp_or_range_expression),
-      ),
+      seq($._declaration_binding, field("in", $._comp_or_range_expression)),
 
     // _comp_expressions: $ =>
     //   choice(
