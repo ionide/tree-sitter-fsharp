@@ -278,13 +278,16 @@ module.exports = grammar({
     //
     // Attributes (BEGIN)
     //
-    attributes: ($) => prec.left(repeat1($._attribute_set)),
-    _attribute_set: ($) =>
-      seq(
-        "[<",
-        $.attribute,
-        prec(PREC.SEQ_EXPR + 1, repeat(seq($._newline, $.attribute))),
-        ">]",
+    attributes: ($) =>
+      prec.left(
+        repeat1(
+          seq(
+            "[<",
+            $.attribute,
+            prec(PREC.SEQ_EXPR + 1, repeat(seq($._newline, $.attribute))),
+            ">]",
+          ),
+        ),
       ),
     attribute: ($) =>
       seq(
