@@ -326,9 +326,8 @@ val singleton : value:'T -> list<'T>
           (long_identifier
             (identifier))
           (type_attributes
-            (type_attribute
-              (type_argument
-                (identifier)))))))))
+            (type_argument
+              (identifier))))))))
 
 ===
 val with measure type
@@ -355,17 +354,16 @@ val speed : float<m/s>
           (long_identifier
             (identifier))
           (type_attributes
-            (type_attribute
-              (measure
-                (measure_quotient
-                  (measure_atom
-                    (simple_type
-                      (long_identifier
-                        (identifier))))
-                  (measure_atom
-                    (simple_type
-                      (long_identifier
-                        (identifier)))))))))))))
+            (measure
+              (measure_quotient
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier))))
+                (measure_atom
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))))))
 
 ===
 top-level module signature holds only signature elements

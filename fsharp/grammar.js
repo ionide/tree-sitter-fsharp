@@ -1328,17 +1328,10 @@ module.exports = grammar({
     named_static_parameter: ($) =>
       prec(3, seq($.identifier, "=", $.static_parameter_value)),
 
-    type_attribute: ($) =>
-      choice(
-        $._type,
-        $._static_parameter,
-        $.measure,
-      ),
-
     type_attributes: ($) =>
       seq(
-        $.type_attribute,
-        repeat(prec.right(PREC.COMMA, seq(",", $.type_attribute))),
+        choice($._type, $._static_parameter, $.measure),
+        repeat(prec.right(PREC.COMMA, seq(",", choice($._type, $._static_parameter, $.measure)))),
       ),
 
 

@@ -4120,11 +4120,11 @@
     }
   },
   {
-    "type": "type_attribute",
+    "type": "type_attributes",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -4137,21 +4137,6 @@
         },
         {
           "type": "measure",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "type_attributes",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "type_attribute",
           "named": true
         }
       ]
