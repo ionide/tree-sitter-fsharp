@@ -9110,35 +9110,6 @@
         }
       ]
     },
-    "_infix_or_prefix_op": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "+"
-        },
-        {
-          "type": "STRING",
-          "value": "-"
-        },
-        {
-          "type": "STRING",
-          "value": "+."
-        },
-        {
-          "type": "STRING",
-          "value": "-."
-        },
-        {
-          "type": "STRING",
-          "value": "%"
-        },
-        {
-          "type": "STRING",
-          "value": "&"
-        }
-      ]
-    },
     "prefix_op": {
       "type": "PREC_LEFT",
       "value": 0,
@@ -9146,8 +9117,28 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_infix_or_prefix_op"
+            "type": "STRING",
+            "value": "+"
+          },
+          {
+            "type": "STRING",
+            "value": "-"
+          },
+          {
+            "type": "STRING",
+            "value": "+."
+          },
+          {
+            "type": "STRING",
+            "value": "-."
+          },
+          {
+            "type": "STRING",
+            "value": "%"
+          },
+          {
+            "type": "STRING",
+            "value": "&"
           },
           {
             "type": "STRING",
@@ -9178,8 +9169,28 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_infix_or_prefix_op"
+            "type": "STRING",
+            "value": "+"
+          },
+          {
+            "type": "STRING",
+            "value": "-"
+          },
+          {
+            "type": "STRING",
+            "value": "+."
+          },
+          {
+            "type": "STRING",
+            "value": "-."
+          },
+          {
+            "type": "STRING",
+            "value": "%"
+          },
+          {
+            "type": "STRING",
+            "value": "&"
           },
           {
             "type": "IMMEDIATE_TOKEN",

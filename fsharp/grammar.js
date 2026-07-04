@@ -2179,18 +2179,16 @@ module.exports = grammar({
     _identifier_or_op: ($) =>
       choice($.identifier, $.op_identifier, $.active_pattern),
 
-    _infix_or_prefix_op: (_) => choice("+", "-", "+.", "-.", "%", "&"),
-
     prefix_op: ($) =>
       prec.left(
-        choice($._infix_or_prefix_op, "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
+        choice("+", "-", "+.", "-.", "%", "&", "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
       ),
 
     infix_op: ($) =>
       prec(
         PREC.INFIX_OP,
         choice(
-          $._infix_or_prefix_op,
+          "+", "-", "+.", "-.", "%", "&",
           token.immediate(prec(1, /[+-]/)),
           /[-+=<>|&^*'%@?][!%&*+./<=>@^|~?-]*/,
           /\/[!%&*+.<=>@^|~?-]*/,
