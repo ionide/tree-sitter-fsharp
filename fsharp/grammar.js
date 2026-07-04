@@ -710,13 +710,22 @@ module.exports = grammar({
     _do_body: ($) =>
       seq(alias($._do_keyword, "do"), $._expression_block, optional("done")),
 
+    // Shared `<pattern> in <comp-or-range>` binding head of for_expression's
+    // enumerable branch and short_comp_expression. Both are reached right after
+    // "for" from the same _expression context (iter-3 shared-prefix shape:
+    // one linear SEQ sub-automaton, divergent suffix — do-body vs `-> expr`),
+    // so the pattern + comp_or_range states are generated once, not twice.
+    // Hidden + non-aliased, so the _pattern and _comp_or_range_expression
+    // children promote directly into either parent (tree-identical).
+    _for_in_binding: ($) => seq($._pattern, "in", $._comp_or_range_expression),
+
     for_expression: ($) =>
       prec(
         PREC.DO_EXPR + 1,
         seq(
           "for",
           choice(
-            seq($._pattern, "in", $._comp_or_range_expression),
+            $._for_in_binding,
             seq(
               $.identifier,
               "=",
@@ -1151,7 +1160,7 @@ module.exports = grammar({
     //   ),
 
     short_comp_expression: ($) =>
-      seq("for", $._pattern, "in", $._comp_or_range_expression, arrow(), $._expression),
+      seq("for", $._for_in_binding, arrow(), $._expression),
 
     // comp_rule: $ =>
     //   seq(

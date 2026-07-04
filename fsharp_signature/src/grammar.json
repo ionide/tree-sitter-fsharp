@@ -2402,6 +2402,23 @@
         }
       ]
     },
+    "_for_in_binding": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_pattern"
+        },
+        {
+          "type": "STRING",
+          "value": "in"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_comp_or_range_expression"
+        }
+      ]
+    },
     "for_expression": {
       "type": "PREC",
       "value": 9,
@@ -2416,21 +2433,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_pattern"
-                  },
-                  {
-                    "type": "STRING",
-                    "value": "in"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_comp_or_range_expression"
-                  }
-                ]
+                "type": "SYMBOL",
+                "name": "_for_in_binding"
               },
               {
                 "type": "SEQ",
@@ -3752,15 +3756,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_pattern"
-        },
-        {
-          "type": "STRING",
-          "value": "in"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_comp_or_range_expression"
+          "name": "_for_in_binding"
         },
         {
           "type": "TOKEN",
