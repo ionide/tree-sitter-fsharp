@@ -741,11 +741,9 @@ module.exports = grammar({
     elif_expression: ($) =>
       seq("elif", field("guard", $._expression_block), $._then_expression),
 
-    _if_branch: ($) => seq("if", field("guard", $._expression_block)),
-
     if_expression: ($) =>
       seq(
-        $._if_branch,
+        seq("if", field("guard", $._expression_block)),
         $._then_expression,
         repeat($.elif_expression),
         optional($._else_expression),

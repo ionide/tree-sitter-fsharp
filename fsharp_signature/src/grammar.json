@@ -2571,29 +2571,25 @@
         }
       ]
     },
-    "_if_branch": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "if"
-        },
-        {
-          "type": "FIELD",
-          "name": "guard",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_expression_block"
-          }
-        }
-      ]
-    },
     "if_expression": {
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_if_branch"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "if"
+            },
+            {
+              "type": "FIELD",
+              "name": "guard",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_expression_block"
+              }
+            }
+          ]
         },
         {
           "type": "SYMBOL",
