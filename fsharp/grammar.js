@@ -1820,28 +1820,6 @@ module.exports = grammar({
     property_accessor: ($) =>
       seq(choice("get", "set"), $._property_accessor_body),
 
-    _property_defn: ($) =>
-      prec.left(
-        PREC.APP_EXPR + 100001,
-        seq(
-          optional(seq(":", $._type)),
-          choice(
-            seq("=", $._expression_block),
-            seq(
-              "with",
-              scoped(
-                seq(
-                  $.property_accessor,
-                  repeat(seq("and", $.property_accessor)),
-                ),
-                $._indent,
-                $._dedent,
-              ),
-            ),
-          ),
-        ),
-      ),
-
     _val_property_defn: ($) =>
       prec.left(
         PREC.APP_EXPR + 100000,
@@ -1875,7 +1853,26 @@ module.exports = grammar({
               "=",
               $._expression_block,
             ),
-            $._property_defn,
+            prec.left(
+              PREC.APP_EXPR + 100001,
+              seq(
+                optional(seq(":", $._type)),
+                choice(
+                  seq("=", $._expression_block),
+                  seq(
+                    "with",
+                    scoped(
+                      seq(
+                        $.property_accessor,
+                        repeat(seq("and", $.property_accessor)),
+                      ),
+                      $._indent,
+                      $._dedent,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             seq(
               "with",
               scoped($._function_or_value_defns, $._indent, $._dedent),
