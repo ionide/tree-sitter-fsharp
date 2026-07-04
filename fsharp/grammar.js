@@ -921,7 +921,7 @@ module.exports = grammar({
     begin_end_expression: ($) =>
       prec(
         PREC.PAREN_EXPR,
-        seq("begin", scoped($._expression, $._indent, $._dedent), "end"),
+        seq("begin", field("block", $._expression_block), "end"),
       ),
 
     paren_expression: ($) =>

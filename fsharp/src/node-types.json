@@ -813,7 +813,7 @@
     "named": true,
     "fields": {
       "block": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {

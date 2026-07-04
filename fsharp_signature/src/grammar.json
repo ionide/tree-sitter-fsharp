@@ -3417,21 +3417,8 @@
             "type": "FIELD",
             "name": "block",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_indent"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_dedent"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_expression_block"
             }
           },
           {
