@@ -1377,7 +1377,7 @@ module.exports = grammar({
       prec(
         1000000,
         choice(
-          seq($.type_argument, ":>", $._type),
+          $.constrained_type,
           seq($.type_argument, ":", "null"),
           seq(
             $.type_argument,

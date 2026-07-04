@@ -4963,21 +4963,8 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "type_argument"
-              },
-              {
-                "type": "STRING",
-                "value": ":>"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_type"
-              }
-            ]
+            "type": "SYMBOL",
+            "name": "constrained_type"
           },
           {
             "type": "SEQ",
