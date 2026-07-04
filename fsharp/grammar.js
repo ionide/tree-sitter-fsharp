@@ -109,6 +109,7 @@ module.exports = grammar({
     [$._module_elem, $.preproc_else_in_expression],
     [$._module_body_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $.preproc_else_in_expression],
+    [$._module_body_elem, $.preproc_else_in_expression],
     [$.rules],
     // Singleton: union_type_cases conflicts with itself (shift the optional
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
@@ -763,17 +764,26 @@ module.exports = grammar({
         ),
       ),
 
+    // Shared rules-block for match_expression and function_expression: rules may
+    // sit in an indent scope, follow a newline, or share the line (e.g.
+    // `|> function | A -> ...`, where the mid-line '| ' suppresses the zero-width
+    // INDENT). Hidden + non-aliased, so the three $.rules alternatives promote
+    // directly into either parent (tree-identical) while the block's states are
+    // generated once, not twice.
+    _rules_block: ($) =>
+      choice(
+        seq($._newline, $.rules),
+        scoped($.rules, $._indent, $._dedent),
+        $.rules,
+      ),
+
     match_expression: ($) =>
       seq(
         choice("match", "match!"),
         $._expression,
         optional($._newline),
         "with",
-        choice(
-          seq($._newline, $.rules),
-          scoped($.rules, $._indent, $._dedent),
-          $.rules,
-        ),
+        $._rules_block,
       ),
 
     function_expression: ($) =>
@@ -781,14 +791,7 @@ module.exports = grammar({
         PREC.MATCH_EXPR,
         seq(
           "function",
-          // Same alternatives as match_expression: rules may sit in an indent
-          // scope, follow a newline, or share the line (e.g. `|> function | A -> ...`,
-          // where the mid-line '| ' suppresses the zero-width INDENT).
-          choice(
-            seq($._newline, $.rules),
-            scoped($.rules, $._indent, $._dedent),
-            $.rules,
-          ),
+          $._rules_block,
         ),
       ),
 
