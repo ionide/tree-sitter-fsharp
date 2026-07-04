@@ -168,16 +168,6 @@ module.exports = grammar({
         repeat($._module_elem),
       ),
 
-    _preproc_toplevel_module: ($) =>
-      seq(
-        optional($.attributes),
-        "module",
-        optional($.access_modifier),
-        optional("rec"),
-        field("name", $.long_identifier),
-        repeat($._module_elem),
-      ),
-
     _module_body_elem: ($) =>
       choice(
         alias($.value_declaration, $.declaration_expression),
@@ -2375,7 +2365,7 @@ module.exports = grammar({
               optional($.attributes),
             ),
             $.attributes,
-            alias($._preproc_toplevel_module, $.named_module),
+            $.named_module,
           ),
         ),
     ),

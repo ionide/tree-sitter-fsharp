@@ -137,66 +137,6 @@
         }
       ]
     },
-    "_preproc_toplevel_module": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "attributes"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": "module"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "access_modifier"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "rec"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "FIELD",
-          "name": "name",
-          "content": {
-            "type": "SYMBOL",
-            "name": "long_identifier"
-          }
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_module_elem"
-          }
-        }
-      ]
-    },
     "_module_body_elem": {
       "type": "CHOICE",
       "members": [
@@ -10265,13 +10205,8 @@
                     "name": "attributes"
                   },
                   {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_preproc_toplevel_module"
-                    },
-                    "named": true,
-                    "value": "named_module"
+                    "type": "SYMBOL",
+                    "name": "named_module"
                   }
                 ]
               },
@@ -10365,13 +10300,8 @@
                     "name": "attributes"
                   },
                   {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_preproc_toplevel_module"
-                    },
-                    "named": true,
-                    "value": "named_module"
+                    "type": "SYMBOL",
+                    "name": "named_module"
                   }
                 ]
               },
