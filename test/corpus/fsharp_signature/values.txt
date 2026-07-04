@@ -366,3 +366,98 @@ val speed : float<m/s>
                     (simple_type
                       (long_identifier
                         (identifier)))))))))))))
+
+===
+top-level module signature holds only signature elements
+:language(fsharp_signature)
+===
+
+module MyLib
+
+val x : int
+
+type Color = Red | Green
+
+exception Err of string
+
+---
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)))))
+    (exception_definition
+      exception_name: (long_identifier
+        (identifier))
+      (union_type_fields
+        (union_type_field
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+===
+nested module in namespace holds only signature elements
+:language(fsharp_signature)
+===
+
+namespace MyLib
+
+module Inner =
+    val x : int
+    type Color = Red | Green
+
+val y : int
+
+---
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (module_defn
+      (identifier)
+      block: (value_definition
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (curried_spec
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_definition
+        (union_type_defn
+          (type_name
+            type_name: (identifier))
+          block: (union_type_cases
+            (union_type_case
+              (identifier))
+            (union_type_case
+              (identifier))))))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (simple_type
+          (long_identifier
+            (identifier)))))))
