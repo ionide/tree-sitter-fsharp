@@ -1685,6 +1685,18 @@ module.exports = grammar({
     union_type_field: ($) =>
       prec.left(choice($._type, seq($.identifier, ":", $._type))),
 
+    // Shared indent-scoped member block of interface_type_defn and the struct
+    // branch of anon_type_defn. Both are reached in the SAME follow context
+    // (a bare "end" terminates each), so — like _rules_block/_do_body — the
+    // block's states merge into ONE copy instead of being generated per parent.
+    // Hidden + non-aliased, so the scoped "block" field and its member/interface/
+    // preproc children promote directly into either parent (tree-identical).
+    // (Unlike iter-4/H1, which factored only the 3-way choice reused across
+    // divergent contexts incl. _type_extension_inner and GREW; here the whole
+    // scoped-repeat sub-automaton is shared by exactly two same-follow parents.)
+    _class_member_block: ($) =>
+      scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
+
     interface_type_defn: ($) =>
       prec.left(
         1,
@@ -1693,7 +1705,7 @@ module.exports = grammar({
           "=",
           seq(
             alias($._interface_begin, "interface"),
-            scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
+            $._class_member_block,
             "end",
           ),
         ),
@@ -1715,7 +1727,7 @@ module.exports = grammar({
             ),
             seq(
               alias($._struct_begin, "struct"),
-              scoped(repeat(choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if))), $._indent, $._dedent),
+              $._class_member_block,
               "end",
             ),
           ),

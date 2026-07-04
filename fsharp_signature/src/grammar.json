@@ -6713,6 +6713,48 @@
         ]
       }
     },
+    "_class_member_block": {
+      "type": "FIELD",
+      "name": "block",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_indent"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "member_defn"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "interface_implementation"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "preproc_if_in_class_definition"
+                  },
+                  "named": true,
+                  "value": "preproc_if"
+                }
+              ]
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_dedent"
+          }
+        ]
+      }
+    },
     "interface_type_defn": {
       "type": "PREC_LEFT",
       "value": 1,
@@ -6740,46 +6782,8 @@
                 "value": "interface"
               },
               {
-                "type": "FIELD",
-                "name": "block",
-                "content": {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_indent"
-                    },
-                    {
-                      "type": "REPEAT",
-                      "content": {
-                        "type": "CHOICE",
-                        "members": [
-                          {
-                            "type": "SYMBOL",
-                            "name": "member_defn"
-                          },
-                          {
-                            "type": "SYMBOL",
-                            "name": "interface_implementation"
-                          },
-                          {
-                            "type": "ALIAS",
-                            "content": {
-                              "type": "SYMBOL",
-                              "name": "preproc_if_in_class_definition"
-                            },
-                            "named": true,
-                            "value": "preproc_if"
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_dedent"
-                    }
-                  ]
-                }
+                "type": "SYMBOL",
+                "name": "_class_member_block"
               },
               {
                 "type": "STRING",
@@ -6938,46 +6942,8 @@
                     "value": "struct"
                   },
                   {
-                    "type": "FIELD",
-                    "name": "block",
-                    "content": {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "SYMBOL",
-                          "name": "_indent"
-                        },
-                        {
-                          "type": "REPEAT",
-                          "content": {
-                            "type": "CHOICE",
-                            "members": [
-                              {
-                                "type": "SYMBOL",
-                                "name": "member_defn"
-                              },
-                              {
-                                "type": "SYMBOL",
-                                "name": "interface_implementation"
-                              },
-                              {
-                                "type": "ALIAS",
-                                "content": {
-                                  "type": "SYMBOL",
-                                  "name": "preproc_if_in_class_definition"
-                                },
-                                "named": true,
-                                "value": "preproc_if"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "type": "SYMBOL",
-                          "name": "_dedent"
-                        }
-                      ]
-                    }
+                    "type": "SYMBOL",
+                    "name": "_class_member_block"
                   },
                   {
                     "type": "STRING",
