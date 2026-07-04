@@ -106,8 +106,6 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$._module_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $._expression],
-    [$.preproc_if_in_expression, $.preproc_if_in_module_body],
-    [$.preproc_else_in_expression, $.preproc_else_in_module_body],
     [$._module_elem, $.preproc_else_in_expression],
     [$._module_body_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $.preproc_else_in_expression],
@@ -2335,7 +2333,7 @@ module.exports = grammar({
     ...preprocIf(
       "_in_module_body",
       ($) => repeat(seq(optional($._newline), $._module_body_elem)),
-      -2,
+      -1,
     ),
     ...preprocIf(
       "_in_class_definition",

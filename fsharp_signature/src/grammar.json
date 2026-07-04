@@ -10523,7 +10523,7 @@
     },
     "preproc_if_in_module_body": {
       "type": "PREC",
-      "value": -2,
+      "value": -1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -10597,7 +10597,7 @@
     },
     "preproc_else_in_module_body": {
       "type": "PREC",
-      "value": -2,
+      "value": -1,
       "content": {
         "type": "SEQ",
         "members": [
