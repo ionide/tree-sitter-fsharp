@@ -106,7 +106,7 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
     [$._module_elem, $.preproc_if_in_expression],
-    [$._module_expression, $._expression],
+    [$._module_body_elem, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
     [$.preproc_if_in_expression, $.preproc_if_in_module_body],
     [$.preproc_else_in_expression, $.preproc_else_in_module_body],
@@ -179,12 +179,7 @@ module.exports = grammar({
         $.exception_definition,
         $.extern_binding,
         alias($.preproc_if_in_module_body, $.preproc_if),
-        $._module_expression,
-        // $.exception_defn
-      ),
-
-    _module_expression: ($) =>
-      choice(
+        // inlined from former _module_expression (single-use hidden rule)
         "null",
         $.const,
         $.paren_expression,
@@ -214,7 +209,7 @@ module.exports = grammar({
         $.application_expression,
         $.dot_expression,
         $.srtp_call_expression,
-        // (static-typars : (member-sig) expr)
+        // $.exception_defn
       ),
 
     _module_elem: ($) =>

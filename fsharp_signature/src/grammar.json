@@ -187,15 +187,6 @@
           "value": "preproc_if"
         },
         {
-          "type": "SYMBOL",
-          "name": "_module_expression"
-        }
-      ]
-    },
-    "_module_expression": {
-      "type": "CHOICE",
-      "members": [
-        {
           "type": "STRING",
           "value": "null"
         },
