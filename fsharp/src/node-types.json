@@ -1280,10 +1280,6 @@
           {
             "type": "_expression",
             "named": true
-          },
-          {
-            "type": "range_expression",
-            "named": true
           }
         ]
       }

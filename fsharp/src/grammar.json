@@ -3970,38 +3970,12 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comp_declaration_expression"
-          },
-          "named": true,
-          "value": "declaration_expression"
-        },
-        {
           "type": "SYMBOL",
           "name": "range_expression"
         },
         {
           "type": "SYMBOL",
           "name": "_expression"
-        }
-      ]
-    },
-    "comp_declaration_expression": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_declaration_binding"
-        },
-        {
-          "type": "FIELD",
-          "name": "in",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_comp_or_range_expression"
-          }
         }
       ]
     },
@@ -11057,10 +11031,6 @@
     [
       "_module_body_elem",
       "_expression"
-    ],
-    [
-      "declaration_expression",
-      "_comp_or_range_expression"
     ],
     [
       "preproc_if_in_expression",

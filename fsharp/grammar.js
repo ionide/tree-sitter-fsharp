@@ -106,7 +106,6 @@ module.exports = grammar({
     [$.long_identifier, $._identifier_or_op],
     [$._module_elem, $.preproc_if_in_expression],
     [$._module_body_elem, $._expression],
-    [$.declaration_expression, $._comp_or_range_expression],
     [$.preproc_if_in_expression, $.preproc_if_in_module_body],
     [$.preproc_else_in_expression, $.preproc_else_in_module_body],
     [$._module_elem, $.preproc_else_in_expression],
@@ -1004,14 +1003,10 @@ module.exports = grammar({
 
     _comp_or_range_expression: ($) =>
       choice(
-        alias($.comp_declaration_expression, $.declaration_expression),
         // short_comp_expression is reachable via _expression now.
         $.range_expression,
         $._expression,
       ),
-
-    comp_declaration_expression: ($) =>
-      seq($._declaration_binding, field("in", $._comp_or_range_expression)),
 
     // _comp_expressions: $ =>
     //   choice(
