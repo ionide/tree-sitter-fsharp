@@ -6212,25 +6212,21 @@
         }
       ]
     },
-    "_class_type_body_inner": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "class_inherits_decl"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "type_extension_elements"
-        }
-      ]
-    },
     "_class_type_body": {
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_class_type_body_inner"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "class_inherits_decl"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "type_extension_elements"
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -6242,8 +6238,17 @@
                 "name": "_newline"
               },
               {
-                "type": "SYMBOL",
-                "name": "_class_type_body_inner"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "class_inherits_decl"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "type_extension_elements"
+                  }
+                ]
               }
             ]
           }
@@ -10565,8 +10570,17 @@
                   ]
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "_class_type_body_inner"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "class_inherits_decl"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "type_extension_elements"
+                    }
+                  ]
                 }
               ]
             }
@@ -10627,8 +10641,17 @@
                   ]
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "_class_type_body_inner"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "class_inherits_decl"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "type_extension_elements"
+                    }
+                  ]
                 }
               ]
             }

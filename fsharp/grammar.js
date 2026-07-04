@@ -1584,13 +1584,15 @@ module.exports = grammar({
         ),
       ),
 
-    _class_type_body_inner: ($) =>
-      choice($.class_inherits_decl, $.type_extension_elements),
-
     _class_type_body: ($) =>
       seq(
-        $._class_type_body_inner,
-        repeat(seq($._newline, $._class_type_body_inner)),
+        choice($.class_inherits_decl, $.type_extension_elements),
+        repeat(
+          seq(
+            $._newline,
+            choice($.class_inherits_decl, $.type_extension_elements),
+          ),
+        ),
       ),
 
     _record_type_defn_inner: ($) =>
@@ -2380,7 +2382,13 @@ module.exports = grammar({
     ),
     ...preprocIf(
       "_in_class_definition",
-      ($) => repeat(seq(optional($._newline), $._class_type_body_inner)),
+      ($) =>
+        repeat(
+          seq(
+            optional($._newline),
+            choice($.class_inherits_decl, $.type_extension_elements),
+          ),
+        ),
       -2,
     ),
     ...preprocIf("_in_member_definition", ($) => repeat($.member_defn), -2),
