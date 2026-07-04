@@ -8,11 +8,7 @@ and the [F# compiler parser](https://github.com/dotnet/fsharp/blob/main/src/Comp
 
 First, run `npm install` to install the `tree-sitter` CLI as a local devDependency (it lands at `node_modules/.bin/tree-sitter`, not on your global `$PATH`).
 
-You can then run the CLI in any of these ways:
-
-- `npx tree-sitter <command>` — resolves the local binary automatically.
-- `source ./activate` (from the repo root) — prepends `node_modules/.bin` to `$PATH` for the current shell, similar to Python's `venv/bin/activate`. After sourcing, plain `tree-sitter <command>` works. Run `deactivate` to undo.
-- `npm run generate` — regenerates both parsers (`fsharp` and `fsharp_signature`).
+Run the CLI with `npx tree-sitter <command>` — this resolves the local binary automatically. To regenerate both parsers use `npm run generate`.
 
 To parse a file: `npx tree-sitter parse <file>` (see the [Development](#development) section for more).
 
