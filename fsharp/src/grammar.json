@@ -4635,6 +4635,27 @@
         ]
       }
     },
+    "_record_fields_block": {
+      "type": "FIELD",
+      "name": "block",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_indent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "record_fields"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_dedent"
+          }
+        ]
+      }
+    },
     "anon_record_type": {
       "type": "SEQ",
       "members": [
@@ -4655,25 +4676,8 @@
           "value": "{|"
         },
         {
-          "type": "FIELD",
-          "name": "block",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_indent"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "record_fields"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_dedent"
-              }
-            ]
-          }
+          "type": "SYMBOL",
+          "name": "_record_fields_block"
         },
         {
           "type": "STRING",
@@ -6203,25 +6207,8 @@
           "value": "{"
         },
         {
-          "type": "FIELD",
-          "name": "block",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_indent"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "record_fields"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_dedent"
-              }
-            ]
-          }
+          "type": "SYMBOL",
+          "name": "_record_fields_block"
         },
         {
           "type": "STRING",

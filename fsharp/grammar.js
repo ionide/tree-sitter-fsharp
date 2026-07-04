@@ -1313,8 +1313,10 @@ module.exports = grammar({
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
+    _record_fields_block: ($) => scoped($.record_fields, $._indent, $._dedent),
+
     anon_record_type: ($) =>
-      seq(optional("struct"), "{|", scoped($.record_fields, $._indent, $._dedent), "|}"),
+      seq(optional("struct"), "{|", $._record_fields_block, "|}"),
     types: ($) =>
       seq($._type, repeat(prec.left(PREC.COMMA - 1, seq(",", $._type)))),
 
@@ -1586,7 +1588,7 @@ module.exports = grammar({
       seq(
         optional($.access_modifier),
         "{",
-        scoped($.record_fields, $._indent, $._dedent),
+        $._record_fields_block,
         "}",
         optional($.type_extension_elements),
       ),
