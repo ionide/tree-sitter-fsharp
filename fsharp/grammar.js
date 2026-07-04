@@ -2004,18 +2004,6 @@ module.exports = grammar({
         $._hexgraph_short,
       ),
 
-    // note: \n is allowed in strings
-    _string_char: ($) =>
-      choice(
-        $._inside_string_marker,
-        token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
-        $._escape_char,
-        $._trigraph,
-        $._unicodegraph_short,
-        $._hexgraph_short,
-        $._non_escape_char,
-        $._unicodegraph_long,
-      ),
 
     char: (_) =>
       prec(
@@ -2039,7 +2027,7 @@ module.exports = grammar({
               // '{{' / '}}' are literal-brace escapes; must outrank the
               // interpolation-hole '{' (prec 1000).
               token.immediate(prec(1001, /\{\{|\}\}/)),
-              $._string_char,
+              choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long),
             ),
           ),
           '"',
@@ -2059,13 +2047,13 @@ module.exports = grammar({
         ),
       ),
 
-    _string_literal: ($) => seq('"', repeat($._string_char), '"'),
+    _string_literal: ($) => seq('"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long)), '"'),
 
     string: ($) => choice($._string_literal, $.format_string),
 
     verbatim_string: ($) =>
       seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"')),
-    bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),
+    bytearray: ($) => seq('"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\a\f\v\\"]/)), $._escape_char, $._trigraph, $._unicodegraph_short, $._hexgraph_short, $._non_escape_char, $._unicodegraph_long)), token.immediate('"B')),
     verbatim_bytearray: ($) =>
       seq('@"', repeat(choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/)), token.immediate('"B')),
 

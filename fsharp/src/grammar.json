@@ -8539,50 +8539,6 @@
         }
       ]
     },
-    "_string_char": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_inside_string_marker"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
-          "content": {
-            "type": "PREC",
-            "value": 1,
-            "content": {
-              "type": "PATTERN",
-              "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
-            }
-          }
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_escape_char"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_trigraph"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_unicodegraph_short"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_hexgraph_short"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_non_escape_char"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_unicodegraph_long"
-        }
-      ]
-    },
     "char": {
       "type": "PREC",
       "value": -1,
@@ -8675,8 +8631,48 @@
                     }
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_string_char"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_inside_string_marker"
+                      },
+                      {
+                        "type": "IMMEDIATE_TOKEN",
+                        "content": {
+                          "type": "PREC",
+                          "value": 1,
+                          "content": {
+                            "type": "PATTERN",
+                            "value": "[^\\t\\r\b\\a\\f\\v\\\\\"]"
+                          }
+                        }
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_escape_char"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_trigraph"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_unicodegraph_short"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_hexgraph_short"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_non_escape_char"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_unicodegraph_long"
+                      }
+                    ]
                   }
                 ]
               }
@@ -8786,8 +8782,48 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_string_char"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_inside_string_marker"
+              },
+              {
+                "type": "IMMEDIATE_TOKEN",
+                "content": {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[^\\t\\r\b\\a\\f\\v\\\\\"]"
+                  }
+                }
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_escape_char"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_trigraph"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_unicodegraph_short"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_hexgraph_short"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_non_escape_char"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_unicodegraph_long"
+              }
+            ]
           }
         },
         {
@@ -8870,8 +8906,48 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_string_char"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_inside_string_marker"
+              },
+              {
+                "type": "IMMEDIATE_TOKEN",
+                "content": {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[^\\t\\r\b\\a\\f\\v\\\\\"]"
+                  }
+                }
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_escape_char"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_trigraph"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_unicodegraph_short"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_hexgraph_short"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_non_escape_char"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_unicodegraph_long"
+              }
+            ]
           }
         },
         {
