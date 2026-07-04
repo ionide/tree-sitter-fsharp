@@ -117,7 +117,7 @@ module.exports = grammar({
     // Singleton: union_type_cases conflicts with itself (shift the optional
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
     [$.union_type_cases],
-    [$.prefixed_expression, $._low_prec_app, $.infix_expression],
+    [$.prefixed_expression, $.application_expression, $.infix_expression],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
   ],
@@ -922,22 +922,20 @@ module.exports = grammar({
     paren_expression: ($) =>
       prec(PREC.PAREN_EXPR, seq("(", $._paren_expression_block, ")")),
 
-    _high_prec_app: ($) =>
-      prec.left(
-        PREC.DOT + 1,
-        seq(
-          $._expression,
-          choice(
-            $.unit,
-            seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
+    application_expression: ($) =>
+      choice(
+        prec.left(
+          PREC.DOT + 1,
+          seq(
+            $._expression,
+            choice(
+              $.unit,
+              seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
+            ),
           ),
         ),
+        prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
       ),
-
-    _low_prec_app: ($) =>
-      prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
-
-    application_expression: ($) => choice($._high_prec_app, $._low_prec_app),
 
     dot_expression: ($) =>
       prec.right(

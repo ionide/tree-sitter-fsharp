@@ -3512,79 +3512,71 @@
         ]
       }
     },
-    "_high_prec_app": {
-      "type": "PREC_LEFT",
-      "value": 20,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_expression"
-          },
-          {
-            "type": "CHOICE",
+    "application_expression": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PREC_LEFT",
+          "value": 20,
+          "content": {
+            "type": "SEQ",
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "unit"
+                "name": "_expression"
               },
               {
-                "type": "SEQ",
+                "type": "CHOICE",
                 "members": [
                   {
-                    "type": "IMMEDIATE_TOKEN",
-                    "content": {
-                      "type": "PREC",
-                      "value": 10000,
-                      "content": {
-                        "type": "STRING",
-                        "value": "("
-                      }
-                    }
-                  },
-                  {
                     "type": "SYMBOL",
-                    "name": "_paren_expression_block"
+                    "name": "unit"
                   },
                   {
-                    "type": "STRING",
-                    "value": ")"
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "IMMEDIATE_TOKEN",
+                        "content": {
+                          "type": "PREC",
+                          "value": 10000,
+                          "content": {
+                            "type": "STRING",
+                            "value": "("
+                          }
+                        }
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_paren_expression_block"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": ")"
+                      }
+                    ]
                   }
                 ]
               }
             ]
           }
-        ]
-      }
-    },
-    "_low_prec_app": {
-      "type": "PREC_LEFT",
-      "value": 16,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_expression"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_expression"
-          }
-        ]
-      }
-    },
-    "application_expression": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_high_prec_app"
         },
         {
-          "type": "SYMBOL",
-          "name": "_low_prec_app"
+          "type": "PREC_LEFT",
+          "value": 16,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              }
+            ]
+          }
         }
       ]
     },
