@@ -1445,15 +1445,16 @@ module.exports = grammar({
           optional($.type_arguments),
           ":",
           $.curried_spec,
-          optional(
-            choice(
-              seq("with", "get"),
-              seq("with", "set"),
-              seq("with", "get", ",", "set"),
-              seq("with", "set", ",", "get"),
-            ),
-          ),
+          optional(seq("with", $._get_set_spec)),
         ),
+      ),
+
+    _get_set_spec: (_) =>
+      choice(
+        "get",
+        "set",
+        seq("get", ",", "set"),
+        seq("set", ",", "get"),
       ),
 
     curried_spec: ($) => seq(repeat(seq($.arguments_spec, arrow())), $._curried_return_type),
@@ -1827,17 +1828,7 @@ module.exports = grammar({
           optional(seq(":", $._type)),
           "=",
           $._expression,
-          optional(
-            seq(
-              "with",
-              choice(
-                "get",
-                "set",
-                seq("get", ",", "set"),
-                seq("set", ",", "get"),
-              ),
-            ),
-          ),
+          optional(seq("with", $._get_set_spec)),
         ),
       ),
 
