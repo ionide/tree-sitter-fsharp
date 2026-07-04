@@ -121,8 +121,9 @@ type A() =
         (identifier))
       (primary_constr_args)
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 attribute on let binding
@@ -389,7 +390,6 @@ type AfterShapes = { X : int }
           (simple_type
             (long_identifier
               (identifier))))))))
-
 
 ================================================================================
 Attribute between a type and a name

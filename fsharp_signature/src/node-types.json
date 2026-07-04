@@ -5523,12 +5523,8 @@
             "named": true
           },
           {
-            "type": "const",
-            "named": true
-          },
-          {
             "type": "do",
-            "named": false
+            "named": true
           },
           {
             "type": "function_or_value_defn",
@@ -5539,19 +5535,7 @@
             "named": true
           },
           {
-            "type": "long_identifier_or_op",
-            "named": true
-          },
-          {
             "type": "member_defn",
-            "named": true
-          },
-          {
-            "type": "null",
-            "named": false
-          },
-          {
-            "type": "paren_expression",
             "named": true
           },
           {
@@ -5574,7 +5558,7 @@
           "named": true
         },
         {
-          "type": "const",
+          "type": "do",
           "named": true
         },
         {
@@ -5586,15 +5570,7 @@
           "named": true
         },
         {
-          "type": "long_identifier_or_op",
-          "named": true
-        },
-        {
           "type": "member_defn",
-          "named": true
-        },
-        {
-          "type": "paren_expression",
           "named": true
         },
         {

@@ -1740,7 +1740,7 @@ module.exports = grammar({
           seq(
             optional($.attributes),
             optional("static"),
-            choice($.function_or_value_defn, seq("do", $._expression_block)),
+            choice($.function_or_value_defn, $.do),
           ),
           choice($.member_defn, $.interface_implementation, alias($.preproc_if_in_class_definition, $.preproc_if)),
         ),

@@ -6959,17 +6959,8 @@
                     "name": "function_or_value_defn"
                   },
                   {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "STRING",
-                        "value": "do"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "_expression_block"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "do"
                   }
                 ]
               }

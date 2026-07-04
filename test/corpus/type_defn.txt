@@ -195,8 +195,9 @@ type A() =
         (identifier))
       (primary_constr_args)
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class-as definition
@@ -216,8 +217,9 @@ type A() as this =
         (class_as_reference
           (identifier)))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class inherit definition
@@ -721,8 +723,9 @@ type A() =
         (const
           (unit)))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class inherit and member method definition
@@ -796,8 +799,9 @@ type A<'T>(t: 'T) =
           (long_identifier_or_op
             (identifier))))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class member then interface impl. test
@@ -2760,7 +2764,7 @@ type T = U
     (union_type_defn
       (type_name
         (identifier))
-       (union_type_cases
+      (union_type_cases
         (union_type_case
           (identifier))))))
 
@@ -3680,7 +3684,6 @@ module M =
             (simple_type
               (long_identifier
                 (identifier)))))))))
-
 
 ================================================================================
 exception defn with members

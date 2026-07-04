@@ -4206,16 +4206,12 @@
         "required": false,
         "types": [
           {
-            "type": "_expression",
-            "named": true
-          },
-          {
             "type": "attributes",
             "named": true
           },
           {
             "type": "do",
-            "named": false
+            "named": true
           },
           {
             "type": "function_or_value_defn",
@@ -4230,6 +4226,10 @@
             "named": true
           },
           {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
             "type": "static",
             "named": false
           }
@@ -4241,11 +4241,11 @@
       "required": false,
       "types": [
         {
-          "type": "_expression",
+          "type": "attributes",
           "named": true
         },
         {
-          "type": "attributes",
+          "type": "do",
           "named": true
         },
         {
@@ -4258,6 +4258,10 @@
         },
         {
           "type": "member_defn",
+          "named": true
+        },
+        {
+          "type": "preproc_if",
           "named": true
         }
       ]
