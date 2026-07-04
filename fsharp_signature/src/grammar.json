@@ -10696,6 +10696,9 @@
     ],
     [
       "union_type_cases"
+    ],
+    [
+      "_union_type_defn_inner"
     ]
   ],
   "precedences": [],
@@ -10848,7 +10851,6 @@
   "inline": [
     "_object_expression_inner",
     "_record_type_defn_inner",
-    "_union_type_defn_inner",
     "_then_expression"
   ],
   "supertypes": [

@@ -114,6 +114,10 @@ module.exports = grammar({
     // Singleton: union_type_cases conflicts with itself (shift the optional
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
     [$.union_type_cases],
+    // Singleton: after union_type_cases, reduce _union_type_defn_inner vs. shift
+    // its optional trailing type_extension_elements (was resolved by inlining;
+    // now that the rule is a shared nonterminal, GLR picks the parse).
+    [$._union_type_defn_inner],
     [$.prefixed_expression, $.application_expression, $.infix_expression],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
@@ -124,7 +128,6 @@ module.exports = grammar({
   inline: ($) => [
     $._object_expression_inner,
     $._record_type_defn_inner,
-    $._union_type_defn_inner,
     $._then_expression,
   ],
 

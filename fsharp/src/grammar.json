@@ -10768,6 +10768,9 @@
       "union_type_cases"
     ],
     [
+      "_union_type_defn_inner"
+    ],
+    [
       "prefixed_expression",
       "application_expression",
       "infix_expression"
@@ -10931,7 +10934,6 @@
   "inline": [
     "_object_expression_inner",
     "_record_type_defn_inner",
-    "_union_type_defn_inner",
     "_then_expression"
   ],
   "supertypes": [
