@@ -2175,8 +2175,34 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_object_members"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "with"
+            },
+            {
+              "type": "FIELD",
+              "name": "block",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_indent"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_member_defns"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_dedent"
+                  }
+                ]
+              }
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -7235,8 +7261,34 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "_object_members"
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "with"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "block",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_indent"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_member_defns"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_dedent"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               {
                 "type": "BLANK"
@@ -7282,36 +7334,6 @@
           }
         ]
       }
-    },
-    "_object_members": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "with"
-        },
-        {
-          "type": "FIELD",
-          "name": "block",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_indent"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_member_defns"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_dedent"
-              }
-            ]
-          }
-        }
-      ]
     },
     "member_defn": {
       "type": "PREC",

@@ -662,7 +662,7 @@ module.exports = grammar({
       ),
 
     _object_expression_inner: ($) =>
-      seq($._object_members, repeat($.interface_implementation)),
+      seq(seq("with", scoped($._member_defns, $._indent, $._dedent)), repeat($.interface_implementation)),
 
     object_expression: ($) =>
       prec(
@@ -1750,15 +1750,12 @@ module.exports = grammar({
       ),
 
     interface_implementation: ($) =>
-      prec.left(seq("interface", $._type, optional($._object_members))),
+      prec.left(seq("interface", $._type, optional(seq("with", scoped($._member_defns, $._indent, $._dedent))))),
 
     _member_defns: ($) =>
       prec.left(
         seq($.member_defn, repeat(seq(optional($._newline), $.member_defn))),
       ),
-
-    _object_members: ($) =>
-      seq("with", scoped($._member_defns, $._indent, $._dedent)),
 
     member_defn: ($) =>
       prec(
