@@ -726,19 +726,27 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "_type",
+          "type": "flexible_type",
           "named": true
         },
         {
-          "type": "long_identifier",
+          "type": "generic_type",
           "named": true
         },
         {
-          "type": "type_attributes",
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         }
       ]

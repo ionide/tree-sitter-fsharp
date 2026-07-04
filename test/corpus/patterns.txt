@@ -599,15 +599,17 @@ do
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
             (const
               (bool)))
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
               (identifier))
             (const
               (bool))))))))

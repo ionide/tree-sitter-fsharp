@@ -583,27 +583,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "anon_record_type",
-          "named": true
-        },
-        {
-          "type": "compound_type",
-          "named": true
-        },
-        {
-          "type": "constrained_type",
-          "named": true
-        },
-        {
           "type": "flexible_type",
-          "named": true
-        },
-        {
-          "type": "function_type",
           "named": true
         },
         {
@@ -611,19 +595,7 @@
           "named": true
         },
         {
-          "type": "list_type",
-          "named": true
-        },
-        {
-          "type": "long_identifier",
-          "named": true
-        },
-        {
           "type": "paren_type",
-          "named": true
-        },
-        {
-          "type": "postfix_type",
           "named": true
         },
         {
@@ -631,19 +603,7 @@
           "named": true
         },
         {
-          "type": "static_type",
-          "named": true
-        },
-        {
-          "type": "struct_type",
-          "named": true
-        },
-        {
           "type": "type_argument",
-          "named": true
-        },
-        {
-          "type": "type_attributes",
           "named": true
         }
       ]

@@ -1365,11 +1365,11 @@ module.exports = grammar({
     atomic_type: ($) =>
       prec.right(
         choice(
-          seq("#", $._type),
+          $.flexible_type,
           $.type_argument,
-          seq("(", $._type, ")"),
-          $.long_identifier,
-          seq($.long_identifier, "<", $.type_attributes, ">"),
+          $.paren_type,
+          $.simple_type,
+          $.generic_type,
         ),
       ),
 

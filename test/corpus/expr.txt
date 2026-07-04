@@ -2004,17 +2004,19 @@ let test =
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier)
-                  (identifier)
-                  (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier)
+                    (identifier)))))
             (const
               (unit)))
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
             (const
               (unit))))))))
 
@@ -4615,15 +4617,15 @@ let x =
                 (identifier))
               (long_identifier_or_op
                 (identifier)))
+            (application_expression
               (application_expression
-                (application_expression
-                  (long_identifier_or_op
-                    (identifier))
-                  (long_identifier_or_op
-                    (identifier)))
-                (list_expression
-                  (long_identifier_or_op
-                    (identifier))))))))))
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (list_expression
+                (long_identifier_or_op
+                  (identifier))))))))))
 
 ================================================================================
 let then short for expression in computation expression
@@ -4825,7 +4827,7 @@ let f (x: struct (int * int)) = x
                   (simple_type
                     (long_identifier
                       (identifier)))
-                   (simple_type
+                  (simple_type
                     (long_identifier
                       (identifier)))))))))
       (long_identifier_or_op
