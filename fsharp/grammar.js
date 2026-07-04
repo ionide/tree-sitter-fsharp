@@ -1498,13 +1498,16 @@ module.exports = grammar({
             seq(
               "and",
               choice(
-                seq(optional($.attributes), $._type_defn_body),
-                seq($._indent, optional($.attributes), $._type_defn_body, $._dedent),
+                $._attributed_type_defn_body,
+                seq($._indent, $._attributed_type_defn_body, $._dedent),
               ),
             ),
           ),
         ),
       ),
+
+    _attributed_type_defn_body: ($) =>
+      seq(optional($.attributes), $._type_defn_body),
 
     _type_defn_body: ($) =>
       choice(

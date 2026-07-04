@@ -5647,25 +5647,8 @@
                   "type": "CHOICE",
                   "members": [
                     {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "attributes"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "SYMBOL",
-                          "name": "_type_defn_body"
-                        }
-                      ]
+                      "type": "SYMBOL",
+                      "name": "_attributed_type_defn_body"
                     },
                     {
                       "type": "SEQ",
@@ -5675,20 +5658,8 @@
                           "name": "_indent"
                         },
                         {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "attributes"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
-                        },
-                        {
                           "type": "SYMBOL",
-                          "name": "_type_defn_body"
+                          "name": "_attributed_type_defn_body"
                         },
                         {
                           "type": "SYMBOL",
@@ -5703,6 +5674,27 @@
           }
         ]
       }
+    },
+    "_attributed_type_defn_body": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "attributes"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_defn_body"
+        }
+      ]
     },
     "_type_defn_body": {
       "type": "CHOICE",
