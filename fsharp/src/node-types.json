@@ -575,11 +575,35 @@
       "required": false,
       "types": [
         {
-          "type": "_pattern",
+          "type": "array_pattern",
+          "named": true
+        },
+        {
+          "type": "const",
+          "named": true
+        },
+        {
+          "type": "list_pattern",
           "named": true
         },
         {
           "type": "long_identifier",
+          "named": true
+        },
+        {
+          "type": "paren_pattern",
+          "named": true
+        },
+        {
+          "type": "record_pattern",
+          "named": true
+        },
+        {
+          "type": "type_check_pattern",
+          "named": true
+        },
+        {
+          "type": "typed_const_pattern",
           "named": true
         }
       ]

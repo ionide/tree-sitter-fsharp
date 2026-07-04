@@ -460,7 +460,7 @@ module.exports = grammar({
             $.list_pattern,
             $.record_pattern,
             $.array_pattern,
-            seq("(", $._pattern, ")"),
+            $.paren_pattern,
             $.type_check_pattern,
           ),
         ),

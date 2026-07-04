@@ -161,12 +161,13 @@ let inline double<^a when ^a:(member Double: unit -> ^a)> (x: ^a) = x.Double()
                   (type_argument
                     (identifier)))))))
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))))
       (application_expression
         (long_identifier_or_op
           (long_identifier
@@ -204,12 +205,13 @@ let inline double<'a when 'a:(member Double: unit -> 'a)> (x: 'a) = x.Double()
                   (type_argument
                     (identifier)))))))
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))))
       (application_expression
         (long_identifier_or_op
           (long_identifier
@@ -291,18 +293,20 @@ let inline add (x: ^a) (y: ^a) : ^a when ^a : (static member (+) : ^a * ^a -> ^a
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))))
       (type_argument
         (identifier))
       (type_argument_constraints
@@ -479,13 +483,14 @@ module Entry =
           (access_modifier)
           (identifier)
           (argument_patterns
-            (typed_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (simple_type
-                (long_identifier
-                  (identifier))))))
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
         (mutate_expression
           (long_identifier_or_op
             (long_identifier

@@ -251,31 +251,7 @@
           "named": true
         },
         {
-          "type": "as_pattern",
-          "named": true
-        },
-        {
-          "type": "attribute_pattern",
-          "named": true
-        },
-        {
-          "type": "conjunct_pattern",
-          "named": true
-        },
-        {
-          "type": "cons_pattern",
-          "named": true
-        },
-        {
           "type": "const",
-          "named": true
-        },
-        {
-          "type": "disjunct_pattern",
-          "named": true
-        },
-        {
-          "type": "identifier_pattern",
           "named": true
         },
         {
@@ -287,14 +263,6 @@
           "named": true
         },
         {
-          "type": "named_field_pattern",
-          "named": true
-        },
-        {
-          "type": "optional_pattern",
-          "named": true
-        },
-        {
           "type": "paren_pattern",
           "named": true
         },
@@ -303,23 +271,11 @@
           "named": true
         },
         {
-          "type": "repeat_pattern",
-          "named": true
-        },
-        {
           "type": "type_check_pattern",
           "named": true
         },
         {
           "type": "typed_const_pattern",
-          "named": true
-        },
-        {
-          "type": "typed_pattern",
-          "named": true
-        },
-        {
-          "type": "wildcard_pattern",
           "named": true
         }
       ]

@@ -2351,9 +2351,10 @@ type C() =
               (identifier))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2392,9 +2393,10 @@ type C() =
                 (unit)))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2431,9 +2433,10 @@ type C() =
                 (unit)))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2948,24 +2951,25 @@ let inline f (x: ^T when ^T : (static member Parse: string -> ^T)) =
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier))
-            constraints: (type_argument_constraints
-              (constraint
-                (type_argument
-                  (identifier))
-                (trait_member_constraint
-                  (identifier)
-                  (function_type
-                    (simple_type
-                      (long_identifier
-                        (identifier)))
-                    (type_argument
-                      (identifier)))))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))
+              constraints: (type_argument_constraints
+                (constraint
+                  (type_argument
+                    (identifier))
+                  (trait_member_constraint
+                    (identifier)
+                    (function_type
+                      (simple_type
+                        (long_identifier
+                          (identifier)))
+                      (type_argument
+                        (identifier))))))))))
       body: (paren_expression
         (srtp_call_expression
           (type_argument
@@ -2996,20 +3000,22 @@ let inline create (a: int) (b: string) =
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
       body: (paren_expression
         (srtp_call_expression
           (type_argument
