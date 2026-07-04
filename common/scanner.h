@@ -943,6 +943,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             lexer->result_symbol = DEDENT;
             return true;
           }
+        } else if (!is_word_char(lexer->lookahead)) {
+          // Handle 'and' followed by newline/EOF (not word char, not space).
+          // Mirror the space-branch: emit AND when valid; otherwise trigger
+          // a keyword-driven DEDENT to close intermediate scopes so the parser
+          // retries AND at the correct level on the next scan.
+          if (valid_symbols[AND]) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = AND;
+            return true;
+          } else if (valid_symbols[DEDENT]) {
+            pop_indent(scanner);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }
@@ -976,6 +990,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = DEDENT;
               return true;
             }
+          } else if (valid_symbols[WITH] && !is_word_char(lexer->lookahead)) {
+            // Handle 'with' followed by newline/EOF (not word char, not space).
+            // Only emit WITH here. Unlike 'and', do NOT force a keyword-driven
+            // DEDENT when only DEDENT is valid: `with` on a new line inside a
+            // class body is a CONTINUATION of the enclosing type (starting a
+            // type_extension_elements), so closing the enclosing scope early
+            // would truncate the type definition. Let the natural indent
+            // tracking (line ~1050) emit any needed DEDENTs and NEWLINE.
+            lexer->mark_end(lexer);
+            lexer->result_symbol = WITH;
+            return true;
           }
         }
       }
