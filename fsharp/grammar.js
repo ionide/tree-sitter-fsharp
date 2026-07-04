@@ -2005,15 +2005,10 @@ module.exports = grammar({
       ),
 
     // note: \n is allowed in strings
-    _simple_string_char: ($) =>
+    _string_char: ($) =>
       choice(
         $._inside_string_marker,
         token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
-      ),
-
-    _string_char: ($) =>
-      choice(
-        $._simple_string_char,
         $._escape_char,
         $._trigraph,
         $._unicodegraph_short,
@@ -2069,7 +2064,7 @@ module.exports = grammar({
     string: ($) => choice($._string_literal, $.format_string),
 
     _verbatim_string_char: ($) =>
-      choice($._simple_string_char, $._non_escape_char, "\\", /\"\"/),
+      choice($._inside_string_marker, token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)), $._non_escape_char, "\\", /\"\"/),
     verbatim_string: ($) =>
       seq('@"', repeat($._verbatim_string_char), token.immediate('"')),
     bytearray: ($) => seq('"', repeat($._string_char), token.immediate('"B')),

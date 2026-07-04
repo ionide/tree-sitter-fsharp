@@ -8389,7 +8389,7 @@
         }
       ]
     },
-    "_simple_string_char": {
+    "_string_char": {
       "type": "CHOICE",
       "members": [
         {
@@ -8406,15 +8406,6 @@
               "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
             }
           }
-        }
-      ]
-    },
-    "_string_char": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_simple_string_char"
         },
         {
           "type": "SYMBOL",
@@ -8645,7 +8636,18 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_simple_string_char"
+          "name": "_inside_string_marker"
+        },
+        {
+          "type": "IMMEDIATE_TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "PATTERN",
+              "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
+            }
+          }
         },
         {
           "type": "SYMBOL",
