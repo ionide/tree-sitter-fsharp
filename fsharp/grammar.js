@@ -453,26 +453,28 @@ module.exports = grammar({
       // argument patterns are generally no different from normal patterns.
       // however, any time an argument pattern is a valid node, (i.e. inside a beginning fun decl)
       // it is always the correct node to construct.
-      prec.left(1000, repeat1($._atomic_pattern)),
+      prec.left(
+        1000,
+        repeat1(
+          choice(
+            "null",
+            "_",
+            $.typed_const_pattern,
+            $.const,
+            $.long_identifier,
+            $.list_pattern,
+            $.record_pattern,
+            $.array_pattern,
+            seq("(", $._pattern, ")"),
+            $.type_check_pattern,
+          ),
+        ),
+      ),
 
     field_pattern: ($) =>
       prec(
         1,
         seq($.long_identifier, "=", $._pattern),
-      ),
-
-    _atomic_pattern: ($) =>
-      choice(
-        "null",
-        "_",
-        $.typed_const_pattern,
-        $.const,
-        $.long_identifier,
-        $.list_pattern,
-        $.record_pattern,
-        $.array_pattern,
-        seq("(", $._pattern, ")"),
-        $.type_check_pattern,
       ),
 
     _list_pattern_content: ($) =>
