@@ -1807,16 +1807,6 @@ module.exports = grammar({
         $._identifier_or_op,
       ),
 
-    _method_defn: ($) =>
-      choice(
-        seq(
-          optional($.type_arguments),
-          field("args", repeat1($._pattern)),
-          "=",
-          $._expression_block,
-        ),
-      ),
-
     _property_accessor_body: ($) =>
       seq(
         $.argument_patterns,
@@ -1877,7 +1867,12 @@ module.exports = grammar({
         seq(
           field("name", $.property_or_ident),
           choice(
-            $._method_defn,
+            seq(
+              optional($.type_arguments),
+              field("args", repeat1($._pattern)),
+              "=",
+              $._expression_block,
+            ),
             $._property_defn,
             seq(
               "with",
