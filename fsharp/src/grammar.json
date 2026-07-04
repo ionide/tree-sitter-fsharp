@@ -4470,23 +4470,6 @@
         ]
       }
     },
-    "_measure_operand": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "measure_power"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "measure_atom"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "compound_type"
-        }
-      ]
-    },
     "measure_quotient": {
       "type": "PREC_LEFT",
       "value": 5,
@@ -4494,16 +4477,42 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_measure_operand"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "measure_power"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "measure_atom"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "compound_type"
+              }
+            ]
           },
           {
             "type": "STRING",
             "value": "/"
           },
           {
-            "type": "SYMBOL",
-            "name": "_measure_operand"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "measure_power"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "measure_atom"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "compound_type"
+              }
+            ]
           }
         ]
       }

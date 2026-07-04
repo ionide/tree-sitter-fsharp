@@ -1290,14 +1290,15 @@ module.exports = grammar({
 
     measure_power: ($) => prec.right(6, seq($.measure_atom, "^", $.int)),
 
-    _measure_operand: ($) =>
-      choice(
-        $.measure_power,
-        $.measure_atom,
-        $.compound_type,
+    measure_quotient: ($) =>
+      prec.left(
+        5,
+        seq(
+          choice($.measure_power, $.measure_atom, $.compound_type),
+          "/",
+          choice($.measure_power, $.measure_atom, $.compound_type),
+        ),
       ),
-
-    measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
 
     measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
 
