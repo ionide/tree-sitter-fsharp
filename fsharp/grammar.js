@@ -122,7 +122,6 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   inline: ($) => [
-    $._expression_or_range,
     $._object_expression_inner,
     $._record_type_defn_inner,
     $._union_type_defn_inner,
@@ -716,7 +715,7 @@ module.exports = grammar({
         seq(
           "for",
           choice(
-            seq($._pattern, "in", $._expression_or_range),
+            seq($._pattern, "in", $._comp_or_range_expression),
             seq(
               $.identifier,
               "=",
@@ -898,8 +897,6 @@ module.exports = grammar({
           optional(seq("..", $._expression)),
         ),
       ),
-
-    _expression_or_range: ($) => choice($._expression, $.range_expression),
 
     rule: ($) =>
       prec.right(
@@ -1153,7 +1150,7 @@ module.exports = grammar({
     //   ),
 
     short_comp_expression: ($) =>
-      seq("for", $._pattern, "in", $._expression_or_range, arrow(), $._expression),
+      seq("for", $._pattern, "in", $._comp_or_range_expression, arrow(), $._expression),
 
     // comp_rule: $ =>
     //   seq(

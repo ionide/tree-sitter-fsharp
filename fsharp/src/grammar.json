@@ -2587,7 +2587,7 @@
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "_expression_or_range"
+                    "name": "_comp_or_range_expression"
                   }
                 ]
               },
@@ -3426,19 +3426,6 @@
         ]
       }
     },
-    "_expression_or_range": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "range_expression"
-        }
-      ]
-    },
     "rule": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -3923,7 +3910,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_expression_or_range"
+          "name": "_comp_or_range_expression"
         },
         {
           "type": "TOKEN",
@@ -10942,7 +10929,6 @@
     }
   ],
   "inline": [
-    "_expression_or_range",
     "_object_expression_inner",
     "_record_type_defn_inner",
     "_union_type_defn_inner",
