@@ -1737,7 +1737,7 @@ module.exports = grammar({
     type_extension_elements: ($) =>
       prec.left(
         choice(
-          seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+          $._type_extension_with,
           $._type_extension_inner,
         ),
       ),

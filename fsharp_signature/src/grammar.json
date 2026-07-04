@@ -7078,34 +7078,8 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "with"
-              },
-              {
-                "type": "FIELD",
-                "name": "block",
-                "content": {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_indent"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_type_extension_inner"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_dedent"
-                    }
-                  ]
-                }
-              }
-            ]
+            "type": "SYMBOL",
+            "name": "_type_extension_with"
           },
           {
             "type": "SYMBOL",
