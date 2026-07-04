@@ -1723,15 +1723,17 @@ module.exports = grammar({
         ),
       ),
 
-    _class_function_or_value_defn: ($) =>
-      seq(
-        optional($.attributes),
-        optional("static"),
-        choice($.function_or_value_defn, seq("do", $._expression_block)),
-      ),
-
     _type_extension_inner: ($) =>
-      repeat1(choice($._class_function_or_value_defn, $._type_defn_elements)),
+      repeat1(
+        choice(
+          seq(
+            optional($.attributes),
+            optional("static"),
+            choice($.function_or_value_defn, seq("do", $._expression_block)),
+          ),
+          $._type_defn_elements,
+        ),
+      ),
 
     type_extension_elements: ($) =>
       prec.left(
