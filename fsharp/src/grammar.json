@@ -4870,31 +4870,7 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "long_identifier"
-          },
-          {
-            "type": "STRING",
-            "value": "<"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_indent"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "type_attributes"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "STRING",
-            "value": ">"
+            "name": "_multiline_generic_type_head"
           },
           {
             "type": "SYMBOL",

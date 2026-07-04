@@ -1345,7 +1345,7 @@ module.exports = grammar({
     _multiline_generic_type: ($) =>
       prec.right(
         5,
-        seq($.long_identifier, "<", $._indent, optional($.type_attributes), ">", $._dedent),
+        seq($._multiline_generic_type_head, $._dedent),
       ),
 
     _multiline_generic_type_head: ($) =>
