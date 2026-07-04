@@ -701,6 +701,15 @@ module.exports = grammar({
         seq($._expression, choice(":", ":>", ":?", ":?>"), $._type),
       ),
 
+    // Shared `do <block> [done]` tail of for_expression and while_expression.
+    // Both terminate right after this tail (same follow context), so — like
+    // _rules_block for match/function — the tail's states merge into one copy
+    // instead of being generated per parent. Hidden + non-aliased, so the "do"
+    // token, _expression_block, and optional "done" promote directly into
+    // either parent (tree-identical).
+    _do_body: ($) =>
+      seq(alias($._do_keyword, "do"), $._expression_block, optional("done")),
+
     for_expression: ($) =>
       prec(
         PREC.DO_EXPR + 1,
@@ -716,9 +725,7 @@ module.exports = grammar({
               $._expression,
             ),
           ),
-          alias($._do_keyword, "do"),
-          $._expression_block,
-          optional("done"),
+          $._do_body,
         ),
       ),
 
@@ -728,9 +735,7 @@ module.exports = grammar({
         seq(
           choice("while", "while!"),
           $._expression,
-          alias($._do_keyword, "do"),
-          $._expression_block,
-          optional("done"),
+          $._do_body,
         ),
       ),
 

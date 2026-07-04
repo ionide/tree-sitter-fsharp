@@ -2385,6 +2385,36 @@
         ]
       }
     },
+    "_do_body": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_do_keyword"
+          },
+          "named": false,
+          "value": "do"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_expression_block"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "done"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
     "for_expression": {
       "type": "PREC",
       "value": 9,
@@ -2452,29 +2482,8 @@
             ]
           },
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_do_keyword"
-            },
-            "named": false,
-            "value": "do"
-          },
-          {
             "type": "SYMBOL",
-            "name": "_expression_block"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "done"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
+            "name": "_do_body"
           }
         ]
       }
@@ -2503,29 +2512,8 @@
             "name": "_expression"
           },
           {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_do_keyword"
-            },
-            "named": false,
-            "value": "do"
-          },
-          {
             "type": "SYMBOL",
-            "name": "_expression_block"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "done"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
+            "name": "_do_body"
           }
         ]
       }
