@@ -195,8 +195,9 @@ type A() =
         (identifier))
       (primary_constr_args)
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class-as definition
@@ -216,8 +217,9 @@ type A() as this =
         (class_as_reference
           (identifier)))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class inherit definition
@@ -721,8 +723,9 @@ type A() =
         (const
           (unit)))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class inherit and member method definition
@@ -789,15 +792,15 @@ type A<'T>(t: 'T) =
           (long_identifier
             (identifier))
           (type_attributes
-            (type_attribute
-              (type_argument
-                (identifier)))))
+            (type_argument
+              (identifier))))
         (paren_expression
           (long_identifier_or_op
             (identifier))))
       (type_extension_elements
-        (const
-          (unit))))))
+        (do
+          (const
+            (unit)))))))
 
 ================================================================================
 class member then interface impl. test
@@ -902,9 +905,8 @@ and 'T maybe = Maybe<'T>
         (long_identifier
           (identifier))
         (type_attributes
-          (type_attribute
-            (type_argument
-              (identifier))))))))
+          (type_argument
+            (identifier)))))))
 
 ================================================================================
 record definition
@@ -1308,9 +1310,8 @@ type A(x: int, y:int) =
             (long_identifier
               (identifier))
             (type_attributes
-              (type_attribute
-                (type_argument
-                  (identifier)))))
+              (type_argument
+                (identifier))))
           (member_defn
             (method_or_prop_defn
               (property_or_ident
@@ -1373,10 +1374,9 @@ type IProp2 =
                   (long_identifier
                     (identifier))
                   (type_attributes
-                    (type_attribute
-                      (simple_type
-                        (long_identifier
-                          (identifier))))))))))))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))
     (type_definition
       (anon_type_defn
         (type_name
@@ -1398,10 +1398,9 @@ type IProp2 =
                   (long_identifier
                     (identifier))
                   (type_attributes
-                    (type_attribute
-                      (simple_type
-                        (long_identifier
-                          (identifier))))))))))))))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))))))))))
 
 ================================================================================
 member with curried arguments
@@ -1659,11 +1658,12 @@ type A() =
                   (identifier)))
               (type_argument_constraints
                 (constraint
-                  (type_argument
-                    (identifier))
-                  (simple_type
-                    (long_identifier
-                      (identifier))))
+                  (constrained_type
+                    (type_argument
+                      (identifier))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
                 (constraint
                   (type_argument
                     (identifier)))
@@ -1763,12 +1763,11 @@ type sql = SqlProvider<ConnectionString = "secret">
         (long_identifier
           (identifier))
         (type_attributes
-          (type_attribute
-            (named_static_parameter
-              (identifier)
-              (static_parameter_value
-                (const
-                  (string))))))))))
+          (named_static_parameter
+            (identifier)
+            (static_parameter_value
+              (const
+                (string)))))))))
 
 ================================================================================
 type provider with multiple parameters
@@ -1791,16 +1790,14 @@ type sql = SqlProvider<
         (long_identifier
           (identifier))
         (type_attributes
-          (type_attribute
+          (static_parameter_value
+            (const
+              (triple_quoted_string)))
+          (named_static_parameter
+            (identifier)
             (static_parameter_value
               (const
-                (triple_quoted_string))))
-          (type_attribute
-            (named_static_parameter
-              (identifier)
-              (static_parameter_value
-                (const
-                  (string))))))))))
+                (string)))))))))
 
 ================================================================================
 type abbreviation with generic function type
@@ -1820,10 +1817,9 @@ type F = List<int> -> string
           (long_identifier
             (identifier))
           (type_attributes
-            (type_attribute
-              (simple_type
-                (long_identifier
-                  (identifier))))))
+            (simple_type
+              (long_identifier
+                (identifier)))))
         (simple_type
           (long_identifier
             (identifier)))))))
@@ -1887,10 +1883,9 @@ type CsvFile
               (long_identifier
                 (identifier))
               (type_attributes
-                (type_attribute
-                  (simple_type
-                    (long_identifier
-                      (identifier)))))))
+                (simple_type
+                  (long_identifier
+                    (identifier))))))
           (attribute_pattern
             (attributes
               (attribute
@@ -2347,9 +2342,10 @@ type C() =
               (identifier))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2388,9 +2384,10 @@ type C() =
                 (unit)))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2427,9 +2424,10 @@ type C() =
                 (unit)))
             (property_accessor
               (argument_patterns
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier))))
+                (paren_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))))
               (mutate_expression
                 (long_identifier_or_op
                   (identifier))
@@ -2760,7 +2758,7 @@ type T = U
     (union_type_defn
       (type_name
         (identifier))
-       (union_type_cases
+      (union_type_cases
         (union_type_case
           (identifier))))))
 
@@ -2944,24 +2942,25 @@ let inline f (x: ^T when ^T : (static member Parse: string -> ^T)) =
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier))
-            constraints: (type_argument_constraints
-              (constraint
-                (type_argument
-                  (identifier))
-                (trait_member_constraint
-                  (identifier)
-                  (function_type
-                    (simple_type
-                      (long_identifier
-                        (identifier)))
-                    (type_argument
-                      (identifier)))))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))
+              constraints: (type_argument_constraints
+                (constraint
+                  (type_argument
+                    (identifier))
+                  (trait_member_constraint
+                    (identifier)
+                    (function_type
+                      (simple_type
+                        (long_identifier
+                          (identifier)))
+                      (type_argument
+                        (identifier))))))))))
       body: (paren_expression
         (srtp_call_expression
           (type_argument
@@ -2992,20 +2991,22 @@ let inline create (a: int) (b: string) =
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
       body: (paren_expression
         (srtp_call_expression
           (type_argument
@@ -3462,20 +3463,17 @@ module Definitions =
             (long_identifier
               (identifier))
             (type_attributes
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
           (const
             (unit)))
         (type_extension_elements
@@ -3493,20 +3491,17 @@ module Definitions =
             (long_identifier
               (identifier))
             (type_attributes
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
           (const
             (unit)))
         (type_extension_elements
@@ -3544,20 +3539,17 @@ module M =
             (long_identifier
               (identifier))
             (type_attributes
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
           (const
             (unit)))
         (type_extension_elements
@@ -3593,20 +3585,17 @@ module M =
             (long_identifier
               (identifier))
             (type_attributes
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))
-              (type_attribute
-                (simple_type
-                  (long_identifier
-                    (identifier)
-                    (identifier))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
           (const
             (unit)))
         (type_extension_elements
@@ -3680,7 +3669,6 @@ module M =
             (simple_type
               (long_identifier
                 (identifier)))))))))
-
 
 ================================================================================
 exception defn with members

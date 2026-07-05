@@ -1495,13 +1495,14 @@ let exampleNamespace =
       (paren_expression
         (fun_expression
           (argument_patterns
-            (repeat_pattern
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier)))))
+            (paren_pattern
+              (repeat_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))))
           (if_expression
             (infix_expression
               (long_identifier_or_op
@@ -2004,17 +2005,19 @@ let test =
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier)
-                  (identifier)
-                  (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)
+                    (identifier)
+                    (identifier)))))
             (const
               (unit)))
           (rule
             (type_check_pattern
               (atomic_type
-                (long_identifier
-                  (identifier))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
             (const
               (unit))))))))
 
@@ -3029,14 +3032,15 @@ let f (x: #MyType) = ()
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (flexible_type
-              (simple_type
-                (long_identifier
-                  (identifier)))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (flexible_type
+                (simple_type
+                  (long_identifier
+                    (identifier))))))))
       (const
         (unit)))))
 
@@ -3181,23 +3185,24 @@ let f (a: seq<'T>) (b: 'T) =
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (generic_type
-              (long_identifier
-                (identifier))
-              (type_attributes
-                (type_attribute
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (generic_type
+                (long_identifier
+                  (identifier))
+                (type_attributes
                   (type_argument
                     (identifier))))))
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))))
       (const
         (unit)))))
 
@@ -4447,12 +4452,13 @@ let inline f (x: ^a) = (^a : (static member Zero : ^a) ())
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (type_argument
-              (identifier)))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (type_argument
+                (identifier))))))
       (paren_expression
         (srtp_call_expression
           (type_argument
@@ -4615,15 +4621,15 @@ let x =
                 (identifier))
               (long_identifier_or_op
                 (identifier)))
+            (application_expression
               (application_expression
-                (application_expression
-                  (long_identifier_or_op
-                    (identifier))
-                  (long_identifier_or_op
-                    (identifier)))
-                (list_expression
-                  (long_identifier_or_op
-                    (identifier))))))))))
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (list_expression
+                (long_identifier_or_op
+                  (identifier))))))))))
 
 ================================================================================
 let then short for expression in computation expression
@@ -4815,19 +4821,20 @@ let f (x: struct (int * int)) = x
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (struct_type
-              (paren_type
-                (compound_type
-                  (simple_type
-                    (long_identifier
-                      (identifier)))
-                   (simple_type
-                    (long_identifier
-                      (identifier)))))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (struct_type
+                (paren_type
+                  (compound_type
+                    (simple_type
+                      (long_identifier
+                        (identifier)))
+                    (simple_type
+                      (long_identifier
+                        (identifier))))))))))
       (long_identifier_or_op
         (long_identifier
           (identifier))))))
@@ -4846,17 +4853,18 @@ let f (x: struct {| Name: string |}) = x
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (identifier_pattern
-              (long_identifier_or_op
-                (identifier)))
-            (anon_record_type
-              (record_fields
-                (record_field
-                  (identifier)
-                  (simple_type
-                    (long_identifier
-                      (identifier)))))))))
+          (paren_pattern
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (anon_record_type
+                (record_fields
+                  (record_field
+                    (identifier)
+                    (simple_type
+                      (long_identifier
+                        (identifier))))))))))
       (long_identifier_or_op
         (long_identifier
           (identifier))))))

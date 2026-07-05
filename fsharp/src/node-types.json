@@ -575,11 +575,35 @@
       "required": false,
       "types": [
         {
-          "type": "_pattern",
+          "type": "array_pattern",
+          "named": true
+        },
+        {
+          "type": "const",
+          "named": true
+        },
+        {
+          "type": "list_pattern",
           "named": true
         },
         {
           "type": "long_identifier",
+          "named": true
+        },
+        {
+          "type": "paren_pattern",
+          "named": true
+        },
+        {
+          "type": "record_pattern",
+          "named": true
+        },
+        {
+          "type": "type_check_pattern",
+          "named": true
+        },
+        {
+          "type": "typed_const_pattern",
           "named": true
         }
       ]
@@ -726,19 +750,27 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "_type",
+          "type": "flexible_type",
           "named": true
         },
         {
-          "type": "long_identifier",
+          "type": "generic_type",
           "named": true
         },
         {
-          "type": "type_attributes",
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
           "named": true
         }
       ]
@@ -813,7 +845,7 @@
     "named": true,
     "fields": {
       "block": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
@@ -1279,10 +1311,6 @@
         "types": [
           {
             "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "range_expression",
             "named": true
           }
         ]
@@ -1937,7 +1965,7 @@
     },
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "_type",
@@ -3763,10 +3791,6 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
           "type": "long_identifier",
           "named": true
         }
@@ -4096,11 +4120,11 @@
     }
   },
   {
-    "type": "type_attribute",
+    "type": "type_attributes",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -4113,21 +4137,6 @@
         },
         {
           "type": "measure",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "type_attributes",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "type_attribute",
           "named": true
         }
       ]
@@ -4214,16 +4223,12 @@
         "required": false,
         "types": [
           {
-            "type": "_expression",
-            "named": true
-          },
-          {
             "type": "attributes",
             "named": true
           },
           {
             "type": "do",
-            "named": false
+            "named": true
           },
           {
             "type": "function_or_value_defn",
@@ -4238,6 +4243,10 @@
             "named": true
           },
           {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
             "type": "static",
             "named": false
           }
@@ -4249,11 +4258,11 @@
       "required": false,
       "types": [
         {
-          "type": "_expression",
+          "type": "attributes",
           "named": true
         },
         {
-          "type": "attributes",
+          "type": "do",
           "named": true
         },
         {
@@ -4266,6 +4275,10 @@
         },
         {
           "type": "member_defn",
+          "named": true
+        },
+        {
+          "type": "preproc_if",
           "named": true
         }
       ]
