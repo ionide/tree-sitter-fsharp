@@ -1828,7 +1828,7 @@
         ]
       }
     },
-    "_expression_block": {
+    "_indented_expression": {
       "type": "SEQ",
       "members": [
         {
@@ -1838,6 +1838,15 @@
         {
           "type": "SYMBOL",
           "name": "_expression"
+        }
+      ]
+    },
+    "_expression_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_indented_expression"
         },
         {
           "type": "SYMBOL",
@@ -1850,11 +1859,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_indent"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_expression"
+          "name": "_indented_expression"
         },
         {
           "type": "CHOICE",

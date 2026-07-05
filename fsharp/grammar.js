@@ -525,13 +525,24 @@ module.exports = grammar({
     // Expressions (BEGIN)
     //
 
-    _expression_block: ($) => seq($._indent, $._expression, $._dedent),
+    // Shared `<indent> <expression>` head of _expression_block and
+    // _expression_block_for_let. Both reach the whole _expression automaton
+    // right after _indent and diverge only in the CLOSE token (_dedent vs
+    // _dedent|_in) — the iter-4 shared-prefix shape (a large sub-automaton
+    // reached identically, divergent suffix). Previously the two blocks built
+    // the expression automaton TWICE because _expression's follow differed
+    // ({_dedent} vs {_dedent,_in}); sharing the head builds it once (follow
+    // {_dedent,_in}). Hidden + non-aliased, so _expression promotes directly
+    // into either parent (tree-identical).
+    _indented_expression: ($) => seq($._indent, $._expression),
+
+    _expression_block: ($) => seq($._indented_expression, $._dedent),
 
     // Like _expression_block, but also allows the block to be terminated by
     // the 'in' keyword instead of a dedent.  Used for let/use bindings so that
     // single-line  let x = 1 in x  works (where no newline → no DEDENT).
     _expression_block_for_let: ($) =>
-      seq($._indent, $._expression, choice($._dedent, $._in)),
+      seq($._indented_expression, choice($._dedent, $._in)),
 
     _paren_expression_block: ($) => seq($._paren_indent, $._expression, $._dedent),
 
