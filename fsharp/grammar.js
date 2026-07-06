@@ -107,14 +107,8 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
-    [$._module_elem, $.preproc_if_in_expression],
     [$._module_expression, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
-    [$.preproc_if_in_expression, $.preproc_if_in_module_body],
-    [$.preproc_else_in_expression, $.preproc_else_in_module_body],
-    [$._module_elem, $.preproc_else_in_expression],
-    [$._module_body_elem, $.preproc_if_in_expression],
-    [$._module_body_elem, $.preproc_else_in_expression],
     [$.rules],
     // Singleton: union_type_cases conflicts with itself (shift the optional
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
@@ -2386,13 +2380,21 @@ module.exports = grammar({
       // Besides expressions, allow body-less let bindings: a branch often
       // ends with `let x = ...` whose body is the code following #endif
       // (the classic `#if INTERACTIVE` pattern).
+      // prec(-3) on the items: at module-body positions the same content
+      // also parses as _module_elem; prefer that statically instead of
+      // declaring a GLR conflict — the split otherwise stays alive for the
+      // whole branch and multiplies version pressure inside module-spanning
+      // directives.
       ($) =>
         repeat(
-          seq(
-            optional($._newline),
-            choice(
-              $._expression,
-              alias($.value_declaration, $.declaration_expression),
+          prec(
+            -3,
+            seq(
+              optional($._newline),
+              choice(
+                $._expression,
+                alias($.value_declaration, $.declaration_expression),
+              ),
             ),
           ),
         ),
@@ -2401,7 +2403,10 @@ module.exports = grammar({
     ...preprocIf(
       "_in_module_body",
       ($) => repeat(seq(optional($._newline), $._module_body_elem)),
-      -2,
+      // -1 (above _in_expression's -2): where both variants apply — inside a
+      // `module X =` body — the module-body variant subsumes expressions, so
+      // prefer it statically rather than keeping a GLR split alive.
+      -1,
     ),
     ...preprocIf(
       "_in_class_definition",
