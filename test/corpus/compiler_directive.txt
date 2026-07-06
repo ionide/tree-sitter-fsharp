@@ -1104,3 +1104,80 @@ let f x =
             pattern: (wildcard_pattern)
             block: (const
               (string))))))))
+
+================================================================================
+stray preproc_if with negated condition
+================================================================================
+
+let f x =
+    match x with
+#if !DEBUG
+    | 0 -> "release zero"
+#else
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if around a fluent chain link
+================================================================================
+
+services
+    .AddAntiforgery()
+#if !DEBUG
+    .AddHttpsRedirection(fun opt -> ())
+#endif
+    .AddRouting()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+    (dot_expression
+      base: (application_expression
+        (dot_expression
+          base: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit))
+          (preproc_inactive)
+          field: (long_identifier_or_op
+            (identifier)))
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (const
+            (unit))))
+      (preproc_inactive)
+      field: (long_identifier_or_op
+        (identifier)))
+    (unit)))
