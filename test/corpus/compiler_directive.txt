@@ -1106,6 +1106,45 @@ let f x =
               (string))))))))
 
 ================================================================================
+stray preproc_if with negated condition
+================================================================================
+
+let f x =
+    match x with
+#if !DEBUG
+    | 0 -> "release zero"
+#else
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
 stray preproc_if around a fluent chain link
 ================================================================================
 
