@@ -826,15 +826,23 @@ let connStr = "b"
 --------------------------------------------------------------------------------
 
 (file
-  (declaration_expression
+  (preproc_if
     (attributes
       (attribute
         (simple_type
           (long_identifier
             (identifier)))))
-    (preproc_if
-      (preproc_if_not_expression
-        (identifier))
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (string))))
+    (preproc_else
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
@@ -842,16 +850,7 @@ let connStr = "b"
               (long_identifier_or_op
                 (identifier))))
           (const
-            (string))))
-      (preproc_else
-        (declaration_expression
-          (function_or_value_defn
-            (value_declaration_left
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier))))
-            (const
-              (string))))))))
+            (string)))))))
 
 ================================================================================
 preproc_if with dangling let in expression branches
