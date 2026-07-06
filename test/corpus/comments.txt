@@ -404,3 +404,66 @@ let x = 1
             (identifier))))
       body: (const
         (int)))))
+
+================================================================================
+block comment trailing a line that opens an indented block
+================================================================================
+
+let f x = (* c *)
+    x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (block_comment
+        (block_comment_content))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (const
+          (int))))))
+
+================================================================================
+block comment trailing a match arm arrow
+================================================================================
+
+let f x =
+    match x with
+    | 1 ->
+        "one"
+    | _ -> (* c *)
+        "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string)))
+          (rule
+            pattern: (wildcard_pattern)
+            (block_comment
+              (block_comment_content))
+            block: (const
+              (string))))))))
