@@ -1471,7 +1471,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
-      !found_same_line_pipe_infix) {
+      !found_same_line_pipe_infix &&
+      // A block comment trailing the current line must not anchor the new
+      // block: without this, `let f x = (* c *)` + an indented body pushes
+      // the comment's column, and the body line immediately DEDENTs it back
+      // out. Decline instead; after the comment is consumed as an extra, the
+      // re-scan crosses the newline and INDENT anchors to the body line.
+      !(found_comment_start && !found_end_of_line)) {
     push_indent(scanner, indent_length, INDENT_NORMAL);
     lexer->result_symbol = INDENT;
     return true;
