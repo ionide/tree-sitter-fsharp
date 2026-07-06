@@ -974,3 +974,133 @@ let messageBuffer = GlobalHost.Configuration.Max
             (identifier))
           (long_identifier_or_op
             (identifier)))))))
+
+================================================================================
+stray preproc_if around a match rule
+================================================================================
+
+let f x =
+    match x with
+#if DEBUG
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if with else branch around parameters
+================================================================================
+
+let f (x: int)
+#if EXTRA
+      (y: int)
+#endif
+      =
+#if EXTRA
+    x + y
+#else
+    x
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (preproc_inactive)
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (preproc_inactive)
+      body: (preproc_if
+        condition: (identifier)
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (identifier)))
+        alternative: (preproc_else
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+stray preproc_else region with nested directives
+================================================================================
+
+let f x =
+    match x with
+#if A
+    | 1 -> "a"
+#else
+#if B
+    | 2 -> "b"
+#endif
+    | 3 -> "c"
+#endif
+    | _ -> "d"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))

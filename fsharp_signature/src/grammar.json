@@ -10947,6 +10947,10 @@
       "name": "compiler_directive_decl"
     },
     {
+      "type": "SYMBOL",
+      "name": "preproc_inactive"
+    },
+    {
       "type": "STRING",
       "value": ";"
     }
@@ -11109,6 +11113,10 @@
     {
       "type": "SYMBOL",
       "name": "_do_keyword"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "preproc_inactive"
     },
     {
       "type": "SYMBOL",
