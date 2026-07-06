@@ -57,6 +57,7 @@ module.exports = grammar({
     $.xml_doc,
     $.preproc_line,
     $.compiler_directive_decl,
+    $.preproc_inactive,
     ";",
   ],
 
@@ -98,6 +99,7 @@ module.exports = grammar({
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
     $._do_keyword, // external 'do' terminating a while/for header; distinct from do_expression's 'do' so `while a && b do` reduces the condition instead of shifting 'do' as an application argument
+    $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],

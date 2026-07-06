@@ -459,6 +459,10 @@
 (preproc_else
   "#else" @keyword.directive)
 
+; Inactive branch of a directive the grammar could not place structurally;
+; render like a comment, the way C/C++ editors gray out inactive regions.
+(preproc_inactive) @comment
+
 ((long_identifier
   (identifier)+ @variable.member
   .
