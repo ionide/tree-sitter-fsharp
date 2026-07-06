@@ -843,6 +843,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = DEDENT;
               return true;
             }
+            // Branch content starts with a token that can never begin an
+            // expression or declaration but *continues* the enclosing one
+            // (a fluent-chain '.', a closing bracket, a tuple ','): a
+            // structured branch could not parse it, so consume the directive
+            // line — including the newline and the content line's indent, so
+            // the content continues the previous expression exactly as if
+            // the directive were not there — as inactive trivia, and
+            // remember the stray open so `#else`/`#endif` are consumed
+            // textually too.
+            if (has_content && !valid_symbols[ERROR_SENTINEL] &&
+                (lexer->lookahead == '.' || lexer->lookahead == ')' ||
+                 lexer->lookahead == ']' || lexer->lookahead == '}' ||
+                 lexer->lookahead == ',')) {
+              push_preproc_kind(scanner, PREPROC_STRAY);
+              lexer->mark_end(lexer);
+              lexer->result_symbol = PREPROC_INACTIVE;
+              return true;
+            }
             // Branch content stays at block depth: treat the directive lines
             // as whitespace. The peek already consumed up to the content
             // char, so resume the whitespace loop from there.
@@ -877,6 +895,52 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           } else {
             if (scanner->indents.size > 0) {
               if (valid_symbols[PREPROC_IF]) {
+                if (!valid_symbols[ERROR_SENTINEL] &&
+                    !is_word_char(lexer->lookahead)) {
+                  // The grammar can adopt the directive here, but peek the
+                  // first branch line: if it starts with a token that can
+                  // never begin an expression or declaration (a fluent-chain
+                  // '.', a match-arm '|', a closing bracket, a tuple ','),
+                  // the structured branch could not parse and would split
+                  // the surrounding construct. Consume the directive line as
+                  // inactive trivia instead: the branch content then parses
+                  // inline as part of the enclosing construct, and a later
+                  // stray `#else` swallows the alternative branch.
+                  while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                    advance(lexer);
+                  }
+                  lexer->mark_end(lexer);
+                  int32_t branch_start = 0;
+                  while (!lexer->eof(lexer)) {
+                    if (lexer->lookahead == '\n' || lexer->lookahead == '\r' ||
+                        lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                      advance(lexer);
+                    } else if (lexer->lookahead == '/') {
+                      advance(lexer);
+                      if (lexer->lookahead != '/') {
+                        branch_start = '/';
+                        break;
+                      }
+                      while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                        advance(lexer);
+                      }
+                    } else {
+                      branch_start = lexer->lookahead;
+                      break;
+                    }
+                  }
+                  if (branch_start == '.' || branch_start == '|' ||
+                      branch_start == ')' || branch_start == ']' ||
+                      branch_start == '}' || branch_start == ',') {
+                    push_preproc_kind(scanner, PREPROC_STRAY);
+                    lexer->result_symbol = PREPROC_INACTIVE;
+                    return true;
+                  }
+                  // Branch content is expression-shaped: decline, so the
+                  // internal lexer adopts `#if` structurally. (The peek
+                  // advanced past mark_end only; declining returns it all.)
+                  return false;
+                }
                 uint16_t current_indent_length = peek_indent_length(scanner);
                 array_push(&scanner->preprocessor_indents,
                            current_indent_length);

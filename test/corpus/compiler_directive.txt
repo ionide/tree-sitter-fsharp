@@ -1104,3 +1104,41 @@ let f x =
             pattern: (wildcard_pattern)
             block: (const
               (string))))))))
+
+================================================================================
+stray preproc_if around a fluent chain link
+================================================================================
+
+services
+    .AddAntiforgery()
+#if !DEBUG
+    .AddHttpsRedirection(fun opt -> ())
+#endif
+    .AddRouting()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+    (dot_expression
+      base: (application_expression
+        (dot_expression
+          base: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit))
+          (preproc_inactive)
+          field: (long_identifier_or_op
+            (identifier)))
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (const
+            (unit))))
+      (preproc_inactive)
+      field: (long_identifier_or_op
+        (identifier)))
+    (unit)))
