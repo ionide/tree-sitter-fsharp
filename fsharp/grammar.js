@@ -1311,7 +1311,16 @@ module.exports = grammar({
 
     measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
 
-    measure: ($) => choice($.measure_quotient, $.measure_power, seq("(", $.measure, ")")),
+    measure: ($) =>
+      choice(
+        $.measure_quotient,
+        $.measure_power,
+        seq("(", $.measure, ")"),
+        // The dimensionless measure `1`, e.g. `float<1>`. Reuses the same "1"
+        // literal as measure_atom (no new token) so quotient/power measures like
+        // `1/s` are unaffected; only a bare `1` reduces to this standalone form.
+        alias("1", $.measure_atom),
+      ),
 
     simple_type: ($) => choice($.long_identifier, $._static_type_identifier),
     generic_type: ($) =>
@@ -1376,6 +1385,20 @@ module.exports = grammar({
           alias($._multiline_generic_type_head, $.generic_type),
           arrow(),
           $._type,
+          $._dedent,
+        ),
+      ),
+
+    // A tuple/compound type abbreviation whose first operand is a generic type,
+    // e.g. `type T = Foo<'a> * Bar`. The generic head opens an indent scope at
+    // '<' (see _multiline_generic_type_head); the matching _dedent is deferred
+    // until after the whole compound so the single-line form composes correctly.
+    _multiline_generic_compound_type: ($) =>
+      prec.right(
+        6,
+        seq(
+          alias($._multiline_generic_type_head, $.generic_type),
+          repeat1(prec.right(seq("*", $._type))),
           $._dedent,
         ),
       ),
@@ -1559,6 +1582,8 @@ module.exports = grammar({
             ),
             seq(optional($.type_argument), field("type_name", $.identifier)), // Covers `type 'a option = Option<'a>`
           ),
+          // Trailing constraint clause, e.g. `type 'a C when 'a : comparison = ...`
+          optional($.type_argument_constraints),
         ),
       ),
 
@@ -1586,6 +1611,7 @@ module.exports = grammar({
             $._indent,
             choice(
               alias($._multiline_generic_function_type, $.function_type),
+              alias($._multiline_generic_compound_type, $.compound_type),
               $._type,
               $.measure,
               alias($._multiline_generic_type, $.generic_type),
