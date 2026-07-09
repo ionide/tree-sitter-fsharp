@@ -10480,39 +10480,43 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_newline"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_expression"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
+              "type": "PREC",
+              "value": -3,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
                         "type": "SYMBOL",
-                        "name": "value_declaration"
+                        "name": "_newline"
                       },
-                      "named": true,
-                      "value": "declaration_expression"
-                    }
-                  ]
-                }
-              ]
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_expression"
+                      },
+                      {
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "value_declaration"
+                        },
+                        "named": true,
+                        "value": "declaration_expression"
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           },
           {
@@ -10556,39 +10560,43 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_newline"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_expression"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
+              "type": "PREC",
+              "value": -3,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
                         "type": "SYMBOL",
-                        "name": "value_declaration"
+                        "name": "_newline"
                       },
-                      "named": true,
-                      "value": "declaration_expression"
-                    }
-                  ]
-                }
-              ]
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_expression"
+                      },
+                      {
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "value_declaration"
+                        },
+                        "named": true,
+                        "value": "declaration_expression"
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           }
         ]
@@ -10596,7 +10604,7 @@
     },
     "preproc_if_in_module_body": {
       "type": "PREC",
-      "value": -2,
+      "value": -1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -10670,7 +10678,7 @@
     },
     "preproc_else_in_module_body": {
       "type": "PREC",
-      "value": -2,
+      "value": -1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -11019,6 +11027,10 @@
       "name": "compiler_directive_decl"
     },
     {
+      "type": "SYMBOL",
+      "name": "preproc_inactive"
+    },
+    {
       "type": "STRING",
       "value": ";"
     }
@@ -11181,6 +11193,10 @@
     {
       "type": "SYMBOL",
       "name": "_do_keyword"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "preproc_inactive"
     },
     {
       "type": "SYMBOL",

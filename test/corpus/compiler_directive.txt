@@ -826,15 +826,23 @@ let connStr = "b"
 --------------------------------------------------------------------------------
 
 (file
-  (declaration_expression
+  (preproc_if
     (attributes
       (attribute
         (simple_type
           (long_identifier
             (identifier)))))
-    (preproc_if
-      (preproc_if_not_expression
-        (identifier))
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (string))))
+    (preproc_else
       (declaration_expression
         (function_or_value_defn
           (value_declaration_left
@@ -842,16 +850,7 @@ let connStr = "b"
               (long_identifier_or_op
                 (identifier))))
           (const
-            (string))))
-      (preproc_else
-        (declaration_expression
-          (function_or_value_defn
-            (value_declaration_left
-              (identifier_pattern
-                (long_identifier_or_op
-                  (identifier))))
-            (const
-              (string))))))))
+            (string)))))))
 
 ================================================================================
 preproc_if with dangling let in expression branches
@@ -974,3 +973,210 @@ let messageBuffer = GlobalHost.Configuration.Max
             (identifier))
           (long_identifier_or_op
             (identifier)))))))
+
+================================================================================
+stray preproc_if around a match rule
+================================================================================
+
+let f x =
+    match x with
+#if DEBUG
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if with else branch around parameters
+================================================================================
+
+let f (x: int)
+#if EXTRA
+      (y: int)
+#endif
+      =
+#if EXTRA
+    x + y
+#else
+    x
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (preproc_inactive)
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (preproc_inactive)
+      body: (preproc_if
+        condition: (identifier)
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (identifier)))
+        alternative: (preproc_else
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+stray preproc_else region with nested directives
+================================================================================
+
+let f x =
+    match x with
+#if A
+    | 1 -> "a"
+#else
+#if B
+    | 2 -> "b"
+#endif
+    | 3 -> "c"
+#endif
+    | _ -> "d"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if with negated condition
+================================================================================
+
+let f x =
+    match x with
+#if !DEBUG
+    | 0 -> "release zero"
+#else
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if around a fluent chain link
+================================================================================
+
+services
+    .AddAntiforgery()
+#if !DEBUG
+    .AddHttpsRedirection(fun opt -> ())
+#endif
+    .AddRouting()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+    (dot_expression
+      base: (application_expression
+        (dot_expression
+          base: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit))
+          (preproc_inactive)
+          field: (long_identifier_or_op
+            (identifier)))
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (const
+            (unit))))
+      (preproc_inactive)
+      field: (long_identifier_or_op
+        (identifier)))
+    (unit)))

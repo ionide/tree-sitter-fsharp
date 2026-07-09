@@ -6768,6 +6768,11 @@
     "named": false
   },
   {
+    "type": "preproc_inactive",
+    "named": true,
+    "extra": true
+  },
+  {
     "type": "rec",
     "named": false
   },
