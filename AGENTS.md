@@ -4,17 +4,44 @@ This document explains how to add new language features to the F# parser.
 
 ## Project Structure
 
-This project contains two distinct parsers:
+This project contains two parsers:
 
 1. **`fsharp/`** - Parses `.fs` and `.fsx` files (F# source and script files)
 2. **`fsharp_signature/`** - Parses `.fsi` files (F# signature files)
+
+**These are not independent.** `fsharp_signature/grammar.js` starts with
+`grammar(require("../fsharp/grammar"), { ... })` — it extends the base
+grammar and overrides/adds a small number of rules. Consequences you must
+internalize:
+
+- A change to `fsharp/grammar.js` changes the *derived* signature grammar
+  too, even if you never open `fsharp_signature/grammar.js`.
+- Both `fsharp/src/parser.c` **and** `fsharp_signature/src/parser.c` must
+  be regenerated after any change to `fsharp/grammar.js`. Forgetting the
+  second one will fail CI's "parser matches grammar" check.
+- Use `npm run generate` (regenerates both) rather than a single
+  `tree-sitter generate` invocation — see the workflow section below.
 
 Each parser directory contains:
 
 - `grammar.js` - The grammar definition (written in JavaScript)
 - `src/grammar.json` - Generated grammar in JSON format
-- `src/parser.c` - Generated C parser code (This file should never edited directly)
-- `src/scanner.c` - External scanner for handling complex tokenization
+- `src/parser.c` - Generated C parser code (never edit this file directly)
+- `src/scanner.c` - Thin per-parser shim that `#include`s the shared scanner
+
+The **real** external scanner logic lives in a single shared header at
+[`common/scanner.h`](./common/scanner.h). Both `fsharp/src/scanner.c` and
+`fsharp_signature/src/scanner.c` are just three-function shims that delegate
+to functions defined in that header. If you need to change tokenization
+behavior (indent/dedent, keyword handling, string interpolation, etc.),
+edit `common/scanner.h` — never the per-parser `scanner.c` shim.
+
+## Running the CLI
+
+The `tree-sitter` CLI is installed as a local devDependency
+(`node_modules/.bin/tree-sitter`), not globally. Invoke it with
+`npx tree-sitter <command>`, which resolves the local binary
+automatically. All examples in this document use `npx tree-sitter ...`.
 
 ## Workflow for Adding a New Feature
 
@@ -72,30 +99,75 @@ where sample if the code you want to parse.
 
 ### 2. Run the Test
 
-Run the test to see the current failure:
+From the repo root (so `tree-sitter.json` picks up both parsers):
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter test
+npx tree-sitter test
+```
 
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter test
+To limit to a single test file or a single test name:
+
+```bash
+npx tree-sitter test --file-name attributes.txt
+npx tree-sitter test -i "top-level module attribute"
+npx tree-sitter test --overview-only   # pass/fail summary only
+```
+
+To parse a single file (useful for iterating on real F# samples):
+
+```bash
+npx tree-sitter parse path/to/file.fs
+# .fsi files need the signature parser selected explicitly:
+npx tree-sitter parse -p fsharp_signature path/to/file.fsi
 ```
 
 ### 3. Implement the Feature
 
-Update `grammar.js` in the appropriate parser directory to add the new grammar rule. If you need to add special tokenization logic (like handling keywords that can be used as identifiers), you may need to modify `src/scanner.c`.
+Update `grammar.js` in the appropriate parser directory to add the new grammar rule. If a feature applies to both `.fs` and `.fsi`, update **both** `fsharp/grammar.js` and `fsharp_signature/grammar.js`.
 
-### 4. Regenerate the Parser
+If you need to add special tokenization logic (indent/dedent behavior, keyword handling that competes with identifiers, string interpolation, etc.), edit the shared scanner at `common/scanner.h` — not the per-parser `src/scanner.c` shim.
 
-After modifying `grammar.js`, regenerate `grammar.json` and `parser.c`:
+### 4. Regenerate the Parser(s)
+
+After modifying `grammar.js`, regenerate `grammar.json` and `parser.c` for
+**both** parsers. The safe default is:
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter generate
+npm run generate
+```
 
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter generate
+This runs `tree-sitter generate` inside each parser directory and produces
+both `fsharp/src/{grammar.json,parser.c}` and
+`fsharp_signature/src/{grammar.json,parser.c}`. Because
+`fsharp_signature/grammar.js` extends `fsharp/grammar.js`, a change to the
+base grammar shows up in the signature parser too — so this must be run
+even if you only edited `fsharp/grammar.js`.
+
+If you invoke `tree-sitter generate` directly, always pass `--output` or it
+will dump a stray `src/` directory at the repo root:
+
+```bash
+npx tree-sitter generate --output fsharp/src           fsharp/grammar.js
+npx tree-sitter generate --output fsharp_signature/src fsharp_signature/grammar.js
+```
+
+Commit the regenerated `grammar.json` and `parser.c` for both parsers
+alongside your `grammar.js` change. CI runs a "parser matches grammar"
+check that regenerates and diffs against the committed files; a stale
+generated file in either parser fails the build.
+
+**Merge conflicts in `parser.c` or `grammar.json`:** don't hand-edit them.
+Resolve by re-running `npm run generate` on top of the merged `grammar.js`
+and committing the result.
+
+Changes to `common/scanner.h` do **not** require regeneration — they're
+picked up automatically on the next build. But you do need `-r` on the
+next test run to force a rebuild of the compiled scanner, otherwise
+tree-sitter reuses the previously compiled artifact and you'll see stale
+results:
+
+```bash
+npx tree-sitter test -r
 ```
 
 ### 5. Run Tests Again
@@ -103,11 +175,7 @@ cd fsharp_signature && npx tree-sitter generate
 Validate the feature is working:
 
 ```bash
-# For fsharp parser
-cd fsharp && npx tree-sitter test
-
-# For fsharp_signature parser
-cd fsharp_signature && npx tree-sitter test
+npx tree-sitter test
 ```
 
 ### 6. Repeat as Necessary
@@ -130,8 +198,8 @@ If the test still fails, review your implementation and the expected parse tree.
 
 3. **Check the F# spec** - When in doubt about language syntax, refer to https://fsharp.github.io/fslang-spec/
 
-4. **Two parsers need to be in sync** - If you're adding a feature that applies to both `.fs` and `.fsi` files, you need to implement and test it in both `fsharp/` and `fsharp_signature/` directories.
+4. **Two parsers, one grammar chain** - `fsharp_signature` extends `fsharp`, so any change to `fsharp/grammar.js` requires regenerating **both** `fsharp/src/parser.c` and `fsharp_signature/src/parser.c`. `npm run generate` handles this; a single `tree-sitter generate` call does not. CI will fail if either is stale.
 
-5. **Grammar.js vs parser.c** - You should only edit `grammar.js`. The `parser.c` file is auto-generated and will be overwritten when you run `tree-sitter generate`.
+5. **Grammar.js vs parser.c** - You should only edit `grammar.js`. The `parser.c` file is auto-generated and will be overwritten when you run `tree-sitter generate`. Merge conflicts in `parser.c`/`grammar.json` are resolved by regenerating, not by hand-editing.
 
 **IMPORTANT**: You may never change the expected parse tree of an existing test without consulting the user first. If a test fails to parse it is because the parser is broken.

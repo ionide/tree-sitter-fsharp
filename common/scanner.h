@@ -42,6 +42,7 @@ enum TokenType {
   IN,
   DO_KEYWORD,
   TRY_INDENT,
+  PREPROC_INACTIVE,
   ERROR_SENTINEL
 };
 
@@ -55,10 +56,21 @@ typedef enum {
   INDENT_TRY = 3,
 } IndentKind;
 
+// How an open `#if` directive entered the parse. STRUCTURED directives were
+// handed to the grammar (preproc_if rules) and both branches parse as syntax.
+// STRAY directives appeared at a position the grammar has no preproc rule for
+// and their `#if` line was consumed as trivia; only the active (first) branch
+// is parsed — a later `#else` swallows everything to the matching `#endif`.
+typedef enum {
+  PREPROC_STRUCTURED = 0,
+  PREPROC_STRAY = 1,
+} PreprocKind;
+
 typedef struct {
   Array(uint16_t) indents;
   Array(uint8_t) indent_kinds;
   Array(uint16_t) preprocessor_indents;
+  Array(uint8_t) preproc_kinds;
   uint8_t multi_dollar_count;
 } Scanner;
 
@@ -88,6 +100,80 @@ static inline void pop_indent(Scanner *scanner) {
 
 static inline uint16_t peek_indent_length(Scanner *scanner) {
   return *array_back(&scanner->indents);
+}
+
+static inline void push_preproc_kind(Scanner *scanner, PreprocKind kind) {
+  array_push(&scanner->preproc_kinds, (uint8_t)kind);
+}
+
+static inline void pop_preproc_kind(Scanner *scanner) {
+  if (scanner->preproc_kinds.size > 0) {
+    array_pop(&scanner->preproc_kinds);
+  }
+}
+
+static inline bool top_preproc_is_stray(Scanner *scanner) {
+  return scanner->preproc_kinds.size > 0 &&
+         *array_back(&scanner->preproc_kinds) == (uint8_t)PREPROC_STRAY;
+}
+
+// Consume everything from the current position (just past a stray `#else`)
+// through the end of the matching `#endif` line, tracking nested directives
+// textually (proper nesting is guaranteed by the F# lexer, and the inactive
+// branch is never parsed, so line-start matching is sufficient). Stops before
+// the trailing newline so normal newline/indent processing resumes after the
+// region. At EOF (unterminated directive) the rest of the file is consumed.
+static inline void swallow_inactive_region(TSLexer *lexer) {
+  int depth = 1;
+  for (;;) {
+    while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+      advance(lexer);
+    }
+    if (lexer->eof(lexer)) {
+      return;
+    }
+    advance(lexer); // consume the newline
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
+           lexer->lookahead == '\r') {
+      advance(lexer);
+    }
+    if (lexer->lookahead != '#') {
+      continue;
+    }
+    advance(lexer);
+    if (lexer->lookahead == 'i') {
+      advance(lexer);
+      if (lexer->lookahead == 'f') {
+        advance(lexer);
+        if (!is_word_char(lexer->lookahead)) {
+          depth++;
+        }
+      }
+    } else if (lexer->lookahead == 'e') {
+      advance(lexer);
+      if (lexer->lookahead == 'n') {
+        advance(lexer);
+        if (lexer->lookahead == 'd') {
+          advance(lexer);
+          if (lexer->lookahead == 'i') {
+            advance(lexer);
+            if (lexer->lookahead == 'f') {
+              advance(lexer);
+              if (!is_word_char(lexer->lookahead)) {
+                depth--;
+                if (depth == 0) {
+                  while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                    advance(lexer);
+                  }
+                  return;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 static inline IndentKind peek_indent_kind(Scanner *scanner) {
@@ -345,6 +431,82 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return false;
   }
 
+  // `preproc_inactive` is an extra, so it is valid in nearly every state —
+  // including states that had no valid external tokens before it existed and
+  // therefore never invoked this scanner. The full scan logic below assumes
+  // some structural token is wanted (several paths emit DEDENT/NEWLINE
+  // unconditionally), so in those states handle only the stray-directive
+  // fallback and otherwise stay out of the internal lexer's way.
+  if (!valid_symbols[ERROR_SENTINEL]) {
+    bool any_structural_valid = false;
+    for (int i = 0; i < PREPROC_INACTIVE; i++) {
+      if (valid_symbols[i]) {
+        any_structural_valid = true;
+        break;
+      }
+    }
+    if (!any_structural_valid) {
+      while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
+             lexer->lookahead == '\n' || lexer->lookahead == '\r' ||
+             lexer->lookahead == '\f') {
+        skip(lexer);
+      }
+      if (lexer->lookahead != '#') {
+        return false;
+      }
+      advance(lexer);
+      if (lexer->lookahead == 'i') { // #if — grammar cannot place it here
+        advance(lexer);
+        if (lexer->lookahead != 'f') return false;
+        advance(lexer);
+        if (is_word_char(lexer->lookahead)) return false;
+        push_preproc_kind(scanner, PREPROC_STRAY);
+        while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+          advance(lexer);
+        }
+        lexer->mark_end(lexer);
+        lexer->result_symbol = PREPROC_INACTIVE;
+        return true;
+      }
+      if (lexer->lookahead != 'e') {
+        return false;
+      }
+      advance(lexer);
+      if (lexer->lookahead == 'l') { // #else of a stray directive
+        advance(lexer);
+        if (lexer->lookahead != 's') return false;
+        advance(lexer);
+        if (lexer->lookahead != 'e') return false;
+        advance(lexer);
+        if (is_word_char(lexer->lookahead) || !top_preproc_is_stray(scanner)) {
+          return false;
+        }
+        pop_preproc_kind(scanner);
+        swallow_inactive_region(lexer);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = PREPROC_INACTIVE;
+        return true;
+      }
+      if (lexer->lookahead == 'n') { // #endif of a stray directive
+        advance(lexer);
+        if (lexer->lookahead != 'd') return false;
+        advance(lexer);
+        if (lexer->lookahead != 'i') return false;
+        advance(lexer);
+        if (lexer->lookahead != 'f') return false;
+        advance(lexer);
+        if (is_word_char(lexer->lookahead) || !top_preproc_is_stray(scanner)) {
+          return false;
+        }
+        pop_preproc_kind(scanner);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = PREPROC_INACTIVE;
+        return true;
+      }
+      return false;
+    }
+  }
+
   // Type application '<' disambiguation (F# spec Section 15.3).
   // When the grammar expects TYAPP_OPEN (i.e., a '<' immediately after an expression),
   // peek ahead to determine if the content between '<' and '>' looks like type arguments.
@@ -580,6 +742,18 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               advance(lexer);
               if (lexer->lookahead == 'f') {
                 advance(lexer);
+                // The innermost open directive was consumed as trivia (no
+                // grammar rule at its position), so this `#endif` closes it
+                // textually: consume it as an inactive-trivia extra instead
+                // of handing it to the grammar.
+                if (top_preproc_is_stray(scanner) &&
+                    !valid_symbols[ERROR_SENTINEL] &&
+                    !is_word_char(lexer->lookahead)) {
+                  pop_preproc_kind(scanner);
+                  lexer->mark_end(lexer);
+                  lexer->result_symbol = PREPROC_INACTIVE;
+                  return true;
+                }
                 found_preprocessor_end = true;
                 if (try_dedent_for_preproc(scanner, lexer)) {
                   return true;
@@ -588,6 +762,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                   if (scanner->preprocessor_indents.size > 0) {
                     array_pop(&scanner->preprocessor_indents);
                   }
+                  pop_preproc_kind(scanner);
                   lexer->mark_end(lexer);
                   lexer->result_symbol = PREPROC_END;
                   return true;
@@ -601,6 +776,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             advance(lexer);
             if (lexer->lookahead == 'e') {
               advance(lexer);
+              // The innermost open directive was consumed as trivia, so its
+              // `#else` branch is inactive: swallow everything through the
+              // matching `#endif` as a single extra token. Only the active
+              // (first) branch reaches the grammar, so a directive the
+              // grammar has no rule for can never split a construct in two.
+              if (top_preproc_is_stray(scanner) &&
+                  !valid_symbols[ERROR_SENTINEL] &&
+                  !is_word_char(lexer->lookahead)) {
+                pop_preproc_kind(scanner);
+                swallow_inactive_region(lexer);
+                lexer->mark_end(lexer);
+                lexer->result_symbol = PREPROC_INACTIVE;
+                return true;
+              }
               if (try_dedent_for_preproc(scanner, lexer)) {
                 return true;
               }
@@ -664,6 +853,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = DEDENT;
               return true;
             }
+            // Branch content starts with a token that can never begin an
+            // expression or declaration but *continues* the enclosing one
+            // (a fluent-chain '.', a closing bracket, a tuple ','): a
+            // structured branch could not parse it, so consume the directive
+            // line — including the newline and the content line's indent, so
+            // the content continues the previous expression exactly as if
+            // the directive were not there — as inactive trivia, and
+            // remember the stray open so `#else`/`#endif` are consumed
+            // textually too.
+            if (has_content && !valid_symbols[ERROR_SENTINEL] &&
+                (lexer->lookahead == '.' || lexer->lookahead == ')' ||
+                 lexer->lookahead == ']' || lexer->lookahead == '}' ||
+                 lexer->lookahead == ',')) {
+              push_preproc_kind(scanner, PREPROC_STRAY);
+              lexer->mark_end(lexer);
+              lexer->result_symbol = PREPROC_INACTIVE;
+              return true;
+            }
             // Branch content stays at block depth: treat the directive lines
             // as whitespace. The peek already consumed up to the content
             // char, so resume the whitespace loop from there.
@@ -676,18 +883,85 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
               skip(lexer);
             }
+          } else if (!valid_symbols[PREPROC_IF] &&
+                     !valid_symbols[ERROR_SENTINEL] &&
+                     !(scanner->indents.size > 0 && valid_symbols[DEDENT]) &&
+                     !is_word_char(lexer->lookahead)) {
+            // The grammar has no preproc rule at this position and no
+            // zero-width token (NEWLINE/INDENT/DEDENT) can change that:
+            // consume the directive line as inactive trivia and remember the
+            // stray open, so the matching `#else`/`#endif` are consumed
+            // textually too instead of reaching the grammar. Only the active
+            // (first) branch is parsed, so a directive the grammar cannot
+            // place never splits a construct in two. Previously this case
+            // emitted a token the parser could not shift, producing an ERROR.
+            push_preproc_kind(scanner, PREPROC_STRAY);
+            while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+              advance(lexer);
+            }
+            lexer->mark_end(lexer);
+            lexer->result_symbol = PREPROC_INACTIVE;
+            return true;
           } else {
             if (scanner->indents.size > 0) {
               if (valid_symbols[PREPROC_IF]) {
+                if (!valid_symbols[ERROR_SENTINEL] &&
+                    !is_word_char(lexer->lookahead)) {
+                  // The grammar can adopt the directive here, but peek the
+                  // first branch line: if it starts with a token that can
+                  // never begin an expression or declaration (a fluent-chain
+                  // '.', a match-arm '|', a closing bracket, a tuple ','),
+                  // the structured branch could not parse and would split
+                  // the surrounding construct. Consume the directive line as
+                  // inactive trivia instead: the branch content then parses
+                  // inline as part of the enclosing construct, and a later
+                  // stray `#else` swallows the alternative branch.
+                  while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                    advance(lexer);
+                  }
+                  lexer->mark_end(lexer);
+                  int32_t branch_start = 0;
+                  while (!lexer->eof(lexer)) {
+                    if (lexer->lookahead == '\n' || lexer->lookahead == '\r' ||
+                        lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                      advance(lexer);
+                    } else if (lexer->lookahead == '/') {
+                      advance(lexer);
+                      if (lexer->lookahead != '/') {
+                        branch_start = '/';
+                        break;
+                      }
+                      while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+                        advance(lexer);
+                      }
+                    } else {
+                      branch_start = lexer->lookahead;
+                      break;
+                    }
+                  }
+                  if (branch_start == '.' || branch_start == '|' ||
+                      branch_start == ')' || branch_start == ']' ||
+                      branch_start == '}' || branch_start == ',') {
+                    push_preproc_kind(scanner, PREPROC_STRAY);
+                    lexer->result_symbol = PREPROC_INACTIVE;
+                    return true;
+                  }
+                  // Branch content is expression-shaped: decline, so the
+                  // internal lexer adopts `#if` structurally. (The peek
+                  // advanced past mark_end only; declining returns it all.)
+                  return false;
+                }
                 uint16_t current_indent_length = peek_indent_length(scanner);
                 array_push(&scanner->preprocessor_indents,
                            current_indent_length);
+                push_preproc_kind(scanner, PREPROC_STRUCTURED);
               } else {
                 pop_indent(scanner);
                 lexer->result_symbol = DEDENT;
                 return true;
               }
             } else {
+              push_preproc_kind(scanner, PREPROC_STRUCTURED);
               lexer->mark_end(lexer);
               lexer->result_symbol = PREPROC_IF;
               return true;
@@ -940,6 +1214,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             lexer->result_symbol = DEDENT;
             return true;
           }
+        } else if (!is_word_char(lexer->lookahead)) {
+          // Handle 'and' followed by newline/EOF (not word char, not space).
+          // Mirror the space-branch: emit AND when valid; otherwise trigger
+          // a keyword-driven DEDENT to close intermediate scopes so the parser
+          // retries AND at the correct level on the next scan.
+          if (valid_symbols[AND]) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = AND;
+            return true;
+          } else if (valid_symbols[DEDENT]) {
+            pop_indent(scanner);
+            lexer->result_symbol = DEDENT;
+            return true;
+          }
         }
       }
     }
@@ -984,6 +1272,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               lexer->result_symbol = DEDENT;
               return true;
             }
+          } else if (valid_symbols[WITH] && !is_word_char(lexer->lookahead)) {
+            // Handle 'with' followed by newline/EOF (not word char, not space).
+            // Only emit WITH here. Unlike 'and', do NOT force a keyword-driven
+            // DEDENT when only DEDENT is valid: `with` on a new line inside a
+            // class body is a CONTINUATION of the enclosing type (starting a
+            // type_extension_elements), so closing the enclosing scope early
+            // would truncate the type definition. Let the natural indent
+            // tracking (line ~1050) emit any needed DEDENTs and NEWLINE.
+            lexer->mark_end(lexer);
+            lexer->result_symbol = WITH;
+            return true;
           }
         }
       }
@@ -1203,7 +1502,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
-      !found_same_line_pipe_infix) {
+      !found_same_line_pipe_infix &&
+      // A block comment trailing the current line must not anchor the new
+      // block: without this, `let f x = (* c *)` + an indented body pushes
+      // the comment's column, and the body line immediately DEDENTs it back
+      // out. Decline instead; after the comment is consumed as an extra, the
+      // re-scan crosses the newline and INDENT anchors to the body line.
+      !(found_comment_start && !found_end_of_line)) {
     push_indent(scanner, indent_length, INDENT_NORMAL);
     lexer->result_symbol = INDENT;
     return true;
@@ -1359,6 +1664,19 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)*array_get(&scanner->indent_kinds, i);
   }
 
+  size_t preproc_kind_count = scanner->preproc_kinds.size;
+  if (preproc_kind_count > UINT8_MAX) {
+    preproc_kind_count = UINT8_MAX;
+  }
+  if (size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+    buffer[size++] = (char)preproc_kind_count;
+  }
+  for (size_t i = 0; i < preproc_kind_count &&
+                     size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
+       i++) {
+    buffer[size++] = (char)*array_get(&scanner->preproc_kinds, i);
+  }
+
   return size;
 }
 
@@ -1369,6 +1687,7 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_push(&scanner->indent_kinds, (uint8_t)INDENT_NORMAL);
 
   array_delete(&scanner->preprocessor_indents);
+  array_delete(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
   if (length > 0) {
     size_t size = 0;
@@ -1396,6 +1715,14 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       uint8_t kind = (size < length) ? (uint8_t)buffer[size++] : (uint8_t)INDENT_NORMAL;
       array_push(&scanner->indent_kinds, kind);
     }
+
+    if (size >= length) return;
+    size_t preproc_kind_count = (uint8_t)buffer[size++];
+    size_t preproc_kind_end = size + preproc_kind_count;
+    if (preproc_kind_end > length) preproc_kind_end = length;
+    for (; size < preproc_kind_end; size++) {
+      array_push(&scanner->preproc_kinds, (unsigned char)buffer[size]);
+    }
   }
 }
 
@@ -1404,6 +1731,7 @@ static Scanner *create() {
   array_init(&scanner->indents);
   array_init(&scanner->indent_kinds);
   array_init(&scanner->preprocessor_indents);
+  array_init(&scanner->preproc_kinds);
   deserialize(scanner, NULL, 0);
   return scanner;
 }
@@ -1412,6 +1740,7 @@ static void destroy(Scanner *scanner) {
   array_delete(&scanner->indents);
   array_delete(&scanner->indent_kinds);
   array_delete(&scanner->preprocessor_indents);
+  array_delete(&scanner->preproc_kinds);
   ts_free(scanner);
 }
 
