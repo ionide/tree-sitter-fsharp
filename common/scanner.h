@@ -41,6 +41,7 @@ enum TokenType {
   TYPE_DECL_NEWLINE,
   IN,
   DO_KEYWORD,
+  TRY_INDENT,
   PREPROC_INACTIVE,
   ERROR_SENTINEL
 };
@@ -49,6 +50,10 @@ typedef enum {
   INDENT_NORMAL = 0,
   INDENT_PAREN = 1,
   INDENT_TYPE_APP = 2,
+  // Body of a `try` expression. Behaves like a normal indent for all dedent
+  // logic, but can be force-closed when its terminating `with`/`finally` sits
+  // at the same column as the body (where an ordinary dedent would not fire).
+  INDENT_TRY = 3,
 } IndentKind;
 
 // How an open `#if` directive entered the parse. STRUCTURED directives were
@@ -177,11 +182,16 @@ static inline IndentKind peek_indent_kind(Scanner *scanner) {
 }
 
 static inline bool peek_is_paren_indent(Scanner *scanner) {
-  return peek_indent_kind(scanner) != INDENT_NORMAL;
+  IndentKind kind = peek_indent_kind(scanner);
+  return kind == INDENT_PAREN || kind == INDENT_TYPE_APP;
 }
 
 static inline bool peek_is_type_app_indent(Scanner *scanner) {
   return peek_indent_kind(scanner) == INDENT_TYPE_APP;
+}
+
+static inline bool peek_is_try_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) == INDENT_TRY;
 }
 
 // Peek forward from after a '<' to its matching '>' and check that the content
@@ -1244,6 +1254,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         if (lexer->lookahead == 'h') {
           advance(lexer);
           if (!is_word_char(lexer->lookahead)) {
+            // Force-close a try-body scope whose terminating 'with' begins a
+            // new line at the same column as the body, so an ordinary dedent
+            // won't fire. This must take priority over the same-indent NEWLINE
+            // heuristic below: unlike a class/record body, a try body has no
+            // 'with' augmentation of its own, so the 'with' must close it.
+            if (valid_symbols[DEDENT] && !valid_symbols[WITH] &&
+                peek_is_try_indent(scanner)) {
+              pop_indent(scanner);
+              lexer->result_symbol = DEDENT;
+              return true;
+            }
             // If 'with' sits at the same indent as the current scope and the
             // grammar isn't yet expecting WITH, emit NEWLINE first so the
             // preceding statement closes before the augmentation opens.
@@ -1480,6 +1501,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       lexer->result_symbol = NEWLINE;
       return true;
     }
+  }
+
+  if (valid_symbols[TRY_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end && !found_preprocessor_end &&
+      !found_same_line_pipe_infix) {
+    // Like INDENT, but the scope is tagged so it can be force-closed when its
+    // terminating `with`/`finally` sits at the same column as the body.
+    push_indent(scanner, indent_length, INDENT_TRY);
+    lexer->result_symbol = TRY_INDENT;
+    return true;
   }
 
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&

@@ -2360,6 +2360,31 @@
                     {
                       "type": "SYMBOL",
                       "name": "with_field_expression"
+                    },
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "class_inherits_decl"
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_newline"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "field_initializers"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -2908,8 +2933,21 @@
             "value": "try"
           },
           {
-            "type": "SYMBOL",
-            "name": "_expression_block"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_try_indent"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_dedent"
+              }
+            ]
           },
           {
             "type": "CHOICE",
@@ -7713,6 +7751,18 @@
                     "value": "val"
                   },
                   {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "access_modifier"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
                     "type": "SYMBOL",
                     "name": "property_or_ident"
                   },
@@ -11264,6 +11314,10 @@
     {
       "type": "SYMBOL",
       "name": "_do_keyword"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_try_indent"
     },
     {
       "type": "SYMBOL",

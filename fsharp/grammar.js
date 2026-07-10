@@ -99,6 +99,7 @@ module.exports = grammar({
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
     $._do_keyword, // external 'do' terminating a while/for header; distinct from do_expression's 'do' so `while a && b do` reduces the condition instead of shifting 'do' as an application argument
+    $._try_indent, // like _indent, but opens a try-body scope that can be force-closed when its 'with'/'finally' sits at the same column as the body
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
@@ -647,6 +648,7 @@ module.exports = grammar({
               $.field_initializers,
               $.object_expression,
               $.with_field_expression,
+              seq($.class_inherits_decl, optional($._newline), $.field_initializers),
             ),
             $._indent,
             $._dedent,
@@ -775,7 +777,7 @@ module.exports = grammar({
         PREC.MATCH_EXPR,
         seq(
           "try",
-          $._expression_block,
+          seq($._try_indent, $._expression, $._dedent),
           optional($._newline),
           choice(seq("with", $.rules), seq("finally", $._expression_block)),
         ),
@@ -1820,7 +1822,7 @@ module.exports = grammar({
               optional($.access_modifier),
               $.member_signature,
             ),
-            seq("member", "val", $.property_or_ident, $._val_property_defn),
+            seq("member", "val", optional($.access_modifier), $.property_or_ident, $._val_property_defn),
             seq("override", optional($.access_modifier), $.method_or_prop_defn),
             seq("default", optional($.access_modifier), $.method_or_prop_defn),
             seq(

@@ -864,6 +864,10 @@
         "required": true,
         "types": [
           {
+            "type": "class_inherits_decl",
+            "named": true
+          },
+          {
             "type": "field_initializers",
             "named": true
           },

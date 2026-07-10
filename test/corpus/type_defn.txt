@@ -2760,7 +2760,7 @@ type T = U
     (union_type_defn
       (type_name
         (identifier))
-       (union_type_cases
+      (union_type_cases
         (union_type_case
           (identifier))))))
 
@@ -3681,7 +3681,6 @@ module M =
               (long_identifier
                 (identifier)))))))))
 
-
 ================================================================================
 exception defn with members
 ================================================================================
@@ -3804,3 +3803,197 @@ let f (x: float[,]) : float[,,,] =
                   (identifier)))))))
       (long_identifier_or_op
         (identifier)))))
+
+================================================================================
+Try inside a DU augmentation
+================================================================================
+
+module M =
+    type Mode =
+        | Average
+        | Sum
+
+        with
+        member x.Make () =
+            try
+            match x with
+            | Average -> 1.0
+            | Sum -> 2.0
+            with
+            | :? System.Exception -> failwith "bad"
+
+    type AfterMode = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (union_type_defn
+        (type_name
+          (identifier))
+        (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)))
+        (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              (property_or_ident
+                (identifier)
+                (identifier))
+              (const
+                (unit))
+              (try_expression
+                (match_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (rules
+                    (rule
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier)))
+                      (const
+                        (float)))
+                    (rule
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier)))
+                      (const
+                        (float)))))
+                (rules
+                  (rule
+                    (type_check_pattern
+                      (atomic_type
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (const
+                        (string)))))))))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Accessibility on an auto-property
+================================================================================
+
+type Bench() =
+    member val public instructionSEt : int = 0 with get, set
+    member val public m = 0 with get, set
+
+type AfterBench = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (type_extension_elements
+        (member_defn
+          (access_modifier)
+          (property_or_ident
+            (identifier))
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (const
+            (int))))
+      (type_extension_elements
+        (member_defn
+          (access_modifier)
+          (property_or_ident
+            (identifier))
+          (const
+            (int))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+Inherit in constructor initialisor
+================================================================================
+
+type Conn =
+    inherit BaseType
+
+    val fs : int
+
+    new (fs) =
+        {
+            inherit BaseType()
+            fs = fs
+        }
+
+
+type AfterConn = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (class_inherits_decl
+        (simple_type
+          (long_identifier
+            (identifier))))
+      (type_extension_elements
+        (member_defn
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (additional_constr_defn
+            (paren_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (brace_expression
+              (class_inherits_decl
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (const
+                  (unit)))
+              (field_initializers
+                (field_initializer
+                  (long_identifier
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier))))))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
