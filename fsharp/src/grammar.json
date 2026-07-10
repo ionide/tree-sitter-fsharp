@@ -19,8 +19,17 @@
           "content": {
             "type": "REPEAT",
             "content": {
-              "type": "SYMBOL",
-              "name": "_module_elem"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_module_elem"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_elem_separator"
+                }
+              ]
             }
           }
         },
@@ -37,6 +46,18 @@
     "namespace": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_elem_separator"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
         {
           "type": "STRING",
           "value": "namespace"
@@ -78,8 +99,17 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_module_elem"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_module_elem"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_elem_separator"
+              }
+            ]
           }
         }
       ]
@@ -87,6 +117,18 @@
     "named_module": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_elem_separator"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
         {
           "type": "CHOICE",
           "members": [
@@ -138,8 +180,17 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_module_elem"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_module_elem"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_elem_separator"
+              }
+            ]
           }
         }
       ]
@@ -11171,6 +11222,13 @@
     [
       "_type",
       "_curried_return_type"
+    ],
+    [
+      "file",
+      "named_module"
+    ],
+    [
+      "namespace"
     ]
   ],
   "precedences": [],
@@ -11322,6 +11380,10 @@
     {
       "type": "SYMBOL",
       "name": "preproc_inactive"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_elem_separator"
     },
     {
       "type": "SYMBOL",

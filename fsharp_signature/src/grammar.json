@@ -11254,6 +11254,10 @@
     },
     {
       "type": "SYMBOL",
+      "name": "_elem_separator"
+    },
+    {
+      "type": "SYMBOL",
       "name": "_error_sentinel"
     }
   ],

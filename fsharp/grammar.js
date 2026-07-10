@@ -101,6 +101,7 @@ module.exports = grammar({
     $._do_keyword, // external 'do' terminating a while/for header; distinct from do_expression's 'do' so `while a && b do` reduces the condition instead of shifting 'do' as an application argument
     $._try_indent, // like _indent, but opens a try-body scope that can be force-closed when its 'with'/'finally' sits at the same column as the body
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
+    $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -117,6 +118,14 @@ module.exports = grammar({
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
+    // A leading _elem_separator (fired after a file-opening extra such as a
+    // doc comment) could belong to the plain module-elements repeat or open
+    // named_module/namespace; both must stay alive until the header keyword
+    // and the presence/absence of '=' decide.
+    [$.file, $.named_module],
+    // Singleton: a separator after a namespace body could continue that
+    // namespace's element repeat or lead the next namespace in the file.
+    [$.namespace],
   ],
 
   word: ($) => $.identifier,
@@ -142,27 +151,54 @@ module.exports = grammar({
     //
     // Top-level rules (BEGIN)
     //
+    // Top-level elements are separated by an optional _elem_separator: the
+    // scanner emits one at a column-0 line while only the base indent level
+    // is open, which stops an application expression from absorbing the
+    // next element (e.g. `f 1` followed by `let g x = ...` parsing as a
+    // let-in argument of `f`). A dedicated token — reusing _newline here
+    // would also fire at before-element newline positions inside preproc
+    // branches and derail those parses. Both arms of the choice must stay
+    // bare: wrapping either in a seq (seq(elem, optional(sep)) or
+    // seq(sep, elem) were both tried) changes static conflict resolution
+    // and kills the GLR fork that continues a column-0 union case after a
+    // trailing line comment. Because the separator therefore sits in a
+    // plain repeat — where the parser would shift a zero-width token
+    // forever, allocating without bound — the scanner-side token consumes
+    // the newline it fires on, so each emission makes progress and cannot
+    // repeat at the same position.
     file: ($) =>
-      choice(repeat1($.namespace), prec(-1, repeat($._module_elem)), prec(1, $.named_module)),
+      choice(
+        repeat1($.namespace),
+        prec(-1, repeat(choice($._module_elem, $._elem_separator))),
+        prec(1, $.named_module),
+      ),
 
+    // The optional leading _elem_separator matters when the file opens with
+    // an extra (e.g. a doc comment) before the header keyword: the scanner
+    // fires the separator after the extra's newline, and if only the plain
+    // module-elements arm of `file` could shift it, doing so would commit
+    // the parse away from namespace/named_module before the keyword is even
+    // seen (`module M` then mis-parses as a module_defn missing its `=`).
     namespace: ($) =>
       seq(
+        optional($._elem_separator),
         "namespace",
         choice(
           "global",
           field("name", seq(optional("rec"), $.long_identifier)),
         ),
-        repeat($._module_elem),
+        repeat(choice($._module_elem, $._elem_separator)),
       ),
 
     named_module: ($) =>
       seq(
+        optional($._elem_separator),
         optional($.attributes),
         "module",
         optional($.access_modifier),
         optional("rec"),
         field("name", $.long_identifier),
-        repeat($._module_elem),
+        repeat(choice($._module_elem, $._elem_separator)),
       ),
 
     _preproc_toplevel_module: ($) =>
