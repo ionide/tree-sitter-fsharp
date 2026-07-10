@@ -4615,15 +4615,15 @@ let x =
                 (identifier))
               (long_identifier_or_op
                 (identifier)))
+            (application_expression
               (application_expression
-                (application_expression
-                  (long_identifier_or_op
-                    (identifier))
-                  (long_identifier_or_op
-                    (identifier)))
-                (list_expression
-                  (long_identifier_or_op
-                    (identifier))))))))))
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (list_expression
+                (long_identifier_or_op
+                  (identifier))))))))))
 
 ================================================================================
 let then short for expression in computation expression
@@ -4825,7 +4825,7 @@ let f (x: struct (int * int)) = x
                   (simple_type
                     (long_identifier
                       (identifier)))
-                   (simple_type
+                  (simple_type
                     (long_identifier
                       (identifier)))))))))
       (long_identifier_or_op
@@ -5379,3 +5379,318 @@ let confidenceLimited =
               (simple_type
                 (long_identifier
                   (identifier))))))))))
+
+================================================================================
+Measure division abbreviation
+================================================================================
+
+module M =
+    [<Measure>] type Dollars
+    [<Measure>] type TradeableUnit
+
+    [<Measure>]
+    type DollarPrice = Dollars / TradeableUnit
+
+    type AfterMeasure = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_declaration
+        (type_name
+          (identifier))))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_declaration
+        (type_name
+          (identifier))))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_abbrev_defn
+        (type_name
+          (identifier))
+        (measure
+          (measure_quotient
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Measure inside a generic
+================================================================================
+
+module M = 
+    type Row =
+        {
+            NumOrders : Prov<float<1>>
+            NumFills : float<1>
+        }
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (generic_type
+                    (long_identifier
+                      (identifier))
+                    (type_attributes
+                      (type_attribute
+                        (measure
+                          (measure_atom)))))))))
+          (record_field
+            (identifier)
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (measure
+                    (measure_atom)))))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+postfix type in a record field
+================================================================================
+
+type FillLog = {
+    trade : int
+    orderId : int WWFun
+    size : float }
+
+type AfterFill = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+DU case with named fields + generic param
+================================================================================
+
+type 'predId Constraint when 'predId : comparison = 
+    | SingleEqualityConstraint of predId : 'predId * RightHandSide : double
+    | AlphaEqualTo of RightHandSide : double
+
+type AfterConstraint = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (type_argument
+          (identifier))
+        (identifier)
+        (type_argument_constraints
+          (constraint
+            (type_argument
+              (identifier)))))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (type_argument
+                (identifier)))
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+Tuple type abbreviation with generic args
+================================================================================
+
+module M = 
+    type TOLQueue<'a> = TimedQueue.TimedQueue<'a> * UpdatingTimeStamp
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (type_abbrev_defn
+        (type_name
+          (long_identifier
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))))
+        (compound_type
+          (generic_type
+            (long_identifier
+              (identifier)
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (type_argument
+                  (identifier)))))
+          (simple_type
+            (long_identifier
+              (identifier))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+Tuple type abbreviation with no generics
+================================================================================
+
+module M = 
+    type CombinedEdit = Option<SensitivityFeatureEdit> * Option<SensitivityParameterEdit>
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (type_abbrev_defn
+        (type_name
+          (identifier))
+        (compound_type
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))))
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))

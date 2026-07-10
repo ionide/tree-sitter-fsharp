@@ -340,7 +340,15 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
            lexer->lookahead == '>';
   case 'o':
     skip(lexer);
-    return lexer->lookahead == 'r';
+    if (lexer->lookahead != 'r') {
+      return false;
+    }
+    skip(lexer);
+    // Only the standalone `or` operator counts; identifiers that merely start
+    // with "or" (e.g. `orderId`) must not be treated as an infix op, otherwise
+    // the newline before them is suppressed and they get glued to the previous
+    // token (e.g. a record field type).
+    return !is_word_char(lexer->lookahead);
   case '@':
   case '$':
     skip(lexer);
@@ -651,6 +659,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       return true;
     }
     if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+      // Emit a zero-width token: fix the token end at the newline so the newline
+      // itself is NOT consumed. This matters inside module bodies, where the
+      // newline is the separator between elements; if TYPE_DECL_NEWLINE ate it,
+      // the module would close after a single bare type declaration.
+      lexer->mark_end(lexer);
       // Peek ahead: skip newlines/whitespace to find indentation of next content.
       // If next content is NOT more indented than current scope, this is a bare
       // type declaration (e.g. [<Measure>] type Dollars).

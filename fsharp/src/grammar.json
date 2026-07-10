@@ -4674,6 +4674,15 @@
               "value": ")"
             }
           ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "1"
+          },
+          "named": true,
+          "value": "measure_atom"
         }
       ]
     },
@@ -5202,6 +5211,48 @@
           {
             "type": "SYMBOL",
             "name": "_type"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_dedent"
+          }
+        ]
+      }
+    },
+    "_multiline_generic_compound_type": {
+      "type": "PREC_RIGHT",
+      "value": 6,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_multiline_generic_type_head"
+            },
+            "named": true,
+            "value": "generic_type"
+          },
+          {
+            "type": "REPEAT1",
+            "content": {
+              "type": "PREC_RIGHT",
+              "value": 0,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "*"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_type"
+                  }
+                ]
+              }
+            }
           },
           {
             "type": "SYMBOL",
@@ -6328,6 +6379,18 @@
                 ]
               }
             ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "type_argument_constraints"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }
@@ -6463,6 +6526,15 @@
                     },
                     "named": true,
                     "value": "function_type"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_multiline_generic_compound_type"
+                    },
+                    "named": true,
+                    "value": "compound_type"
                   },
                   {
                     "type": "SYMBOL",
