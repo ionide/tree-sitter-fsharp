@@ -777,8 +777,6 @@ module.exports = grammar({
         PREC.MATCH_EXPR,
         seq(
           "try",
-          // The body opens a dedicated try-scope so the closing 'with'/'finally'
-          // can force it shut even when it sits at the same column as the body.
           seq($._try_indent, $._expression, $._dedent),
           optional($._newline),
           choice(seq("with", $.rules), seq("finally", $._expression_block)),
