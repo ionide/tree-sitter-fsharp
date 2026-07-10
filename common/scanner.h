@@ -43,6 +43,7 @@ enum TokenType {
   DO_KEYWORD,
   TRY_INDENT,
   PREPROC_INACTIVE,
+  ELEM_SEP,
   ERROR_SENTINEL
 };
 
@@ -710,7 +711,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool found_bracket_end = false;
   bool found_preprocessor_end = false;
   bool found_preproc_if = false;
+  bool found_preproc_else = false;
   bool found_comment_start = false;
+  bool advanced_in_ws_walk = false;
   uint32_t indent_length = lexer->get_column(lexer);
 
   for (;;) {
@@ -734,7 +737,14 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     } else if (lexer->lookahead == '/') {
       skip(lexer);
       if (!valid_symbols[INSIDE_STRING] && lexer->lookahead == '/') {
-        if (!found_preproc_if) {
+        // Once the loop has scanned past a directive (`#endif`/`#else` that
+        // couldn't be emitted yet, or a `#if` line), declining on a trailing
+        // line comment would leave the directive — not the comment — as the
+        // next text for the internal lexer, which cannot lex it (ERROR).
+        // Skip the comment like whitespace instead, exactly as if the line
+        // were blank, so the pending NEWLINE/DEDENT decision proceeds.
+        if (!found_preproc_if && !found_preprocessor_end &&
+            !found_preproc_else) {
           return false;
         }
         while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
@@ -744,6 +754,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         return false;
       }
     } else if (lexer->lookahead == '#') {
+      advanced_in_ws_walk = true;
       advance(lexer);
       if (lexer->lookahead == 'e') {
         advance(lexer);
@@ -811,6 +822,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                 lexer->result_symbol = PREPROC_ELSE;
                 return true;
               }
+              // Not emittable yet (an enclosing rule must close first):
+              // remember we scanned past it so a trailing line comment
+              // doesn't make the scanner decline (see the '/' case above).
+              found_preproc_else = true;
             }
           }
         }
@@ -1012,6 +1027,44 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     } else {
       break;
     }
+  }
+
+  // Top-level module-element separator, phase 1 of 2 (arm): a next line at
+  // column 0 while only the base indent level is open separates module
+  // elements, so an application expression cannot absorb the next element
+  // (`f 1` followed by `let g ...` otherwise parses `let` as a let-in
+  // argument with a MISSING body). Arming must happen here — at the end of
+  // the whitespace walk, before any probe below moves the lexer — because
+  // the token must CONSUME the walked newline: mark_end lands past it, so
+  // an emission always makes progress. That is load-bearing: ELEM_SEP sits
+  // in a repeat position, and a zero-width token emitted before the newline
+  // can be shifted again at the same position forever, allocating without
+  // bound. The EMISSION happens at phase 2, after the keyword probes, so
+  // `and`/`then`/... keep their priority over the separator — a probe that
+  // fires sets its own mark_end, and a probe that declines only advanced
+  // past this mark (rolled back on emission). The next-line check is a
+  // single-lookahead whitelist: only lines that begin like a fresh
+  // declaration or expression (word char, '[' for attributes or lists,
+  // '"') arm; anything else — a '|' union case or match arm, an infix or
+  // fluent continuation, a closing bracket, a comment, a directive — takes
+  // the normal paths. A blocked separator merely reverts that line pair to
+  // the old absorbed-application parse; a wrong separator would split a
+  // valid construct, so the whitelist errs toward blocking. Never at EOF
+  // (nothing to separate), never after in-walk advances (the consumed span
+  // must be pure walked whitespace), never during error recovery (recovery
+  // marks every symbol valid regardless of grammar position). Accepted
+  // side effect of arming: a zero-width token emitted below in an armed
+  // scan (e.g. INDENT) carries this mark_end too and consumes the newline
+  // as padding — same parse, slightly shifted extents.
+  bool elem_sep_armed = false;
+  if (valid_symbols[ELEM_SEP] && !valid_symbols[ERROR_SENTINEL] &&
+      found_end_of_line && indent_length == 0 && !lexer->eof(lexer) &&
+      scanner->indents.size == 1 && !advanced_in_ws_walk &&
+      !found_preprocessor_end && !found_preproc_if && !found_preproc_else &&
+      (is_word_char(lexer->lookahead) || lexer->lookahead == '[' ||
+       lexer->lookahead == '"')) {
+    elem_sep_armed = true;
+    lexer->mark_end(lexer);
   }
 
   // Handle @> and @@> as external tokens to prevent them from being
@@ -1576,6 +1629,18 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           lexer->result_symbol = NEWLINE;
           return true;
         }
+      }
+
+      // Top-level module-element separator, phase 2 of 2 (emit). All
+      // eligibility checks — and the mark_end that makes the token consume
+      // the walked newline — happened at the arming site right after the
+      // whitespace walk; see the comment there. Emitting this late keeps
+      // the keyword probes' priority (an `and` continuation line must
+      // produce AND, not a separator), and any lookahead they consumed past
+      // the armed mark_end is returned to the input here.
+      if (elem_sep_armed) {
+        lexer->result_symbol = ELEM_SEP;
+        return true;
       }
 
       bool can_dedent_preproc;
