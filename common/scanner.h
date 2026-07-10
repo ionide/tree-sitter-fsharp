@@ -1759,13 +1759,16 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 }
 
 static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
-  array_delete(&scanner->indents);
+  // array_clear keeps the allocated capacity; deserialize runs on every
+  // scanner-state restore (constantly, under GLR), and array_delete here
+  // would free + re-malloc all four buffers each time.
+  array_clear(&scanner->indents);
   array_push(&scanner->indents, 0);
-  array_delete(&scanner->indent_kinds);
+  array_clear(&scanner->indent_kinds);
   array_push(&scanner->indent_kinds, (uint8_t)INDENT_NORMAL);
 
-  array_delete(&scanner->preprocessor_indents);
-  array_delete(&scanner->preproc_kinds);
+  array_clear(&scanner->preprocessor_indents);
+  array_clear(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
   if (length > 0) {
     size_t size = 0;
