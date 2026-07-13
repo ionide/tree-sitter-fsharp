@@ -2364,6 +2364,11 @@ module.exports = grammar({
         choice(
           /\/\/([^/\n\r][^\n\r]*)?/,
           /\/{4,}[^\n\r]*/,
+          // Shebang line for .fsx scripts (e.g. #!/usr/bin/env dotnet fsi).
+          // F# has no #-comment syntax; fsi simply skips this line, so we lex
+          // it as trivia. Widening this token costs ~0 table size (unlike a
+          // compiler_directive_decl production).
+          /#![^\n\r]*/,
         ),
       ),
     xml_doc: (_) => token(/\/\/\/([^/\n\r][^\n\r]*)?/),
