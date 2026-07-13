@@ -698,11 +698,11 @@ module.exports = grammar({
         PREC.PAREN_EXPR,
         seq(
           "{|",
-          scoped(
+          optional(scoped(
             choice($.field_initializers, $.with_field_expression),
             $._indent,
             $._dedent,
-          ),
+          )),
           "|}",
         ),
       ),
@@ -883,7 +883,7 @@ module.exports = grammar({
     declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
+          seq(choice("use", "use!"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -1064,7 +1064,7 @@ module.exports = grammar({
     comp_declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, "=", $._expression_block_for_let),
+          seq(choice("use", "use!"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -1391,7 +1391,7 @@ module.exports = grammar({
       choice($.static_parameter_value, $.named_static_parameter),
 
     named_static_parameter: ($) =>
-      prec(3, seq($.identifier, "=", $.static_parameter_value)),
+      prec(3, seq($.identifier, "=", choice($.static_parameter_value, $.long_identifier))),
 
     type_attribute: ($) =>
       choice(
@@ -2094,11 +2094,14 @@ module.exports = grammar({
         $._hexgraph_short,
       ),
 
-    // note: \n is allowed in strings
+    // note: \n, \r and \t are all allowed in strings.
+    // \r must be permitted so multi-line string literals survive CRLF
+    // endings (the \r of a \r\n break sits inside the string
+    // body); \t so a literal tab in a string is not a terminator.
     _simple_string_char: ($) =>
       choice(
         $._inside_string_marker,
-        token.immediate(prec(1, /[^\t\r\u0008\a\f\v\\"]/)),
+        token.immediate(prec(1, /[^\u0008\a\f\v\\"]/)),
       ),
 
     _string_char: ($) =>
