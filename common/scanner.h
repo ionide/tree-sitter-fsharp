@@ -702,6 +702,37 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  // Block-comment content must be handled before the whitespace/offside walk
+  // below. It is only ever valid immediately after a '(*' opener, so nothing
+  // else needs scanning here; running the ws-walk instead lets a '#' that is
+  // the first non-space char of the comment (e.g. a Markdown '(* # Heading')
+  // be mis-read as a preprocessor directive, breaking the comment.
+  if (valid_symbols[BLOCK_COMMENT_CONTENT] && !valid_symbols[ERROR_SENTINEL]) {
+    lexer->mark_end(lexer);
+    while (true) {
+      if (lexer->lookahead == '\0') {
+        break;
+      }
+      if (lexer->lookahead != '(' && lexer->lookahead != '*') {
+        advance(lexer);
+      } else if (lexer->lookahead == '*') {
+        lexer->mark_end(lexer);
+        advance(lexer);
+        if (lexer->lookahead == ')') {
+          break;
+        }
+      } else if (scan_block_comment(lexer)) {
+        lexer->mark_end(lexer);
+        advance(lexer);
+        if (lexer->lookahead == '*') {
+          break;
+        }
+      }
+    }
+    lexer->result_symbol = BLOCK_COMMENT_CONTENT;
+    return true;
+  }
+
   lexer->mark_end(lexer);
 
   bool found_end_of_line = false;
@@ -1675,32 +1706,6 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         return true;
       }
     }
-  }
-
-  if (valid_symbols[BLOCK_COMMENT_CONTENT] && !valid_symbols[ERROR_SENTINEL]) {
-    lexer->mark_end(lexer);
-    while (true) {
-      if (lexer->lookahead == '\0') {
-        break;
-      }
-      if (lexer->lookahead != '(' && lexer->lookahead != '*') {
-        advance(lexer);
-      } else if (lexer->lookahead == '*') {
-        lexer->mark_end(lexer);
-        advance(lexer);
-        if (lexer->lookahead == ')') {
-          break;
-        }
-      } else if (scan_block_comment(lexer)) {
-        lexer->mark_end(lexer);
-        advance(lexer);
-        if (lexer->lookahead == '*') {
-          break;
-        }
-      }
-    }
-    lexer->result_symbol = BLOCK_COMMENT_CONTENT;
-    return true;
   }
 
   return false;

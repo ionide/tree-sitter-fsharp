@@ -60,6 +60,27 @@ let x = 1
         (int)))))
 
 ================================================================================
+block comment with leading hash (markdown heading)
+================================================================================
+
+(* # Heading *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
 multi-line block comment
 ================================================================================
 

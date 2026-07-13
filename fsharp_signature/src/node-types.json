@@ -3793,6 +3793,10 @@
           "named": true
         },
         {
+          "type": "long_identifier",
+          "named": true
+        },
+        {
           "type": "static_parameter_value",
           "named": true
         }
