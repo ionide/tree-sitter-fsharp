@@ -2464,34 +2464,42 @@
             "value": "{|"
           },
           {
-            "type": "FIELD",
-            "name": "block",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_indent"
-                },
-                {
-                  "type": "CHOICE",
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "block",
+                "content": {
+                  "type": "SEQ",
                   "members": [
                     {
                       "type": "SYMBOL",
-                      "name": "field_initializers"
+                      "name": "_indent"
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "field_initializers"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "with_field_expression"
+                        }
+                      ]
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "with_field_expression"
+                      "name": "_dedent"
                     }
                   ]
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_dedent"
                 }
-              ]
-            }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           },
           {
             "type": "STRING",
@@ -3336,6 +3344,27 @@
                   "name": "identifier"
                 },
                 {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "STRING",
+                          "value": ":"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_type"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
                   "type": "STRING",
                   "value": "="
                 },
@@ -4173,6 +4202,27 @@
                 {
                   "type": "SYMBOL",
                   "name": "identifier"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "STRING",
+                          "value": ":"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_type"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
                 },
                 {
                   "type": "STRING",
@@ -5103,8 +5153,17 @@
             "value": "="
           },
           {
-            "type": "SYMBOL",
-            "name": "static_parameter_value"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "static_parameter_value"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "long_identifier"
+              }
+            ]
           }
         ]
       }
@@ -8776,7 +8835,7 @@
             "value": 1,
             "content": {
               "type": "PATTERN",
-              "value": "[^\\t\\r\\u0008\\a\\f\\v\\\\\"]"
+              "value": "[^\\u0008\\a\\f\\v\\\\\"]"
             }
           }
         }

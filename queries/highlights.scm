@@ -97,14 +97,21 @@
   (_pattern) @variable.parameter
   (_type) @type)
 
+;; A member name has two mutually-exclusive shapes, matched separately so the
+;; highlight is deterministic regardless of tree-sitter's alternation-match order
+;; (0.26.11 changed which branch of an overlapping `[...]` wins for a node that
+;; matched both). Bare `member M(x)` -> M is the method; instance `member this.M`
+;; -> `this` is the self parameter, M the method.
 (member_defn
   (method_or_prop_defn
-    [
-      (property_or_ident) @function
-      (property_or_ident
-        instance: (identifier) @variable.parameter.builtin
-        method: (identifier) @function.method)
-    ]
+    (property_or_ident . (identifier) @function .)
+    args: (_)* @variable.parameter))
+
+(member_defn
+  (method_or_prop_defn
+    (property_or_ident
+      instance: (identifier) @variable.parameter.builtin
+      method: (identifier) @function.method)
     args: (_)* @variable.parameter))
 
 
