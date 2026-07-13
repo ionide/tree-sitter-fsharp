@@ -451,7 +451,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "field_initializers",
@@ -1298,6 +1298,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "_type",
           "named": true
         },
         {
@@ -3012,6 +3016,10 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "long_identifier",
           "named": true
         },
         {
