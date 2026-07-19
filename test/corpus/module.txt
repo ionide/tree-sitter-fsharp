@@ -411,3 +411,48 @@ module M =
               (identifier))))
         (const
           (int))))))
+
+================================================================================
+dedent from nested module back to outer module
+:skip
+================================================================================
+
+module M =
+
+    module Inner =
+         let a = ()
+         let b = ()
+
+        let c = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (module_defn
+      (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (unit))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (unit)))))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (unit))))))
