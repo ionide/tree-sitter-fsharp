@@ -288,6 +288,10 @@
         "named": true
       },
       {
+        "type": "byref_type",
+        "named": true
+      },
+      {
         "type": "compound_type",
         "named": true
       },
@@ -884,6 +888,21 @@
     }
   },
   {
+    "type": "byref_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "byte",
     "named": true,
     "fields": {},
@@ -987,7 +1006,7 @@
     "extra": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {

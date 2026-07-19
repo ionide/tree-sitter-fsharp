@@ -4516,6 +4516,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "byref_type"
+          },
+          {
+            "type": "SYMBOL",
             "name": "static_type"
           },
           {
@@ -4954,13 +4958,33 @@
             "type": "TOKEN",
             "content": {
               "type": "PATTERN",
-              "value": "\\[,*\\]"
+              "value": "\\[[ \\t]*(,[ \\t]*)*\\]"
             }
           },
           "named": false,
           "value": "[]"
         }
       ]
+    },
+    "byref_type": {
+      "type": "PREC_LEFT",
+      "value": 4,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_type"
+          },
+          {
+            "type": "IMMEDIATE_TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "&"
+            }
+          }
+        ]
+      }
     },
     "static_type": {
       "type": "PREC",
@@ -9320,8 +9344,8 @@
         "type": "PREC",
         "value": 100000,
         "content": {
-          "type": "STRING",
-          "value": "()"
+          "type": "PATTERN",
+          "value": "\\([ \\t]*\\)"
         }
       }
     },
@@ -9441,7 +9465,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "``([^`\\n\\r\\t])+``"
+            "value": "``([^`\\n\\r\\t]|`[^`\\n\\r\\t])+``"
           }
         ]
       }
@@ -10300,22 +10324,25 @@
                 "value": "#nowarn"
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_string_literal"
+                "type": "REPEAT1",
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_string_literal"
+                      },
+                      "named": true,
+                      "value": "string"
                     },
-                    "named": true,
-                    "value": "string"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "int"
-                  }
-                ]
+                    {
+                      "type": "SYMBOL",
+                      "name": "int"
+                    }
+                  ]
+                }
               },
               {
                 "type": "SYMBOL",

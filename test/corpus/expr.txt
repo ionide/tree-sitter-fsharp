@@ -2559,8 +2559,7 @@ let spaced = new TypeWithSpace(    )
       (prefixed_expression
         (application_expression
           (long_identifier_or_op
-            (long_identifier
-              (identifier)))
+            (identifier))
           (unit))))))
 
 ================================================================================
