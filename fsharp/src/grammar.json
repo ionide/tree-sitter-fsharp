@@ -2107,6 +2107,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "generic_new_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "brace_expression"
         },
         {
@@ -2661,6 +2665,56 @@
           }
         }
       ]
+    },
+    "generic_new_expression": {
+      "type": "PREC_RIGHT",
+      "value": 24,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "new"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_argument"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "unit"
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "IMMEDIATE_TOKEN",
+                    "content": {
+                      "type": "PREC",
+                      "value": 10000,
+                      "content": {
+                        "type": "STRING",
+                        "value": "("
+                      }
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_paren_expression_block"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ")"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     "typecast_expression": {
       "type": "PREC_RIGHT",
@@ -3336,6 +3390,18 @@
                     {
                       "type": "STRING",
                       "value": "use!"
+                    }
+                  ]
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "mutable"
+                    },
+                    {
+                      "type": "BLANK"
                     }
                   ]
                 },
@@ -9701,6 +9767,10 @@
             "value": "\\/[!%&*+.<=>@^|~?-]*"
           },
           {
+            "type": "PATTERN",
+            "value": "\\.[!%&*+/<=>@^|~?-][!%&*+./<=>@^|~?-]*"
+          },
+          {
             "type": "STRING",
             "value": "="
           },
@@ -11258,6 +11328,10 @@
     [
       "simple_type",
       "type_argument"
+    ],
+    [
+      "_srtp_type_argument",
+      "_static_type_identifier"
     ],
     [
       "_module_expression",

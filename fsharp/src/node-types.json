@@ -56,6 +56,10 @@
         "named": true
       },
       {
+        "type": "generic_new_expression",
+        "named": true
+      },
+      {
         "type": "if_expression",
         "named": true
       },
@@ -1976,6 +1980,29 @@
       "types": [
         {
           "type": "_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "generic_new_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "type_argument",
+          "named": true
+        },
+        {
+          "type": "unit",
           "named": true
         }
       ]

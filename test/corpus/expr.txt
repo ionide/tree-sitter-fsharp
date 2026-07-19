@@ -4862,6 +4862,492 @@ let f (x: struct {| Name: string |}) = x
           (identifier))))))
 
 ================================================================================
+Trailing ; after nested single line
+================================================================================
+
+module M =
+    type Tracker() =
+        member val Filled = 0.0 with get, set
+        member val Last = 0.0 with get, set
+        member x.AddFill (newTime : bool) (time : float) (dollarClipSize : float) : float =
+            let mutable dollarFill = dollarClipSize
+            if (dollarFill <= 0.0) then
+                0.0
+            else
+                if newTime then x.Last <- time;
+                x.Filled <- x.Filled + dollarFill;
+                dollarFill
+
+    type AfterTracker = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        (primary_constr_args)
+        block: (type_extension_elements
+          (member_defn
+            (property_or_ident
+              (identifier))
+            (const
+              (float))))
+        block: (type_extension_elements
+          (member_defn
+            (property_or_ident
+              (identifier))
+            (const
+              (float))))
+        block: (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (paren_pattern
+                (typed_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              args: (paren_pattern
+                (typed_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              args: (typed_pattern
+                (paren_pattern
+                  (typed_pattern
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier)))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (declaration_expression
+                (function_or_value_defn
+                  (value_declaration_left
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  body: (long_identifier_or_op
+                    (identifier)))
+                in: (if_expression
+                  guard: (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (float))))
+                  then: (const
+                    (float))
+                  else: (sequential_expression
+                    (if_expression
+                      guard: (long_identifier_or_op
+                        (identifier))
+                      then: (mutate_expression
+                        assignee: (long_identifier_or_op
+                          (long_identifier
+                            (identifier)
+                            (identifier)))
+                        value: (long_identifier_or_op
+                          (identifier))))
+                    (sequential_expression
+                      (mutate_expression
+                        assignee: (long_identifier_or_op
+                          (long_identifier
+                            (identifier)
+                            (identifier)))
+                        value: (infix_expression
+                          (long_identifier_or_op
+                            (long_identifier
+                              (identifier)
+                              (identifier)))
+                          (infix_op)
+                          (long_identifier_or_op
+                            (identifier))))
+                      (long_identifier_or_op
+                        (identifier)))))))))))
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Multi line else if &&
+================================================================================
+
+module M =
+    let handle (trade : Trade) (side : int) =
+        if trade.TradeType = 1 then
+            startCollation trade
+        else if trade.TradeType = 2
+            && trade.TradeSize = side then
+            startCollection trade
+
+    type AfterHandle = { X : int }
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        body: (if_expression
+          guard: (infix_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (infix_op)
+            (const
+              (int)))
+          then: (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (elif_expression
+            guard: (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (const
+                  (int)))
+              (infix_op)
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            then: (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+
+================================================================================
+Mixed separators ; and newline
+:skip
+================================================================================
+
+module M =
+    let build (r : string []) =
+        let newObj =
+            {Date = System.DateTime.Parse(r.[0]);
+            ExchId = r.[1] |> int32;
+            Delay = {ToBrokerDelay = -1.0; FromBrokerDelay = -1.0; MarketDataDelay = -1.0
+                    OrderEntryToExchangeDelay = -1.0}}
+        newObj
+
+    let after () = 42
+
+
+--------------------------------------------------------------------------------
+
+SKIPPED (known limitation): the record's continuation fields are aligned one
+column left of the first field, which shares the opening `{` line. Parsing that
+correctly requires reworking how the external scanner anchors and closes `{...}`
+field blocks -- machinery shared by records, computation expressions, object
+expressions, and query expressions -- so a targeted fix regresses those. Tracked
+as follow-up work.
+
+
+================================================================================
+Custom operators in an expression
+================================================================================
+
+module M =
+    let expr myCols =
+        (myCols.Trade.Size >> sideSign) .*. (future myCols .-. now myCols) ./. myCols.Trade.Price
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        body: (infix_expression
+          (infix_expression
+            (paren_expression
+              (infix_expression
+                (dot_expression
+                  base: (long_identifier_or_op
+                    (long_identifier
+                      (identifier))
+                    (identifier))
+                  field: (long_identifier_or_op
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            (infix_op)
+            (paren_expression
+              (application_expression
+                (infix_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (identifier)))
+                (long_identifier_or_op
+                  (identifier)))))
+          (infix_op)
+          (dot_expression
+            base: (long_identifier_or_op
+              (long_identifier
+                (identifier))
+              (identifier))
+            field: (long_identifier_or_op
+              (identifier))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+
+================================================================================
+Use mutable
+================================================================================
+
+module M =
+    let run () =
+        use mutable okResponse : HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+        okResponse.ToSTring()
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (declaration_expression
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
+          in: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+generic new constructor
+================================================================================
+
+module M = 
+    let make<'T when 'T : (new : unit -> 'T)> () =
+        let factor = new 'T()
+        factory
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))
+            (type_argument_constraints
+              (constraint
+                (type_argument
+                  (identifier))
+                (type_argument
+                  (identifier)))))
+          (argument_patterns
+            (const
+              (unit))))
+        body: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (generic_new_expression
+              (type_argument
+                (identifier))
+              (unit)))
+          in: (long_identifier_or_op
+            (identifier)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+trailing dot float and semicolon
+================================================================================
+
+module M =
+    let score diff maxTolerance =
+        if (diff <= -maxTolerance) then 1.; // behind
+        elif (diff >= maxTolerance) then 0.; // ahead
+        else 0.5
+
+    let after () = 42
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))
+            (long_identifier
+              (identifier))))
+        body: (if_expression
+          guard: (paren_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (prefixed_expression
+                (prefix_op)
+                (long_identifier_or_op
+                  (identifier)))))
+          then: (const
+            (float))
+          (line_comment)
+          (elif_expression
+            guard: (paren_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            then: (const
+              (float)))
+          (line_comment)
+          else: (const
+            (float)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
 while expression with boolean infix condition
 ================================================================================
 
