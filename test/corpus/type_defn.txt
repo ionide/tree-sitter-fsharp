@@ -1543,6 +1543,7 @@ type with shorthand array postfix
 
 type A = {
   A : int[]
+  B : int[ ]
 }
 
 --------------------------------------------------------------------------------
@@ -1553,6 +1554,12 @@ type A = {
       (type_name
         (identifier))
       (record_fields
+        (record_field
+          (identifier)
+          (list_type
+            (simple_type
+              (long_identifier
+                (identifier)))))
         (record_field
           (identifier)
           (list_type

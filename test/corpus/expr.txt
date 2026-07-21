@@ -2532,6 +2532,7 @@ object instantiation expression
 ================================================================================
 
 let disposables = new Disposables.CompositeDisposable()
+let spaced = new TypeWithSpace(    )
 
 --------------------------------------------------------------------------------
 
@@ -2548,6 +2549,17 @@ let disposables = new Disposables.CompositeDisposable()
             (long_identifier
               (identifier)
               (identifier)))
+          (unit)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
           (unit))))))
 
 ================================================================================
@@ -5694,3 +5706,86 @@ module M =
               (unit))))
         (const
           (int))))))
+
+================================================================================
+Embedded backtick indent
+================================================================================
+
+module M = 
+    let ``Parser reads `InputOpts` as expected.`` (args : string list) = 
+        args |> List.length
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (postfix_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (long_identifier
+                  (identifier))))))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+Triple Backtick indent
+================================================================================
+
+module M =
+    let ```enumerateCaches` can enumerate a single cache.`` () =
+        42
+
+    let after () = 43
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+

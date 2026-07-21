@@ -591,6 +591,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -670,6 +674,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -869,6 +877,73 @@
     }
   },
   {
+    "type": "byref_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
+          "named": true
+        },
+        {
+          "type": "compound_type",
+          "named": true
+        },
+        {
+          "type": "constrained_type",
+          "named": true
+        },
+        {
+          "type": "flexible_type",
+          "named": true
+        },
+        {
+          "type": "function_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "paren_type",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
+          "named": true
+        },
+        {
+          "type": "simple_type",
+          "named": true
+        },
+        {
+          "type": "static_type",
+          "named": true
+        },
+        {
+          "type": "struct_type",
+          "named": true
+        },
+        {
+          "type": "type_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "byte",
     "named": true,
     "fields": {},
@@ -922,6 +997,10 @@
         "types": [
           {
             "type": "anon_record_type",
+            "named": true
+          },
+          {
+            "type": "byref_type",
             "named": true
           },
           {
@@ -998,7 +1077,7 @@
     "extra": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
@@ -1022,6 +1101,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -1365,6 +1448,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -1425,6 +1512,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -1609,6 +1700,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -1933,6 +2028,10 @@
             "named": true
           },
           {
+            "type": "byref_type",
+            "named": true
+          },
+          {
             "type": "compound_type",
             "named": true
           },
@@ -2014,6 +2113,10 @@
         "types": [
           {
             "type": "anon_record_type",
+            "named": true
+          },
+          {
+            "type": "byref_type",
             "named": true
           },
           {
@@ -2199,6 +2302,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -2400,6 +2507,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -2472,6 +2583,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -2761,6 +2876,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -2943,6 +3062,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -3152,6 +3275,10 @@
         },
         {
           "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -3367,6 +3494,10 @@
             "named": true
           },
           {
+            "type": "byref_type",
+            "named": true
+          },
+          {
             "type": "compound_type",
             "named": true
           },
@@ -3487,6 +3618,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -4058,6 +4193,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -4118,6 +4257,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -4599,6 +4742,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -4723,6 +4870,10 @@
         },
         {
           "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -5009,6 +5160,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -5107,6 +5262,10 @@
         },
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -5216,6 +5375,10 @@
         "types": [
           {
             "type": "anon_record_type",
+            "named": true
+          },
+          {
+            "type": "byref_type",
             "named": true
           },
           {
@@ -5362,6 +5525,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -5741,6 +5908,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -5861,6 +6032,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
@@ -6007,6 +6182,10 @@
           "named": true
         },
         {
+          "type": "byref_type",
+          "named": true
+        },
+        {
           "type": "compound_type",
           "named": true
         },
@@ -6136,6 +6315,10 @@
       "types": [
         {
           "type": "anon_record_type",
+          "named": true
+        },
+        {
+          "type": "byref_type",
           "named": true
         },
         {
