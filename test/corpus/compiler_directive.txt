@@ -1180,3 +1180,82 @@ services
       field: (long_identifier_or_op
         (identifier)))
     (unit)))
+
+
+================================================================================
+Extern PInvoke
+================================================================================
+
+module M =
+    [<System.Runtime.InteropServices.DllImport("foo", EntryPoint="compute")>]
+    extern float32 compute_batch(int& pNodes, int32 numItems, float32& pValues)
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (extern_binding
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)
+              (identifier)
+              (identifier)
+              (identifier)))
+          (paren_expression
+            (tuple_expression
+              (const
+                (string))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (const
+                  (string)))))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier)
+      (extern_param
+        (byref_type
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (identifier))
+      (extern_param
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (identifier))
+      (extern_param
+        (byref_type
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (identifier)))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+multiarg
+================================================================================
+
+#nowarn "9" "51"
+
+--------------------------------------------------------------------------------
+
+(file
+  (compiler_directive_decl
+    (string)
+    (string)))

@@ -1296,6 +1296,7 @@ module.exports = grammar({
           $.compound_type,
           $.postfix_type,
           $.list_type,
+          $.byref_type,
           $.static_type,
           $.type_argument,
           $.constrained_type,
@@ -1395,7 +1396,11 @@ module.exports = grammar({
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
     // '[]', '[,]', '[,,]', ... — multidimensional array suffixes share the
     // token so 'float[,]' lexes as one postfix rather than index syntax.
-    list_type: ($) => seq($._type, alias(token(/\[,*\]/), "[]")),
+    // Interior whitespace is permitted ('int[ ]', 'float[ , ]').
+    list_type: ($) => seq($._type, alias(token(/\[[ \t]*(,[ \t]*)*\]/), "[]")),
+    // Byref type: 'int&', 'float32&'. The '&' must immediately follow the type
+    // (token.immediate) so it is not confused with the '&' infix/pattern op.
+    byref_type: ($) => prec.left(4, seq($._type, token.immediate("&"))),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
     flexible_type: ($) => prec.right(seq("#", $._type)),
@@ -2214,7 +2219,7 @@ module.exports = grammar({
 
     bool: (_) => token(choice("true", "false")),
 
-    unit: (_) => token(prec(100000, "()")),
+    unit: (_) => token(prec(100000, /\([ \t]*\)/)),
 
     const: ($) =>
       choice(
@@ -2248,7 +2253,14 @@ module.exports = grammar({
     // Identifiers:
     identifier: (_) =>
       token(
-        choice(/[_\p{XID_Start}][_'\p{XID_Continue}]*/, /``([^`\n\r\t])+``/),
+        choice(
+          /[_\p{XID_Start}][_'\p{XID_Continue}]*/,
+          // Double-backtick identifier: any run of non-newline chars delimited
+          // by ``. Single backticks may appear inside (e.g. ``a `b` c``); the
+          // delimiter is the next `` pair, so a backtick is only consumed when
+          // followed by a non-backtick.
+          /``([^`\n\r\t]|`[^`\n\r\t])+``/,
+        ),
       ),
 
     long_identifier: ($) =>
@@ -2405,7 +2417,7 @@ module.exports = grammar({
         choice(
           seq(
             "#nowarn",
-            choice(alias($._string_literal, $.string), $.int),
+            repeat1(choice(alias($._string_literal, $.string), $.int)),
             $._newline_not_aligned,
           ),
           seq("#warnon", $.int, $._newline_not_aligned),
