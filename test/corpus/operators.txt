@@ -158,3 +158,72 @@ let x = 1 => 2
         (infix_op)
         (const
           (int))))))
+
+
+================================================================================
+Custom operators in an expression
+================================================================================
+
+module M =
+    let expr myCols =
+        (myCols.Trade.Size >> sideSign) .*. (future myCols .-. now myCols) ./. myCols.Trade.Price
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        body: (infix_expression
+          (infix_expression
+            (paren_expression
+              (infix_expression
+                (dot_expression
+                  base: (long_identifier_or_op
+                    (long_identifier
+                      (identifier))
+                    (identifier))
+                  field: (long_identifier_or_op
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            (infix_op)
+            (paren_expression
+              (application_expression
+                (infix_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (identifier)))
+                (long_identifier_or_op
+                  (identifier)))))
+          (infix_op)
+          (dot_expression
+            base: (long_identifier_or_op
+              (long_identifier
+                (identifier))
+              (identifier))
+            field: (long_identifier_or_op
+              (identifier))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
