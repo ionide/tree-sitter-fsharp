@@ -1247,17 +1247,35 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     advance(lexer);
     lexer->mark_end(lexer);  // Token = just ';'; chars after are returned to input
     bool saw_newline = false;
-    while (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
-           lexer->lookahead == '\r') {
-      if (lexer->lookahead == '\n') {
-        saw_newline = true;
-        indent_length = 0;
-      } else if (lexer->lookahead == '\r') {
-        // CRLF: skip without counting toward indentation.
-      } else if (saw_newline) {
-        indent_length++;
+    for (;;) {
+      while (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
+             lexer->lookahead == '\r') {
+        if (lexer->lookahead == '\n') {
+          saw_newline = true;
+          indent_length = 0;
+        } else if (lexer->lookahead == '\r') {
+          // CRLF: skip without counting toward indentation.
+        } else if (saw_newline) {
+          indent_length++;
+        }
+        advance(lexer);  // Beyond mark_end: returned to input for next token
       }
-      advance(lexer);  // Beyond mark_end: returned to input for next token
+      // A trailing line comment ("// ...") means the ';' is the last code on
+      // its line, so skip over it (lookahead only — the comment stays in the
+      // input) to reach the terminating newline. Without this, the loop would
+      // stop at '/' and treat the ';' as a mid-line separator that demands a
+      // following expression which isn't there (e.g. `then 1.; // note`).
+      if (lexer->lookahead == '/') {
+        advance(lexer);
+        if (lexer->lookahead == '/') {
+          while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+            advance(lexer);
+          }
+          continue;  // re-enter to consume the newline after the comment
+        }
+        break;  // a lone '/' is an operator, not a comment
+      }
+      break;
     }
     if (saw_newline) {
       found_end_of_line = true;
@@ -1433,9 +1451,12 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                 return true;
               } else {
                 lexer->mark_end(lexer);
+                // Only fold "else if" into ELIF when they share a line. If a
+                // newline separates them this is an `else` whose block body
+                // starts with an `if` (and may be followed by more statements),
+                // so skip only same-line spacing here, never newlines.
                 for (;;) {
-                  if (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
-                      lexer->lookahead == '\r' || lexer->lookahead == '\t') {
+                  if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
                     advance(lexer);
                   } else {
                     break;
@@ -1687,7 +1708,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       bool can_dedent_infix_op;
 
       if (found_start_of_infix_op) {
-        can_dedent_infix_op = indent_length + 2 < current_indent_length;
+        // A continuation line that starts with an infix operator is part of the
+        // preceding expression (F#'s offside rule), so never DEDENT into it —
+        // even when it sits several columns left of the expression it continues
+        // (e.g. an `&&` line under a multi-line `if`/`elif` condition).
+        can_dedent_infix_op = false;
       } else {
         can_dedent_infix_op = true;
       }

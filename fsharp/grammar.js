@@ -109,6 +109,10 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
+    // `new ^T ...` is ambiguous between an SRTP type arg (^T or ^U ...) and a
+    // plain generic type var; only reachable via generic_new_expression,
+    // resolved dynamically.
+    [$._srtp_type_argument, $._static_type_identifier],
     [$._module_expression, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
     [$.rules],
@@ -600,6 +604,7 @@ module.exports = grammar({
         $.array_expression,
         $.ce_expression,
         $.prefixed_expression,
+        $.generic_new_expression,
         $.brace_expression,
         $.anon_record_expression,
         $.typecast_expression,
@@ -746,6 +751,22 @@ module.exports = grammar({
         prec.right(PREC.PREFIX_EXPR, $._expression),
       ),
 
+    // `new 'T()` / `new 'T(args)`: constructing a value of a generic type
+    // parameter. A type variable ('T / ^T) is not a general expression atom
+    // (that would clash with char literals), so this is gated on `new`.
+    generic_new_expression: ($) =>
+      prec.right(
+        PREC.NEW_OBJ,
+        seq(
+          "new",
+          $.type_argument,
+          choice(
+            $.unit,
+            seq(token.immediate(prec(10000, "(")), $._paren_expression_block, ")"),
+          ),
+        ),
+      ),
+
     typecast_expression: ($) =>
       prec.right(
         PREC.SPECIAL_INFIX,
@@ -883,7 +904,7 @@ module.exports = grammar({
     declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
+          seq(choice("use", "use!"), optional("mutable"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -2291,6 +2312,10 @@ module.exports = grammar({
           token.immediate(prec(1, /[+-]/)),
           /[-+=<>|&^*'%@?][!%&*+./<=>@^|~?-]*/,
           /\/[!%&*+.<=>@^|~?-]*/,
+          // Dotted custom operators such as .*. .-. ./. — F# allows '.' to begin
+          // an operator. A lone '.' is member access and '..' is a range, so the
+          // char right after the first '.' must be a non-dot operator char.
+          /\.[!%&*+/<=>@^|~?-][!%&*+./<=>@^|~?-]*/,
           "=",
           "!=",
           ":=",

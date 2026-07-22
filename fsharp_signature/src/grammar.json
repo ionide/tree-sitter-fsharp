@@ -2452,6 +2452,56 @@
         }
       ]
     },
+    "generic_new_expression": {
+      "type": "PREC_RIGHT",
+      "value": 24,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "new"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "type_argument"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "unit"
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "IMMEDIATE_TOKEN",
+                    "content": {
+                      "type": "PREC",
+                      "value": 10000,
+                      "content": {
+                        "type": "STRING",
+                        "value": "("
+                      }
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_paren_expression_block"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ")"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
     "typecast_expression": {
       "type": "PREC_RIGHT",
       "value": 16,
@@ -3126,6 +3176,18 @@
                     {
                       "type": "STRING",
                       "value": "use!"
+                    }
+                  ]
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "mutable"
+                    },
+                    {
+                      "type": "BLANK"
                     }
                   ]
                 },
@@ -9522,6 +9584,10 @@
           {
             "type": "PATTERN",
             "value": "\\/[!%&*+.<=>@^|~?-]*"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\.[!%&*+/<=>@^|~?-][!%&*+./<=>@^|~?-]*"
           },
           {
             "type": "STRING",

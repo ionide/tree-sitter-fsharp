@@ -158,3 +158,294 @@ let x = 1 => 2
         (infix_op)
         (const
           (int))))))
+
+
+================================================================================
+Custom operators in an expression
+================================================================================
+
+module M =
+    let expr myCols =
+        (myCols.Trade.Size >> sideSign) .*. (future myCols .-. now myCols) ./. myCols.Trade.Price
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        body: (infix_expression
+          (infix_expression
+            (paren_expression
+              (infix_expression
+                (dot_expression
+                  base: (long_identifier_or_op
+                    (long_identifier
+                      (identifier))
+                    (identifier))
+                  field: (long_identifier_or_op
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            (infix_op)
+            (paren_expression
+              (application_expression
+                (infix_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (identifier)))
+                (long_identifier_or_op
+                  (identifier)))))
+          (infix_op)
+          (dot_expression
+            base: (long_identifier_or_op
+              (long_identifier
+                (identifier))
+              (identifier))
+            field: (long_identifier_or_op
+              (identifier))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+
+================================================================================
+Dotted custom operators
+================================================================================
+
+let a = x .*. y
+let b = x ./. y
+let c = x .+. y
+let d = x .>>. y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+
+================================================================================
+Long and multi-character custom operators
+================================================================================
+
+let a = x <*> y
+let b = x >>= y
+let c = x >=> y
+let d = x <|> y
+let e = x ++++++++++ y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+
+================================================================================
+Range operator .. is not a dotted operator
+================================================================================
+
+let a = [1..10]
+let b = [1 .. 10]
+let c = [1..2..10]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (slice_ranges
+          (slice_range
+            from: (const
+              (int))
+            to: (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (slice_ranges
+          (slice_range
+            from: (const
+              (int))
+            to: (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (slice_ranges
+          (slice_range
+            from: (const
+              (int))
+            step: (const
+              (int))
+            to: (const
+              (int))))))))
+
+
+================================================================================
+A run of slashes is a comment, not an operator
+================================================================================
+
+let a = x /// doc
+let b = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (long_identifier_or_op
+        (identifier))
+      (xml_doc)))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
