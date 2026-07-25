@@ -1782,15 +1782,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // out. Decline instead; after the comment is consumed as an extra, the
       // re-scan crosses the newline and INDENT anchors to the body line.
       !(found_comment_start && !found_end_of_line)) {
-    push_indent(
-        scanner, indent_length,
-        (IndentKind)(INDENT_NORMAL |
-                     (found_end_of_line
-                          ? 0
-                          : (INDENT_KIND_MIDLINE_FLAG |
-                             (scanner->line_stranded
-                                  ? INDENT_KIND_STRANDED_LINE_FLAG
-                                  : 0)))));
+    uint8_t indent_flags = 0;
+    if (!found_end_of_line) {
+      indent_flags |= INDENT_KIND_MIDLINE_FLAG;
+      if (scanner->line_stranded) {
+        indent_flags |= INDENT_KIND_STRANDED_LINE_FLAG;
+      }
+    }
+    push_indent(scanner, indent_length,
+                (IndentKind)(INDENT_NORMAL | indent_flags));
     lexer->result_symbol = INDENT;
     return true;
   }
@@ -1986,6 +1986,7 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 
   buffer[size++] = (char)scanner->multi_dollar_count;
   buffer[size++] = (char)scanner->stranded_dedent;
+  buffer[size++] = (char)scanner->line_stranded;
 
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
@@ -2016,10 +2017,6 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
   // so the extra bytes vs bit-packing are negligible.
   for (uint32_t i = 1; i <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++i) {
     buffer[size++] = (char)*array_get(&scanner->indent_kinds, i);
-  }
-
-  if (size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
-    buffer[size++] = (char)scanner->line_stranded;
   }
 
   size_t preproc_kind_count = scanner->preproc_kinds.size;
@@ -2060,6 +2057,9 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     scanner->stranded_dedent = (uint8_t)buffer[size++];
 
     if (size >= length) return;
+    scanner->line_stranded = (uint8_t)buffer[size++];
+
+    if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];
 
     size_t preproc_end = size + preprocessor_count;
@@ -2081,9 +2081,6 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
       uint8_t kind = (size < length) ? (uint8_t)buffer[size++] : (uint8_t)INDENT_NORMAL;
       array_push(&scanner->indent_kinds, kind);
     }
-
-    if (size >= length) return;
-    scanner->line_stranded = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     size_t preproc_kind_count = (uint8_t)buffer[size++];
