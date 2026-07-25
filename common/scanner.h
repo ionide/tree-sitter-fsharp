@@ -44,6 +44,7 @@ enum TokenType {
   TRY_INDENT,
   PREPROC_INACTIVE,
   ELEM_SEP,
+  BRACE_INDENT,
   ERROR_SENTINEL
 };
 
@@ -55,6 +56,11 @@ typedef enum {
   // logic, but can be force-closed when its terminating `with`/`finally` sits
   // at the same column as the body (where an ordinary dedent would not fire).
   INDENT_TRY = 3,
+  // Body of a `{...}` record / computation-expression block. Closed by '}'
+  // (never DEDENTs on under-indentation, like a paren indent), but an
+  // under-indented line still emits a NEWLINE so record/CE items keep
+  // separating even when a continuation item sits left of the first one.
+  INDENT_BRACE = 4,
 } IndentKind;
 
 // How an open `#if` directive entered the parse. STRUCTURED directives were
@@ -73,6 +79,11 @@ typedef struct {
   Array(uint16_t) preprocessor_indents;
   Array(uint8_t) preproc_kinds;
   uint8_t multi_dollar_count;
+  // Set when a DEDENT pops a level but the current line still sits *above* the
+  // new enclosing level (a "stranded"/partial dedent). Consumed on the very
+  // next scan to emit the NEWLINE the enclosing block owes as an item
+  // separator. See the emit site in the found_end_of_line handling.
+  uint8_t stranded_dedent;
 } Scanner;
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -185,6 +196,10 @@ static inline IndentKind peek_indent_kind(Scanner *scanner) {
 static inline bool peek_is_paren_indent(Scanner *scanner) {
   IndentKind kind = peek_indent_kind(scanner);
   return kind == INDENT_PAREN || kind == INDENT_TYPE_APP;
+}
+
+static inline bool peek_is_brace_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) == INDENT_BRACE;
 }
 
 static inline bool peek_is_type_app_indent(Scanner *scanner) {
@@ -413,6 +428,12 @@ static inline bool is_bracket_end(TSLexer *lexer) {
   }
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+  // A stranded-dedent flag lives for exactly one scan: capture it and clear
+  // the persistent copy up front so it is consumed by the immediately
+  // following scan (the NEWLINE emit below) and never leaks further.
+  bool prev_stranded_dedent = scanner->stranded_dedent;
+  scanner->stranded_dedent = false;
+
   if (valid_symbols[ERROR_SENTINEL]) {
     // During error recovery, all valid_symbols are true. Tree-sitter's error
     // recovery mechanism cannot emit external scanner tokens, so we must still
@@ -453,6 +474,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         any_structural_valid = true;
         break;
       }
+    }
+    // BRACE_INDENT sits after the PREPROC_INACTIVE/ELEM_SEP "extra" tokens in
+    // the enum but is a structural indent token like INDENT, so it must count
+    // here — otherwise a state where only BRACE_INDENT is valid (right after a
+    // record/CE '{') bails out and the token is never emitted.
+    if (valid_symbols[BRACE_INDENT]) {
+      any_structural_valid = true;
     }
     if (!any_structural_valid) {
       while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
@@ -1643,6 +1671,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
+  if (valid_symbols[BRACE_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end &&
+      !found_preprocessor_end && !found_same_line_pipe_infix) {
+    // Opens a '{...}' record/CE field block (see INDENT_BRACE).
+    push_indent(scanner, indent_length, INDENT_BRACE);
+    lexer->result_symbol = BRACE_INDENT;
+    return true;
+  }
+
   // Fires after '<' if the type args span multiple lines — either we just
   // consumed a newline, or peek-ahead shows one before the matching '>' (the
   // variant where the first arg shares the line with '<').
@@ -1659,6 +1696,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (scanner->indents.size > 0) {
     bool is_paren_indent = peek_is_paren_indent(scanner);
+    bool is_brace_indent = peek_is_brace_indent(scanner);
     uint16_t current_indent_length = peek_indent_length(scanner);
 
     // '>' closes a TYPE_APP_INDENT the same way ')' closes a PAREN_INDENT —
@@ -1674,13 +1712,33 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
 
     if (found_end_of_line) {
-      if (indent_length == current_indent_length && indent_length > 0 &&
+      // Inside a brace block, a line that is not more indented than the anchor
+      // (including one left of the first item) separates items rather than
+      // dedenting out — the '}' is what closes the block.
+      bool brace_separator =
+          is_brace_indent && indent_length < current_indent_length;
+      if ((indent_length == current_indent_length || brace_separator) &&
+          indent_length > 0 &&
           !found_start_of_infix_op && !found_bracket_end) {
         if (valid_symbols[NEWLINE] && !found_preprocessor_end &&
             !found_comment_start) {
           lexer->result_symbol = NEWLINE;
           return true;
         }
+      }
+
+      // Consume a pending stranded-dedent: the previous scan emitted a DEDENT
+      // that closed a nested block, but this line sits above the enclosing
+      // block's indent. Emit the NEWLINE the enclosing block owes so the line
+      // starts a new element instead of being stranded. Guarded on a real
+      // preceding stranded DEDENT so ordinary more-indented continuation lines
+      // (e.g. a multi-line application argument) are untouched.
+      if (prev_stranded_dedent && indent_length > current_indent_length &&
+          valid_symbols[NEWLINE] && !found_start_of_infix_op &&
+          !found_bracket_end && !found_preprocessor_end &&
+          !found_comment_start) {
+        lexer->result_symbol = NEWLINE;
+        return true;
       }
 
       // Top-level module-element separator, phase 2 of 2 (emit). All
@@ -1721,12 +1779,29 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // continuation lines. But still allow it at true EOF / column 0 so a
       // paren indent can't get stranded forever if its closing bracket was
       // consumed by the grammar rather than seen here at the start of a line.
-      bool can_dedent_paren_indent = !is_paren_indent || indent_length == 0 || lexer->eof(lexer);
+      bool can_dedent_paren_indent = !(is_paren_indent || is_brace_indent) || indent_length == 0 || lexer->eof(lexer);
 
       if (indent_length < current_indent_length && !found_bracket_end &&
           can_dedent_preproc && can_dedent_infix_op &&
           (!valid_symbols[TUPLE_MARKER] || valid_symbols[ERROR_SENTINEL]) && can_dedent_paren_indent) {
         pop_indent(scanner);
+        // If this line closed a nested block but still sits above the enclosing
+        // block's own indent (e.g. dedenting from a nested module body back to
+        // an outer module whose next member is indented past the outer
+        // module's offside column), the enclosing block owes an item
+        // separator. Record that so the next scan emits the NEWLINE — a bare
+        // DEDENT here would strand the line between two open levels.
+        //
+        // Require a genuine enclosing indent level (size > 1, i.e. we landed on
+        // a pushed level, not the base level 0). A top-level `module M`/namespace
+        // body is not indent-scoped, so an expression block (e.g. a `do ()` body)
+        // closing back to the base level is an ordinary dedent, not a stranded
+        // one — injecting a separator there wrongly glues sibling members into a
+        // sequential_expression.
+        if (scanner->indents.size > 1 &&
+            indent_length > peek_indent_length(scanner)) {
+          scanner->stranded_dedent = true;
+        }
         lexer->result_symbol = DEDENT;
         return true;
       }
@@ -1740,6 +1815,7 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
   size_t size = 0;
 
   buffer[size++] = (char)scanner->multi_dollar_count;
+  buffer[size++] = (char)scanner->stranded_dedent;
 
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
@@ -1800,9 +1876,13 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_clear(&scanner->preprocessor_indents);
   array_clear(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
+  scanner->stranded_dedent = false;
   if (length > 0) {
     size_t size = 0;
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
+
+    if (size >= length) return;
+    scanner->stranded_dedent = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];

@@ -414,7 +414,6 @@ module M =
 
 ================================================================================
 dedent from nested module back to outer module
-:skip
 ================================================================================
 
 module M =
@@ -456,3 +455,164 @@ module M =
               (identifier))))
         (const
           (unit))))))
+
+================================================================================
+dedent from nested module to a sibling nested module
+================================================================================
+
+module M =
+
+    module Inner =
+         let a = ()
+
+        module Inner2 =
+            let b = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (module_defn
+      (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (unit)))))
+    (module_defn
+      (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (unit)))))))
+
+================================================================================
+dedent from nested module with multiple trailing members
+================================================================================
+
+module M =
+
+    module Inner =
+         let a = ()
+
+        let c = ()
+        let d = ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (module_defn
+      (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (unit)))))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (unit))))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (unit))))))
+
+================================================================================
+top-level module with do-binding then member
+================================================================================
+
+module M
+
+    do ()
+    let f a = a
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (declaration_expression
+      (do
+        (const
+          (unit))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+top-level module with attribute, do-binding and entry point
+================================================================================
+
+module M
+
+    [<assembly: Foo("")>]
+    do ()
+
+    [<EntryPoint>]
+    let main args = exit 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (declaration_expression
+      (attributes
+        (attribute
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (paren_expression
+            (const
+              (string)))))
+      (do
+        (const
+          (unit))))
+    (declaration_expression
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))))))

@@ -2185,7 +2185,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_indent"
+                  "name": "_brace_indent"
                 },
                 {
                   "type": "CHOICE",
@@ -3928,7 +3928,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_indent"
+                  "name": "_brace_indent"
                 },
                 {
                   "type": "SYMBOL",
@@ -11411,6 +11411,10 @@
     {
       "type": "SYMBOL",
       "name": "_elem_separator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_brace_indent"
     },
     {
       "type": "SYMBOL",

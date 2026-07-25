@@ -5095,7 +5095,6 @@ module M =
 
 ================================================================================
 Mixed separators ; and newline
-:skip
 ================================================================================
 
 module M =
@@ -5112,12 +5111,94 @@ module M =
 
 --------------------------------------------------------------------------------
 
-SKIPPED (known limitation): the record's continuation fields are aligned one
-column left of the first field, which shares the opening `{` line. Parsing that
-correctly requires reworking how the external scanner anchors and closes `{...}`
-field blocks -- machinery shared by records, computation expressions, object
-expressions, and query expressions -- so a targeted fix regresses those. Tracked
-as follow-up work.
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (list_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        body: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (brace_expression
+              block: (field_initializers
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (application_expression
+                    (dot_expression
+                      base: (long_identifier_or_op
+                        (long_identifier
+                          (identifier))
+                        (identifier))
+                      field: (long_identifier_or_op
+                        (identifier)))
+                    (index_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      index: (const
+                        (int)))))
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (infix_expression
+                    (index_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      index: (const
+                        (int)))
+                    (infix_op)
+                    (long_identifier_or_op
+                      (identifier))))
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (brace_expression
+                    block: (field_initializers
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))))))))
+          in: (long_identifier_or_op
+            (identifier)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
 
 
 ================================================================================
