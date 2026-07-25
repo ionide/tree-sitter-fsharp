@@ -44,6 +44,7 @@ enum TokenType {
   TRY_INDENT,
   PREPROC_INACTIVE,
   ELEM_SEP,
+  BRACE_INDENT,
   ERROR_SENTINEL
 };
 
@@ -55,6 +56,11 @@ typedef enum {
   // logic, but can be force-closed when its terminating `with`/`finally` sits
   // at the same column as the body (where an ordinary dedent would not fire).
   INDENT_TRY = 3,
+  // Body of a `{...}` record / computation-expression block. Closed by '}'
+  // (never DEDENTs on under-indentation, like a paren indent), but an
+  // under-indented line still emits a NEWLINE so record/CE items keep
+  // separating even when a continuation item sits left of the first one.
+  INDENT_BRACE = 4,
 } IndentKind;
 
 // How an open `#if` directive entered the parse. STRUCTURED directives were
@@ -185,6 +191,10 @@ static inline IndentKind peek_indent_kind(Scanner *scanner) {
 static inline bool peek_is_paren_indent(Scanner *scanner) {
   IndentKind kind = peek_indent_kind(scanner);
   return kind == INDENT_PAREN || kind == INDENT_TYPE_APP;
+}
+
+static inline bool peek_is_brace_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) == INDENT_BRACE;
 }
 
 static inline bool peek_is_type_app_indent(Scanner *scanner) {
@@ -453,6 +463,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         any_structural_valid = true;
         break;
       }
+    }
+    // BRACE_INDENT sits after the PREPROC_INACTIVE/ELEM_SEP "extra" tokens in
+    // the enum but is a structural indent token like INDENT, so it must count
+    // here — otherwise a state where only BRACE_INDENT is valid (right after a
+    // record/CE '{') bails out and the token is never emitted.
+    if (valid_symbols[BRACE_INDENT]) {
+      any_structural_valid = true;
     }
     if (!any_structural_valid) {
       while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
@@ -1643,6 +1660,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
+  if (valid_symbols[BRACE_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end &&
+      !found_preprocessor_end && !found_same_line_pipe_infix) {
+    // Opens a '{...}' record/CE field block (see INDENT_BRACE).
+    push_indent(scanner, indent_length, INDENT_BRACE);
+    lexer->result_symbol = BRACE_INDENT;
+    return true;
+  }
+
   // Fires after '<' if the type args span multiple lines — either we just
   // consumed a newline, or peek-ahead shows one before the matching '>' (the
   // variant where the first arg shares the line with '<').
@@ -1659,6 +1685,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (scanner->indents.size > 0) {
     bool is_paren_indent = peek_is_paren_indent(scanner);
+    bool is_brace_indent = peek_is_brace_indent(scanner);
     uint16_t current_indent_length = peek_indent_length(scanner);
 
     // '>' closes a TYPE_APP_INDENT the same way ')' closes a PAREN_INDENT —
@@ -1674,7 +1701,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
 
     if (found_end_of_line) {
-      if (indent_length == current_indent_length && indent_length > 0 &&
+      // Inside a brace block, a line that is not more indented than the anchor
+      // (including one left of the first item) separates items rather than
+      // dedenting out — the '}' is what closes the block.
+      bool brace_separator =
+          is_brace_indent && indent_length < current_indent_length;
+      if ((indent_length == current_indent_length || brace_separator) &&
+          indent_length > 0 &&
           !found_start_of_infix_op && !found_bracket_end) {
         if (valid_symbols[NEWLINE] && !found_preprocessor_end &&
             !found_comment_start) {
@@ -1721,7 +1754,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // continuation lines. But still allow it at true EOF / column 0 so a
       // paren indent can't get stranded forever if its closing bracket was
       // consumed by the grammar rather than seen here at the start of a line.
-      bool can_dedent_paren_indent = !is_paren_indent || indent_length == 0 || lexer->eof(lexer);
+      bool can_dedent_paren_indent = !(is_paren_indent || is_brace_indent) || indent_length == 0 || lexer->eof(lexer);
 
       if (indent_length < current_indent_length && !found_bracket_end &&
           can_dedent_preproc && can_dedent_infix_op &&

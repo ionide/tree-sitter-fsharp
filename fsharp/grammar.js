@@ -102,6 +102,7 @@ module.exports = grammar({
     $._try_indent, // like _indent, but opens a try-body scope that can be force-closed when its 'with'/'finally' sits at the same column as the body
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
+    $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -691,7 +692,7 @@ module.exports = grammar({
               $.with_field_expression,
               seq($.class_inherits_decl, optional($._newline), $.field_initializers),
             ),
-            $._indent,
+            $._brace_indent,
             $._dedent,
           ),
           "}",
@@ -1041,7 +1042,7 @@ module.exports = grammar({
         seq(
           prec(-1, $._expression),
           "{",
-          scoped($._comp_expression_block, $._indent, $._dedent),
+          scoped($._comp_expression_block, $._brace_indent, $._dedent),
           "}",
         ),
       ),
