@@ -79,6 +79,11 @@ typedef struct {
   Array(uint16_t) preprocessor_indents;
   Array(uint8_t) preproc_kinds;
   uint8_t multi_dollar_count;
+  // Set when a DEDENT pops a level but the current line still sits *above* the
+  // new enclosing level (a "stranded"/partial dedent). Consumed on the very
+  // next scan to emit the NEWLINE the enclosing block owes as an item
+  // separator. See the emit site in the found_end_of_line handling.
+  uint8_t stranded_dedent;
 } Scanner;
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -423,6 +428,12 @@ static inline bool is_bracket_end(TSLexer *lexer) {
   }
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+  // A stranded-dedent flag lives for exactly one scan: capture it and clear
+  // the persistent copy up front so it is consumed by the immediately
+  // following scan (the NEWLINE emit below) and never leaks further.
+  bool prev_stranded_dedent = scanner->stranded_dedent;
+  scanner->stranded_dedent = false;
+
   if (valid_symbols[ERROR_SENTINEL]) {
     // During error recovery, all valid_symbols are true. Tree-sitter's error
     // recovery mechanism cannot emit external scanner tokens, so we must still
@@ -1716,6 +1727,20 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
 
+      // Consume a pending stranded-dedent: the previous scan emitted a DEDENT
+      // that closed a nested block, but this line sits above the enclosing
+      // block's indent. Emit the NEWLINE the enclosing block owes so the line
+      // starts a new element instead of being stranded. Guarded on a real
+      // preceding stranded DEDENT so ordinary more-indented continuation lines
+      // (e.g. a multi-line application argument) are untouched.
+      if (prev_stranded_dedent && indent_length > current_indent_length &&
+          valid_symbols[NEWLINE] && !found_start_of_infix_op &&
+          !found_bracket_end && !found_preprocessor_end &&
+          !found_comment_start) {
+        lexer->result_symbol = NEWLINE;
+        return true;
+      }
+
       // Top-level module-element separator, phase 2 of 2 (emit). All
       // eligibility checks — and the mark_end that makes the token consume
       // the walked newline — happened at the arming site right after the
@@ -1760,6 +1785,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           can_dedent_preproc && can_dedent_infix_op &&
           (!valid_symbols[TUPLE_MARKER] || valid_symbols[ERROR_SENTINEL]) && can_dedent_paren_indent) {
         pop_indent(scanner);
+        // If this line closed a nested block but still sits above the enclosing
+        // block's own indent (e.g. dedenting from a nested module body back to
+        // an outer module whose next member is indented past the outer
+        // module's offside column), the enclosing block owes an item
+        // separator. Record that so the next scan emits the NEWLINE — a bare
+        // DEDENT here would strand the line between two open levels.
+        if (scanner->indents.size > 0 &&
+            indent_length > peek_indent_length(scanner)) {
+          scanner->stranded_dedent = true;
+        }
         lexer->result_symbol = DEDENT;
         return true;
       }
@@ -1773,6 +1808,7 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
   size_t size = 0;
 
   buffer[size++] = (char)scanner->multi_dollar_count;
+  buffer[size++] = (char)scanner->stranded_dedent;
 
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
@@ -1833,9 +1869,13 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_clear(&scanner->preprocessor_indents);
   array_clear(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
+  scanner->stranded_dedent = false;
   if (length > 0) {
     size_t size = 0;
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
+
+    if (size >= length) return;
+    scanner->stranded_dedent = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];
