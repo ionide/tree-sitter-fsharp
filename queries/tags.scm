@@ -100,9 +100,13 @@
     name: (property_or_ident
       method: (identifier) @name))) @definition.method
 
+; Bare members (`member Bare(x) = ...`, static members): the name field holds
+; a property_or_ident whose only child is the identifier (the instance.method
+; form has two children and is handled above).
 (member_defn
   (method_or_prop_defn
-    name: (identifier) @name)) @definition.method
+    name: (property_or_ident
+      . (identifier) @name .))) @definition.method
 
 (member_defn
   (member_signature

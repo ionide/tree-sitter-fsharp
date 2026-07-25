@@ -5169,10 +5169,6 @@
     "named": false
   },
   {
-    "type": "f",
-    "named": false
-  },
-  {
     "type": "finally",
     "named": false
   },

@@ -22,7 +22,7 @@
 
 
 ((argument_patterns (long_identifier (identifier) @character.special))
- (#match? @character.special "^\_.*"))
+ (#match? @character.special "^_"))
 
 ;; ----------------------------------------------------------------------------
 ;; Punctuation

@@ -51,7 +51,7 @@ module.exports = grammar({
   name: "fsharp",
 
   extras: ($) => [
-    /[ \s\f\uFEFF\u2060\u200B]|\\\r?n/,
+    /[ \s\f\uFEFF\u2060\u200B]/,
     $.block_comment,
     $.line_comment,
     $.xml_doc,
@@ -2291,7 +2291,9 @@ module.exports = grammar({
           seq(
             "(",
             /\s*/,
-            choice("?", /[!%&*+-./<=>@^|~$?][!%&*+-./<=>@^|~?]*/, ".. .."),
+            // '-' sits last so it is a literal, not a `+`-to-`.` range that
+            // would admit ',' as an operator character.
+            choice("?", /[!%&*+./<=>@^|~$?-][!%&*+./<=>@^|~?-]*/, ".. .."),
             /\s*/,
             ")",
           ),
@@ -2305,7 +2307,7 @@ module.exports = grammar({
 
     prefix_op: ($) =>
       prec.left(
-        choice($._infix_or_prefix_op, "&&", "%%", repeat1("~"), /[!?][!%&*+-./<=>@^|~?]*/),
+        choice($._infix_or_prefix_op, "&&", "%%", repeat1("~"), /[!?][!%&*+./<=>@^|~?-]*/),
       ),
 
     infix_op: ($) =>
@@ -2325,7 +2327,6 @@ module.exports = grammar({
           ":=",
           "::",
           "$",
-          "?",
           "?",
           "?<-",
           "?->",
@@ -2354,7 +2355,7 @@ module.exports = grammar({
 
     ieee32: ($) =>
       choice(
-        seq($.float, token.immediate("f")),
+        seq($.float, token.immediate(/[fF]/)),
         seq($.xint, token.immediate("lf")),
       ),
     ieee64: ($) => seq($.xint, token.immediate("LF")),

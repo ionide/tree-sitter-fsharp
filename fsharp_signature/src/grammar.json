@@ -9470,7 +9470,7 @@
                 },
                 {
                   "type": "PATTERN",
-                  "value": "[!%&*+-./<=>@^|~$?][!%&*+-./<=>@^|~?]*"
+                  "value": "[!%&*+./<=>@^|~$?-][!%&*+./<=>@^|~?-]*"
                 },
                 {
                   "type": "STRING",
@@ -9563,7 +9563,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "[!?][!%&*+-./<=>@^|~?]*"
+            "value": "[!?][!%&*+./<=>@^|~?-]*"
           }
         ]
       }
@@ -9620,10 +9620,6 @@
           {
             "type": "STRING",
             "value": "$"
-          },
-          {
-            "type": "STRING",
-            "value": "?"
           },
           {
             "type": "STRING",
@@ -9948,8 +9944,8 @@
             {
               "type": "IMMEDIATE_TOKEN",
               "content": {
-                "type": "STRING",
-                "value": "f"
+                "type": "PATTERN",
+                "value": "[fF]"
               }
             }
           ]
@@ -11222,7 +11218,7 @@
   "extras": [
     {
       "type": "PATTERN",
-      "value": "[ \\s\\f\\uFEFF\\u2060\\u200B]|\\\\\\r?n"
+      "value": "[ \\s\\f\\uFEFF\\u2060\\u200B]"
     },
     {
       "type": "SYMBOL",
