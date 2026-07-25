@@ -1791,7 +1791,14 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         // module's offside column), the enclosing block owes an item
         // separator. Record that so the next scan emits the NEWLINE — a bare
         // DEDENT here would strand the line between two open levels.
-        if (scanner->indents.size > 0 &&
+        //
+        // Require a genuine enclosing indent level (size > 1, i.e. we landed on
+        // a pushed level, not the base level 0). A top-level `module M`/namespace
+        // body is not indent-scoped, so an expression block (e.g. a `do ()` body)
+        // closing back to the base level is an ordinary dedent, not a stranded
+        // one — injecting a separator there wrongly glues sibling members into a
+        // sequential_expression.
+        if (scanner->indents.size > 1 &&
             indent_length > peek_indent_length(scanner)) {
           scanner->stranded_dedent = true;
         }
