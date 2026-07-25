@@ -1605,6 +1605,9 @@ module.exports = grammar({
         seq(
           optional($.attributes),
           "type",
+          // Attributes may also sit between `type` and the name:
+          // `type [<Struct>] R = ...`
+          optional($.attributes),
           $._type_defn_body,
           repeat(
             seq(

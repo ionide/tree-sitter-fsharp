@@ -670,3 +670,51 @@ match x with
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+
+================================================================================
+match arm with pipe glued to pattern
+================================================================================
+
+let f w =
+    match w with
+    |"A" -> ()
+    |_ -> failwith "no"
+    System.Console.WriteLine "x"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (sequential_expression
+        (match_expression
+          (long_identifier_or_op
+            (identifier))
+          (rules
+            (rule
+              (const
+                (string))
+              (const
+                (unit)))
+            (rule
+              (wildcard_pattern)
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))))
+        (application_expression
+          (dot_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier))
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (const
+            (string)))))))
