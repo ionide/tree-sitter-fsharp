@@ -17,9 +17,9 @@
       "scope": "source.fsharp.signature",
       "path": "fsharp_signature",
       "file-types": ["fsi"],
-      "highlights": "queries/highlights.scm",
+      "highlights": "fsharp_signature/queries/highlights.scm",
       "injections": "queries/injections.scm",
-      "tags": "queries/tags.scm",
+      "tags": "fsharp_signature/queries/tags.scm",
       "injection-regex": "^fsharp_signature$"
     }
   ],

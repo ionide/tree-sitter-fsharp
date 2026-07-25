@@ -14,6 +14,7 @@
     "common/**",
     "fsharp/src/**",
     "fsharp_signature/src/**",
+    "fsharp_signature/queries/*",
     "queries/*",
     "*.wasm"
   ],
@@ -27,7 +28,7 @@
     "tree-sitter": "^0.25.0"
   },
   "peerDependenciesMeta": {
-    "tree_sitter": {
+    "tree-sitter": {
       "optional": true
     }
   },

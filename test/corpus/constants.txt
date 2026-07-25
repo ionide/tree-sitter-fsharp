@@ -918,6 +918,7 @@ module M =
             (simple_type
               (long_identifier
                 (identifier)))))))))
+
 ================================================================================
 verbatim interpolated string
 ================================================================================
@@ -968,3 +969,22 @@ let y = $"{{literal}} and {hole} end}}"
             (format_string_eval
               (long_identifier_or_op
                 (identifier)))))))))
+
+================================================================================
+ieee32 uppercase suffix
+================================================================================
+
+let x = 1.0F
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (ieee32
+          (float))))))

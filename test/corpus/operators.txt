@@ -449,3 +449,21 @@ let b = 1
             (identifier))))
       body: (const
         (int)))))
+
+================================================================================
+comma is not an operator character
+================================================================================
+
+let g = f (,)
+
+--------------------------------------------------------------------------------
+
+(file
+  (ERROR
+    (value_declaration_left
+      (identifier_pattern
+        (long_identifier_or_op
+          (identifier))))
+    (long_identifier_or_op
+      (identifier))
+    (ERROR)))
