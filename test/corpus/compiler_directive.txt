@@ -1181,7 +1181,6 @@ services
         (identifier)))
     (unit)))
 
-
 ================================================================================
 Extern PInvoke
 ================================================================================
@@ -1259,3 +1258,32 @@ multiarg
   (compiler_directive_decl
     (string)
     (string)))
+
+================================================================================
+indent directive skipped as trivia
+================================================================================
+
+let a = 1
+#indent "off"
+let b = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int))
+      (preproc_inactive)))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))

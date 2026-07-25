@@ -5092,7 +5092,6 @@ module M =
               (long_identifier
                 (identifier)))))))))
 
-
 ================================================================================
 Mixed separators ; and newline
 ================================================================================
@@ -5199,7 +5198,6 @@ module M =
               (unit))))
         body: (const
           (int))))))
-
 
 ================================================================================
 Use mutable
@@ -6287,3 +6285,143 @@ module M =
         (const
           (int))))))
 
+================================================================================
+multiplication operator reference
+================================================================================
+
+let f = (*) 2 3
+let x = Checked.(*) 2 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (op_identifier))
+          (const
+            (int)))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))
+            (op_identifier))
+          (const
+            (int)))
+        (const
+          (int))))))
+
+================================================================================
+backpipe glued to identifier before parenthesized upcast
+================================================================================
+
+let x = Some(box<|(inst :> System.IComparable).CompareTo 1)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (application_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (dot_expression
+              (paren_expression
+                (typecast_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (simple_type
+                    (long_identifier
+                      (identifier)
+                      (identifier)))))
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (int)))))))
+
+================================================================================
+trailing backpipe continues assignment on next line
+================================================================================
+
+let f (x: B) =
+    x.C <- Some <|
+        max 1 2
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (sequential_expression
+        (mutate_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (application_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (const
+                (int)))
+            (const
+              (int))))
+        (const
+          (unit))))))
+
+================================================================================
+double semicolon terminator
+================================================================================
+
+let a = 1;;
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))

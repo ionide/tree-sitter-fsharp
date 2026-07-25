@@ -63,6 +63,22 @@ typedef enum {
   INDENT_BRACE = 4,
 } IndentKind;
 
+// OR-ed into the indent_kinds byte when the scope's INDENT fired mid-line
+// (no newline crossed before the anchor token), so the anchor column is a
+// mid-line position like the `Some` in `let a = Some <|`. A continuation
+// line that sits strictly BETWEEN such an anchor and the enclosing level is
+// part of the expression (F# offside is measured from the construct start,
+// not the anchor), so DEDENT must not fire into it.
+#define INDENT_KIND_MIDLINE_FLAG 0x80
+// OR-ed into the indent_kinds byte when a mid-line scope was opened on a
+// STRANDED line — one that itself hangs between two open levels and was
+// introduced by the stranded-dedent NEWLINE (e.g. `let c = ()` at col 8
+// under a col-4 module body). A following line at that column is a sibling
+// declaration, not a continuation, so the midline-anchor dedent guard must
+// not apply.
+#define INDENT_KIND_STRANDED_LINE_FLAG 0x40
+#define INDENT_KIND_FLAGS_MASK 0xC0
+
 // How an open `#if` directive entered the parse. STRUCTURED directives were
 // handed to the grammar (preproc_if rules) and both branches parse as syntax.
 // STRAY directives appeared at a position the grammar has no preproc rule for
@@ -78,6 +94,12 @@ typedef struct {
   Array(uint8_t) indent_kinds;
   Array(uint16_t) preprocessor_indents;
   Array(uint8_t) preproc_kinds;
+  // Set when the current line was introduced by a stranded-dedent NEWLINE
+  // (the line hangs between two open levels); cleared when a scan's
+  // whitespace walk crosses onto the next line. Durable because the
+  // stranded NEWLINE is an emitted token, so the flag is captured in the
+  // serialized state that later same-line scans restore.
+  uint8_t line_stranded;
   uint8_t multi_dollar_count;
   // Set when a DEDENT pops a level but the current line still sits *above* the
   // new enclosing level (a "stranded"/partial dedent). Consumed on the very
@@ -93,6 +115,14 @@ static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
 static inline bool is_word_char(int32_t c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
          (c >= '0' && c <= '9') || c == '_' || c == '\'';
+}
+
+static inline bool keyword_equals(const char *word, const char *keyword) {
+  size_t i = 0;
+  while (word[i] != '\0' && word[i] == keyword[i]) {
+    i++;
+  }
+  return word[i] == '\0' && keyword[i] == '\0';
 }
 
 static inline void push_indent(Scanner *scanner, uint16_t indent_length,
@@ -190,7 +220,19 @@ static inline void swallow_inactive_region(TSLexer *lexer) {
 
 static inline IndentKind peek_indent_kind(Scanner *scanner) {
   if (scanner->indent_kinds.size == 0) return INDENT_NORMAL;
-  return (IndentKind)*array_back(&scanner->indent_kinds);
+  return (IndentKind)(*array_back(&scanner->indent_kinds) &
+                      ~INDENT_KIND_FLAGS_MASK);
+}
+
+static inline bool top_indent_is_midline_anchor(Scanner *scanner) {
+  return scanner->indent_kinds.size > 0 &&
+         (*array_back(&scanner->indent_kinds) & INDENT_KIND_MIDLINE_FLAG) != 0;
+}
+
+static inline bool top_indent_is_stranded_line(Scanner *scanner) {
+  return scanner->indent_kinds.size > 0 &&
+         (*array_back(&scanner->indent_kinds) &
+          INDENT_KIND_STRANDED_LINE_FLAG) != 0;
 }
 
 static inline bool peek_is_paren_indent(Scanner *scanner) {
@@ -251,6 +293,9 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
     if (c == '>') {
       angle_depth--;
       if (angle_depth == 0) {
+        // A '>' inside unbalanced parens (e.g. the ':>' in
+        // `box<|(inst :> IFoo).M`) cannot close a type application.
+        if (paren_depth > 0) return false;
         if (out_saw_newline) *out_saw_newline = saw_newline;
         return true;
       }
@@ -736,6 +781,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // the first non-space char of the comment (e.g. a Markdown '(* # Heading')
   // be mis-read as a preprocessor directive, breaking the comment.
   if (valid_symbols[BLOCK_COMMENT_CONTENT] && !valid_symbols[ERROR_SENTINEL]) {
+    // Scan position is directly after a shifted '(*'. If the very next char
+    // is ')', the source text was `(*)` — F# defines that as the
+    // multiplication operator reference, never a comment (matching FSC's
+    // lexer). Decline so the GLR version that lexed '(*' as a comment opener
+    // dies immediately instead of swallowing an arbitrary span hunting for
+    // '*)' (`Constant(Checked.(*) l r, t)` arms repeated in one match were
+    // compounding such zombie versions past the GLR version cap, killing the
+    // correct parse — ExpressionOptimizer.fs whole-file wrap).
+    if (lexer->lookahead == ')') {
+      return false;
+    }
     lexer->mark_end(lexer);
     while (true) {
       if (lexer->lookahead == '\0') {
@@ -890,6 +946,22 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       } else if (lexer->lookahead == 'i') {
         advance(lexer);
+        if (lexer->lookahead == 'n') {
+          // `#indent "off"` / `#indent "on"`: a legacy verbose-syntax
+          // directive with no grammar rule. Swallow the whole line as
+          // inactive trivia (adding it to the grammar instead costs ~1 MB
+          // of parser tables for two real-world occurrences).
+          if (match_keyword_rest(lexer, "ndent") &&
+              !valid_symbols[ERROR_SENTINEL]) {
+            while (lexer->lookahead != '\n' && !lexer->eof(lexer)) {
+              advance(lexer);
+            }
+            lexer->mark_end(lexer);
+            lexer->result_symbol = PREPROC_INACTIVE;
+            return true;
+          }
+          return false;
+        }
         if (lexer->lookahead == 'f') {
           advance(lexer);
           found_preproc_if = true;
@@ -1088,6 +1160,13 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  // We crossed onto a new line: it is not (yet) known to be stranded. The
+  // stranded-NEWLINE emission below re-sets the flag in the same scan when
+  // this line does hang between levels.
+  if (found_end_of_line) {
+    scanner->line_stranded = false;
+  }
+
   // Top-level module-element separator, phase 1 of 2 (arm): a next line at
   // column 0 while only the base indent level is open separates module
   // elements, so an application expression cannot absorb the next element
@@ -1273,7 +1352,12 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
-    lexer->mark_end(lexer);  // Token = just ';'; chars after are returned to input
+    // `;;` is the top-level terminator (scripts / fsi remnants); consume both
+    // semicolons as one separator so the second one doesn't error.
+    if (lexer->lookahead == ';') {
+      advance(lexer);
+    }
+    lexer->mark_end(lexer);  // Token = just ';'/';;'; chars after are returned to input
     bool saw_newline = false;
     for (;;) {
       while (lexer->lookahead == ' ' || lexer->lookahead == '\n' ||
@@ -1349,6 +1433,41 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           // amount of dedent tokens.
           // If 'AND' is not valid we just continue to pop dedent tokens.
           if (valid_symbols[AND]) {
+            // Greedy-`and` guard: a line-leading `and` sitting LEFT of the
+            // current indent scope belongs to an outer construct (e.g.
+            // `and B() = ...` closing a type whose last member was a property
+            // accessor block) — unless it introduces another accessor
+            // (`and set (v) = ...`), which legitimately continues the
+            // accessor scope even though that scope's indent anchors at a
+            // mid-line column. Peeking past `and` moves beyond a possible
+            // mark_end position, so on the accessor path we decline and let
+            // the internal lexer produce the string-literal `and` token.
+            if (found_end_of_line && valid_symbols[DEDENT] &&
+                scanner->indents.size > 0 &&
+                indent_length < (uint32_t)peek_indent_length(scanner)) {
+              while (lexer->lookahead == ' ') {
+                advance(lexer);
+              }
+              char word[9];
+              int word_len = 0;
+              while (is_word_char(lexer->lookahead) && word_len < 8) {
+                word[word_len++] = (char)lexer->lookahead;
+                advance(lexer);
+              }
+              word[word_len] = '\0';
+              bool accessor_next =
+                  !is_word_char(lexer->lookahead) &&
+                  (keyword_equals(word, "get") || keyword_equals(word, "set") ||
+                   keyword_equals(word, "private") ||
+                   keyword_equals(word, "internal") ||
+                   keyword_equals(word, "public"));
+              if (!accessor_next) {
+                pop_indent(scanner);
+                lexer->result_symbol = DEDENT;
+                return true;
+              }
+              return false;
+            }
             lexer->mark_end(lexer);
             lexer->result_symbol = AND;
             return true;
@@ -1561,43 +1680,51 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     found_start_of_infix_op = true;
   } else if (lexer->lookahead == '|') {
     skip(lexer);
-    switch (lexer->lookahead) {
-    case ']':
-    case '}':
+    int32_t after_pipe = lexer->lookahead;
+    if (after_pipe == ']' || after_pipe == '}') {
       found_bracket_end = true;
-      break;
-    case '>':
+    } else if (after_pipe == '>') {
       found_start_of_infix_op = true;
-      break;
-    case ' ':
+    } else if (after_pipe == ' ' ||
+               // A '|' glued to a pattern-start character (`|"A"`, `|_`,
+               // `|(p, q)`, `|Some x`, `|[x]`, ``|``id`` ``) is a match arm
+               // or union case exactly like the spaced form, not an infix
+               // operator. Operator characters (`|>`, `||`, `|.`) keep the
+               // infix treatment below.
+               after_pipe == '"' || after_pipe == '(' || after_pipe == '[' ||
+               after_pipe == '`' || is_word_char(after_pipe)) {
       if (!found_end_of_line) {
         found_start_of_infix_op = true;
         found_same_line_pipe_infix = true;
-        break;
-      }
-      if (indent_length == 0) {
-        indent_length = 1;
-      }
-      if (scanner->indents.size > 0) {
-        uint16_t current_indent_length = peek_indent_length(scanner);
-        if (found_end_of_line && indent_length == current_indent_length &&
-            indent_length > 0 && !found_start_of_infix_op &&
-            !found_bracket_end) {
-          if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
-            lexer->result_symbol = NEWLINE;
-            return true;
+      } else {
+        if (indent_length == 0) {
+          indent_length = 1;
+        }
+        if (scanner->indents.size > 0) {
+          uint16_t current_indent_length = peek_indent_length(scanner);
+          if (found_end_of_line && indent_length == current_indent_length &&
+              indent_length > 0 && !found_start_of_infix_op &&
+              !found_bracket_end) {
+            if (valid_symbols[NEWLINE] && !found_preprocessor_end) {
+              lexer->result_symbol = NEWLINE;
+              return true;
+            }
           }
         }
       }
-      break;
-    default:
+    } else {
       found_start_of_infix_op = true;
-      break;
     }
   } else if (lexer->lookahead == '(') {
     skip(lexer);
     if (lexer->lookahead == '*') {
-      found_comment_start = true;
+      // `(*)` is the multiplication operator reference (F# spec 3.10), not a
+      // comment opener — peek one further so it doesn't suppress INDENT and
+      // force the comment interpretation (`let f = (*) 2 3`).
+      skip(lexer);
+      if (lexer->lookahead != ')') {
+        found_comment_start = true;
+      }
     }
   }
 
@@ -1655,7 +1782,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // out. Decline instead; after the comment is consumed as an extra, the
       // re-scan crosses the newline and INDENT anchors to the body line.
       !(found_comment_start && !found_end_of_line)) {
-    push_indent(scanner, indent_length, INDENT_NORMAL);
+    uint8_t indent_flags = 0;
+    if (!found_end_of_line) {
+      indent_flags |= INDENT_KIND_MIDLINE_FLAG;
+      if (scanner->line_stranded) {
+        indent_flags |= INDENT_KIND_STRANDED_LINE_FLAG;
+      }
+    }
+    push_indent(scanner, indent_length,
+                (IndentKind)(INDENT_NORMAL | indent_flags));
     lexer->result_symbol = INDENT;
     return true;
   }
@@ -1737,6 +1872,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
           valid_symbols[NEWLINE] && !found_start_of_infix_op &&
           !found_bracket_end && !found_preprocessor_end &&
           !found_comment_start) {
+        // This line hangs between two open levels; scopes anchored mid-line
+        // on it must not claim following same-column lines as continuations.
+        scanner->line_stranded = true;
         lexer->result_symbol = NEWLINE;
         return true;
       }
@@ -1781,8 +1919,40 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // consumed by the grammar rather than seen here at the start of a line.
       bool can_dedent_paren_indent = !(is_paren_indent || is_brace_indent) || indent_length == 0 || lexer->eof(lexer);
 
+      // A line that sits strictly DEEPER than the line which opened a
+      // mid-line-anchored scope continues the anchored expression, even when
+      // it is left of the anchor column itself: `let a = Some <|` anchors at
+      // `Some` (col 12), but F#'s offside rule measures the continuation
+      // against the `let` line's indent (4), so an operand at col 8 belongs
+      // to the expression and must not be DEDENTed into. A line at or left
+      // of the anchor line's indent is a sibling/outer construct and still
+      // dedents (`let c = ()` followed by `let d = ()` at the same column).
+      // All conditions must hold, each excluding a shape where the dedent is
+      // legitimate: a genuine pushed enclosing level (size > 2 — a top-level
+      // module body is not indent-scoped and its members MUST dedent out),
+      // of line-column kind (paren/brace/type-app indents are synthetic),
+      // the line strictly deeper than that enclosing level, and the anchor
+      // NOT opened on a stranded line (a stranded declaration like
+      // `let c = ()` at col 8 under a col-4 block is followed by sibling
+      // declarations at its own column, which must still dedent).
+      bool can_dedent_midline_anchor = true;
+      if (top_indent_is_midline_anchor(scanner) &&
+          !top_indent_is_stranded_line(scanner) &&
+          scanner->indents.size > 2) {
+        uint8_t below_kind_raw =
+            *array_get(&scanner->indent_kinds, scanner->indents.size - 2);
+        IndentKind below_kind =
+            (IndentKind)(below_kind_raw & ~INDENT_KIND_FLAGS_MASK);
+        if ((below_kind == INDENT_NORMAL || below_kind == INDENT_TRY) &&
+            indent_length >
+                *array_get(&scanner->indents, scanner->indents.size - 2)) {
+          can_dedent_midline_anchor = false;
+        }
+      }
+
       if (indent_length < current_indent_length && !found_bracket_end &&
           can_dedent_preproc && can_dedent_infix_op &&
+          can_dedent_midline_anchor &&
           (!valid_symbols[TUPLE_MARKER] || valid_symbols[ERROR_SENTINEL]) && can_dedent_paren_indent) {
         pop_indent(scanner);
         // If this line closed a nested block but still sits above the enclosing
@@ -1816,6 +1986,7 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 
   buffer[size++] = (char)scanner->multi_dollar_count;
   buffer[size++] = (char)scanner->stranded_dedent;
+  buffer[size++] = (char)scanner->line_stranded;
 
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
@@ -1877,12 +2048,16 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_clear(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
   scanner->stranded_dedent = false;
+  scanner->line_stranded = false;
   if (length > 0) {
     size_t size = 0;
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     scanner->stranded_dedent = (uint8_t)buffer[size++];
+
+    if (size >= length) return;
+    scanner->line_stranded = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];
@@ -1936,3 +2111,4 @@ static void destroy(Scanner *scanner) {
 }
 
 #endif // TREE_SITTER_FSHARP_SCANNER_H_
+

@@ -4004,3 +4004,100 @@ type AfterConn = { X : int }
           (simple_type
             (long_identifier
               (identifier))))))))
+
+================================================================================
+property accessor with argument before and-type
+================================================================================
+
+type A(c: string list) =
+    member __.Item with get columnName = List.head c
+and B() =
+    member __.X = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args
+        (typed_pattern
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (property_accessor
+              (argument_patterns
+                (long_identifier
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (long_identifier_or_op
+                  (identifier))))))))
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            (property_or_ident
+              (identifier)
+              (identifier))
+            (const
+              (int))))))))
+
+================================================================================
+attributes between type keyword and name
+================================================================================
+
+type [<Struct>] R = { A: int }
+type [<Struct>]W = NormalWhere | HavingWhere
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (union_type_defn
+      (type_name
+        (identifier))
+      (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier))))))
