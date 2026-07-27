@@ -159,6 +159,11 @@ static inline bool top_preproc_is_stray(Scanner *scanner) {
          *array_back(&scanner->preproc_kinds) == (uint8_t)PREPROC_STRAY;
 }
 
+static inline bool top_preproc_is_structured(Scanner *scanner) {
+  return scanner->preproc_kinds.size > 0 &&
+         *array_back(&scanner->preproc_kinds) == (uint8_t)PREPROC_STRUCTURED;
+}
+
 // Consume everything from the current position (just past a stray `#else`)
 // through the end of the matching `#endif` line, tracking nested directives
 // textually (proper nesting is guaranteed by the F# lexer, and the inactive
@@ -1098,9 +1103,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
                       break;
                     }
                   }
-                  if (branch_start == '.' || branch_start == '|' ||
+                  if (top_preproc_is_structured(scanner) ||
+                      branch_start == '.' || branch_start == '|' ||
                       branch_start == ')' || branch_start == ']' ||
                       branch_start == '}' || branch_start == ',') {
+                    // A `#if` nested inside a structured directive's active
+                    // branch is consumed as stray trivia: structured-inside-
+                    // structured mispairs the OUTER `#endif` (the nested
+                    // adoption steals the close; DataContext's indented
+                    // sibling `#if VENDOR` blocks, ProvidedTypes' nested
+                    // record/class directives). Inlining the active branch
+                    // keeps the enclosing books balanced.
                     push_preproc_kind(scanner, PREPROC_STRAY);
                     lexer->result_symbol = PREPROC_INACTIVE;
                     return true;
