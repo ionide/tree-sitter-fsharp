@@ -5,6 +5,29 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2026-07-27
+
+### Added
+- Python bindings for both grammars, published to PyPI: `language()` for
+  implementation files and `language_signature()` for `.fsi`, with the query
+  files bundled (including the signature set) ([#225]). Closes [#176].
+- Go bindings (`go get github.com/ionide/tree-sitter-fsharp`): `Language()`
+  and `LanguageSignature()` from one package; tested in CI across the
+  three-OS matrix ([#225]).
+- Swift bindings via SwiftPM (`Package.swift` building both grammars)
+  ([#225]).
+- Regression tests for de-indented function expressions ([#133]).
+
+### Fixed
+- `#if` directives nested inside another structured directive's branch are
+  consumed as stray trivia, keeping the outer `#endif` paired — halves the
+  error count on directive-heavy real-world files ([#221]).
+- Record updates (`{ q with A = ...; ... }`) accept continuation fields
+  indented less than the first field ([#220]).
+
+### Changed
+- Dependency bumps ([#214], [#226]).
+
 ## [0.3.2] - 2026-07-25
 
 ### Added
@@ -69,9 +92,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial `0.3.x` release.
 
+[0.3.3]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.2...0.3.3
 [0.3.2]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/ionide/tree-sitter-fsharp/releases/tag/0.3.0
+
+[#133]: https://github.com/ionide/tree-sitter-fsharp/pull/133
+[#176]: https://github.com/ionide/tree-sitter-fsharp/issues/176
+[#214]: https://github.com/ionide/tree-sitter-fsharp/pull/214
+[#220]: https://github.com/ionide/tree-sitter-fsharp/pull/220
+[#221]: https://github.com/ionide/tree-sitter-fsharp/pull/221
+[#225]: https://github.com/ionide/tree-sitter-fsharp/pull/225
+[#226]: https://github.com/ionide/tree-sitter-fsharp/pull/226
 
 [#197]: https://github.com/ionide/tree-sitter-fsharp/pull/197
 [#198]: https://github.com/ionide/tree-sitter-fsharp/pull/198
