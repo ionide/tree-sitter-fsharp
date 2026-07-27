@@ -38,3 +38,6 @@ dsl.d.ts
 *.obj
 *.o
 /**/src/parser.c
+
+__pycache__/
+*.pyc
