@@ -2954,6 +2954,7 @@ let v =
     test
 
 --------------------------------------------------------------------------------
+
 (file
   (declaration_expression
     (function_or_value_defn
@@ -2963,7 +2964,7 @@ let v =
             (identifier))))
       body: (sequential_expression
         (function_expression
-          block: (rules
+          (rules
             (rule
               pattern: (wildcard_pattern)
               block: (const
@@ -2971,6 +2972,7 @@ let v =
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
+
 ================================================================================
 function expressions without indent
 ================================================================================
@@ -2983,6 +2985,7 @@ let v =
     | _ -> ()
 
 --------------------------------------------------------------------------------
+
 (file
   (declaration_expression
     (function_or_value_defn
@@ -2991,20 +2994,19 @@ let v =
           (long_identifier_or_op
             (identifier))))
       body: (sequential_expression
-      (function_expression
-        block: (rules
-          (rule
-            pattern: (wildcard_pattern)
-            block: (const
-              (unit)))))
-      (function_expression
-        block: (rules
-          (rule
-            pattern: (wildcard_pattern)
-            block: (const
-              (unit)))))
-      )
-      )))
+        (function_expression
+          (rules
+            (rule
+              pattern: (wildcard_pattern)
+              block: (const
+                (unit)))))
+        (function_expression
+          (rules
+            (rule
+              pattern: (wildcard_pattern)
+              block: (const
+                (unit)))))))))
+
 ================================================================================
 function expressions as list items
 ================================================================================
@@ -3019,6 +3021,7 @@ let v =
     ]
 
 --------------------------------------------------------------------------------
+
 (file
   (declaration_expression
     (function_or_value_defn
@@ -3039,6 +3042,7 @@ let v =
               (wildcard_pattern)
               (const
                 (unit)))))))))
+
 ================================================================================
 address of expression inside application
 ================================================================================
