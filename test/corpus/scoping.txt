@@ -279,6 +279,6 @@ do
                 (infix_op)
                 (long_identifier_or_op
                   (identifier)))
-              (infix_op)
-              (long_identifier_or_op
-                (identifier)))))))))
+               (infix_op)
+               (long_identifier_or_op
+                 (identifier)))))))))

@@ -342,7 +342,7 @@ do test <- 2
 chain mutate expression
 ================================================================================
 
-do test <- 2 <- 4
+do test <- other <- 4
 
 --------------------------------------------------------------------------------
 
@@ -353,8 +353,8 @@ do test <- 2 <- 4
         (long_identifier_or_op
           (identifier))
         (mutate_expression
-          (const
-            (int))
+          (long_identifier_or_op
+            (identifier))
           (const
             (int)))))))
 
@@ -468,6 +468,44 @@ do [2; 3; 4]
   (declaration_expression
     (do
       (list_expression
+        (const
+          (int))
+        (const
+          (int))
+        (const
+          (int))))))
+
+================================================================================
+list expression with trailing semicolon
+================================================================================
+
+do [2; 3; 4;]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (list_expression
+        (const
+          (int))
+        (const
+          (int))
+        (const
+          (int))))))
+
+================================================================================
+array expression with trailing semicolon
+================================================================================
+
+do [|2; 3; 4;|]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (array_expression
         (const
           (int))
         (const
@@ -2494,6 +2532,7 @@ object instantiation expression
 ================================================================================
 
 let disposables = new Disposables.CompositeDisposable()
+let spaced = new TypeWithSpace(    )
 
 --------------------------------------------------------------------------------
 
@@ -2510,6 +2549,17 @@ let disposables = new Disposables.CompositeDisposable()
             (long_identifier
               (identifier)
               (identifier)))
+          (unit)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
           (unit))))))
 
 ================================================================================
@@ -3291,6 +3341,30 @@ do
           (int))))))
 
 ================================================================================
+infix expression inside paren with underindentation
+================================================================================
+
+do
+  f (a ||
+    b)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (paren_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (long_identifier_or_op
+              (identifier))))))))
+
+================================================================================
 literal expressions inside paren
 ================================================================================
 
@@ -3876,3 +3950,2574 @@ let setDefaultColors fg bg sp =
                 (int))))))
       (block_comment
         (block_comment_content)))))
+
+================================================================================
+pipeline with lambda and comparison operators
+================================================================================
+
+let result = items |> List.filter (fun p -> p.Age >= minAge && p.Age <= maxAge)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier))))
+        (paren_expression
+          (fun_expression
+            (argument_patterns
+              (long_identifier
+                (identifier)))
+            (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (infix_op)
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+query expression with where and select
+================================================================================
+
+let results =
+  query {
+    for student in db.Student do
+    where (student.Age > 18)
+    select student
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (paren_expression
+                (infix_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (infix_op)
+                  (const
+                    (int)))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+query expression with sortBy and thenBy
+================================================================================
+
+let x =
+    query {
+        for student in db.Student do
+        sortBy student.Name
+        thenBy student.Age
+        select student
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier))))
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+query expression with groupBy into
+================================================================================
+
+let x =
+  query {
+    for student in db.Student do
+    groupBy student.Age into g
+    select g
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+query expression with join on
+================================================================================
+
+let x =
+  query {
+    for student in db.Student do
+    join course in db.Course on (student.CourseId = course.Id)
+    select (student, course)
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier)))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (long_identifier_or_op
+                  (identifier)))
+              (paren_expression
+                (infix_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (paren_expression
+                (tuple_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))))))))))
+
+================================================================================
+query expression with additional custom operations
+================================================================================
+
+let q =
+  query {
+    for student in db.Student do
+    distinct
+    sortByDescending student.Name
+    thenByDescending student.Age
+    skip 10
+    take 5
+    select student
+  }
+
+let c =
+  query {
+    for student in db.Student do
+    contains student
+  }
+
+let h =
+  query {
+    for student in db.Student do
+    headOrDefault
+  }
+
+let n =
+  query {
+    for student in db.Student do
+    nth 3
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (long_identifier_or_op
+              (identifier))
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (sequential_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier))))
+                (sequential_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (const
+                      (int)))
+                  (sequential_expression
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (const
+                        (int)))
+                    (application_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (long_identifier_or_op
+                        (identifier))))))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (int))))))))
+
+================================================================================
+query expression with groupJoin into and leftOuterJoin into
+================================================================================
+
+let q1 =
+  query {
+    for student in db.Student do
+    groupJoin course in db.Course on (student.CourseId = course.Id) into matches
+    select matches
+  }
+
+let q2 =
+  query {
+    for student in db.Student do
+    leftOuterJoin course in db.Course on (student.CourseId = course.Id) into matches
+    select matches
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (application_expression
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))
+                        (long_identifier_or_op
+                          (identifier)))
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier)))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (sequential_expression
+            (application_expression
+              (application_expression
+                (application_expression
+                  (application_expression
+                    (application_expression
+                      (application_expression
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))
+                        (long_identifier_or_op
+                          (identifier)))
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier)))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+trait call expression with member
+================================================================================
+
+let inline f x = (^a : (member Name : string) x)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (paren_expression
+        (srtp_call_expression
+          (type_argument
+            (identifier))
+          (trait_member_constraint
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+trait call expression with static member
+================================================================================
+
+let inline f (x: ^a) = (^a : (static member Zero : ^a) ())
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      (paren_expression
+        (srtp_call_expression
+          (type_argument
+            (identifier))
+          (trait_member_constraint
+            (identifier)
+            (type_argument
+              (identifier)))
+          (const
+            (unit)))))))
+
+================================================================================
+fixed expression
+================================================================================
+
+let x = fixed &buf
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (prefixed_expression
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+quotation splicing with %%
+================================================================================
+
+let x = <@@ %%expr @@>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (literal_expression
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+quotation with lambda
+================================================================================
+
+let x = <@ fun y -> y @>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (literal_expression
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+range expression in computation expression
+================================================================================
+
+let x = seq { 1..10 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (range_expression
+          (const
+            (int))
+          (const
+            (int)))))))
+
+================================================================================
+range expression with step in computation expression
+================================================================================
+
+let x = seq { 1..2..10 }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (range_expression
+          (const
+            (int))
+          (const
+            (int))
+          (const
+            (int)))))))
+
+================================================================================
+short for expression in computation expression
+================================================================================
+
+let x =
+    seq {
+        for key in vars.Keys -> string key, string vars[key]
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (short_comp_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (tuple_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (list_expression
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+let then short for expression in computation expression
+================================================================================
+
+let x =
+    seq {
+        let vars = Environment.GetEnvironmentVariables()
+        for key in vars.Keys -> string key, string vars[key]
+    }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        block: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (application_expression
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (unit)))
+          in: (short_comp_expression
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (tuple_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier)))
+                (list_expression
+                  (long_identifier_or_op
+                    (identifier)))))))))))
+
+================================================================================
+extern declaration
+================================================================================
+
+[<DllImport("kernel32.dll")>]
+extern bool CloseHandle(nativeint handle)
+
+--------------------------------------------------------------------------------
+
+(file
+  (extern_binding
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string)))))
+    (simple_type
+      (long_identifier
+        (identifier)))
+    (identifier)
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))))
+
+================================================================================
+extern declaration with multiple parameters
+================================================================================
+
+[<DllImport("user32.dll")>]
+extern int SendMessage(nativeint hWnd, int msg, nativeint wParam, nativeint lParam)
+
+--------------------------------------------------------------------------------
+
+(file
+  (extern_binding
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (paren_expression
+          (const
+            (string)))))
+    (simple_type
+      (long_identifier
+        (identifier)))
+    (identifier)
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))
+    (extern_param
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier))))
+
+================================================================================
+and! in computation expression
+================================================================================
+
+do
+  task {
+    let! x = getX()
+    and! y = getY()
+    return x + y
+  }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (unit)))
+          (and_bang
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (unit)))
+          (prefixed_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+struct tuple type annotation
+================================================================================
+
+let f (x: struct (int * int)) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (struct_type
+              (paren_type
+                (compound_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+struct anonymous record type annotation
+================================================================================
+
+let f (x: struct {| Name: string |}) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (anon_record_type
+              (record_fields
+                (record_field
+                  (identifier)
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+Trailing ; after nested single line
+================================================================================
+
+module M =
+    type Tracker() =
+        member val Filled = 0.0 with get, set
+        member val Last = 0.0 with get, set
+        member x.AddFill (newTime : bool) (time : float) (dollarClipSize : float) : float =
+            let mutable dollarFill = dollarClipSize
+            if (dollarFill <= 0.0) then
+                0.0
+            else
+                if newTime then x.Last <- time;
+                x.Filled <- x.Filled + dollarFill;
+                dollarFill
+
+    type AfterTracker = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        (primary_constr_args)
+        block: (type_extension_elements
+          (member_defn
+            (property_or_ident
+              (identifier))
+            (const
+              (float))))
+        block: (type_extension_elements
+          (member_defn
+            (property_or_ident
+              (identifier))
+            (const
+              (float))))
+        block: (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (paren_pattern
+                (typed_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              args: (paren_pattern
+                (typed_pattern
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier)))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              args: (typed_pattern
+                (paren_pattern
+                  (typed_pattern
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier)))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (declaration_expression
+                (function_or_value_defn
+                  (value_declaration_left
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  body: (long_identifier_or_op
+                    (identifier)))
+                in: (if_expression
+                  guard: (paren_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (float))))
+                  then: (const
+                    (float))
+                  else: (sequential_expression
+                    (if_expression
+                      guard: (long_identifier_or_op
+                        (identifier))
+                      then: (mutate_expression
+                        assignee: (long_identifier_or_op
+                          (long_identifier
+                            (identifier)
+                            (identifier)))
+                        value: (long_identifier_or_op
+                          (identifier))))
+                    (sequential_expression
+                      (mutate_expression
+                        assignee: (long_identifier_or_op
+                          (long_identifier
+                            (identifier)
+                            (identifier)))
+                        value: (infix_expression
+                          (long_identifier_or_op
+                            (long_identifier
+                              (identifier)
+                              (identifier)))
+                          (infix_op)
+                          (long_identifier_or_op
+                            (identifier))))
+                      (long_identifier_or_op
+                        (identifier)))))))))))
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Multi line else if &&
+================================================================================
+
+module M =
+    let handle (trade : Trade) (side : int) =
+        if trade.TradeType = 1 then
+            startCollation trade
+        else if trade.TradeType = 2
+            && trade.TradeSize = side then
+            startCollection trade
+
+    type AfterHandle = { X : int }
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        body: (if_expression
+          guard: (infix_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (infix_op)
+            (const
+              (int)))
+          then: (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (elif_expression
+            guard: (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (const
+                  (int)))
+              (infix_op)
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            then: (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))))))
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Mixed separators ; and newline
+================================================================================
+
+module M =
+    let build (r : string []) =
+        let newObj =
+            {Date = System.DateTime.Parse(r.[0]);
+            ExchId = r.[1] |> int32;
+            Delay = {ToBrokerDelay = -1.0; FromBrokerDelay = -1.0; MarketDataDelay = -1.0
+                    OrderEntryToExchangeDelay = -1.0}}
+        newObj
+
+    let after () = 42
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (list_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        body: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (brace_expression
+              block: (field_initializers
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (application_expression
+                    (dot_expression
+                      base: (long_identifier_or_op
+                        (long_identifier
+                          (identifier))
+                        (identifier))
+                      field: (long_identifier_or_op
+                        (identifier)))
+                    (index_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      index: (const
+                        (int)))))
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (infix_expression
+                    (index_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      index: (const
+                        (int)))
+                    (infix_op)
+                    (long_identifier_or_op
+                      (identifier))))
+                (field_initializer
+                  field: (long_identifier
+                    (identifier))
+                  value: (brace_expression
+                    block: (field_initializers
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))
+                      (field_initializer
+                        field: (long_identifier
+                          (identifier))
+                        value: (const
+                          (float)))))))))
+          in: (long_identifier_or_op
+            (identifier)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+Use mutable
+================================================================================
+
+module M =
+    let run () =
+        use mutable okResponse : HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+        okResponse.ToSTring()
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (declaration_expression
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))))
+          in: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+generic new constructor
+================================================================================
+
+module M = 
+    let make<'T when 'T : (new : unit -> 'T)> () =
+        let factor = new 'T()
+        factory
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))
+            (type_argument_constraints
+              (constraint
+                (type_argument
+                  (identifier))
+                (type_argument
+                  (identifier)))))
+          (argument_patterns
+            (const
+              (unit))))
+        body: (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (generic_new_expression
+              (type_argument
+                (identifier))
+              (unit)))
+          in: (long_identifier_or_op
+            (identifier)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+trailing dot float and semicolon
+================================================================================
+
+module M =
+    let score diff maxTolerance =
+        if (diff <= -maxTolerance) then 1.; // behind
+        elif (diff >= maxTolerance) then 0.; // ahead
+        else 0.5
+
+    let after () = 42
+
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (long_identifier
+              (identifier))
+            (long_identifier
+              (identifier))))
+        body: (if_expression
+          guard: (paren_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (prefixed_expression
+                (prefix_op)
+                (long_identifier_or_op
+                  (identifier)))))
+          then: (const
+            (float))
+          (line_comment)
+          (elif_expression
+            guard: (paren_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier))))
+            then: (const
+              (float)))
+          (line_comment)
+          else: (const
+            (float)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        body: (const
+          (int))))))
+
+================================================================================
+while expression with boolean infix condition
+================================================================================
+
+while a && b do
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (while_expression
+    (infix_expression
+      (long_identifier_or_op
+        (identifier))
+      (infix_op)
+      (long_identifier_or_op
+        (identifier)))
+    (const
+      (unit))))
+
+================================================================================
+for expression with boolean infix enumerable
+================================================================================
+
+for x in a && b do
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (for_expression
+    (identifier_pattern
+      (long_identifier_or_op
+        (identifier)))
+    (infix_expression
+      (long_identifier_or_op
+        (identifier))
+      (infix_op)
+      (long_identifier_or_op
+        (identifier)))
+    (const
+      (unit))))
+
+================================================================================
+pipe into function expression
+================================================================================
+
+let a = ps |> function | Card c -> Some c | _ -> None
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (function_expression
+          (rules
+            (rule
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (infix_expression
+                (infix_expression
+                  (application_expression
+                    (long_identifier_or_op
+                      (identifier))
+                    (long_identifier_or_op
+                      (identifier)))
+                  (infix_op)
+                  (long_identifier_or_op
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+when guard with infix and arrow without space
+================================================================================
+
+let f x =
+    match x with
+    | y when y > 0 || isPfOwned-> 1
+    | _ -> 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (infix_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (const
+                  (int)))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))
+            (const
+              (int)))
+          (rule
+            (wildcard_pattern)
+            (const
+              (int))))))))
+
+================================================================================
+leading comma argument continuation
+================================================================================
+
+let opts =
+    Options(
+        ExcludeEnvironment = false
+        ,ExcludeCli = true
+        ,ExcludeManaged = false
+    )
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (tuple_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (bool)))
+          (tuple_expression
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (bool)))
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (bool)))))))))
+
+================================================================================
+under-indented list continuation after semicolon
+================================================================================
+
+let dchars = ["a";"b";
+     "c";"d"] |> Set.ofList
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (list_expression
+          (const
+            (string))
+          (const
+            (string))
+          (const
+            (string))
+          (const
+            (string)))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+operator section as immediate application argument
+================================================================================
+
+let r = (a, b) ||> List.fold(Option.fold(+))
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (paren_expression
+          (tuple_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier))))
+        (infix_op)
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (long_identifier_or_op
+              (op_identifier))))))))
+
+================================================================================
+nested for comprehension with arrow
+================================================================================
+
+let e = [ for l in 0..3 do for h in 0..3 -> (l, h) ]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (list_expression
+        (for_expression
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (range_expression
+            (const
+              (int))
+            (const
+              (int)))
+          (short_comp_expression
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (range_expression
+              (const
+                (int))
+              (const
+                (int)))
+            (paren_expression
+              (tuple_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier))))))))))
+
+================================================================================
+interpolated string after let with if body in lambda
+================================================================================
+
+let r =
+    values
+    |> Array.map(fun v ->
+        let req = if v.Required then "" else " option"
+        $"{v.Name}{req}"
+    )
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (fun_expression
+            (argument_patterns
+              (long_identifier
+                (identifier)))
+            (declaration_expression
+              (function_or_value_defn
+                (value_declaration_left
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))))
+                (if_expression
+                  (long_identifier_or_op
+                    (long_identifier
+                      (identifier)
+                      (identifier)))
+                  (const
+                    (string))
+                  (const
+                    (string))))
+              (const
+                (string
+                  (format_string
+                    (format_string_eval
+                      (long_identifier_or_op
+                        (long_identifier
+                          (identifier)
+                          (identifier))))
+                    (format_string_eval
+                      (long_identifier_or_op
+                        (identifier)))))))))))))
+
+================================================================================
+if else inside named argument
+================================================================================
+
+let f sender =
+    let client = new SmtpClient(host, 8080,
+                        EnableSsl = true, Credentials =
+                            if ok then Cred(sender, b.Replace("a", ""))
+                            else Cred(sender)
+                    )
+    client
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (tuple_expression
+                (long_identifier_or_op
+                  (identifier))
+                (tuple_expression
+                  (const
+                    (int))
+                  (tuple_expression
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (const
+                        (bool)))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (if_expression
+                        (long_identifier_or_op
+                          (identifier))
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (tuple_expression
+                            (long_identifier_or_op
+                              (identifier))
+                            (application_expression
+                              (long_identifier_or_op
+                                (long_identifier
+                                  (identifier)
+                                  (identifier)))
+                              (tuple_expression
+                                (const
+                                  (string))
+                                (const
+                                  (string))))))
+                        (application_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (long_identifier_or_op
+                            (identifier)))))))))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+statement after pipe chain in if branch
+================================================================================
+
+let f () =
+    let basicCheck =
+        if c then
+            eventWarn("x")
+            |> writeLog
+            simpleError "CVC"
+        else moreChecks
+    basicCheck
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (if_expression
+            (long_identifier_or_op
+              (identifier))
+            (sequential_expression
+              (infix_expression
+                (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (const
+                    (string)))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))
+            (long_identifier_or_op
+              (identifier))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+measure literal with backtick-quoted unit
+================================================================================
+
+let confidenceLimited =
+    if confidence > 0.95m<``Risk %``> then 0.95m
+    else confidence/1m<``Risk %``>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (if_expression
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (typed_expression
+            (const
+              (decimal
+                (float)))
+            (types
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (const
+          (decimal
+            (float)))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (typed_expression
+            (const
+              (decimal
+                (int)))
+            (types
+              (simple_type
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+Measure division abbreviation
+================================================================================
+
+module M =
+    [<Measure>] type Dollars
+    [<Measure>] type TradeableUnit
+
+    [<Measure>]
+    type DollarPrice = Dollars / TradeableUnit
+
+    type AfterMeasure = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_declaration
+        (type_name
+          (identifier))))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_declaration
+        (type_name
+          (identifier))))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_abbrev_defn
+        (type_name
+          (identifier))
+        (measure
+          (measure_quotient
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+Measure inside a generic
+================================================================================
+
+module M = 
+    type Row =
+        {
+            NumOrders : Prov<float<1>>
+            NumFills : float<1>
+        }
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (generic_type
+                    (long_identifier
+                      (identifier))
+                    (type_attributes
+                      (type_attribute
+                        (measure
+                          (measure_atom)))))))))
+          (record_field
+            (identifier)
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (measure
+                    (measure_atom)))))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+postfix type in a record field
+================================================================================
+
+type FillLog = {
+    trade : int
+    orderId : int WWFun
+    size : float }
+
+type AfterFill = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier))))
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+DU case with named fields + generic param
+================================================================================
+
+type 'predId Constraint when 'predId : comparison = 
+    | SingleEqualityConstraint of predId : 'predId * RightHandSide : double
+    | AlphaEqualTo of RightHandSide : double
+
+type AfterConstraint = { X : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        (type_argument
+          (identifier))
+        (identifier)
+        (type_argument_constraints
+          (constraint
+            (type_argument
+              (identifier)))))
+      (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (type_argument
+                (identifier)))
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+Tuple type abbreviation with generic args
+================================================================================
+
+module M = 
+    type TOLQueue<'a> = TimedQueue.TimedQueue<'a> * UpdatingTimeStamp
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (type_abbrev_defn
+        (type_name
+          (long_identifier
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))))
+        (compound_type
+          (generic_type
+            (long_identifier
+              (identifier)
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (type_argument
+                  (identifier)))))
+          (simple_type
+            (long_identifier
+              (identifier))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+Tuple type abbreviation with no generics
+================================================================================
+
+module M = 
+    type CombinedEdit = Option<SensitivityFeatureEdit> * Option<SensitivityParameterEdit>
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (type_definition
+      (type_abbrev_defn
+        (type_name
+          (identifier))
+        (compound_type
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))))
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+Embedded backtick indent
+================================================================================
+
+module M = 
+    let ``Parser reads `InputOpts` as expected.`` (args : string list) = 
+        args |> List.length
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (postfix_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (long_identifier
+                  (identifier))))))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier))))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+Triple Backtick indent
+================================================================================
+
+module M =
+    let ```enumerateCaches` can enumerate a single cache.`` () =
+        42
+
+    let after () = 43
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+multiplication operator reference
+================================================================================
+
+let f = (*) 2 3
+let x = Checked.(*) 2 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (op_identifier))
+          (const
+            (int)))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))
+            (op_identifier))
+          (const
+            (int)))
+        (const
+          (int))))))
+
+================================================================================
+backpipe glued to identifier before parenthesized upcast
+================================================================================
+
+let x = Some(box<|(inst :> System.IComparable).CompareTo 1)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (application_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (dot_expression
+              (paren_expression
+                (typecast_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (simple_type
+                    (long_identifier
+                      (identifier)
+                      (identifier)))))
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (int)))))))
+
+================================================================================
+trailing backpipe continues assignment on next line
+================================================================================
+
+let f (x: B) =
+    x.C <- Some <|
+        max 1 2
+    ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (sequential_expression
+        (mutate_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (application_expression
+            (application_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (const
+                (int)))
+            (const
+              (int))))
+        (const
+          (unit))))))
+
+================================================================================
+double semicolon terminator
+================================================================================
+
+let a = 1;;
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))

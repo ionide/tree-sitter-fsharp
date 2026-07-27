@@ -27,14 +27,16 @@ extern "C" {
     fn tree_sitter_fsharp_signature() -> *const ();
 }
 
-/// The tree-sitter [`LanguageFn`] for this grammar.
+/// The tree-sitter [`LanguageFn`] for this fsharp grammar.
 pub const LANGUAGE_FSHARP: LanguageFn = unsafe { LanguageFn::from_raw(tree_sitter_fsharp) };
 pub const LANGUAGE_SIGNATURE: LanguageFn = unsafe { LanguageFn::from_raw(tree_sitter_fsharp_signature) };
 
 /// The content of the [`node-types.json`][] file for this grammar.
-///
-/// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers#static-node-types
+/// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers/6-static-node-types.html
 pub const FSHARP_NODE_TYPES: &str = include_str!("../../fsharp/src/node-types.json");
+
+/// The content of the [`node-types.json`][] file for the signature grammar.
+/// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers/6-static-node-types.html
 pub const SIGNATURE_NODE_TYPES: &str = include_str!("../../fsharp_signature/src/node-types.json");
 
 // NOTE: uncomment these to include any queries that this grammar contains:

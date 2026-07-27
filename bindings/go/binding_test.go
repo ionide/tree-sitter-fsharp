@@ -4,39 +4,45 @@ import (
 	"testing"
 
 	tree_sitter "github.com/tree-sitter/go-tree-sitter"
-	tree_sitter_fsharp "github.com/tree-sitter/tree-sitter-fsharp/bindings/go"
+	tree_sitter_fsharp "github.com/ionide/tree-sitter-fsharp/bindings/go"
 )
 
-func TestFSharpGrammar(t *testing.T) {
-	language := tree_sitter.NewLanguage(tree_sitter_fsharp.LanguageFSharp())
+func TestCanLoadGrammar(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_fsharp.Language())
 	if language == nil {
-		t.Errorf("Error loading FSharp grammar")
-	}
-
-	sourceCode := []byte("module M = ()")
-	parser := tree_sitter.NewParser()
-	defer parser.Close()
-	parser.SetLanguage(language)
-
-	tree := parser.Parse(sourceCode, nil)
-	if tree == nil || tree.RootNode().HasError() {
-		t.Errorf("Error parsing FSharp")
+		t.Errorf("Error loading Fsharp grammar")
 	}
 }
 
-func TestFSharpSignatureGrammar(t *testing.T) {
-	language := tree_sitter.NewLanguage(tree_sitter_fsharp.LanguageFSharpSignature())
+func TestCanLoadSignatureGrammar(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_fsharp.LanguageSignature())
 	if language == nil {
-		t.Errorf("Error loading FSharpSignature grammar")
+		t.Errorf("Error loading Fsharp signature grammar")
 	}
+}
 
-	sourceCode := []byte("val x : int -> int")
+func TestCanParse(t *testing.T) {
 	parser := tree_sitter.NewParser()
 	defer parser.Close()
-	parser.SetLanguage(language)
+	if err := parser.SetLanguage(tree_sitter.NewLanguage(tree_sitter_fsharp.Language())); err != nil {
+		t.Fatalf("Error setting F# language: %v", err)
+	}
+	tree := parser.Parse([]byte("let x = 1\n"), nil)
+	defer tree.Close()
+	if tree.RootNode().HasError() {
+		t.Errorf("Error parsing F# source")
+	}
+}
 
-	tree := parser.Parse(sourceCode, nil)
-	if tree == nil || tree.RootNode().HasError() {
-		t.Errorf("Error parsing FSharpSignature")
+func TestCanParseSignature(t *testing.T) {
+	parser := tree_sitter.NewParser()
+	defer parser.Close()
+	if err := parser.SetLanguage(tree_sitter.NewLanguage(tree_sitter_fsharp.LanguageSignature())); err != nil {
+		t.Fatalf("Error setting F# signature language: %v", err)
+	}
+	tree := parser.Parse([]byte("module Test\nval x : int\n"), nil)
+	defer tree.Close()
+	if tree.RootNode().HasError() {
+		t.Errorf("Error parsing F# signature source")
 	}
 }

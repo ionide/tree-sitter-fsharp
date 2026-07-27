@@ -1,11 +1,15 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
   "grammars": [
     {
       "name": "fsharp",
       "camelcase": "FSharp",
       "scope": "source.fsharp",
       "path": "fsharp",
-      "file-types": ["fs", "fsx"],
+      "file-types": [
+        "fs",
+        "fsx"
+      ],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",
       "tags": "queries/tags.scm",
@@ -16,15 +20,17 @@
       "camelcase": "FSharpSignature",
       "scope": "source.fsharp.signature",
       "path": "fsharp_signature",
-      "file-types": ["fsi"],
-      "highlights": "queries/highlights.scm",
+      "file-types": [
+        "fsi"
+      ],
+      "highlights": "fsharp_signature/queries/highlights.scm",
       "injections": "queries/injections.scm",
-      "tags": "queries/tags.scm",
+      "tags": "fsharp_signature/queries/tags.scm",
       "injection-regex": "^fsharp_signature$"
     }
   ],
   "metadata": {
-    "version": "0.1.0",
+    "version": "0.3.2",
     "license": "MIT",
     "description": "",
     "authors": [
@@ -39,9 +45,11 @@
   "bindings": {
     "c": true,
     "go": true,
+    "java": false,
     "node": true,
     "python": true,
     "rust": true,
-    "swift": true
+    "swift": true,
+    "zig": false
   }
 }

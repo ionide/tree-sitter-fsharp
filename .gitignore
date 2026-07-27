@@ -1,3 +1,5 @@
+.DS_Store
+
 # Rust artifacts
 /Cargo.lock
 /target/
@@ -35,3 +37,7 @@ dsl.d.ts
 *.wasm
 *.obj
 *.o
+/**/src/parser.c
+
+__pycache__/
+*.pyc

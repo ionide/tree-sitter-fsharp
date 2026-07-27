@@ -81,21 +81,21 @@ let name (x: int, y: string) = 1, "test"
       (function_declaration_left
         (identifier)
         (argument_patterns
-          (typed_pattern
-            (repeat_pattern
-              (typed_pattern
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier)))
-                (simple_type
-                  (long_identifier
-                    (identifier))))
+          (repeat_pattern
+            (typed_pattern
               (identifier_pattern
                 (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
                   (identifier))))
-            (simple_type
-              (long_identifier
-                (identifier))))))
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
       (tuple_expression
         (const
           (int))
@@ -390,6 +390,59 @@ let {F1 = v1; F2 = v2} = {F1 = "a"; F2 = "b"}
               (string))))))))
 
 ================================================================================
+multiline record patterns
+================================================================================
+
+let f =
+    match x with
+    | { Field1 = 1
+        Field2 = true } -> ()
+    | { Field1 = 2
+        Field2 = false } -> ()
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (record_pattern
+              (field_pattern
+                (long_identifier
+                  (identifier))
+                (const
+                  (int)))
+              (field_pattern
+                (long_identifier
+                  (identifier))
+                (const
+                  (bool))))
+            (const
+              (unit)))
+          (rule
+            (record_pattern
+              (field_pattern
+                (long_identifier
+                  (identifier))
+                (const
+                  (int)))
+              (field_pattern
+                (long_identifier
+                  (identifier))
+                (const
+                  (bool))))
+            (const
+              (unit))))))))
+
+================================================================================
 named pattern
 ================================================================================
 
@@ -524,3 +577,144 @@ do
               (wildcard_pattern))
             (const
               (unit))))))))
+
+================================================================================
+type test pattern
+================================================================================
+
+do
+  match x with
+  | :? string -> true
+  | :? int as i -> false
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (type_check_pattern
+              (atomic_type
+                (long_identifier
+                  (identifier))))
+            (const
+              (bool)))
+          (rule
+            (type_check_pattern
+              (atomic_type
+                (long_identifier
+                  (identifier)))
+              (identifier))
+            (const
+              (bool))))))))
+
+================================================================================
+record pattern with qualified identifiers and union case field values
+================================================================================
+
+match x with
+| { Bar = A.B } -> 1
+| { Foo.Bar = Some y } -> y
+| { Bar = Foo.Baz y } -> y
+
+--------------------------------------------------------------------------------
+
+(file
+  (match_expression
+    (long_identifier_or_op
+      (identifier))
+    (rules
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier))))))
+        (const
+          (int)))
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier)
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (long_identifier_or_op
+          (identifier)))
+      (rule
+        (record_pattern
+          (field_pattern
+            (long_identifier
+              (identifier))
+            (identifier_pattern
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier)
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+match arm with pipe glued to pattern
+================================================================================
+
+let f w =
+    match w with
+    |"A" -> ()
+    |_ -> failwith "no"
+    System.Console.WriteLine "x"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (sequential_expression
+        (match_expression
+          (long_identifier_or_op
+            (identifier))
+          (rules
+            (rule
+              (const
+                (string))
+              (const
+                (unit)))
+            (rule
+              (wildcard_pattern)
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (const
+                  (string))))))
+        (application_expression
+          (dot_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier))
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (const
+            (string)))))))

@@ -1,41 +1,24 @@
 // swift-tools-version:5.3
+
 import PackageDescription
 
 let package = Package(
-    name: "TreeSitterFSharp",
+    name: "TreeSitterFsharp",
     products: [
-        .library(name: "TreeSitterFSharp", targets: ["TreeSitterFSharp"]),
+        .library(name: "TreeSitterFsharp", targets: ["TreeSitterFsharp"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/ChimeHQ/SwiftTreeSitter", from: "0.8.0"),
+        .package(name: "SwiftTreeSitter", url: "https://github.com/tree-sitter/swift-tree-sitter", from: "0.9.0"),
     ],
     targets: [
         .target(
-            name: "TreeSitterFSharp",
+            name: "TreeSitterFsharp",
+            dependencies: [],
             path: ".",
-            exclude: [
-                "Cargo.toml",
-                "Makefile",
-                "binding.gyp",
-                "bindings/c",
-                "bindings/go",
-                "bindings/node",
-                "bindings/python",
-                "bindings/rust",
-                "prebuilds",
-                "grammar.js",
-                "package.json",
-                "package-lock.json",
-                "pyproject.toml",
-                "setup.py",
-                "test",
-                "examples",
-                ".editorconfig",
-                ".github",
-                ".gitignore",
-                ".gitattributes",
-                ".gitmodules",
-            ],
+            // Both grammars compile into one target; each file is its own
+            // translation unit, so the two scanners' static helpers do not
+            // collide. tree_sitter_fsharp() and tree_sitter_fsharp_signature()
+            // are declared in bindings/swift/TreeSitterFsharp/fsharp.h.
             sources: [
                 "fsharp/src/parser.c",
                 "fsharp/src/scanner.c",
@@ -46,16 +29,19 @@ let package = Package(
                 .copy("queries")
             ],
             publicHeadersPath: "bindings/swift",
-            cSettings: [.headerSearchPath("fsharp/src")]
+            cSettings: [
+                .headerSearchPath("fsharp/src"),
+                .headerSearchPath("fsharp_signature/src"),
+            ]
         ),
         .testTarget(
-            name: "TreeSitterFSharpTests",
+            name: "TreeSitterFsharpTests",
             dependencies: [
                 "SwiftTreeSitter",
-                "TreeSitterFSharp",
+                "TreeSitterFsharp",
             ],
-            path: "bindings/swift/TreeSitterFSharpTests"
+            path: "bindings/swift/TreeSitterFsharpTests"
         )
-    ]
+    ],
+    cLanguageStandard: .c11
 )
-

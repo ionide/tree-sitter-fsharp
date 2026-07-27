@@ -7,8 +7,8 @@ typedef struct TSLanguage TSLanguage;
 extern "C" {
 #endif
 
-extern TSLanguage *tree_sitter_fsharp();
-extern TSLanguage *tree_sitter_fsharp_signature();
+const TSLanguage *tree_sitter_fsharp(void);
+const TSLanguage *tree_sitter_fsharp_signature(void);
 
 #ifdef __cplusplus
 }

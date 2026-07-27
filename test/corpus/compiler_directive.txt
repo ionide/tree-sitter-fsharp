@@ -34,6 +34,31 @@ do ()
           (unit))))))
 
 ================================================================================
+numeric compiler directives
+================================================================================
+
+module A
+#nowarn 20
+#nowarn 20
+#warnon 20
+1
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (compiler_directive_decl
+      (int))
+    (compiler_directive_decl
+      (int))
+    (compiler_directive_decl
+      (int))
+    (const
+      (int))))
+
+================================================================================
 line compiler directive
 ================================================================================
 
@@ -218,7 +243,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (application_expression
               (long_identifier_or_op
                 (identifier))
@@ -257,7 +282,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (application_expression
               (long_identifier_or_op
                 (identifier))
@@ -302,7 +327,7 @@ do
             (int)))
         (sequential_expression
           (preproc_if
-            (identifier)
+            (bool)
             (sequential_expression
               (application_expression
                 (long_identifier_or_op
@@ -502,6 +527,127 @@ let f =
             (int)))))))
 
 ================================================================================
+preproc_if with negation
+================================================================================
+
+#if !DEBUG
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with and condition
+================================================================================
+
+#if A && B
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_and_expression
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with or condition
+================================================================================
+
+#if A || B
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_or_expression
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if with complex condition
+================================================================================
+
+#if (A || B) && !C
+let x = 1
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_and_expression
+      (preproc_if_or_expression
+        (identifier)
+        (identifier))
+      (preproc_if_not_expression
+        (identifier)))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int))))))
+
+================================================================================
+preproc_if around top-level module
+================================================================================
+
+#if !INTERACTIVE
+module ExpressionOptimizer
+#endif
+
+open System
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (named_module
+      (long_identifier
+        (identifier))))
+  (import_decl
+    (long_identifier
+      (identifier))))
+
+================================================================================
 attributes with target
 ================================================================================
 
@@ -534,3 +680,610 @@ let f = ()
             (identifier))))
       (const
         (unit)))))
+
+================================================================================
+preproc_if in module with pipe in else branch
+================================================================================
+
+module M =
+#if A
+    let x = "y"
+#else
+    let x = "a" |> id
+#endif
+    let y = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (preproc_if
+      condition: (identifier)
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (string))))
+      alternative: (preproc_else
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (infix_expression
+              (const
+                (string))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier)))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))
+
+================================================================================
+preproc_if with negated condition and load directive
+================================================================================
+
+#if !FAKE
+#load "intellisense.fsx"
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (fsi_directive_decl
+      (string))))
+
+================================================================================
+preproc_if with empty branches
+================================================================================
+
+#if INTERACTIVE
+#else
+[<EntryPoint>]
+#endif
+let main args = 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (identifier)
+    (preproc_else
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+preproc_if with multiple opens in branches
+================================================================================
+
+module M
+#if A
+open C.D
+#else
+open E.F
+open G.H
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (long_identifier
+      (identifier))
+    (preproc_if
+      (identifier)
+      (import_decl
+        (long_identifier
+          (identifier)
+          (identifier)))
+      (preproc_else
+        (import_decl
+          (long_identifier
+            (identifier)
+            (identifier)))
+        (import_decl
+          (long_identifier
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+preproc_if with attributes before directive
+================================================================================
+
+[<Literal>]
+#if !offline
+let connStr = "a"
+#else
+let connStr = "b"
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (string))))
+    (preproc_else
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (const
+            (string)))))))
+
+================================================================================
+preproc_if with dangling let in expression branches
+================================================================================
+
+let getRooted path =
+    if isRooted path then
+        path
+    else
+        let parsed = path |> combine
+#if INTERACTIVE
+        let basePath = __SOURCE_DIRECTORY__
+#else
+        let basePath = asmLocation |> dirName
+#endif
+        combine2 basePath parsed
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (if_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))
+        (long_identifier_or_op
+          (identifier))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (long_identifier_or_op
+                (identifier))))
+          (sequential_expression
+            (preproc_if
+              (identifier)
+              (declaration_expression
+                (function_or_value_defn
+                  (value_declaration_left
+                    (identifier_pattern
+                      (long_identifier_or_op
+                        (identifier))))
+                  (long_identifier_or_op
+                    (identifier))))
+              (preproc_else
+                (declaration_expression
+                  (function_or_value_defn
+                    (value_declaration_left
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier))))
+                    (infix_expression
+                      (long_identifier_or_op
+                        (identifier))
+                      (infix_op)
+                      (long_identifier_or_op
+                        (identifier)))))))
+            (application_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+preproc_if after record type definition
+================================================================================
+
+type T = {
+    A: int
+}
+
+#if !NETSTANDARD
+let messageBuffer = GlobalHost.Configuration.Max
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        (identifier))
+      (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))))
+  (preproc_if
+    (preproc_if_not_expression
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (dot_expression
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))
+            (identifier))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+stray preproc_if around a match rule
+================================================================================
+
+let f x =
+    match x with
+#if DEBUG
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if with else branch around parameters
+================================================================================
+
+let f (x: int)
+#if EXTRA
+      (y: int)
+#endif
+      =
+#if EXTRA
+    x + y
+#else
+    x
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (preproc_inactive)
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (preproc_inactive)
+      body: (preproc_if
+        condition: (identifier)
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (identifier)))
+        alternative: (preproc_else
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+stray preproc_else region with nested directives
+================================================================================
+
+let f x =
+    match x with
+#if A
+    | 1 -> "a"
+#else
+#if B
+    | 2 -> "b"
+#endif
+    | 3 -> "c"
+#endif
+    | _ -> "d"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if with negated condition
+================================================================================
+
+let f x =
+    match x with
+#if !DEBUG
+    | 0 -> "release zero"
+#else
+    | 0 -> "debug zero"
+#endif
+    | _ -> "other"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (preproc_inactive)
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (string))
+            (preproc_inactive))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (string))))))))
+
+================================================================================
+stray preproc_if around a fluent chain link
+================================================================================
+
+services
+    .AddAntiforgery()
+#if !DEBUG
+    .AddHttpsRedirection(fun opt -> ())
+#endif
+    .AddRouting()
+
+--------------------------------------------------------------------------------
+
+(file
+  (application_expression
+    (dot_expression
+      base: (application_expression
+        (dot_expression
+          base: (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit))
+          (preproc_inactive)
+          field: (long_identifier_or_op
+            (identifier)))
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (const
+            (unit))))
+      (preproc_inactive)
+      field: (long_identifier_or_op
+        (identifier)))
+    (unit)))
+
+================================================================================
+Extern PInvoke
+================================================================================
+
+module M =
+    [<System.Runtime.InteropServices.DllImport("foo", EntryPoint="compute")>]
+    extern float32 compute_batch(int& pNodes, int32 numItems, float32& pValues)
+
+    let after () = 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (extern_binding
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)
+              (identifier)
+              (identifier)
+              (identifier)))
+          (paren_expression
+            (tuple_expression
+              (const
+                (string))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (const
+                  (string)))))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      (identifier)
+      (extern_param
+        (byref_type
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (identifier))
+      (extern_param
+        (simple_type
+          (long_identifier
+            (identifier)))
+        (identifier))
+      (extern_param
+        (byref_type
+          (simple_type
+            (long_identifier
+              (identifier))))
+        (identifier)))
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (const
+              (unit))))
+        (const
+          (int))))))
+
+================================================================================
+multiarg
+================================================================================
+
+#nowarn "9" "51"
+
+--------------------------------------------------------------------------------
+
+(file
+  (compiler_directive_decl
+    (string)
+    (string)))
+
+================================================================================
+indent directive skipped as trivia
+================================================================================
+
+let a = 1
+#indent "off"
+let b = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int))
+      (preproc_inactive)))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))

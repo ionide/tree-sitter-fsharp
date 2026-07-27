@@ -42,3 +42,48 @@ load script
     (string))
   (fsi_directive_decl
     (verbatim_string)))
+
+===
+time directive
+===
+
+#time
+
+---
+
+(file
+  (fsi_directive_decl))
+
+===
+include path directive
+===
+
+#I "path/to/dir"
+
+---
+
+(file
+  (fsi_directive_decl
+    (string)))
+
+===
+help directive
+===
+
+#help
+
+---
+
+(file
+  (fsi_directive_decl))
+
+===
+quit directive
+===
+
+#quit
+
+---
+
+(file
+  (fsi_directive_decl))

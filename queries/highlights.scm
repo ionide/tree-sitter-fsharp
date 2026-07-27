@@ -3,11 +3,11 @@
 
 [
   (line_comment)
+  (xml_doc)
   (block_comment)
 ] @comment @spell
 
-((line_comment) @comment.documentation @spell
- (#not-match? @comment.documentation "^///"))
+(xml_doc) @comment.documentation @spell
 
 (const
   [
@@ -22,12 +22,13 @@
 
 
 ((argument_patterns (long_identifier (identifier) @character.special))
- (#match? @character.special "^\_.*"))
+ (#match? @character.special "^_"))
 
 ;; ----------------------------------------------------------------------------
 ;; Punctuation
 
 (type_name type_name: (_) @type.definition)
+(exception_definition exception_name: (_) @type.definition)
 
 [
  (_type)
@@ -96,28 +97,62 @@
   (_pattern) @variable.parameter
   (_type) @type)
 
+;; A member name has two mutually-exclusive shapes, matched separately so the
+;; highlight is deterministic regardless of tree-sitter's alternation-match order
+;; (0.26.11 changed which branch of an overlapping `[...]` wins for a node that
+;; matched both). Bare `member M(x)` -> M is the method; instance `member this.M`
+;; -> `this` is the self parameter, M the method.
 (member_defn
   (method_or_prop_defn
-    [
-      (property_or_ident) @function
-      (property_or_ident
-        instance: (identifier) @variable.parameter.builtin
-        method: (identifier) @function.method)
-    ]
+    (property_or_ident . (identifier) @function .)
+    args: (_)* @variable.parameter))
+
+(member_defn
+  (method_or_prop_defn
+    (property_or_ident
+      instance: (identifier) @variable.parameter.builtin
+      method: (identifier) @function.method)
     args: (_)* @variable.parameter))
 
 
 (dot_expression
+  base: (_) @variable.member
+  field: (long_identifier_or_op
+    (identifier) @property))
+
+(application_expression
   .
-  (_) @variable.member
+  (long_identifier_or_op
+    (identifier) @function.call)
   .
   (_))
 
 (application_expression
   .
-  (_) @function.call
+  (dot_expression
+    field: (long_identifier_or_op
+      (identifier) @function.call))
   .
-  (_) @variable)
+  (_))
+
+(application_expression
+  .
+  (typed_expression
+    (long_identifier_or_op
+      (identifier) @function.call)
+    (_))
+  .
+  (_))
+
+(application_expression
+  .
+  (typed_expression
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call))
+    (_))
+  .
+  (_))
 
 ((infix_expression
   .
@@ -125,14 +160,50 @@
   .
   (infix_op) @operator
   .
-  (_) @function.call
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
   )
  (#eq? @operator "|>")
  )
 
 ((infix_expression
   .
-  (_) @function.call
+  (_)
+  .
+  (infix_op) @operator
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
+  )
+ (#eq? @operator "|>")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (long_identifier_or_op
+      (identifier) @function.call))
+  .
+  (infix_op) @operator
+  .
+  (_)
+  )
+ (#eq? @operator "<|")
+ )
+
+((infix_expression
+  .
+  (application_expression
+    .
+    (dot_expression
+      field: (long_identifier_or_op
+        (identifier) @function.call)))
   .
   (infix_op) @operator
   .
@@ -168,6 +239,8 @@
   (triple_quoted_string)
   (verbatim_string)
   (char)
+  (format_string)
+  (format_triple_quoted_string)
 ] @spell @string)
 
 (compiler_directive_decl) @keyword.directive
@@ -237,6 +310,9 @@
    ">"
   ] @punctuation.bracket)
 
+(typed_expression
+  ">" @punctuation.bracket)
+
 [
   "if"
   "then"
@@ -279,6 +355,7 @@
 [
   "abstract"
   "delegate"
+  "extern"
   "static"
   "inline"
   "mutable"
@@ -293,12 +370,14 @@
   "let!"
   "use"
   "use!"
+  "and!"
   "member"
 ] @keyword.function
 
 [
   "enum"
   "type"
+  "exception"
   "inherit"
   "interface"
   "and"
@@ -308,6 +387,31 @@
 
 ((identifier) @keyword.exception
  (#any-of? @keyword.exception "failwith" "failwithf" "raise" "reraise"))
+
+;; `query { ... }` custom operations whose names are unambiguous (they are not
+;; ordinary F# functions/values). Common-named operations (zip, head, count,
+;; where, select, sortBy, groupBy, ...) are intentionally omitted: they cannot
+;; be scoped to a `query` builder with the current query language without
+;; highlighting the same names everywhere.
+
+;; Operations that take an argument: matched only as an application head, so
+;; module-qualified names (List.sortByDescending) and member access on an
+;; expression ((expr).sortByDescending) are left untouched.
+((application_expression
+   .
+   (long_identifier_or_op (identifier) @keyword.operator))
+ (#any-of? @keyword.operator
+   "leftOuterJoin" "groupJoin" "groupValBy"
+   "sortByDescending" "thenBy" "thenByDescending"
+   "sortByNullable" "sortByNullableDescending"
+   "thenByNullable" "thenByNullableDescending"
+   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"))
+
+;; Zero-argument terminal operations: matched only as a bare statement inside a
+;; computation-expression body, which likewise excludes member access.
+((sequential_expression (long_identifier_or_op (identifier) @keyword.operator))
+ (#any-of? @keyword.operator
+   "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"))
 
 [
   "as"
@@ -347,7 +451,9 @@
   ] @keyword.exception)
 
 ((_type
-  (long_identifier (identifier) @type.builtin))
+ (simple_type
+    (long_identifier
+      (identifier) @type.builtin)))
  (#any-of? @type.builtin "bool" "byte" "sbyte" "int16" "uint16" "int" "uint" "int64" "uint64" "nativeint" "unativeint" "decimal" "float" "double" "float32" "single" "char" "string" "unit"))
 
 (preproc_if
@@ -359,6 +465,10 @@
 
 (preproc_else
   "#else" @keyword.directive)
+
+; Inactive branch of a directive the grammar could not place structurally;
+; render like a comment, the way C/C++ editors gray out inactive regions.
+(preproc_inactive) @comment
 
 ((long_identifier
   (identifier)+ @variable.member
@@ -372,11 +482,11 @@
    (attributes
      (attribute
        (_type
-         (long_identifier
-           (identifier) @attribute))))
+         (simple_type
+          (long_identifier
+            (identifier) @attribute)))))
    (function_or_value_defn
      (value_declaration_left
        .
        (_) @constant)))
  (#eq? @attribute "Literal"))
-
