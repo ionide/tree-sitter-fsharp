@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tree-sitter-fsharp"
 description = "F# grammars (implementation and signature files) for tree-sitter"
-version = "0.3.2"
+version = "0.3.3"
 keywords = ["incremental", "parsing", "tree-sitter", "fsharp"]
 classifiers = [
   "Intended Audience :: Developers",
