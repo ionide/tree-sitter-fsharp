@@ -2589,7 +2589,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "_indent"
+                "name": "_brace_indent"
               },
               {
                 "type": "SYMBOL",

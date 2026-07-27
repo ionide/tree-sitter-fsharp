@@ -731,7 +731,11 @@ module.exports = grammar({
       seq(
         $._expression,
         "with",
-        scoped($.field_initializers, $._indent, $._dedent),
+        // Brace-kind scope: the fields live inside a literal `{ ... }`, so an
+        // under-indented continuation field must separate (NEWLINE), not close
+        // the scope — `{ q with A = ...;` with the next field left of the
+        // first one is valid F# (the closing `}` bounds the scope).
+        scoped($.field_initializers, $._brace_indent, $._dedent),
       ),
 
     prefixed_expression: ($) =>
