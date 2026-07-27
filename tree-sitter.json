@@ -44,12 +44,12 @@
   },
   "bindings": {
     "c": true,
-    "go": false,
+    "go": true,
     "java": false,
     "node": true,
     "python": true,
     "rust": true,
-    "swift": false,
+    "swift": true,
     "zig": false
   }
 }
