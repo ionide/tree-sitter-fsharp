@@ -26,6 +26,8 @@ jobs:
         uses: tree-sitter/parser-test-action@v2
         with:
           test-rust: true
+          test-python: true
+          test-go: true
   parse-examples:
     name: Parse examples
     runs-on: ${{matrix.os}}
