@@ -1,11 +1,10 @@
-VERSION := 0.1.0
+VERSION := 0.3.10
 
 LANGUAGE_NAME := tree-sitter-fsharp
 
 # repository
 FSHARP_DIR := fsharp
 SIGNATURE_DIR := fsharp_signature
-SRC_DIR := fsharp/src
 
 PARSER_REPO_URL := $(shell git remote get-url origin 2>/dev/null)
 
@@ -31,11 +30,16 @@ LIBDIR ?= $(PREFIX)/lib
 PCLIBDIR ?= $(LIBDIR)/pkgconfig
 
 # object files
-OBJS := $(patsubst %.c,%.o,$(wildcard grammars/*/src/*.c))
+# Both grammars link into one library. Each .c is its own translation unit, so
+# the two scanners' static helpers in common/scanner.h do not collide, and the
+# exported symbols are namespaced per grammar.
+SRCS := $(FSHARP_DIR)/src/parser.c $(FSHARP_DIR)/src/scanner.c \
+	$(SIGNATURE_DIR)/src/parser.c $(SIGNATURE_DIR)/src/scanner.c
+OBJS := $(SRCS:.c=.o)
 
 # flags
 ARFLAGS := rcs
-override CFLAGS += -I$(SRC_DIR) -std=c11 -fPIC
+override CFLAGS += -I$(FSHARP_DIR)/src -I$(SIGNATURE_DIR)/src -std=c11 -fPIC
 
 # OS-specific bits
 ifeq ($(OS),Windows_NT)
@@ -69,6 +73,11 @@ endif
 
 all: lib$(LANGUAGE_NAME).a lib$(LANGUAGE_NAME).$(SOEXT) $(LANGUAGE_NAME).pc
 
+# The real scanner logic lives in the shared header, not in the per-grammar
+# shims, so the implicit .c -> .o rule would otherwise miss edits to it. Keep
+# this below `all` so it does not become the default goal.
+$(FSHARP_DIR)/src/scanner.o $(SIGNATURE_DIR)/src/scanner.o: common/scanner.h
+
 lib$(LANGUAGE_NAME).a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -89,20 +98,21 @@ $(LANGUAGE_NAME).pc: bindings/c/$(LANGUAGE_NAME).pc.in
 		-e 's|@PREFIX@|$(PREFIX)|' $< > $@
 
 $(FSHARP_DIR)/src/parser.c: $(FSHARP_DIR)/grammar.js
-	cd $(FSHARP_DIR) && $(TS) generate --no-bindings
+	cd $(FSHARP_DIR) && $(TS) generate
 
 $(SIGNATURE_DIR)/src/parser.c: $(FSHARP_DIR)/grammar.js $(SIGNATURE_DIR)/grammar.js
-	cd $(SIGNATURE_DIR) && $(TS) generate --no-bindings
+	cd $(SIGNATURE_DIR) && $(TS) generate
 
 install: all
-	install -d '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(PARSER_NAME) '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter '$(DESTDIR)$(PCLIBDIR)' '$(DESTDIR)$(LIBDIR)'
+	install -d '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(FSHARP_DIR) '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(SIGNATURE_DIR) '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter '$(DESTDIR)$(PCLIBDIR)' '$(DESTDIR)$(LIBDIR)'
 	install -m644 bindings/c/tree_sitter/$(LANGUAGE_NAME).h '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h
 	install -m644 $(LANGUAGE_NAME).pc '$(DESTDIR)$(PCLIBDIR)'/$(LANGUAGE_NAME).pc
 	install -m644 lib$(LANGUAGE_NAME).a '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).a
 	install -m755 lib$(LANGUAGE_NAME).$(SOEXT) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXT)
-	install -m644 queries/*.scm '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(PARSER_NAME)
+	install -m644 queries/*.scm '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(FSHARP_DIR)
+	install -m644 $(SIGNATURE_DIR)/queries/*.scm '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(SIGNATURE_DIR)
 
 uninstall:
 	$(RM) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).a \
@@ -111,7 +121,8 @@ uninstall:
 		'$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXT) \
 		'$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h \
 		'$(DESTDIR)$(PCLIBDIR)'/$(LANGUAGE_NAME).pc
-	$(RM) -r '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(PARSER_NAME)
+	$(RM) -r '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(FSHARP_DIR) \
+		'$(DESTDIR)$(DATADIR)'/tree-sitter/queries/$(SIGNATURE_DIR)
 
 clean:
 	$(RM) $(OBJS) $(LANGUAGE_NAME).pc lib$(LANGUAGE_NAME).a lib$(LANGUAGE_NAME).$(SOEXT) lib$(LANGUAGE_NAME).lib

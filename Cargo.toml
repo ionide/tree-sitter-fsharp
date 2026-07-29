@@ -7,6 +7,7 @@ categories = ["parsing", "text-editors"]
 repository = "https://github.com/ionide/tree-sitter-fsharp"
 edition = "2021"
 license = "MIT"
+readme = "bindings/rust/README.md"
 
 build = "bindings/rust/build.rs"
 include = [

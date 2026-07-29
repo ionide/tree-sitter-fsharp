@@ -43,6 +43,7 @@ class BdistWheel(bdist_wheel):
 class EggInfo(egg_info):
     def find_sources(self):
         super().find_sources()
+        self.filelist.include("bindings/python/README.md")
         self.filelist.recursive_include("queries", "*.scm")
         self.filelist.recursive_include("fsharp_signature/queries", "*.scm")
         self.filelist.include("fsharp/src/tree_sitter/*.h")

@@ -1,7 +1,7 @@
 {
   "name": "tree-sitter-fsharp",
   "version": "0.3.10",
-  "description": "",
+  "description": "F# grammars (implementation and signature files) for tree-sitter",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ionide/tree-sitter-fsharp.git"
@@ -37,6 +37,8 @@
   },
   "scripts": {
     "install": "node-gyp-build",
+    "prepack": "node scripts/npm-readme.js swap",
+    "postpack": "node scripts/npm-readme.js restore",
     "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate; cd -; done",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
