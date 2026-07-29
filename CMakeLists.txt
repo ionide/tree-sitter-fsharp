@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-fsharp
-        VERSION "0.3.4"
+        VERSION "0.3.5"
         DESCRIPTION ""
         HOMEPAGE_URL "https://github.com/tree-sitter/tree-sitter-fsharp"
         LANGUAGES C)
