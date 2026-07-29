@@ -4,6 +4,23 @@ tree-sitter grammar for F# (still WIP)
 Based on [the 4.1 F# language specification](https://fsharp.org/specs/language-spec/4.1/FSharpSpec-4.1-latest.pdf) (Mostly, Appendix A)
 and the [F# compiler parser](https://github.com/dotnet/fsharp/blob/main/src/Compiler/pars.fsy)
 
+## Using the grammar
+
+If you just want to *use* the F# parsers rather than work on the grammar, install the
+package for your ecosystem — each has its own usage guide:
+
+| Ecosystem | Package | Guide |
+| --- | --- | --- |
+| Node.js | [npm: `tree-sitter-fsharp`](https://www.npmjs.com/package/tree-sitter-fsharp) | [bindings/node/README.md](./bindings/node/README.md) |
+| Python | [PyPI: `tree-sitter-fsharp`](https://pypi.org/project/tree-sitter-fsharp/) | [bindings/python/README.md](./bindings/python/README.md) |
+| Rust | [crates.io: `tree-sitter-fsharp`](https://crates.io/crates/tree-sitter-fsharp) | [bindings/rust/README.md](./bindings/rust/README.md) |
+| Go | `github.com/ionide/tree-sitter-fsharp/bindings/go` | [bindings/go/README.md](./bindings/go/README.md) |
+| Swift | SwiftPM: `TreeSitterFsharp` | [bindings/swift/README.md](./bindings/swift/README.md) |
+| C | built from source (`make` / CMake) | [bindings/c/README.md](./bindings/c/README.md) |
+| Neovim | via nvim-treesitter | [below](#adding-to-neovim) |
+
+The rest of this README covers building and developing the grammar itself.
+
 ## Getting started
 
 First, run `npm install` to install the `tree-sitter` CLI as a local devDependency (it lands at `node_modules/.bin/tree-sitter`, not on your global `$PATH`).

@@ -16,7 +16,7 @@ classifiers = [
 authors = [{ name = "Nikolaj Sidorenco" }]
 requires-python = ">=3.10"
 license.text = "MIT"
-readme = "README.md"
+readme = "bindings/python/README.md"
 
 [project.urls]
 Homepage = "https://github.com/ionide/tree-sitter-fsharp"
