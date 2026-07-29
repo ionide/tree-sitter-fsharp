@@ -29,13 +29,6 @@ jobs:
           package-manager-cache: false
       - name: Install dependencies
         run: npm i --omit peer --omit optional
-      - name: Regenerate parser
-        run: |
-          while read -r grammar_dir; do
-            pushd "$grammar_dir"
-            npm x -- tree-sitter generate
-            popd > /dev/null
-          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
       - name: Build Wasm binaries
         run: |-
           while read -r grammar_dir; do
@@ -71,15 +64,6 @@ jobs:
           package-manager-cache: false
       - name: Install dependencies
         run: npm i --omit peer --omit optional
-      - name: Regenerate parser
-        shell: bash
-        run: |
-          while read -r grammar_dir; do
-            grammar_dir="${grammar_dir%$'\r'}"
-            pushd "$grammar_dir"
-            npm x -- tree-sitter generate
-            popd > /dev/null
-          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
       - name: Build binary
         run: npm x -- prebuildify -t 20.19.5
       - name: Upload binaries
@@ -145,13 +129,6 @@ jobs:
             (.key | startswith("tree-sitter-"))
             and (.key != "tree-sitter-cli")
             )) | length > 0
-      - name: Regenerate parser
-        run: |
-          while read -r grammar_dir; do
-            pushd "$grammar_dir"
-            tree-sitter generate
-            popd > /dev/null
-          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
       - uses: rust-lang/crates-io-auth-action@v1
         id: auth
       - name: Publish to crates.io
