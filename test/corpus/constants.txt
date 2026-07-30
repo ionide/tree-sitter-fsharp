@@ -800,6 +800,51 @@ do
               (char))))))))
 
 ================================================================================
+char unicode escapes
+================================================================================
+
+do
+  '☠'
+  '\U00002620'
+  '\x41'
+  '\065'
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (do
+      (sequential_expression
+        (const
+          (char))
+        (sequential_expression
+          (const
+            (char))
+          (sequential_expression
+            (const
+              (char))
+            (const
+              (char))))))))
+
+================================================================================
+string unicode escapes
+================================================================================
+
+let x = "☠\U0001F600\x41\065"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string)))))
+
+================================================================================
 float with measure literal
 ================================================================================
 
@@ -988,3 +1033,47 @@ let x = 1.0F
       (const
         (ieee32
           (float))))))
+
+================================================================================
+measure literal with negative and rational exponents
+================================================================================
+
+let x = 1.0<kg^(1/2)>
+let y = 2.0<s^-1>
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (typed_expression
+        (const
+          (float))
+        (measure
+          (measure_power
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (int)
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (typed_expression
+        (const
+          (float))
+        (measure
+          (measure_power
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (int)))))))

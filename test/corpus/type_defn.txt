@@ -4101,3 +4101,201 @@ type [<Struct>]W = NormalWhere | HavingWhere
           (identifier))
         (union_type_case
           (identifier))))))
+
+================================================================================
+static abstract member in interface
+================================================================================
+
+type IStaticProperty<'T when 'T :> IStaticProperty<'T>> =
+    static abstract StaticProperty: 'T
+    static abstract member StaticMethod: 'T -> 'T
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))
+          (type_argument_constraints
+            (constraint
+              (type_argument
+                (identifier))
+              (generic_type
+                (long_identifier
+                  (identifier))
+                (type_attributes
+                  (type_attribute
+                    (type_argument
+                      (identifier)))))))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (type_argument
+                (identifier))))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (type_argument
+                    (identifier))))
+              (type_argument
+                (identifier)))))))))
+
+================================================================================
+self-constrained typar constraint
+================================================================================
+
+let inline f<'T when IStaticProperty<'T>>() = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))
+          (type_argument_constraints
+            (constraint
+              (generic_type
+                (long_identifier
+                  (identifier))
+                (type_attributes
+                  (type_attribute
+                    (type_argument
+                      (identifier))))))))
+        (argument_patterns
+          (const
+            (unit))))
+      (const
+        (int)))))
+
+================================================================================
+measure abbreviation with juxtaposed product and power
+================================================================================
+
+[<Measure>] type N = kg m / s^2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_abbrev_defn
+      (type_name
+        type_name: (identifier))
+      block: (measure
+        (measure_quotient
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier)))
+          (measure_power
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (int)))))))
+
+================================================================================
+measure abbreviation with left-associative quotient chain
+================================================================================
+
+[<Measure>] type A = m / s / s
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_abbrev_defn
+      (type_name
+        type_name: (identifier))
+      block: (measure
+        (measure_quotient
+          (measure_quotient
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (measure_atom
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (measure_atom
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+interface body with inherit
+================================================================================
+
+type I1 =
+    interface
+        inherit System.IDisposable
+    end
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (interface_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (class_inherits_decl
+        block: (simple_type
+          (long_identifier
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+additional constructor returning an empty object
+================================================================================
+
+type S =
+    new (x: int) = {}
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (member_defn
+          (additional_constr_defn
+            (paren_pattern
+              (typed_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))
+            (brace_expression)))))))

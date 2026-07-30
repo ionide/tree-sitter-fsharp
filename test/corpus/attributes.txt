@@ -457,3 +457,93 @@ module M =
             (simple_type
               (long_identifier
                 (identifier)))))))))
+================================================================================
+attribute on a property setter accessor
+================================================================================
+
+type T() =
+    let mutable v = 0
+    member this.P
+        with get () = v
+        and [<System.Obsolete>] set x = v <- x
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            block: (property_accessor
+              (argument_patterns
+                (const
+                  (unit)))
+              (long_identifier_or_op
+                (identifier)))
+            block: (property_accessor
+              (attributes
+                (attribute
+                  (simple_type
+                    (long_identifier
+                      (identifier)
+                      (identifier)))))
+              (argument_patterns
+                (long_identifier
+                  (identifier)))
+              (mutate_expression
+                assignee: (long_identifier_or_op
+                  (identifier))
+                value: (long_identifier_or_op
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+attributes on a return type
+================================================================================
+
+open System
+let f(x) : [<Obsolete>] int = x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (import_decl
+    (long_identifier
+      (identifier)))
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))))
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (const
+          (int))))))

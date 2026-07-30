@@ -6525,3 +6525,118 @@ let a = 1;;
             (identifier))))
       (const
         (int)))))
+
+================================================================================
+double semicolon terminator after application
+================================================================================
+
+module M
+
+exit 0;;
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (application_expression
+      (long_identifier_or_op
+        (identifier))
+      (const
+        (int)))))
+
+================================================================================
+double semicolon terminator between module elements
+================================================================================
+
+module M
+
+exit 0;;
+let y = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (application_expression
+      (long_identifier_or_op
+        (identifier))
+      (const
+        (int)))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))
+
+================================================================================
+trait call expression with parenthesized or-constrained typars
+================================================================================
+
+let inline (!!) (x: ^a) : ^b = ((^a or ^b): (static member op_Implicit: ^a -> ^b) x)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (op_identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      (type_argument
+        (identifier))
+      body: (paren_expression
+        (srtp_call_expression
+          (type_argument
+            (identifier)
+            (identifier))
+          (trait_member_constraint
+            (identifier)
+            (function_type
+              (type_argument
+                (identifier))
+              (type_argument
+                (identifier))))
+          (long_identifier_or_op
+            (identifier)))))))
+
+================================================================================
+single semicolon terminator between module elements
+================================================================================
+
+module M
+
+exit 0;
+let y = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (application_expression
+      (long_identifier_or_op
+        (identifier))
+      (const
+        (int)))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))

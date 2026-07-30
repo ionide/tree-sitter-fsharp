@@ -869,7 +869,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "class_inherits_decl",
@@ -1345,6 +1345,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "paren_pattern",
           "named": true
         }
       ]
@@ -1975,6 +1979,10 @@
           "named": true
         },
         {
+          "type": "attributes",
+          "named": true
+        },
+        {
           "type": "function_declaration_left",
           "named": true
         },
@@ -2306,6 +2314,10 @@
         "required": true,
         "types": [
           {
+            "type": "class_inherits_decl",
+            "named": true
+          },
+          {
             "type": "interface_implementation",
             "named": true
           },
@@ -2493,6 +2505,10 @@
           "named": true
         },
         {
+          "type": "measure_product",
+          "named": true
+        },
+        {
           "type": "measure_quotient",
           "named": true
         }
@@ -2542,6 +2558,29 @@
     }
   },
   {
+    "type": "measure_product",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "compound_type",
+          "named": true
+        },
+        {
+          "type": "measure_atom",
+          "named": true
+        },
+        {
+          "type": "measure_power",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "measure_quotient",
     "named": true,
     "fields": {},
@@ -2559,6 +2598,18 @@
         },
         {
           "type": "measure_power",
+          "named": true
+        },
+        {
+          "type": "measure_product",
+          "named": true
+        },
+        {
+          "type": "measure_quotient",
+          "named": true
+        },
+        {
+          "type": "postfix_type",
           "named": true
         }
       ]
@@ -2675,6 +2726,10 @@
           {
             "type": "and",
             "named": false
+          },
+          {
+            "type": "attributes",
+            "named": true
           },
           {
             "type": "function_declaration_left",
@@ -3530,6 +3585,10 @@
         },
         {
           "type": "argument_patterns",
+          "named": true
+        },
+        {
+          "type": "attributes",
           "named": true
         }
       ]
@@ -5062,6 +5121,10 @@
   },
   {
     "type": "^",
+    "named": false
+  },
+  {
+    "type": "^-",
     "named": false
   },
   {
