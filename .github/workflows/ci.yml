@@ -44,6 +44,24 @@ jobs:
         uses: tree-sitter/setup-action@v2
         with:
           install-lib: false
+      - name: Collect expected parse failures
+        id: expected-failures
+        shell: bash
+        # Corpus files that F#'s own parser rejects (deliberately malformed
+        # compiler test fixtures, ...). Passed as invalid-files so they are
+        # reported as KNOWN instead of counted as failures. Regenerate the list
+        # with `dotnet fsi scripts/find-fsc-parse-failures.fsx`.
+        run: |
+          # A missing list is a real problem, so check for it explicitly; an
+          # empty one is not, so tolerate grep's exit code 1 (no lines left)
+          # instead of failing the step under `bash -e`.
+          test -f test/fsc-parse-failures.txt
+          {
+            echo 'files<<EOF'
+            grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' \
+              test/fsc-parse-failures.txt || test $? -eq 1
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
       - name: Parse sample files
         uses: tree-sitter/parse-action@v3
         id: parse-files
@@ -51,6 +69,7 @@ jobs:
         with:
           files: |-
             examples/**/*.fs
+          invalid-files: ${{steps.expected-failures.outputs.files}}
       - name: Upload failures artifact
         uses: actions/upload-artifact@v4
         if: "!cancelled() && steps.parse-files.outcome == 'failure'"

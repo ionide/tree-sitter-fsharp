@@ -1287,3 +1287,24 @@ let b = 2
             (identifier))))
       (const
         (int)))))
+
+================================================================================
+light directive with argument
+================================================================================
+
+#light "off"
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (compiler_directive_decl
+    (string))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))

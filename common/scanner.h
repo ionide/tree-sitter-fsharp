@@ -268,9 +268,15 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
   int angle_depth = 1;
   int paren_depth = 0;
   bool saw_newline = false;
+  // Whether the character just consumed was a '^'. Only the exact `^-<int>`
+  // spelling of a negative measure exponent may relax the '-' rule below, so
+  // this is per-character state, not "a caret appeared somewhere".
+  bool prev_was_caret = false;
 
   while (!lexer->eof(lexer) && angle_depth > 0) {
     int32_t c = lexer->lookahead;
+    bool after_caret = prev_was_caret;
+    prev_was_caret = false;
 
     if (c == '\n' || c == '\r') {
       saw_newline = true;
@@ -284,6 +290,7 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
         // Backtick-quoted measure/type names may contain '%' and '`',
         // e.g. 0.95m<``Risk %``>.
         c == '`' || c == '%') {
+      prev_was_caret = (c == '^');
       advance(lexer);
       continue;
     }
@@ -311,6 +318,14 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
       // '->' is valid in function types, bare '-' is not.
       advance(lexer);
       if (lexer->lookahead == '>') { advance(lexer); continue; }
+      // A negative measure exponent: `float<m s^-1>` directly after the '^',
+      // or the numerator of a rational one, `23<kg^(-12345/123)>`, where the
+      // '-' sits inside the parens. Both spellings are narrow, so ordinary
+      // comparison chains (`a<b-1>c`, `a<b^2 - 1>c`) remain non-type-apps.
+      if ((after_caret || paren_depth > 0) && lexer->lookahead >= '0' &&
+          lexer->lookahead <= '9') {
+        continue;
+      }
       return false;
     }
     // Anything else (`&`, `!`, `=`, `+`, `;`, `@`, `$`, `%`, `?`, …) rules out type args.
@@ -322,6 +337,62 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
 
 static inline bool is_type_application_open(TSLexer *lexer) {
   return is_type_application_open_ex(lexer, NULL);
+}
+
+// Peek the body of a parenthesised multi-typar group that opens an SRTP trait
+// call: `^a or ^b) : (` / `'T1 or 'T2) : (`, as in
+// `((^a or ^b) : (static member op_Implicit: ^a -> ^b) x)`. Called with the
+// lookahead on the first typar — the group's '(' has already been passed,
+// either by the parser or by one of scan()'s own probes. At least two typars
+// joined by `or`, then the group's ')' and the following `: (`, are required,
+// so the body of a parenthesised expression can never match.
+static inline bool is_srtp_typar_group_ahead(TSLexer *lexer) {
+  unsigned typars = 0;
+  for (;;) {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      advance(lexer);
+    }
+    if (lexer->lookahead != '^' && lexer->lookahead != '\'') {
+      return false;
+    }
+    advance(lexer);
+    if (!is_word_char(lexer->lookahead)) {
+      return false;
+    }
+    while (is_word_char(lexer->lookahead)) {
+      advance(lexer);
+    }
+    typars++;
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      advance(lexer);
+    }
+    if (lexer->lookahead != 'o') {
+      break;
+    }
+    advance(lexer);
+    if (lexer->lookahead != 'r') {
+      return false;
+    }
+    advance(lexer);
+    if (is_word_char(lexer->lookahead)) {
+      return false;  // an identifier starting with "or", not the keyword
+    }
+  }
+  if (typars < 2 || lexer->lookahead != ')') {
+    return false;
+  }
+  advance(lexer);
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    advance(lexer);
+  }
+  if (lexer->lookahead != ':') {
+    return false;
+  }
+  advance(lexer);
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    advance(lexer);
+  }
+  return lexer->lookahead == '(';
 }
 
 static inline bool is_multiline_type_app_ahead(TSLexer *lexer) {
@@ -834,6 +905,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool found_preproc_else = false;
   bool found_comment_start = false;
   bool advanced_in_ws_walk = false;
+  bool skipped_open_paren = false;
   uint32_t indent_length = lexer->get_column(lexer);
 
   for (;;) {
@@ -1365,8 +1437,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (valid_symbols[NEWLINE] && lexer->lookahead == ';') {
     advance(lexer);
-    // `;;` is the top-level terminator (scripts / fsi remnants); consume both
-    // semicolons as one separator so the second one doesn't error.
+    // `;;` is the fsi-style spelling of the same thing; consume both
+    // semicolons as one token so the second one doesn't error.
     if (lexer->lookahead == ';') {
       advance(lexer);
     }
@@ -1405,7 +1477,41 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     if (saw_newline) {
       found_end_of_line = true;
     }
-    found_end_of_line_semi_colon = true;
+    // A trailing ';' / ';;' TERMINATES a top-level element; it does not
+    // separate two expressions. (';;' is just ';' here — the second semicolon
+    // adds nothing but an fsi convention.) Emitting NEWLINE makes it a
+    // sequential-expression separator that demands another expression on the
+    // right, so `exit 0;` at end of file errors, and `exit 0;` followed by a
+    // column-0 `let` absorbs that let as a let-in argument (MISSING `in`).
+    // When the semicolon really does end a top-level element — only the base
+    // indent is open and the next content is at column 0, or the file ends —
+    // hand the position to the module-element separator instead (same
+    // whitelist as the arming site above), which is what an element boundary
+    // with no semicolon at all already produces; or at EOF decline so the ';'
+    // extra takes the characters. Anything else (a ';' inside an indented
+    // block or a bracket, mid-line, before a continuation line, before a
+    // comment) keeps the separator behaviour.
+    bool semi_terminator =
+        !found_comment_start && scanner->indents.size == 1 &&
+        (lexer->eof(lexer) || (saw_newline && indent_length == 0));
+    if (semi_terminator) {
+      if (!lexer->eof(lexer) && valid_symbols[ELEM_SEP] &&
+          !valid_symbols[ERROR_SENTINEL] &&
+          (is_word_char(lexer->lookahead) || lexer->lookahead == '[' ||
+           lexer->lookahead == '"')) {
+        // Consume the `;;` and the newline: the separator makes progress, so
+        // it cannot be re-shifted at this position (see the arming comment).
+        lexer->mark_end(lexer);
+        elem_sep_armed = true;
+      } else if (lexer->eof(lexer)) {
+        return false;
+      } else {
+        semi_terminator = false;
+      }
+    }
+    if (!semi_terminator) {
+      found_end_of_line_semi_colon = true;
+    }
   }
 
   if (lexer->lookahead == 't' &&
@@ -1469,11 +1575,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
               }
               word[word_len] = '\0';
               bool accessor_next =
-                  !is_word_char(lexer->lookahead) &&
-                  (keyword_equals(word, "get") || keyword_equals(word, "set") ||
-                   keyword_equals(word, "private") ||
-                   keyword_equals(word, "internal") ||
-                   keyword_equals(word, "public"));
+                  // `and [<Attr>] set (v) = ...`: an attribute set can only
+                  // introduce another accessor here.
+                  (word_len == 0 && lexer->lookahead == '[') ||
+                  (!is_word_char(lexer->lookahead) &&
+                   (keyword_equals(word, "get") || keyword_equals(word, "set") ||
+                    keyword_equals(word, "inline") ||
+                    keyword_equals(word, "private") ||
+                    keyword_equals(word, "internal") ||
+                    keyword_equals(word, "public")));
               if (!accessor_next) {
                 pop_indent(scanner);
                 lexer->result_symbol = DEDENT;
@@ -1730,6 +1840,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   } else if (lexer->lookahead == '(') {
     skip(lexer);
+    // Recorded for the SRTP typar-group veto below: this scan began *on* a
+    // '(', so any group seen from here is inside that paren, i.e. the request
+    // belongs to the enclosing expression's paren rather than to the group's.
+    skipped_open_paren = true;
     if (lexer->lookahead == '*') {
       // `(*)` is the multiplication operator reference (F# spec 3.10), not a
       // comment opener — peek one further so it doesn't suppress INDENT and
@@ -1811,6 +1925,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[PAREN_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end &&
       !found_preprocessor_end && !found_same_line_pipe_infix) {
+    // In `((^a or ^b) : (static member M : ^a -> ^b) x)` the inner '(' opens a
+    // trait call's typar group, not a parenthesised expression. PAREN_INDENT is
+    // zero-width and the parser takes it whenever it is valid, so emitting it
+    // just inside that '(' would commit to paren_expression and kill the group
+    // reading. Decline when what follows is exactly a typar group closed by
+    // `) : (`, which the body of a parenthesised expression can never be.
+    //
+    // `skipped_open_paren` keeps the *enclosing* expression's own indent: this
+    // same group is also what follows the outer '(', and that request — which
+    // arrives with the scan sitting on the '(' the probe above skipped — must
+    // still produce PAREN_INDENT, or the whole parenthesised expression dies.
+    // No mark_end, so returning false discards the peek entirely.
+    if (!skipped_open_paren &&
+        (lexer->lookahead == '^' || lexer->lookahead == '\'') &&
+        !found_end_of_line && !advanced_in_ws_walk &&
+        is_srtp_typar_group_ahead(lexer)) {
+      return false;
+    }
     // Like INDENT, but tracked separately as a paren indent so DEDENT/NEWLINE
     // logic can be more lenient inside parenthesized expressions, where the
     // closing ')' determines scope rather than indentation alone.

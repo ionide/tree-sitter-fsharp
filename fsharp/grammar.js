@@ -337,6 +337,8 @@ module.exports = grammar({
         "[<",
         $.attribute,
         prec(PREC.SEQ_EXPR + 1, repeat(seq($._newline, $.attribute))),
+        // A trailing separator is allowed: `[<Fact; >]`.
+        optional($._newline),
         ">]",
       ),
     attribute: ($) =>
@@ -383,7 +385,8 @@ module.exports = grammar({
     _function_or_value_defn_body: ($) =>
       seq(
         choice($.function_declaration_left, $.value_declaration_left),
-        optional(seq(":", $._type)),
+        // The return type may carry attributes: `let f(x) : [<A>] int = ...`.
+        optional(seq(":", optional($.attributes), $._type)),
         optional($.type_argument_constraints),
         "=",
         field("body", $._expression_block_for_let),
@@ -644,7 +647,16 @@ module.exports = grammar({
       prec.right(
         PREC.PAREN_EXPR,
         seq(
-          alias($._srtp_type_argument, $.type_argument),
+          // A support constraint over several typars is written parenthesized:
+          // `((^a or ^b) : (static member op_Implicit: ^a -> ^b) x)`. The
+          // single-typar form `(^a : ...)` takes no inner parens. Either way
+          // the outer parens belong to the surrounding paren_expression; the
+          // scanner keeps the group's '(' from opening one of its own (see
+          // is_srtp_typar_group_ahead).
+          choice(
+            alias($._srtp_type_argument, $.type_argument),
+            seq("(", alias($._srtp_type_argument, $.type_argument), ")"),
+          ),
           ":",
           "(",
           $.trait_member_constraint,
@@ -685,15 +697,23 @@ module.exports = grammar({
         PREC.CE_EXPR + 1,
         seq(
           "{",
-          scoped(
-            choice(
-              $.field_initializers,
-              $.object_expression,
-              $.with_field_expression,
-              seq($.class_inherits_decl, optional($._newline), $.field_initializers),
+          // Optional so an additional constructor can hand back an empty
+          // object: `new (x) = {}` / `{ }`, and so the inherit-only form
+          // `new () = { inherit Base() }` needs no field initializers.
+          optional(
+            scoped(
+              choice(
+                $.field_initializers,
+                $.object_expression,
+                $.with_field_expression,
+                seq(
+                  $.class_inherits_decl,
+                  optional(seq(optional($._newline), $.field_initializers)),
+                ),
+              ),
+              $._brace_indent,
+              $._dedent,
             ),
-            $._brace_indent,
-            $._dedent,
           ),
           "}",
         ),
@@ -909,7 +929,7 @@ module.exports = grammar({
     declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), optional("mutable"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
+          seq(choice("use", "use!"), optional("mutable"), choice($.identifier, $.paren_pattern), optional(seq(":", $._type)), "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -1090,7 +1110,7 @@ module.exports = grammar({
     comp_declaration_expression: ($) =>
       seq(
         choice(
-          seq(choice("use", "use!"), $.identifier, optional(seq(":", $._type)), "=", $._expression_block_for_let),
+          seq(choice("use", "use!"), choice($.identifier, $.paren_pattern), optional(seq(":", $._type)), "=", $._expression_block_for_let),
           seq(
             $.function_or_value_defn,
             repeat($.and_bang),
@@ -1365,7 +1385,24 @@ module.exports = grammar({
         "1",
       ),
 
-    measure_power: ($) => prec.right(6, seq($.measure_atom, "^", $.int)),
+    measure_power: ($) =>
+      prec.right(
+        7,
+        seq(
+          $.measure_atom,
+          choice(
+            seq("^", $._measure_exponent),
+            // `s^-1`: the lexer takes `^-` as a single symbolic-operator
+            // token, so a negative exponent cannot be spelled `^` `-` int.
+            seq("^-", $.int),
+          ),
+        ),
+      ),
+
+    // The exponent may also be a parenthesized rational (`kg^(1/2)`,
+    // `s^(-1/2)`) — F# spec 9.4 "Measure expressions".
+    _measure_exponent: ($) =>
+      choice($.int, seq("(", optional("-"), $.int, "/", $.int, ")")),
 
     _measure_operand: ($) =>
       choice(
@@ -1374,12 +1411,41 @@ module.exports = grammar({
         $.compound_type,
       ),
 
-    measure_quotient: ($) => prec.left(5, seq($._measure_operand, "/", $._measure_operand)),
+    // Product by juxtaposition: `kg m`, `m s^-1`, `'u 'v`. F# also spells the
+    // product `kg * m`, which arrives here as a compound_type operand. Binds
+    // tighter than '/' so `kg m / s^2` is `(kg m) / s^2`.
+    measure_product: ($) =>
+      prec.left(6, seq($._measure_operand, repeat1($._measure_operand))),
+
+    // Left-associative, so `m / s / s` is `(m / s) / s` rather than an error.
+    // A chain of divisions is one node with the operands in order, matching how
+    // FSC parses it: `m / s / s` is a flat `SynType.Tuple [Type; Slash; Type;
+    // Slash; Type]`, folded left only later during checking. A single '/' gives
+    // the same two children as the earlier binary rule did.
+    measure_quotient: ($) =>
+      prec.left(
+        5,
+        seq(
+          choice(
+            $._measure_operand,
+            $.measure_product,
+            // `kg m` is indistinguishable from a postfix type until a
+            // measure-only token appears, and the postfix reading wins the
+            // (statically resolved) reduce/reduce — so accept it here, which
+            // is what lets `kg m / s^2` parse. Only on the left of '/': as a
+            // general operand it would also make a plain `type T = A.B`
+            // abbreviation ambiguous with a measure.
+            $.postfix_type,
+          ),
+          repeat1(seq("/", choice($._measure_operand, $.measure_product))),
+        ),
+      ),
 
     measure: ($) =>
       choice(
         $.measure_quotient,
         $.measure_power,
+        $.measure_product,
         seq("(", $.measure, ")"),
         // The dimensionless measure `1`, e.g. `float<1>`. Reuses the same "1"
         // literal as measure_atom (no new token) so quotient/power measures like
@@ -1490,7 +1556,9 @@ module.exports = grammar({
           seq($.type_argument, ":>", $._type),
           seq($.type_argument, ":", "null"),
           seq(
-            $.type_argument,
+            // `when (^t or ^u or ^v) : (static member M : string)` — a
+            // support constraint over several typars parenthesizes them.
+            choice($.type_argument, seq("(", $.type_argument, ")")),
             ":",
             "(",
             choice(
@@ -1516,6 +1584,12 @@ module.exports = grammar({
             ">",
           ),
           seq("default", $.type_argument, ":", $._type),
+          // Self-constrained typar: `when IStaticProperty<'T>` / `when
+          // AverageOps<'T>` names an interface (or a constraint abbreviation)
+          // the typar must satisfy. Only the generic form is accepted, so the
+          // leading token can never be confused with the typar-first
+          // alternatives above.
+          $.generic_type,
         ),
       ),
 
@@ -1807,7 +1881,13 @@ module.exports = grammar({
           "=",
           seq(
             alias($._interface_begin, "interface"),
-            scoped(repeat($._type_defn_elements), $._indent, $._dedent),
+            // An interface body may open with base interfaces:
+            //   type I1 = interface inherit I0 end
+            scoped(
+              repeat(choice($._type_defn_elements, $.class_inherits_decl)),
+              $._indent,
+              $._dedent,
+            ),
             "end",
           ),
         ),
@@ -1887,8 +1967,16 @@ module.exports = grammar({
               $.method_or_prop_defn,
             ),
             seq(
+              // `static abstract` declares an interface member that
+              // implementing types must provide statically (F# 7 IWSAMs).
+              // The accessibility modifier is accepted on either side of
+              // `abstract` (FSC parses both and rejects it later, FS0561),
+              // and `inline` likewise parses here (rejected as FS3151).
+              optional($.access_modifier),
+              optional("static"),
               "abstract",
               optional("member"),
+              optional("inline"),
               optional($.access_modifier),
               $.member_signature,
             ),
@@ -1938,8 +2026,15 @@ module.exports = grammar({
         $._expression_block,
       ),
 
+    // Each accessor may carry its own attributes and `inline`:
+    // `with [<A>] get () = v and [<B>] inline set x = ...`.
     property_accessor: ($) =>
-      seq(choice("get", "set"), $._property_accessor_body),
+      seq(
+        optional($.attributes),
+        optional("inline"),
+        choice("get", "set"),
+        $._property_accessor_body,
+      ),
 
     _property_defn: ($) =>
       prec.left(
@@ -2115,7 +2210,10 @@ module.exports = grammar({
     // using \u0008 to model \b
     _simple_char_char: (_) => token.immediate(/[^\n\t\r\u0008\a\f\v'\\]/),
     _unicodegraph_short: (_) => /\\u[0-9a-fA-F]{4}/,
-    _unicodegraph_long: (_) => /\\u[0-9a-fA-F]{8}/,
+    // The long form is spelled with a capital U (`\UXXXXXXXX`); with a
+    // lowercase `u` the short form above already claims the first four
+    // digits, so the long alternative was unreachable.
+    _unicodegraph_long: (_) => /\\U[0-9a-fA-F]{8}/,
     _trigraph: (_) => /\\[0-9]{3}/,
     _hexgraph_short: (_) => /\\x[0-9a-fA-F]{2}/,
 
@@ -2152,7 +2250,7 @@ module.exports = grammar({
     char: (_) =>
       prec(
         -1,
-        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|(\\\\))?'B?/,
+        /'([^\n\t\r\u0008\a\f\v\\]|\\["\'ntbrafv]|\\[0-9]{3}|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\x[0-9a-fA-F]{2}|(\\\\))?'B?/,
       ),
 
     format_string_eval: ($) =>
@@ -2430,7 +2528,14 @@ module.exports = grammar({
             $._newline_not_aligned,
           ),
           seq("#warnon", $.int, $._newline_not_aligned),
-          seq("#light", $._newline_not_aligned),
+          // `#light` also takes an explicit argument: `#light "off"` selects
+          // the legacy verbose syntax, `#light "on"` the default. The string
+          // is optional so bare `#light` keeps working.
+          seq(
+            "#light",
+            optional(alias($._string_literal, $.string)),
+            $._newline_not_aligned,
+          ),
         ),
       ),
 
