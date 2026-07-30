@@ -2605,10 +2605,6 @@
           "named": true
         },
         {
-          "type": "measure_quotient",
-          "named": true
-        },
-        {
           "type": "postfix_type",
           "named": true
         }

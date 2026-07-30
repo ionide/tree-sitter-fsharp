@@ -268,10 +268,15 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
   int angle_depth = 1;
   int paren_depth = 0;
   bool saw_newline = false;
-  bool saw_caret = false;
+  // Whether the character just consumed was a '^'. Only the exact `^-<int>`
+  // spelling of a negative measure exponent may relax the '-' rule below, so
+  // this is per-character state, not "a caret appeared somewhere".
+  bool prev_was_caret = false;
 
   while (!lexer->eof(lexer) && angle_depth > 0) {
     int32_t c = lexer->lookahead;
+    bool after_caret = prev_was_caret;
+    prev_was_caret = false;
 
     if (c == '\n' || c == '\r') {
       saw_newline = true;
@@ -285,9 +290,7 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
         // Backtick-quoted measure/type names may contain '%' and '`',
         // e.g. 0.95m<``Risk %``>.
         c == '`' || c == '%') {
-      if (c == '^') {
-        saw_caret = true;
-      }
+      prev_was_caret = (c == '^');
       advance(lexer);
       continue;
     }
@@ -315,10 +318,12 @@ static inline bool is_type_application_open_ex(TSLexer *lexer,
       // '->' is valid in function types, bare '-' is not.
       advance(lexer);
       if (lexer->lookahead == '>') { advance(lexer); continue; }
-      // A negative measure exponent, e.g. `float<m s^-1>`. Only after a '^',
-      // so an ordinary comparison chain (`a<b-1>c`) is still not a type
-      // application.
-      if (saw_caret && lexer->lookahead >= '0' && lexer->lookahead <= '9') {
+      // A negative measure exponent: `float<m s^-1>` directly after the '^',
+      // or the numerator of a rational one, `23<kg^(-12345/123)>`, where the
+      // '-' sits inside the parens. Both spellings are narrow, so ordinary
+      // comparison chains (`a<b-1>c`, `a<b^2 - 1>c`) remain non-type-apps.
+      if ((after_caret || paren_depth > 0) && lexer->lookahead >= '0' &&
+          lexer->lookahead <= '9') {
         continue;
       }
       return false;

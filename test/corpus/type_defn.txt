@@ -4218,7 +4218,7 @@ measure abbreviation with juxtaposed product and power
             (int)))))))
 
 ================================================================================
-measure abbreviation with left-associative quotient chain
+measure abbreviation with a quotient chain
 ================================================================================
 
 [<Measure>] type A = m / s / s
@@ -4237,15 +4237,14 @@ measure abbreviation with left-associative quotient chain
         type_name: (identifier))
       block: (measure
         (measure_quotient
-          (measure_quotient
-            (measure_atom
-              (simple_type
-                (long_identifier
-                  (identifier))))
-            (measure_atom
-              (simple_type
-                (long_identifier
-                  (identifier)))))
+          (measure_atom
+            (simple_type
+              (long_identifier
+                (identifier))))
+          (measure_atom
+            (simple_type
+              (long_identifier
+                (identifier))))
           (measure_atom
             (simple_type
               (long_identifier

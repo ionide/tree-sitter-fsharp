@@ -1418,6 +1418,10 @@ module.exports = grammar({
       prec.left(6, seq($._measure_operand, repeat1($._measure_operand))),
 
     // Left-associative, so `m / s / s` is `(m / s) / s` rather than an error.
+    // A chain of divisions is one node with the operands in order, matching how
+    // FSC parses it: `m / s / s` is a flat `SynType.Tuple [Type; Slash; Type;
+    // Slash; Type]`, folded left only later during checking. A single '/' gives
+    // the same two children as the earlier binary rule did.
     measure_quotient: ($) =>
       prec.left(
         5,
@@ -1425,7 +1429,6 @@ module.exports = grammar({
           choice(
             $._measure_operand,
             $.measure_product,
-            $.measure_quotient,
             // `kg m` is indistinguishable from a postfix type until a
             // measure-only token appears, and the postfix reading wins the
             // (statically resolved) reduce/reduce — so accept it here, which
@@ -1434,8 +1437,7 @@ module.exports = grammar({
             // abbreviation ambiguous with a measure.
             $.postfix_type,
           ),
-          "/",
-          choice($._measure_operand, $.measure_product),
+          repeat1(seq("/", choice($._measure_operand, $.measure_product))),
         ),
       ),
 

@@ -52,9 +52,14 @@ jobs:
         # reported as KNOWN instead of counted as failures. Regenerate the list
         # with `dotnet fsi scripts/find-fsc-parse-failures.fsx`.
         run: |
+          # A missing list is a real problem, so check for it explicitly; an
+          # empty one is not, so tolerate grep's exit code 1 (no lines left)
+          # instead of failing the step under `bash -e`.
+          test -f test/fsc-parse-failures.txt
           {
             echo 'files<<EOF'
-            grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' test/fsc-parse-failures.txt
+            grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' \
+              test/fsc-parse-failures.txt || test $? -eq 1
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
       - name: Parse sample files

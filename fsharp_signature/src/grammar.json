@@ -4790,30 +4790,34 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "measure_quotient"
-              },
-              {
-                "type": "SYMBOL",
                 "name": "postfix_type"
               }
             ]
           },
           {
-            "type": "STRING",
-            "value": "/"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_measure_operand"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "measure_product"
-              }
-            ]
+            "type": "REPEAT1",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "/"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_measure_operand"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "measure_product"
+                    }
+                  ]
+                }
+              ]
+            }
           }
         ]
       }

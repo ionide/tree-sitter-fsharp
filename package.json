@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-fsharp",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "F# grammars (implementation and signature files) for tree-sitter",
   "repository": {
     "type": "git",

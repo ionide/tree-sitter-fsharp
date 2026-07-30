@@ -5,6 +5,40 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.11] - 2026-07-30
+
+### Added
+- SRTP support constraints and trait calls over several typars:
+  `((^a or ^b) : (static member op_Implicit: ^a -> ^b) x)` and
+  `when (^t or ^u) : (static member M : string)`.
+- F# 7 interfaces with static abstract members (`static abstract member M: 'T`)
+  and self-constrained typars (`when IStaticProperty<'T>`).
+- Units of measure: juxtaposed products (`kg m / s^2`), negative exponents
+  (`s^-1`), rational exponents (`kg^(1/2)`, `kg^(-1/2)`) and quotient chains
+  (`m / s / s`).
+- `inherit` inside an `interface ... end` body.
+- Empty and inherit-only object initializers in additional constructors:
+  `new (x) = {}`, `new () = { inherit Base() }`.
+- Attributes and `inline` on property accessors
+  (`with [<A>] get () = v and [<B>] inline set x = ...`), attributes on return
+  types (`let f x : [<A>] int = ...`), `abstract inline`, accessibility
+  modifiers before `abstract`, `use (pat: T) = ...`, and a trailing separator
+  in an attribute set (`[<A; >]`).
+- `#light "off"` / `#light "on"` (the directive with an explicit argument).
+- `\UXXXXXXXX` escapes in character literals.
+
+### Fixed
+- A trailing `;` or `;;` now terminates a top-level element instead of acting as
+  a sequential-expression separator, so `exit 0;;` at end of file — or followed
+  by a further declaration — parses.
+- `_unicodegraph_long` matched `\u` with eight digits, which the four-digit
+  short form already claimed, leaving the long form unreachable.
+
+### Changed
+- `measure_quotient` reports a division chain as one node with the operands in
+  order, matching FSC's own flat `SynType.Tuple [Type; Slash; Type]` shape. A
+  single `/` is unaffected.
+
 ## [0.3.3] - 2026-07-27
 
 ### Added
