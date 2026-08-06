@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Negative test suite under `test/corpus/invalid/`: snippets that are not valid
+  F# and must produce an `ERROR` node, using the corpus `:error` attribute. See
+  [`test/NEGATIVE-TESTS.md`](test/NEGATIVE-TESTS.md).
+
+- `static member val` is now parsed by the auto-property rule rather than
+  falling through to the generic member rule with `val` as the method name,
+  which mis-nested the declaration that followed it.
+- `new (args) as this = ...` on an additional constructor, which previously
+  parsed only by accident, as an application of the identifiers `as` and `this`.
+
+### Fixed
+- Constructs that F#'s own parser rejects are no longer accepted:
+  an accessibility modifier *after* `abstract` (`abstract public M : int`; the
+  modifier is still accepted before `abstract`, which FSC parses and rejects
+  later as FS0561), an accessibility modifier on a record field
+  (`type R = { private i : int }`), an unparenthesised function type in a
+  union case or exception field (`type B = A of int -> int`, which F# requires
+  to be written `A of (int -> int)`), and an `as` binding on an object
+  expression (`{ new Base() as b with ... }`).
+- `npm run generate` now works on Windows. It was a `for dir in ...; do` shell
+  loop, which npm hands to `cmd.exe` there, failing with "dir was unexpected at
+  this time"; it is now two `tree-sitter generate --output` calls joined by `&&`.
+- `as`, `namespace`, `open` and `type` are now reserved words, so they no longer
+  fall back to identifiers in positions where the keyword is not valid. This
+  makes `let type = 2`, `open` inside a function body, a `namespace` declaration
+  after code, and `inherit Base(x) as base` report an error, as FSC does.
+
 ## [0.3.11] - 2026-07-30
 
 ### Added

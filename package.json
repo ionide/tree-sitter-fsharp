@@ -39,7 +39,7 @@
     "install": "node-gyp-build",
     "prepack": "node scripts/npm-readme.js swap",
     "postpack": "node scripts/npm-readme.js restore",
-    "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate; cd -; done",
+    "generate": "tree-sitter generate --output fsharp/src fsharp/grammar.js && tree-sitter generate --output fsharp_signature/src fsharp_signature/grammar.js",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "node --test bindings/node/*_test.js"

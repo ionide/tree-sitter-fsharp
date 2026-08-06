@@ -2304,6 +2304,28 @@ type C() =
             (string)))))))
 
 ================================================================================
+static member val with get, set
+================================================================================
+
+type C() =
+  static member val P = "" with get, set
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        (identifier))
+      (primary_constr_args)
+      (type_extension_elements
+        (member_defn
+          (property_or_ident
+            (identifier))
+          (const
+            (string)))))))
+
+================================================================================
 property with get
 ================================================================================
 
