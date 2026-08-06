@@ -718,3 +718,128 @@ let f w =
               (identifier)))
           (const
             (string)))))))
+
+================================================================================
+cons pattern
+================================================================================
+
+let rec sum l =
+  match l with
+  | x :: rest -> x + sum rest
+  | [] -> 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (cons_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (application_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier))))
+          (rule
+            (list_pattern)
+            (const
+              (int))))))))
+
+================================================================================
+as pattern
+================================================================================
+
+let f x =
+  match x with
+  | Some v as original -> original
+  | None -> None
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (as_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (rule
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+conjunct pattern
+================================================================================
+
+let f x =
+  match x with
+  | A & B -> 1
+  | _ -> 0
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            (conjunct_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            (const
+              (int)))
+          (rule
+            (wildcard_pattern)
+            (const
+              (int))))))))

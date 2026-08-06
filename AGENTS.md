@@ -191,15 +191,16 @@ snippets that are **not** valid F#, and the parser is expected to report an
 `ERROR` node. They use the `:error` attribute and an empty expected-tree section,
 and run under the same `npx tree-sitter test`.
 
-This matters when you are making a sample file parse. Widening a rule until the
+This is the counterweight to making sample files parse: widening a rule until a
 failing file goes green is easy, and nothing else in the suite notices when the
-grammar becomes loose enough to accept syntax F# rejects. Run the full test suite,
-not just your feature's file.
+grammar starts accepting syntax F# rejects.
 
-Every case there passes today. Read [`test/NEGATIVE-TESTS.md`](./test/NEGATIVE-TESTS.md)
-before adding or changing anything under `test/corpus/invalid/`; it covers how to
-verify a case against FSC, which kinds of errors deliberately stay out, and a
-list of known gaps that are not yet tests — a good source of work.
+Only **structural** syntax errors belong — not type or name-resolution errors
+(`let y = 4 + y` parses fine), and not offside errors (`--langversion`-dependent).
+Before adding a case, confirm FSC reports a diagnostic with `SubCategory = "parse"`
+using the script in step 1; asserting an error on legal F# is worse than no case.
+Every case passes today — never add a failing one, mark one `:skip`, or delete one
+to make a change pass.
 
 ## References
 

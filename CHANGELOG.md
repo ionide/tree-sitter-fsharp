@@ -9,8 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Negative test suite under `test/corpus/invalid/`: snippets that are not valid
-  F# and must produce an `ERROR` node, using the corpus `:error` attribute. See
-  [`test/NEGATIVE-TESTS.md`](test/NEGATIVE-TESTS.md).
+  F# and must produce an `ERROR` node, using the corpus `:error` attribute.
 
 - `static member val` is now parsed by the auto-property rule rather than
   falling through to the generic member rule with `val` as the method name,
