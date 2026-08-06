@@ -136,9 +136,11 @@ After modifying `grammar.js`, regenerate `grammar.json` and `parser.c` for
 npm run generate
 ```
 
-This runs `tree-sitter generate` inside each parser directory and produces
-both `fsharp/src/{grammar.json,parser.c}` and
-`fsharp_signature/src/{grammar.json,parser.c}`. Because
+This runs `tree-sitter generate` once per parser and produces both
+`fsharp/src/{grammar.json,parser.c}` and
+`fsharp_signature/src/{grammar.json,parser.c}`. It uses `--output` and `&&`
+rather than a shell loop, so it works on Windows (where npm runs scripts through
+`cmd.exe`) as well as on macOS and Linux. Because
 `fsharp_signature/grammar.js` extends `fsharp/grammar.js`, a change to the
 base grammar shows up in the signature parser too — so this must be run
 even if you only edited `fsharp/grammar.js`.
@@ -182,6 +184,23 @@ npx tree-sitter test
 
 If the test still fails, review your implementation and the expected parse tree. Make sure your grammar rules correctly capture the syntax of the new feature.
 
+## Negative Tests
+
+`test/corpus/invalid/` asserts the *opposite* of the rest of the suite: these are
+snippets that are **not** valid F#, and the parser is expected to report an
+`ERROR` node. They use the `:error` attribute and an empty expected-tree section,
+and run under the same `npx tree-sitter test`.
+
+This matters when you are making a sample file parse. Widening a rule until the
+failing file goes green is easy, and nothing else in the suite notices when the
+grammar becomes loose enough to accept syntax F# rejects. Run the full test suite,
+not just your feature's file.
+
+Every case there passes today. Read [`test/NEGATIVE-TESTS.md`](./test/NEGATIVE-TESTS.md)
+before adding or changing anything under `test/corpus/invalid/`; it covers how to
+verify a case against FSC, which kinds of errors deliberately stay out, and a
+list of known gaps that are not yet tests — a good source of work.
+
 ## References
 
 - **Tree-sitter Documentation**: https://tree-sitter.github.io/tree-sitter/creating-parsers/index.html
@@ -201,5 +220,7 @@ If the test still fails, review your implementation and the expected parse tree.
 4. **Two parsers, one grammar chain** - `fsharp_signature` extends `fsharp`, so any change to `fsharp/grammar.js` requires regenerating **both** `fsharp/src/parser.c` and `fsharp_signature/src/parser.c`. `npm run generate` handles this; a single `tree-sitter generate` call does not. CI will fail if either is stale.
 
 5. **Grammar.js vs parser.c** - You should only edit `grammar.js`. The `parser.c` file is auto-generated and will be overwritten when you run `tree-sitter generate`. Merge conflicts in `parser.c`/`grammar.json` are resolved by regenerating, not by hand-editing.
+
+6. **Never weaken a negative test** - Do not delete a case from `test/corpus/invalid/`, and do not add `:skip` to one that was previously enforced, in order to make a change pass. A negative test that starts failing means the grammar now accepts invalid F#.
 
 **IMPORTANT**: You may never change the expected parse tree of an existing test without consulting the user first. If a test fails to parse it is because the parser is broken.

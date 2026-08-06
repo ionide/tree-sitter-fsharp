@@ -25,7 +25,7 @@
     "eslint": "^10.0.3",
     "eslint-config-google": "^0.14.0",
     "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.26.6"
+    "tree-sitter-cli": "^0.26.11"
   },
   "peerDependencies": {
     "tree-sitter": "^0.25.0"
@@ -39,7 +39,7 @@
     "install": "node-gyp-build",
     "prepack": "node scripts/npm-readme.js swap",
     "postpack": "node scripts/npm-readme.js restore",
-    "generate": "for dir in fsharp fsharp_signature; do cd $dir; tree-sitter generate; cd -; done",
+    "generate": "tree-sitter generate --output fsharp/src fsharp/grammar.js && tree-sitter generate --output fsharp_signature/src fsharp_signature/grammar.js",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "node --test bindings/node/*_test.js"
