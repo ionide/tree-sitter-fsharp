@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Negative test suite under `test/corpus/invalid/`: snippets that are not valid
   F# and must produce an `ERROR` node, using the corpus `:error` attribute.
+- `test/fsc-detected.txt` and `npm run check:invalid`: 346 corpus files where
+  tree-sitter reports an error at the same line F#'s own parser does, asserted in
+  CI. `Parse examples` only warns when a file it expects to be invalid parses
+  cleanly, so a grammar that started accepting invalid F# went green; this fails
+  by name instead. Files where tree-sitter errors somewhere unrelated (FSharp.Core's
+  inline IL, for one) are not listed, and the list is append-only, so a regression
+  cannot be cleared by regenerating it.
 
 - `static member val` is now parsed by the auto-property rule rather than
   falling through to the generic member rule with `val` as the method name,

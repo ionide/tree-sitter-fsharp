@@ -202,6 +202,15 @@ using the script in step 1; asserting an error on legal F# is worse than no case
 Every case passes today — never add a failing one, mark one `:skip`, or delete one
 to make a change pass.
 
+`test/fsc-detected.txt` is the same idea at corpus scale: files F#'s parser
+rejects, with the line it rejects them on, where tree-sitter reports an ERROR at
+that same line. `npm run check:invalid` asserts it still does, so a loosened rule
+that starts accepting invalid F# fails by name. Files where tree-sitter errors
+somewhere unrelated are deliberately not listed — they would look like coverage
+while checking nothing. The list is append-only; regenerate with
+`dotnet fsi scripts/record-fsc-detected.fsx` and never delete an entry to go
+green.
+
 ## References
 
 - **Tree-sitter Documentation**: https://tree-sitter.github.io/tree-sitter/creating-parsers/index.html
