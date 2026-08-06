@@ -45,8 +45,24 @@ enum TokenType {
   PREPROC_INACTIVE,
   ELEM_SEP,
   BRACE_INDENT,
+  FLOAT_TRAILING_DOT,
+  RULES_INDENT,
   ERROR_SENTINEL
 };
+
+// The second character of an F# dotted infix operator (the set following the
+// leading '.' in the infix_op grammar rule). Used to decide when the trailing
+// '.' of a float literal would otherwise be glued into such an operator.
+static inline bool is_dotted_infix_follow(int32_t c) {
+  switch (c) {
+    case '!': case '%': case '&': case '*': case '+': case '/': case '<':
+    case '=': case '>': case '@': case '^': case '|': case '~': case '?':
+    case '-':
+      return true;
+    default:
+      return false;
+  }
+}
 
 typedef enum {
   INDENT_NORMAL = 0,
@@ -61,6 +77,12 @@ typedef enum {
   // under-indented line still emits a NEWLINE so record/CE items keep
   // separating even when a continuation item sits left of the first one.
   INDENT_BRACE = 4,
+  // Body of a match/function `rules` list. Behaves like a normal indent, but
+  // when a line that is not a '| ' arm sits at the same column as the rules
+  // (undented arms followed by a continuation, e.g. `let f = function` with the
+  // arms aligned to `let` and a trailing call on the next line), it is
+  // force-closed with a DEDENT rather than kept open by a same-column NEWLINE.
+  INDENT_RULES = 5,
 } IndentKind;
 
 // OR-ed into the indent_kinds byte when the scope's INDENT fired mid-line
@@ -255,6 +277,10 @@ static inline bool peek_is_type_app_indent(Scanner *scanner) {
 
 static inline bool peek_is_try_indent(Scanner *scanner) {
   return peek_indent_kind(scanner) == INDENT_TRY;
+}
+
+static inline bool peek_is_rules_indent(Scanner *scanner) {
+  return peek_indent_kind(scanner) == INDENT_RULES;
 }
 
 // Peek forward from after a '<' to its matching '>' and check that the content
@@ -554,6 +580,25 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // following scan (the NEWLINE emit below) and never leaks further.
   bool prev_stranded_dedent = scanner->stranded_dedent;
   scanner->stranded_dedent = false;
+
+  // Trailing decimal point of a float literal (`0.`) immediately followed by an
+  // operator character. Only valid right after the integer part of a float, so
+  // this never fires for a lone `.` elsewhere. F#'s rule is that a '.' directly
+  // after digits is the decimal point; without this the generated lexer would
+  // prefer the longer dotted infix operator (`.<`, `.*`, ...) and foreclose the
+  // float, so `0.<measure>` mis-parsed as `0 .< measure >`. A following '.'
+  // (range `0..10`) or digit (`0.5`) is left to the generated lexer, which
+  // already handles both correctly.
+  if (valid_symbols[FLOAT_TRAILING_DOT] && !valid_symbols[ERROR_SENTINEL] &&
+      lexer->lookahead == '.') {
+    advance(lexer);
+    lexer->mark_end(lexer);
+    if (is_dotted_infix_follow(lexer->lookahead)) {
+      lexer->result_symbol = FLOAT_TRAILING_DOT;
+      return true;
+    }
+    return false;
+  }
 
   if (valid_symbols[ERROR_SENTINEL]) {
     // During error recovery, all valid_symbols are true. Tree-sitter's error
@@ -1900,6 +1945,16 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     return true;
   }
 
+  if (valid_symbols[RULES_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_bracket_end && !found_preprocessor_end &&
+      !found_same_line_pipe_infix) {
+    // Like INDENT, but tagged so it can be force-closed when a non-'|' line
+    // sits at the same column as undented match/function arms (see INDENT_RULES).
+    push_indent(scanner, indent_length, INDENT_RULES);
+    lexer->result_symbol = RULES_INDENT;
+    return true;
+  }
+
   if (valid_symbols[INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix &&
@@ -1992,6 +2047,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
 
     if (found_end_of_line) {
+      // Force-close an undented match/function rules scope. A line at the same
+      // column as the arms that does not begin a new '| ' arm ends the rules
+      // (F#'s offside rule). '|' arm lines and infix-continuation lines (`|>`,
+      // `||`) were handled earlier and either returned NEWLINE or set
+      // found_start_of_infix_op, so reaching here at the same column with DEDENT
+      // valid means the rules are complete and the enclosing block owes a
+      // DEDENT — a same-column NEWLINE would instead strand it and keep the
+      // rules open as if another arm followed.
+      if (peek_is_rules_indent(scanner) &&
+          indent_length == current_indent_length && indent_length > 0 &&
+          valid_symbols[DEDENT] && !found_start_of_infix_op &&
+          !found_bracket_end && !found_preprocessor_end &&
+          !found_comment_start) {
+        pop_indent(scanner);
+        lexer->result_symbol = DEDENT;
+        return true;
+      }
+
       // Inside a brace block, a line that is not more indented than the anchor
       // (including one left of the first item) separates items rather than
       // dedenting out — the '}' is what closes the block.
@@ -2088,7 +2161,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             *array_get(&scanner->indent_kinds, scanner->indents.size - 2);
         IndentKind below_kind =
             (IndentKind)(below_kind_raw & ~INDENT_KIND_FLAGS_MASK);
-        if ((below_kind == INDENT_NORMAL || below_kind == INDENT_TRY) &&
+        if ((below_kind == INDENT_NORMAL || below_kind == INDENT_TRY ||
+             below_kind == INDENT_RULES) &&
             indent_length >
                 *array_get(&scanner->indents, scanner->indents.size - 2)) {
           can_dedent_midline_anchor = false;

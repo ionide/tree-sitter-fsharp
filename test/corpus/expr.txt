@@ -3044,6 +3044,99 @@ let v =
                 (unit)))))))))
 
 ================================================================================
+let-bound function with rules undented to the let column, then a continuation
+================================================================================
+
+module Prime =
+    let testPrimality (p : int) (divisors : int list) =
+        if p < 2 then false else
+        let rec loop = function
+        | [] -> true
+        | d::ds -> if p % d = 0 then false else loop ds
+        loop divisors
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (function_declaration_left
+          (identifier)
+          (argument_patterns
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier))))
+            (typed_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (postfix_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (long_identifier
+                  (identifier))))))
+        (if_expression
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (int)))
+          (const
+            (bool))
+          (declaration_expression
+            (function_or_value_defn
+              (value_declaration_left
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (function_expression
+                (rules
+                  (rule
+                    (list_pattern)
+                    (const
+                      (bool)))
+                  (rule
+                    (cons_pattern
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier)))
+                      (identifier_pattern
+                        (long_identifier_or_op
+                          (identifier))))
+                    (if_expression
+                      (infix_expression
+                        (infix_expression
+                          (long_identifier_or_op
+                            (identifier))
+                          (infix_op)
+                          (long_identifier_or_op
+                            (identifier)))
+                        (infix_op)
+                        (const
+                          (int)))
+                      (const
+                        (bool))
+                      (application_expression
+                        (long_identifier_or_op
+                          (identifier))
+                        (long_identifier_or_op
+                          (identifier))))))))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
 address of expression inside application
 ================================================================================
 

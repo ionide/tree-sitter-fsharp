@@ -103,6 +103,8 @@ module.exports = grammar({
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
     $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
+    $._float_trailing_dot, // the trailing '.' of a float literal (e.g. `0.`) when immediately followed by an operator char; preempts the generated lexer gluing it into a dotted infix op (`.<`) so `0.<measure>` reads as float-then-type-app
+    $._rules_indent, // like _indent, but opens a match/function rules scope that can be force-closed when a non-'|' line sits at the same column as the rules (undented arms followed by a continuation)
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -873,7 +875,7 @@ module.exports = grammar({
         "with",
         choice(
           seq($._newline, $.rules),
-          scoped($.rules, $._indent, $._dedent),
+          scoped($.rules, $._rules_indent, $._dedent),
           $.rules,
         ),
       ),
@@ -888,7 +890,7 @@ module.exports = grammar({
           // where the mid-line '| ' suppresses the zero-width INDENT).
           choice(
             seq($._newline, $.rules),
-            scoped($.rules, $._indent, $._dedent),
+            scoped($.rules, $._rules_indent, $._dedent),
             $.rules,
           ),
         ),
@@ -2471,8 +2473,16 @@ module.exports = grammar({
           choice(
             seq(
               $.int,
-              token.immediate("."),
-              optional(token.immediate(/([0-9]_?)+/)),
+              choice(
+                seq(
+                  token.immediate("."),
+                  optional(token.immediate(/([0-9]_?)+/)),
+                ),
+                // Trailing decimal point immediately followed by an operator
+                // char (`0.<m>`, `0.*x`): the external scanner claims the '.'
+                // so it is not glued into a dotted infix op like `.<`.
+                $._float_trailing_dot,
+              ),
             ),
             seq(
               $.int,
