@@ -3240,7 +3240,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "_indent"
+                    "name": "_rules_indent"
                   },
                   {
                     "type": "SYMBOL",
@@ -3295,7 +3295,7 @@
                   "members": [
                     {
                       "type": "SYMBOL",
-                      "name": "_indent"
+                      "name": "_rules_indent"
                     },
                     {
                       "type": "SYMBOL",
@@ -10554,24 +10554,38 @@
                   "name": "int"
                 },
                 {
-                  "type": "IMMEDIATE_TOKEN",
-                  "content": {
-                    "type": "STRING",
-                    "value": "."
-                  }
-                },
-                {
                   "type": "CHOICE",
                   "members": [
                     {
-                      "type": "IMMEDIATE_TOKEN",
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "([0-9]_?)+"
-                      }
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "IMMEDIATE_TOKEN",
+                          "content": {
+                            "type": "STRING",
+                            "value": "."
+                          }
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "IMMEDIATE_TOKEN",
+                              "content": {
+                                "type": "PATTERN",
+                                "value": "([0-9]_?)+"
+                              }
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": "BLANK"
+                      "type": "SYMBOL",
+                      "name": "_float_trailing_dot"
                     }
                   ]
                 }
@@ -11885,6 +11899,14 @@
     {
       "type": "SYMBOL",
       "name": "_brace_indent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_float_trailing_dot"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_rules_indent"
     },
     {
       "type": "SYMBOL",

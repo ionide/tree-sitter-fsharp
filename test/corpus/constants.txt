@@ -965,6 +965,43 @@ module M =
                 (identifier)))))))))
 
 ================================================================================
+Trailing dot float-literal with measure annotation
+================================================================================
+
+module M =
+    let x = 0.<TradeableUnit>
+    type After = { x : int }
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (typed_expression
+          (const
+            (float))
+          (types
+            (simple_type
+              (long_identifier
+                (identifier)))))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          (identifier))
+        (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
 verbatim interpolated string
 ================================================================================
 
