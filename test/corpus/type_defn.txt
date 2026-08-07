@@ -4320,3 +4320,25 @@ type S =
                   (long_identifier
                     (identifier)))))
             (brace_expression)))))))
+
+================================================================================
+delegate type definition
+================================================================================
+
+type Handler = delegate of int -> unit
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (delegate_type_defn
+      (type_name
+        (identifier))
+      (delegate_signature
+        (function_type
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (simple_type
+            (long_identifier
+              (identifier))))))))

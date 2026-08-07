@@ -77,6 +77,16 @@ jobs:
         with:
           name: failures-${{runner.os}}
           path: ${{steps.parse-files.outputs.failures}}
+      - name: Check invalid F# is still detected
+        # The step above lists the FSC-rejected files as `invalid-files`, but one
+        # of those parsing cleanly is only a warning there, so a grammar that
+        # started accepting invalid F# would still go green. This asserts the
+        # subset tree-sitter currently catches stays caught.
+        if: "!cancelled()"
+        shell: bash
+        env:
+          TREE_SITTER: tree-sitter
+        run: dotnet fsi scripts/check-fsc-detected.fsx
   fuzz:
     name: Fuzz scanner
     runs-on: ubuntu-latest

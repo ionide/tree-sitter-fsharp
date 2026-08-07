@@ -42,6 +42,7 @@
     "generate": "tree-sitter generate --output fsharp/src fsharp/grammar.js && tree-sitter generate --output fsharp_signature/src fsharp_signature/grammar.js",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
+    "check:invalid": "dotnet fsi scripts/check-fsc-detected.fsx",
     "test": "node --test bindings/node/*_test.js"
   },
   "dependencies": {

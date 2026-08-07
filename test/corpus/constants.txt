@@ -1077,3 +1077,39 @@ let y = 2.0<s^-1>
                 (long_identifier
                   (identifier))))
             (int)))))))
+
+================================================================================
+byte array literal
+================================================================================
+
+let b = "abc"B
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (bytearray)))))
+
+================================================================================
+verbatim byte array literal
+================================================================================
+
+let v = @"abc"B
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (verbatim_bytearray)))))
