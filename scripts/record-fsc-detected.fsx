@@ -76,10 +76,34 @@ let treeSitterErrorLines (paths: string[]) =
         psi.RedirectStandardError <- true
         psi.UseShellExecute <- false
 
-        use proc = Process.Start psi
-        let stdout = proc.StandardOutput.ReadToEnd()
-        proc.StandardError.ReadToEnd() |> ignore
+        use proc =
+            try
+                Process.Start psi
+            with e ->
+                eprintfn "could not run `%s`: %s" treeSitter e.Message
+                eprintfn "Set TREE_SITTER to the CLI path, or put it on PATH."
+                exit 2
+
+        // Drain both pipes concurrently; reading one to completion first
+        // deadlocks as soon as the other fills its buffer.
+        let stdoutTask = proc.StandardOutput.ReadToEndAsync()
+        let stderrTask = proc.StandardError.ReadToEndAsync()
         proc.WaitForExit()
+        let stdout = stdoutTask.Result
+        let stderr = stderrTask.Result
+
+        // Reporting on no files means the CLI failed, not that nothing errors.
+        // Recording that silence would write an empty list and quietly drop
+        // every assertion.
+        let reported =
+            stdout.Split('\n') |> Array.filter (fun l -> l.StartsWith "examples/") |> Array.length
+
+        if reported = 0 && paths.Length > 0 then
+            eprintfn "`%s parse` reported on none of the %d files (exit %d)." treeSitter paths.Length proc.ExitCode
+            eprintfn "Refusing to record an empty list."
+            eprintfn ""
+            eprintfn "%s" (stderr.Trim())
+            exit 2
 
         stdout.Split('\n')
         |> Array.map (fun line -> line.TrimEnd('\r'))

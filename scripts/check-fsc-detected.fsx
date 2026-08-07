@@ -70,10 +70,38 @@ let treeSitterErrorLines (paths: string[]) =
         psi.RedirectStandardError <- true
         psi.UseShellExecute <- false
 
-        use proc = Process.Start psi
-        let stdout = proc.StandardOutput.ReadToEnd()
-        proc.StandardError.ReadToEnd() |> ignore
+        use proc =
+            try
+                Process.Start psi
+            with e ->
+                eprintfn "could not run `%s`: %s" treeSitter e.Message
+                eprintfn "Set TREE_SITTER to the CLI path, or put it on PATH."
+                exit 2
+
+        // Both pipes must be drained concurrently. Reading one to completion
+        // first deadlocks as soon as the other fills its buffer -- which it
+        // does when this is the run that compiles the parser and stderr
+        // carries the whole build log.
+        let stdoutTask = proc.StandardOutput.ReadToEndAsync()
+        let stderrTask = proc.StandardError.ReadToEndAsync()
         proc.WaitForExit()
+        let stdout = stdoutTask.Result
+        let stderr = stderrTask.Result
+
+        // tree-sitter prints one line per file, and exits non-zero whenever any
+        // file has an error -- which is the normal case here, so the exit code
+        // says nothing. Reporting on no files at all is the signal that the CLI
+        // itself failed. Without this the script would read the silence as
+        // "every recorded error disappeared" and cry regression on all of them.
+        let reported =
+            stdout.Split('\n') |> Array.filter (fun l -> l.StartsWith "examples/") |> Array.length
+
+        if reported = 0 && paths.Length > 0 then
+            eprintfn "`%s parse` reported on none of the %d files (exit %d)." treeSitter paths.Length proc.ExitCode
+            eprintfn "This is a tooling failure, not a grammar regression."
+            eprintfn ""
+            eprintfn "%s" (stderr.Trim())
+            exit 2
 
         stdout.Split('\n')
         |> Array.map (fun line -> line.TrimEnd('\r'))
