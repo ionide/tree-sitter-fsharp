@@ -412,6 +412,56 @@ static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
   return true;
 }
 
+// Called with the lexer just past the `(*` of a block comment that starts a
+// line. Skips that comment and any further block comments on the same line,
+// and reports whether nothing but whitespace or a line comment follows them,
+// i.e. the line holds only comments. Nesting is counted as FSC's lexer counts
+// it: `(*` opens, `*)` closes, and `(*)` is the operator, which opens nothing.
+static inline bool comments_fill_rest_of_line(TSLexer *lexer) {
+  for (;;) {
+    uint32_t depth = 1;
+    while (depth > 0) {
+      if (lexer->eof(lexer)) {
+        return true;
+      }
+      int32_t c = lexer->lookahead;
+      skip(lexer);
+      if (c == '(' && lexer->lookahead == '*') {
+        skip(lexer);
+        if (lexer->lookahead == ')') {
+          skip(lexer);
+        } else {
+          depth++;
+        }
+      } else if (c == '*' && lexer->lookahead == ')') {
+        skip(lexer);
+        depth--;
+      }
+    }
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      skip(lexer);
+    }
+    if (lexer->lookahead == '(') {
+      // Another comment on the same line, unless it is the `(*)` operator.
+      skip(lexer);
+      if (lexer->lookahead != '*') {
+        return false;
+      }
+      skip(lexer);
+      if (lexer->lookahead == ')') {
+        return false;
+      }
+      continue;
+    }
+    if (lexer->lookahead == '/') {
+      skip(lexer);
+      return lexer->lookahead == '/';
+    }
+    return lexer->eof(lexer) || lexer->lookahead == '\n' ||
+           lexer->lookahead == '\r';
+  }
+}
+
 static inline bool scan_block_comment(TSLexer *lexer) {
   lexer->mark_end(lexer);
   if (lexer->lookahead != '(')
@@ -2115,7 +2165,24 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
 
+      // A line holding only block comments does not close a scope: F#'s
+      // offside rule ignores comments, so a `(*` at column 0 inside a class
+      // or a function body must not end it. Decline instead, as for a line
+      // that starts with `//`: the comments are consumed as extras and the
+      // next scan measures the line after them. A line with code after its
+      // comment (`(* c *) let x = 1`) still decides layout from the
+      // comment's column, as before. Not when the walk crossed a directive
+      // line (`#if`, `#else`, `#endif`): the DEDENT then belongs before the
+      // directive, which the grammar needs to see at the enclosing level.
+      // This is the scan's last decision, so the lookahead the check consumes
+      // is not needed afterwards.
+      bool comment_only_line =
+          found_comment_start && !found_preprocessor_end &&
+          !found_preproc_if && !found_preproc_else &&
+          indent_length < current_indent_length &&
+          comments_fill_rest_of_line(lexer);
       if (indent_length < current_indent_length && !found_bracket_end &&
+          !comment_only_line &&
           can_dedent_preproc && can_dedent_infix_op &&
           can_dedent_midline_anchor &&
           (!valid_symbols[TUPLE_MARKER] || valid_symbols[ERROR_SENTINEL]) && can_dedent_paren_indent) {
