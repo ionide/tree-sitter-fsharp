@@ -276,12 +276,11 @@ do (A[1]).B
     (do
       (dot_expression
         (paren_expression
-          (application_expression
+          (index_expression
             (long_identifier_or_op
               (identifier))
-            (list_expression
-              (const
-                (int)))))
+            (const
+              (int))))
         (long_identifier_or_op
           (long_identifier
             (identifier)))))))
@@ -314,12 +313,186 @@ do test[test]
 (file
   (declaration_expression
     (do
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (long_identifier_or_op
+          (identifier))))))
+
+================================================================================
+index with a touching bracket, application with a spaced one
+================================================================================
+
+let a = xs[1]
+let b = g [1; 2]
+let c = g xs[0]
+let d = xs[0][1]
+let e = m["k"]
+let f = (xs)[0]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
       (application_expression
         (long_identifier_or_op
           (identifier))
         (list_expression
+          (const
+            (int))
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
           (long_identifier_or_op
-            (identifier)))))))
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (index_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (index_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (string)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (index_expression
+        (paren_expression
+          (long_identifier_or_op
+            (identifier)))
+        (const
+          (int))))))
+
+================================================================================
+touching array literal and empty list are application arguments
+================================================================================
+
+let a = g[|1|]
+let b = TreeNode[]
+let c = [Seq[]; x]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (array_expression
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (list_expression))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (list_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (list_expression))
+        (long_identifier_or_op
+          (identifier))))))
+
+================================================================================
+index body under-indented inside its brackets
+================================================================================
+
+let r = xs[
+    1 +
+  2
+]
+let k = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (index_expression
+        (long_identifier_or_op
+          (identifier))
+        index: (infix_expression
+          (const
+            (int))
+          (infix_op)
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
 
 ================================================================================
 mutate expression
@@ -524,7 +697,7 @@ do [2; 3; 4][1]
 (file
   (declaration_expression
     (do
-      (application_expression
+      (index_expression
         (list_expression
           (const
             (int))
@@ -532,9 +705,8 @@ do [2; 3; 4][1]
             (int))
           (const
             (int)))
-        (list_expression
-          (const
-            (int)))))))
+        (const
+          (int))))))
 
 ================================================================================
 index single list expressions
@@ -547,13 +719,12 @@ do [2][1]
 (file
   (declaration_expression
     (do
-      (application_expression
+      (index_expression
         (list_expression
           (const
             (int)))
-        (list_expression
-          (const
-            (int)))))))
+        (const
+          (int))))))
 
 ================================================================================
 two single list expressions
@@ -604,7 +775,7 @@ do [|2; 3; 4|][1]
 (file
   (declaration_expression
     (do
-      (application_expression
+      (index_expression
         (array_expression
           (const
             (int))
@@ -612,9 +783,8 @@ do [|2; 3; 4|][1]
             (int))
           (const
             (int)))
-        (list_expression
-          (const
-            (int)))))))
+        (const
+          (int))))))
 
 ================================================================================
 array single list expressions
@@ -627,13 +797,12 @@ do [|2|][1]
 (file
   (declaration_expression
     (do
-      (application_expression
+      (index_expression
         (array_expression
           (const
             (int)))
-        (list_expression
-          (const
-            (int)))))))
+        (const
+          (int))))))
 
 ================================================================================
 two single array expressions
@@ -1021,12 +1190,11 @@ let x =
             (long_identifier_or_op
               (identifier))))
         (application_expression
-          (application_expression
+          (index_expression
             (long_identifier_or_op
               (identifier))
-            (list_expression
-              (const
-                (int))))
+            (const
+              (int)))
           (const
             (int)))))))
 
@@ -1061,20 +1229,19 @@ let x =
               (int))
             (const
               (int))))
-        (application_expression
+        (index_expression
           (long_identifier_or_op
             (identifier))
-          (list_expression
-            (declaration_expression
-              (function_or_value_defn
-                (value_declaration_left
-                  (identifier_pattern
-                    (long_identifier_or_op
-                      (identifier))))
-                (const
-                  (int)))
-              (long_identifier_or_op
-                (identifier)))))))))
+          (declaration_expression
+            (function_or_value_defn
+              (value_declaration_left
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (const
+                (int)))
+            (long_identifier_or_op
+              (identifier))))))))
 
 ================================================================================
 apply value declaration to function
@@ -2149,12 +2316,11 @@ let a b =
                   (long_identifier
                     (identifier)
                     (identifier)))
-                (application_expression
+                (index_expression
                   (long_identifier_or_op
                     (identifier))
-                  (list_expression
-                    (const
-                      (int)))))
+                  (const
+                    (int))))
               (infix_op)
               (long_identifier_or_op
                 (identifier))))
@@ -2366,62 +2532,56 @@ let f xs =
           (long_identifier
             (identifier))))
       (sequential_expression
-        (application_expression
+        (index_expression
           (long_identifier_or_op
             (identifier))
-          (list_expression
+          (slice_ranges
+            (slice_range
+              (const
+                (int)))))
+        (sequential_expression
+          (index_expression
+            (long_identifier_or_op
+              (identifier))
             (slice_ranges
               (slice_range
                 (const
-                  (int))))))
-        (sequential_expression
-          (application_expression
-            (long_identifier_or_op
-              (identifier))
-            (list_expression
+                  (int)))))
+          (sequential_expression
+            (index_expression
+              (long_identifier_or_op
+                (identifier))
               (slice_ranges
                 (slice_range
                   (const
-                    (int))))))
-          (sequential_expression
-            (application_expression
-              (long_identifier_or_op
-                (identifier))
-              (list_expression
+                    (int))
+                  (const
+                    (int)))))
+            (sequential_expression
+              (index_expression
+                (long_identifier_or_op
+                  (identifier))
                 (slice_ranges
                   (slice_range
                     (const
-                      (int))
-                    (const
-                      (int))))))
-            (sequential_expression
-              (application_expression
-                (long_identifier_or_op
-                  (identifier))
-                (list_expression
+                      (int)))))
+              (sequential_expression
+                (index_expression
+                  (long_identifier_or_op
+                    (identifier))
                   (slice_ranges
                     (slice_range
                       (const
-                        (int))))))
-              (sequential_expression
-                (application_expression
+                        (int)))))
+                (index_expression
                   (long_identifier_or_op
                     (identifier))
-                  (list_expression
-                    (slice_ranges
-                      (slice_range
-                        (const
-                          (int))))))
-                (application_expression
-                  (long_identifier_or_op
-                    (identifier))
-                  (list_expression
-                    (slice_ranges
-                      (slice_range
-                        (const
-                          (int))
-                        (const
-                          (int))))))))))))))
+                  (slice_ranges
+                    (slice_range
+                      (const
+                        (int))
+                      (const
+                        (int)))))))))))))
 
 ================================================================================
 array index with slice ranges
@@ -4728,12 +4888,11 @@ let x =
               (long_identifier_or_op
                 (identifier)))
             (application_expression
-              (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (index_expression
                 (long_identifier_or_op
                   (identifier))
-                (long_identifier_or_op
-                  (identifier)))
-              (list_expression
                 (long_identifier_or_op
                   (identifier))))))))))
 
@@ -4786,13 +4945,12 @@ let x =
                 (long_identifier_or_op
                   (identifier)))
               (application_expression
-                (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (index_expression
                   (long_identifier_or_op
                     (identifier))
-                  (long_identifier_or_op
-                    (identifier)))
-                (list_expression
-                  (long_identifier_or_op
+                  index: (long_identifier_or_op
                     (identifier)))))))))))
 
 ================================================================================
