@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 742 with errors; 4447 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -35,7 +35,6 @@
 2	examples/FSharp.Compiler/src/Compiler/Driver/ParseAndCheckInputs.fs
 2	examples/FSharp.Compiler/src/Compiler/Facilities/prim-lexing.fs
 2	examples/FSharp.Compiler/src/Compiler/Interactive/fsi.fs
-1	examples/FSharp.Compiler/src/Compiler/Optimize/LowerSequences.fs
 1	examples/FSharp.Compiler/src/Compiler/Service/FSharpCheckerResults.fs
 2	examples/FSharp.Compiler/src/Compiler/Service/FSharpParseFileResults.fs
 4	examples/FSharp.Compiler/src/Compiler/Service/FSharpProjectSnapshot.fs
@@ -54,7 +53,6 @@
 2	examples/FSharp.Compiler/src/Compiler/TypedTree/tainted.fs
 1	examples/FSharp.Compiler/src/Compiler/Utilities/ImmutableArray.fs
 4	examples/FSharp.Compiler/src/Compiler/Utilities/sformat.fs
-1	examples/FSharp.Compiler/src/FSharp.Core/Linq.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/QueryExtensions.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/SI.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/array2.fs
@@ -147,7 +145,6 @@
 2	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/UnitsOfMeasure/Parsing/Quotient.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/UnitsOfMeasure/Parsing/Reciprocal01.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Diagnostics/async/UseBindingWrongForm01.fs
-8	examples/FSharp.Compiler/tests/FSharp.Compiler.Private.Scripting.UnitTests/DependencyManagerInteractiveTests.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/Common.fs
 8	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/EditorTests.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/ExprTests.fs

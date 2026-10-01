@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- A line holding only block comments (optionally followed by a `//` comment)
+  no longer closes a layout scope. A `(*` at column 0 inside a class or a
+  function body used to end it, so the members or expressions after it were
+  parsed at the wrong level. Such a line is now treated like a `//` line: the
+  next line decides layout. A comment followed by code on the same line still
+  marks that line's indentation, and a comment-only line before the first line
+  of an indented block still anchors it, as before. Three `.fs` corpus files
+  parse cleanly and no `.fs` file parses worse.
+
 ## [0.3.12] - 2026-09-12
 
 ### Added

@@ -1683,9 +1683,9 @@ let x =
               (long_identifier_or_op
                 (identifier))))
           (const
-            (int)))
-        (block_comment
-          (block_comment_content))
+            (int))
+          (block_comment
+            (block_comment_content)))
         (infix_expression
           (long_identifier_or_op
             (identifier))
