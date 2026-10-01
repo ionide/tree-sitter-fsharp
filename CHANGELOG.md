@@ -12,10 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   no longer closes a layout scope. A `(*` at column 0 inside a class or a
   function body used to end it, so the members or expressions after it were
   parsed at the wrong level. Such a line is now treated like a `//` line: the
-  next line decides layout. A comment followed by code on the same line still
-  marks that line's indentation, and a comment-only line before the first line
-  of an indented block still anchors it, as before. Three `.fs` corpus files
-  parse cleanly and no `.fs` file parses worse.
+  next line decides layout. A comment-only line before the first line of an
+  indented block still anchors it, as before. Three `.fs` corpus files parse
+  cleanly and no `.fs` file parses worse.
+- A line that starts left of the current scope with block comments and then
+  holds code takes its layout from the code's column, not the comment's, when
+  an open scope sits exactly at that column: `(* c *) member this.C() = 3` at
+  the member column is the next member instead of closing the class. An infix
+  operator after the comments continues the current item. The comment's column
+  still decides, as before, for a closing bracket, a leading `;`, a layout
+  keyword, a member keyword after comments that start at or right of an
+  inner scope, code at no open scope's column, a line
+  after one that ends with `;`, and comments holding a `"`, a `(*)`, a nested
+  comment, or an empty one before anything but a member keyword.
+  `ImpliedSignatureHashTests.fs` now parses without errors.
 
 ## [0.3.12] - 2026-09-12
 

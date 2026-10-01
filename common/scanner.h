@@ -412,14 +412,46 @@ static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
   return true;
 }
 
+// What `comments_fill_rest_of_line` saw in the comments, for callers that
+// look past them.
+// An empty comment `(**)`, at any depth: where an expression may start, the
+// grammar reads it as the `**` operator instead.
+#define COMMENTS_HAVE_EMPTY 0x01
+// A `(*)` inside a comment: FSC reads it as the operator, which opens
+// nothing, but `scan_block_comment` counts it as an opening, so the comment
+// may end elsewhere for the parser than for this helper.
+#define COMMENTS_HAVE_STAR_OPERATOR 0x02
+// A `"` inside a comment. FSC's lexer skips strings (and char literals) in a
+// comment, but this helper and the comment token do not, so a delimiter
+// inside one ends or nests the comment elsewhere for them. Telling where a
+// string ends would need escapes, char literals and triple quotes; any quote
+// at all is the conservative test.
+#define COMMENTS_HAVE_QUOTE 0x04
+// A comment nested in another. FSC nests them, but the comment token
+// (`scan_block_comment`) ends a line-start comment at its first nested `(*`,
+// so the parser reads the rest of it as code.
+#define COMMENTS_HAVE_NESTED 0x08
+
 // Called with the lexer just past the `(*` of a block comment that starts a
 // line. Skips that comment and any further block comments on the same line,
 // and reports whether nothing but whitespace or a line comment follows them,
-// i.e. the line holds only comments. Nesting is counted as FSC's lexer counts
+// i.e. the line holds only comments. Otherwise sets `*code_column` to the
+// column of the first token after the comments, and `*code_start` to its
+// first character: the lexer may already be past that character (a `(` or a
+// `/` is consumed to look for another comment), so callers classify the token
+// from `*code_start` for those two. Nesting is counted as FSC's lexer counts
 // it: `(*` opens, `*)` closes, and `(*)` is the operator, which opens nothing.
-static inline bool comments_fill_rest_of_line(TSLexer *lexer) {
+// Strings inside a comment are not skipped, as in the comment token itself.
+// ORs the COMMENTS_HAVE_* bits it sees into `*flags`.
+static inline bool comments_fill_rest_of_line(TSLexer *lexer,
+                                              uint32_t *code_column,
+                                              int32_t *code_start,
+                                              uint8_t *flags) {
   for (;;) {
     uint32_t depth = 1;
+    // Nothing yet since the innermost `(*`: a `*)` now closes an empty
+    // comment.
+    bool fresh = true;
     while (depth > 0) {
       if (lexer->eof(lexer)) {
         return true;
@@ -430,17 +462,32 @@ static inline bool comments_fill_rest_of_line(TSLexer *lexer) {
         skip(lexer);
         if (lexer->lookahead == ')') {
           skip(lexer);
+          *flags |= COMMENTS_HAVE_STAR_OPERATOR;
+          fresh = false;
         } else {
           depth++;
+          fresh = true;
+          *flags |= COMMENTS_HAVE_NESTED;
         }
       } else if (c == '*' && lexer->lookahead == ')') {
         skip(lexer);
         depth--;
+        if (fresh) {
+          *flags |= COMMENTS_HAVE_EMPTY;
+        }
+        fresh = false;
+      } else {
+        if (c == '"') {
+          *flags |= COMMENTS_HAVE_QUOTE;
+        }
+        fresh = false;
       }
     }
     while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
       skip(lexer);
     }
+    *code_column = lexer->get_column(lexer);
+    *code_start = lexer->lookahead;
     if (lexer->lookahead == '(') {
       // Another comment on the same line, unless it is the `(*)` operator.
       skip(lexer);
@@ -543,6 +590,94 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
   default:
     return false;
   }
+}
+
+typedef enum {
+  LEADING_WORD_OTHER,
+  // A keyword whose layout the ordinary line-start path decides itself
+  // (`else` joins the `if`, `end` closes a block, `with` a match, …).
+  LEADING_WORD_LAYOUT_KEYWORD,
+  // The `or` operator, which the ordinary path treats as an infix operator.
+  LEADING_WORD_OR,
+  // A keyword that starts a class member (`member`, `static`, `val`, …). F#
+  // ends the previous member's body before it even at or right of that
+  // body's column.
+  LEADING_WORD_MEMBER_KEYWORD,
+} LeadingWord;
+
+// Classifies the word the input continues with (the lookahead is a letter or
+// `_`). Consumes the whole word, so nothing after it may inspect the lexer:
+// an ordinary word is never an infix operator, whatever follows it.
+static inline LeadingWord scan_leading_word(TSLexer *lexer) {
+  static const char *const keywords[] = {"and",  "done", "elif",    "else",
+                                         "end",  "in",   "finally", "then",
+                                         "when", "with"};
+  static const char *const member_keywords[] = {
+      "abstract", "default", "member", "override", "static", "val"};
+  char word[9];
+  size_t length = 0;
+  bool lowercase = true;
+  // F# identifiers may continue with non-ASCII letters (`oré`): such a word
+  // is never a keyword, and must be read whole.
+  while (is_word_char(lexer->lookahead) || lexer->lookahead >= 0x80) {
+    if (!(lexer->lookahead >= 'a' && lexer->lookahead <= 'z')) {
+      lowercase = false;
+    }
+    if (length < sizeof word - 1) {
+      word[length] = (char)lexer->lookahead;
+    }
+    length++;
+    skip(lexer);
+  }
+  if (!lowercase || length >= sizeof word) {
+    return LEADING_WORD_OTHER;
+  }
+  word[length] = '\0';
+  if (keyword_equals(word, "or")) {
+    return LEADING_WORD_OR;
+  }
+  for (size_t k = 0; k < sizeof keywords / sizeof *keywords; k++) {
+    if (keyword_equals(word, keywords[k])) {
+      return LEADING_WORD_LAYOUT_KEYWORD;
+    }
+  }
+  for (size_t k = 0; k < sizeof member_keywords / sizeof *member_keywords;
+       k++) {
+    if (keyword_equals(word, member_keywords[k])) {
+      return LEADING_WORD_MEMBER_KEYWORD;
+    }
+  }
+  return LEADING_WORD_OTHER;
+}
+
+// Whether an open scope other than the base level sits at or left of
+// `column`.
+static inline bool open_level_above_base_at_or_left_of(Scanner *scanner,
+                                                       uint32_t column) {
+  for (uint32_t i = scanner->indents.size; i-- > 1;) {
+    if (*array_get(&scanner->indents, i) <= column) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Whether an open scope sits exactly at `column`. With `skip_midline`, a
+// scope anchored mid-line does not count (the body after `member x.A =`).
+static inline bool open_level_at(Scanner *scanner, uint32_t column,
+                                 bool skip_midline) {
+  for (uint32_t i = scanner->indents.size; i-- > 0;) {
+    uint16_t level = *array_get(&scanner->indents, i);
+    if (level < column) {
+      return false;
+    }
+    if (level == column &&
+        !(skip_midline && (*array_get(&scanner->indent_kinds, i) &
+                           INDENT_KIND_MIDLINE_FLAG))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 static inline bool is_bracket_end(TSLexer *lexer) {
@@ -2106,6 +2241,141 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         return true;
       }
 
+      // A line that starts left of the current scope with block comments:
+      // F#'s offside rule ignores comments, so the line's column is that of
+      // its first token after them. If there is none, the line does not
+      // close a scope: decline, as for a line that starts with `//`, and the
+      // comments are consumed as extras before the next line decides. If
+      // there is code, its first token is classified as the ordinary
+      // line-start path classifies it, and:
+      //   - an infix operator continues the current item, wherever it is (F#
+      //     lets an operator undent);
+      //   - other code takes the code's column when an open scope sits
+      //     exactly at that column: at the current scope's column it starts a
+      //     new item, and left of it it closes the scopes above that level. A
+      //     scope anchored mid-line does not count for a member keyword: F#
+      //     ends that member body before it, and NEWLINE there would put the
+      //     member inside the body;
+      //   - every other line keeps the comment's column, as before: a closing
+      //     bracket, a leading `;`, or a keyword the ordinary path decides
+      //     layout for (that path runs before this one and cannot see past
+      //     the comment), code at no open scope's column (between two levels,
+      //     or right of the current one, where the grammar's reading depends
+      //     on the construct), a member keyword after comments that start at
+      //     or right of an open level other than the base, a line after one
+      //     that ends with `;`, and comments the rest of the parser may read
+      //     differently from the helper (a `(*)`, a `"` or a nested comment
+      //     inside one; an empty one, unless a member keyword follows).
+      // A line that closes several scopes is scanned once per DEDENT. While
+      // the open scopes' columns increase up the stack, each decision depends
+      // only on the line and on the scopes at or below the code's column,
+      // which those DEDENTs leave alone, so every scan of the line decides
+      // alike. Where a scope sits left of the one below it (a bracket, or the
+      // body of `function`, `fun` or `(fun` anchored mid-line further right),
+      // an early scan can find no level at the code's column and pop with the
+      // comment's column, and a later scan, with that scope gone, take the
+      // code's. The `;` rule, too, holds for the line's first DEDENT only:
+      // that token consumes the `;`. None of this applies
+      // when the walk crossed a directive line (`#if`, `#else`, `#endif`):
+      // the DEDENT then belongs before the directive, which the grammar needs
+      // to see at the enclosing level. These are the scan's last decisions,
+      // so the lookahead the check consumes is not needed afterwards;
+      // `lexer->eof` below now reports whether anything follows the comments.
+      bool comment_only_line = false;
+      bool input_ends_after_comments = false;
+      bool looked_past_comments = false;
+      if (found_comment_start && !found_preprocessor_end &&
+          !found_preproc_if && !found_preproc_else &&
+          indent_length < current_indent_length) {
+        looked_past_comments = true;
+        uint32_t code_column = 0;
+        int32_t code_start = 0;
+        uint8_t comment_flags = 0;
+        comment_only_line = comments_fill_rest_of_line(
+            lexer, &code_column, &code_start, &comment_flags);
+        // What the code after the comments looks like below; the
+        // classification consumes some of it.
+        input_ends_after_comments = lexer->eof(lexer);
+        if (!comment_only_line) {
+          // The helper has already consumed a leading `(` (not a comment) or
+          // `/` (not `//`, so an operator).
+          bool keep_comment_column =
+              (comment_flags & (COMMENTS_HAVE_STAR_OPERATOR |
+                                COMMENTS_HAVE_QUOTE |
+                                COMMENTS_HAVE_NESTED)) != 0;
+          bool continues = false;
+          bool member_keyword = false;
+          if (!keep_comment_column && code_start == '/') {
+            continues = true;
+          } else if (!keep_comment_column && code_start != '(') {
+            if (is_bracket_end(lexer) || lexer->lookahead == ';') {
+              keep_comment_column = true;
+            } else if ((lexer->lookahead >= 'a' && lexer->lookahead <= 'z') ||
+                       (lexer->lookahead >= 'A' && lexer->lookahead <= 'Z') ||
+                       lexer->lookahead == '_') {
+              LeadingWord word = scan_leading_word(lexer);
+              keep_comment_column = word == LEADING_WORD_LAYOUT_KEYWORD;
+              continues = word == LEADING_WORD_OR;
+              member_keyword = word == LEADING_WORD_MEMBER_KEYWORD;
+            } else if (lexer->lookahead == '|') {
+              skip(lexer);
+              int32_t after_pipe = lexer->lookahead;
+              if (after_pipe == ']' || after_pipe == '}') {
+                keep_comment_column = true;
+              } else if (!(after_pipe == ' ' || after_pipe == '"' ||
+                           after_pipe == '(' || after_pipe == '[' ||
+                           after_pipe == '`' || is_word_char(after_pipe) ||
+                           after_pipe >= 0x80)) {
+                // `|>`, `||`, `|.` …; a `|` before a pattern is a match arm.
+                continues = true;
+              }
+            } else {
+              continues = is_infix_op_start(lexer);
+            }
+          }
+          // After a line that ends with `;`, the ordinary path above has its
+          // own rule (the `;` ends the item, so `+ 2` is a prefix
+          // application, not a continuation), which never sees past the
+          // comment.
+          if (found_end_of_line_semi_colon) {
+            keep_comment_column = true;
+          }
+          // An empty comment is read as the `**` operator where an expression
+          // may start, which a new item at the code's column may allow. After a
+          // member keyword it can only be a comment.
+          if ((comment_flags & COMMENTS_HAVE_EMPTY) && !member_keyword) {
+            keep_comment_column = true;
+          }
+          // F# ends any member body before a member keyword, even one whose
+          // scope sits at the code's column. After comments that start at or
+          // right of an open level other than the base, the comment's column
+          // closes the bodies right of it, as on #250; only after comments
+          // further left is the code's column the better guess.
+          if (member_keyword &&
+              open_level_above_base_at_or_left_of(scanner, indent_length)) {
+            keep_comment_column = true;
+          }
+          if (!keep_comment_column && !continues &&
+              !open_level_at(scanner, code_column, member_keyword)) {
+            keep_comment_column = true;
+          }
+          if (!keep_comment_column) {
+            if (code_column >= current_indent_length) {
+              if (code_column == current_indent_length &&
+                  valid_symbols[NEWLINE] && !continues) {
+                lexer->result_symbol = NEWLINE;
+                return true;
+              }
+              return false;
+            }
+            indent_length = code_column;
+            if (continues) {
+              found_start_of_infix_op = true;
+            }
+          }
+        }
+      }
+
       bool can_dedent_preproc;
 
       if (scanner->preprocessor_indents.size > 0) {
@@ -2132,7 +2402,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // continuation lines. But still allow it at true EOF / column 0 so a
       // paren indent can't get stranded forever if its closing bracket was
       // consumed by the grammar rather than seen here at the start of a line.
-      bool can_dedent_paren_indent = !(is_paren_indent || is_brace_indent) || indent_length == 0 || lexer->eof(lexer);
+      bool input_ends = looked_past_comments ? input_ends_after_comments
+                                             : lexer->eof(lexer);
+      bool can_dedent_paren_indent = !(is_paren_indent || is_brace_indent) || indent_length == 0 || input_ends;
 
       // A line that sits strictly DEEPER than the line which opened a
       // mid-line-anchored scope continues the anchored expression, even when
@@ -2165,22 +2437,6 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
 
-      // A line holding only block comments does not close a scope: F#'s
-      // offside rule ignores comments, so a `(*` at column 0 inside a class
-      // or a function body must not end it. Decline instead, as for a line
-      // that starts with `//`: the comments are consumed as extras and the
-      // next scan measures the line after them. A line with code after its
-      // comment (`(* c *) let x = 1`) still decides layout from the
-      // comment's column, as before. Not when the walk crossed a directive
-      // line (`#if`, `#else`, `#endif`): the DEDENT then belongs before the
-      // directive, which the grammar needs to see at the enclosing level.
-      // This is the scan's last decision, so the lookahead the check consumes
-      // is not needed afterwards.
-      bool comment_only_line =
-          found_comment_start && !found_preprocessor_end &&
-          !found_preproc_if && !found_preproc_else &&
-          indent_length < current_indent_length &&
-          comments_fill_rest_of_line(lexer);
       if (indent_length < current_indent_length && !found_bracket_end &&
           !comment_only_line &&
           can_dedent_preproc && can_dedent_infix_op &&
