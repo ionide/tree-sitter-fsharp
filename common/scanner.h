@@ -45,6 +45,7 @@ enum TokenType {
   PREPROC_INACTIVE,
   ELEM_SEP,
   BRACE_INDENT,
+  NEWLINE_INDENT,
   ERROR_SENTINEL
 };
 
@@ -77,7 +78,13 @@ typedef enum {
 // declaration, not a continuation, so the midline-anchor dedent guard must
 // not apply.
 #define INDENT_KIND_STRANDED_LINE_FLAG 0x40
-#define INDENT_KIND_FLAGS_MASK 0xC0
+// OR-ed into the indent_kinds byte of the block after a `lazy` or `assert`
+// that ends its line (NEWLINE_INDENT). While this block is the innermost
+// open scope, a comment-led line whose code is right of it continues it,
+// however far left the comment starts. Every flag must be in
+// INDENT_KIND_FLAGS_MASK: the readers of a scope's kind mask them out.
+#define INDENT_KIND_LAZY_BLOCK_FLAG 0x20
+#define INDENT_KIND_FLAGS_MASK 0xE0
 
 // How an open `#if` directive entered the parse. STRUCTURED directives were
 // handed to the grammar (preproc_if rules) and both branches parse as syntax.
@@ -232,6 +239,12 @@ static inline IndentKind peek_indent_kind(Scanner *scanner) {
 static inline bool top_indent_is_midline_anchor(Scanner *scanner) {
   return scanner->indent_kinds.size > 0 &&
          (*array_back(&scanner->indent_kinds) & INDENT_KIND_MIDLINE_FLAG) != 0;
+}
+
+static inline bool top_indent_is_lazy_block(Scanner *scanner) {
+  return scanner->indent_kinds.size > 0 &&
+         (*array_back(&scanner->indent_kinds) &
+          INDENT_KIND_LAZY_BLOCK_FLAG) != 0;
 }
 
 static inline bool top_indent_is_stranded_line(Scanner *scanner) {
@@ -784,8 +797,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     // BRACE_INDENT sits after the PREPROC_INACTIVE/ELEM_SEP "extra" tokens in
     // the enum but is a structural indent token like INDENT, so it must count
     // here — otherwise a state where only BRACE_INDENT is valid (right after a
-    // record/CE '{') bails out and the token is never emitted.
-    if (valid_symbols[BRACE_INDENT]) {
+    // record/CE '{') bails out and the token is never emitted. NEWLINE_INDENT
+    // likewise (the block after a line-ending `lazy`/`assert`).
+    if (valid_symbols[BRACE_INDENT] || valid_symbols[NEWLINE_INDENT]) {
       any_structural_valid = true;
     }
     if (!any_structural_valid) {
@@ -2095,6 +2109,58 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   }
 
+  // The body of a `lazy` / `assert` that ends its line: a block opened on the
+  // next line, if that line is at least as indented as the enclosing scope
+  // (FSC opens the block at an equal column too). Inside brackets (a paren or
+  // brace scope on top), F# lets the body undent past the bracket's scope, so
+  // there the block opens anywhere right of column 0, unless the block's
+  // column is a comment's (below). Never on the keyword's own line, where the
+  // operand is an ordinary expression. An infix-looking start (`-x`, `%x`,
+  // `<@ … @>`) is the body's first operand, not a continuation: the keyword's
+  // line has nothing for it to continue.
+  if (valid_symbols[NEWLINE_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
+      found_end_of_line && !lexer->eof(lexer) && !found_bracket_end &&
+      !found_preprocessor_end) {
+    uint32_t block_column = indent_length;
+    // Whether block_column is the code's column, not a comment's.
+    bool block_column_from_code = !found_comment_start;
+    if (found_comment_start) {
+      // A line that starts with block comments: F#'s offside rule ignores
+      // them, so the block's column is that of the code after them. A
+      // comment-only line opens nothing: decline, and the line after it
+      // decides. Either way this scan ends here, so the lookahead consumed
+      // is not needed afterwards (in this state the other valid tokens are
+      // `#if`, `begin` and string starts, which cannot follow a comment at
+      // the start of the line in the same scan).
+      // Comments the rest of the parser may read differently from the helper
+      // (see COMMENTS_HAVE_*; an empty one here starts an expression) leave
+      // the block at the comment's column.
+      uint32_t code_column = 0;
+      int32_t code_start = 0;
+      uint8_t comment_flags = 0;
+      if (comments_fill_rest_of_line(lexer, &code_column, &code_start,
+                                     &comment_flags)) {
+        return false;
+      }
+      if (comment_flags == 0) {
+        block_column = code_column;
+        block_column_from_code = true;
+      }
+    }
+    if (scanner->indents.size == 0 ||
+        block_column >= peek_indent_length(scanner) ||
+        (block_column_from_code && block_column > 0 &&
+         (peek_is_paren_indent(scanner) || peek_is_brace_indent(scanner)))) {
+      push_indent(scanner, block_column,
+                  (IndentKind)(INDENT_NORMAL | INDENT_KIND_LAZY_BLOCK_FLAG));
+      lexer->result_symbol = NEWLINE_INDENT;
+      return true;
+    }
+    if (found_comment_start) {
+      return false;
+    }
+  }
+
   if (valid_symbols[TRY_INDENT] && !valid_symbols[ERROR_SENTINEL] &&
       !found_bracket_end && !found_preprocessor_end &&
       !found_same_line_pipe_infix) {
@@ -2256,6 +2322,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       //     scope anchored mid-line does not count for a member keyword: F#
       //     ends that member body before it, and NEWLINE there would put the
       //     member inside the body;
+      //   - code strictly right of a `lazy`/`assert` block that is the
+      //     innermost scope continues the body, before any of the reasons
+      //     below: nothing F# reads right of the block's column closes it;
       //   - every other line keeps the comment's column, as before: a closing
       //     bracket, a leading `;`, or a keyword the ordinary path decides
       //     layout for (that path runs before this one and cannot see past
@@ -2297,6 +2366,17 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         // classification consumes some of it.
         input_ends_after_comments = lexer->eof(lexer);
         if (!comment_only_line) {
+          // Inside the block after a line-ending `lazy`/`assert`, code
+          // strictly right of the block's column continues the body, whatever
+          // the code and the comments look like: F#'s offside rule does not
+          // see comments, and a layout keyword, a closing bracket, a `;` or a
+          // `|` there belongs to a construct inside the body. Decline: the
+          // comments become extras and the code is scanned mid-line, as
+          // when the comment starts right of the block.
+          if (top_indent_is_lazy_block(scanner) &&
+              code_column > current_indent_length) {
+            return false;
+          }
           // The helper has already consumed a leading `(` (not a comment) or
           // `/` (not `//`, so an operator).
           bool keep_comment_column =

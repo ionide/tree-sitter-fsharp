@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   after one that ends with `;`, and comments holding a `"`, a `(*)`, a nested
   comment, or an empty one before anything but a member keyword.
   `ImpliedSignatureHashTests.fs` now parses without errors.
+- `lazy` and `assert` at the end of a line take the indented block on the
+  following lines as their body, as FSC does. The lines of that block were
+  not separated, so `let a = 1` / `a + 1` read as `1 a + 1` and `f a` /
+  `g b` as `f a g b`, with no ERROR node. Five corpus files that use the
+  form now parse without errors.
 
 ## [0.3.12] - 2026-09-12
 
