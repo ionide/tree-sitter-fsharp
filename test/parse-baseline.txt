@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 744 with errors; 4453 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -170,7 +170,6 @@
 1	examples/FSharp.Compiler/tests/FSharp.Core.UnitTests/FSharp.Core/RecordTypes.fs
 4	examples/FSharp.Compiler/tests/FSharp.Core.UnitTests/TestFrameworkHelpers.fs
 1	examples/FSharp.Compiler/tests/FSharp.Test.Utilities/CompilerAssert.fs
-1	examples/FSharp.Compiler/tests/FSharp.Test.Utilities/ProjectGeneration.fs
 4	examples/FSharp.Compiler/tests/FSharp.Test.Utilities/TestFramework.fs
 5	examples/FSharp.Compiler/tests/FSharp.Test.Utilities/Utilities.fs
 6	examples/FSharp.Compiler/tests/benchmarks/CompiledCodeBenchmarks/MicroPerf/Equality/Misc.fs
@@ -365,7 +364,7 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/InteractiveSession/Misc/NativeIntSuffix01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/InteractiveSession/Misc/PipingWithDirectives.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/InteractiveSession/Misc/UNativeIntSuffix01.fs
-10	examples/FSharp.Compiler/tests/fsharpqa/Source/Misc/E_productioncoverage03.fs
+6	examples/FSharp.Compiler/tests/fsharpqa/Source/Misc/E_productioncoverage03.fs
 5	examples/FSharp.Compiler/tests/fsharpqa/Source/Misc/productioncoverage01.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Exception/Missing name 02.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Exception/Recover Function Type 01.fs

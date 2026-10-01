@@ -946,11 +946,30 @@ module.exports = grammar({
     index_expression: ($) =>
       prec(
         PREC.INDEX_EXPR,
-        seq(
-          $._expression,
-          ".[",
-          choice(field("index", $._expression), $.slice_ranges),
-          "]",
+        choice(
+          seq(
+            $._expression,
+            ".[",
+            choice(field("index", $._expression), $.slice_ranges),
+            "]",
+          ),
+          // Since F# 6, `xs[i]`: a '[' touching the expression before it is
+          // an index (FSC's LexFilter turns it into HIGH_PRECEDENCE_BRACK_APP),
+          // while `f [i]` applies f to a list. No lexical prec: the longer
+          // `[|` and `[]` tokens must still win (`f[|1|]` is an application,
+          // `null : string[]` an array type), and against a list's '[' of the
+          // same length this rule, defined first, wins. The body is scoped
+          // like a list's, so it may span lines.
+          seq(
+            $._expression,
+            alias(token.immediate("["), "["),
+            $._paren_indent,
+            optional($._newline),
+            choice(field("index", $._expression), $.slice_ranges),
+            optional($._newline),
+            $._dedent,
+            "]",
+          ),
         ),
       ),
 
@@ -1069,7 +1088,23 @@ module.exports = grammar({
       ),
 
     _low_prec_app: ($) =>
-      prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
+      prec.left(
+        PREC.APP_EXPR,
+        seq(
+          $._expression,
+          choice(
+            $._expression,
+            alias($._touching_empty_list, $.list_expression),
+          ),
+        ),
+      ),
+
+    // `f[]` applies f to the empty list (FCS parses it as an application;
+    // there is nothing to index with): a touching '[', which otherwise opens
+    // an index_expression, is an empty list when ']' follows at once. Only an
+    // argument can start this way, so it lives here rather than in
+    // list_expression, where it would also claim every `([` and `[[`.
+    _touching_empty_list: (_) => seq(alias(token.immediate("["), "["), "]"),
 
     application_expression: ($) => choice($._high_prec_app, $._low_prec_app),
 
