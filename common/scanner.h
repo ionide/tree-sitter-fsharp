@@ -45,6 +45,10 @@ enum TokenType {
   PREPROC_INACTIVE,
   ELEM_SEP,
   BRACE_INDENT,
+  AFTER_TYPE_KEYWORD,
+  AFTER_AND_KEYWORD,
+  AFTER_EXCEPTION_KEYWORD,
+  END_DEDENT,
   ERROR_SENTINEL
 };
 
@@ -79,6 +83,10 @@ typedef enum {
 #define INDENT_KIND_STRANDED_LINE_FLAG 0x40
 #define INDENT_KIND_FLAGS_MASK 0xC0
 
+// See `line_recorded` in Scanner.
+#define LINE_PAIRS_MAX 8
+#define LINE_TAIL 16
+
 // How an open `#if` directive entered the parse. STRUCTURED directives were
 // handed to the grammar (preproc_if rules) and both branches parse as syntax.
 // STRAY directives appeared at a position the grammar has no preproc rule for
@@ -106,7 +114,41 @@ typedef struct {
   // next scan to emit the NEWLINE the enclosing block owes as an item
   // separator. See the emit site in the found_end_of_line handling.
   uint8_t stranded_dedent;
+  // The column of the current type definition group's `type` keyword (an
+  // `and` keeps it; F# measures the `and` definitions against `type` too), or
+  // of an exception definition's `exception`, recorded by the AFTER_*_KEYWORD
+  // tokens in F#'s units (see `line_recorded`), or TYPE_KEYWORD_COLUMN_UNKNOWN.
+  // F# measures a member block's `end` against it. Type definitions do not
+  // nest, so the latest keyword is the one that matters wherever END_DEDENT
+  // is valid. It is not cleared when the definition ends. Later, a stale column can only make an `end` left of
+  // it close the innermost scope first (see the offside rule), and the
+  // constructs that take an `end` after their scope closes still take it
+  // after that DEDENT; END_DEDENT itself is only valid inside a definition,
+  // which records its own keyword first.
+  uint16_t type_keyword_column;
+  // F# counts columns in UTF-16 units and get_column in code points, so a
+  // character above U+FFFF (a surrogate pair) is two columns for F# and one
+  // here. To give the keyword column above in F#'s units, the scanner keeps a
+  // record of the line it is on: the code-point columns of the pairs from
+  // where it starts to the line's end (`line_end`), at most LINE_PAIRS_MAX of
+  // them (`line_complete_before` is the column of the first one not kept, or
+  // UINT16_MAX), and the line's last LINE_TAIL characters (low 16 bits). Its
+  // state survives only through emitted tokens, so the record is taken after
+  // a token whose scan crossed a newline, or when there is none, and kept
+  // otherwise. When a comment or string carried the scan onto the line, the
+  // record starts where it ended, and pairs left of that are not recorded.
+  bool line_recorded;
+  uint8_t line_pair_count;
+  uint8_t line_tail_length;
+  uint16_t line_end;
+  uint16_t line_complete_before;
+  uint16_t line_pair_columns[LINE_PAIRS_MAX];
+  uint16_t line_tail[LINE_TAIL];
+  // Not serialized: whether the current scan crossed a newline.
+  bool line_crossed;
 } Scanner;
+
+#define TYPE_KEYWORD_COLUMN_UNKNOWN UINT16_MAX
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
@@ -412,7 +454,9 @@ static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
   return true;
 }
 
-static inline bool scan_block_comment(TSLexer *lexer) {
+// Scans a (nested) block comment from its `(`; sets *crossed if it contains
+// a newline.
+static inline bool scan_block_comment(TSLexer *lexer, bool *crossed) {
   lexer->mark_end(lexer);
   if (lexer->lookahead != '(')
     return false;
@@ -426,7 +470,7 @@ static inline bool scan_block_comment(TSLexer *lexer) {
   while (true) {
     switch (lexer->lookahead) {
     case '(':
-      scan_block_comment(lexer);
+      scan_block_comment(lexer, crossed);
       break;
     case '*':
       advance(lexer);
@@ -437,6 +481,10 @@ static inline bool scan_block_comment(TSLexer *lexer) {
       break;
     case '\0':
       return true;
+    case '\n':
+      *crossed = true;
+      advance(lexer);
+      break;
     default:
       advance(lexer);
     }
@@ -548,12 +596,186 @@ static inline bool is_bracket_end(TSLexer *lexer) {
     return false;
   }
 
+// What read_line saw from the lexer's position to the end of its line.
+typedef struct {
+  uint8_t pair_count;
+  uint8_t tail_length;
+  uint16_t end;
+  uint16_t complete_before;
+  uint16_t pair_columns[LINE_PAIRS_MAX];
+  uint16_t tail[LINE_TAIL];
+} LineRead;
+
+static inline uint16_t clamp_column(uint32_t column) {
+  return column > UINT16_MAX ? UINT16_MAX : (uint16_t)column;
+}
+
+// Reads from the lexer's position (code-point column `column`) to the end of
+// the line. Only after the token is marked: the lookahead is returned to the
+// input.
+static void read_line(TSLexer *lexer, uint32_t column, LineRead *line) {
+  line->pair_count = 0;
+  line->tail_length = 0;
+  line->complete_before = UINT16_MAX;
+  uint8_t head = 0;
+  while (!lexer->eof(lexer) && lexer->lookahead != '\n' &&
+         lexer->lookahead != '\r') {
+    if (lexer->lookahead > 0xFFFF) {
+      if (line->pair_count < LINE_PAIRS_MAX) {
+        line->pair_columns[line->pair_count++] = clamp_column(column);
+      } else if (line->complete_before == UINT16_MAX) {
+        line->complete_before = clamp_column(column);
+      }
+    }
+    // A ring: `head` is the next slot, and once full, the oldest character.
+    line->tail[head] = (uint16_t)(lexer->lookahead & 0xFFFF);
+    head = (uint8_t)((head + 1) % LINE_TAIL);
+    if (line->tail_length < LINE_TAIL) {
+      line->tail_length++;
+    }
+    advance(lexer);
+    column++;
+  }
+  line->end = clamp_column(column);
+  if (line->tail_length == LINE_TAIL && head != 0) {
+    uint16_t ordered[LINE_TAIL];
+    for (uint8_t i = 0; i < LINE_TAIL; i++) {
+      ordered[i] = line->tail[(head + i) % LINE_TAIL];
+    }
+    for (uint8_t i = 0; i < LINE_TAIL; i++) {
+      line->tail[i] = ordered[i];
+    }
+  }
+}
+
+static void record_line(Scanner *scanner, TSLexer *lexer) {
+  uint32_t column = lexer->get_column(lexer);
+  LineRead line;
+  read_line(lexer, column, &line);
+  scanner->line_recorded = true;
+  scanner->line_end = line.end;
+  scanner->line_complete_before = line.complete_before;
+  scanner->line_pair_count = line.pair_count;
+  for (uint8_t i = 0; i < line.pair_count; i++) {
+    scanner->line_pair_columns[i] = line.pair_columns[i];
+  }
+  scanner->line_tail_length = line.tail_length;
+  for (uint8_t i = 0; i < line.tail_length; i++) {
+    scanner->line_tail[i] = line.tail[i];
+  }
+}
+
+// How many surrogate pairs the record holds left of `start` (the keyword's
+// code-point column), if the record is of the keyword's line; 0 otherwise.
+// The lexer is just past the keyword, at `after`; reading the rest of the
+// line checks that the record is of this line. A record of the line may hold
+// fewer pairs than the line has left of the keyword: none left of where it
+// starts (in a comment or string that carried the scan onto the line),
+// and at most LINE_PAIRS_MAX. So the correction can fall short of F#'s
+// column, but never pass it.
+static uint32_t pairs_left_of(Scanner *scanner, TSLexer *lexer, uint32_t start,
+                              uint32_t after) {
+  if (!scanner->line_recorded || scanner->line_pair_count == 0) {
+    return 0;
+  }
+  LineRead line;
+  read_line(lexer, after, &line);
+  if (line.end != scanner->line_end || line.end == UINT16_MAX) {
+    return 0;
+  }
+  uint8_t tail = line.tail_length < scanner->line_tail_length
+                     ? line.tail_length
+                     : scanner->line_tail_length;
+  for (uint8_t i = 1; i <= tail; i++) {
+    if (line.tail[line.tail_length - i] !=
+        scanner->line_tail[scanner->line_tail_length - i]) {
+      return 0;
+    }
+  }
+  // From the keyword on, the same pairs in both reads, as far as both kept
+  // them. The current read starts after the keyword, so a recorded pair
+  // inside it matches none.
+  uint32_t limit = line.complete_before < scanner->line_complete_before
+                       ? line.complete_before
+                       : scanner->line_complete_before;
+  uint8_t k = 0;
+  uint32_t left = 0;
+  for (uint8_t i = 0; i < scanner->line_pair_count; i++) {
+    uint16_t column = scanner->line_pair_columns[i];
+    if (column < start) {
+      left++;
+    } else if (column < limit) {
+      if (k >= line.pair_count || line.pair_columns[k] != column) {
+        return 0;
+      }
+      k++;
+    }
+  }
+  if (k < line.pair_count && line.pair_columns[k] < limit) {
+    return 0;  // the line has a pair right of the keyword the record lacks
+  }
+  return left;
+}
+
+static bool scan_token(Scanner *scanner, TSLexer *lexer,
+                       const bool *valid_symbols);
+
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+  scanner->line_crossed = false;
+  if (!scan_token(scanner, lexer, valid_symbols)) {
+    return false;
+  }
+  // The token's end is marked, so the line can be read ahead. A new record
+  // after a newline the scan crossed, or when there is none; the record of
+  // the current line is kept otherwise.
+  if (scanner->line_crossed || !scanner->line_recorded) {
+    record_line(scanner, lexer);
+  }
+  return true;
+}
+
+static bool scan_token(Scanner *scanner, TSLexer *lexer,
+                       const bool *valid_symbols) {
   // A stranded-dedent flag lives for exactly one scan: capture it and clear
   // the persistent copy up front so it is consumed by the immediately
   // following scan (the NEWLINE emit below) and never leaks further.
   bool prev_stranded_dedent = scanner->stranded_dedent;
   scanner->stranded_dedent = false;
+
+  // Right after a type definition's `type` or `and`, or an exception
+  // definition's `exception`: nothing has been skipped yet, so the keyword
+  // ends at the lexer's column. The grammar makes at most one of the three
+  // valid. Not in error recovery, where every symbol is valid and the lexer
+  // is not after any of them.
+  if ((valid_symbols[AFTER_TYPE_KEYWORD] || valid_symbols[AFTER_AND_KEYWORD] ||
+       valid_symbols[AFTER_EXCEPTION_KEYWORD]) &&
+      !valid_symbols[ERROR_SENTINEL]) {
+    enum TokenType symbol =
+        valid_symbols[AFTER_TYPE_KEYWORD]  ? AFTER_TYPE_KEYWORD
+        : valid_symbols[AFTER_AND_KEYWORD] ? AFTER_AND_KEYWORD
+                                           : AFTER_EXCEPTION_KEYWORD;
+    uint32_t length = symbol == AFTER_TYPE_KEYWORD  ? 4
+                      : symbol == AFTER_AND_KEYWORD ? 3
+                                                    : 9;
+    uint32_t column = lexer->get_column(lexer);
+    lexer->mark_end(lexer);
+    // F# measures an `and` definition's `end` against the group's `type`,
+    // which `and` only continues: keep that column, if known.
+    if (symbol != AFTER_AND_KEYWORD ||
+        scanner->type_keyword_column == TYPE_KEYWORD_COLUMN_UNKNOWN) {
+      uint32_t start = TYPE_KEYWORD_COLUMN_UNKNOWN;
+      if (column >= length) {
+        // In F#'s units: one more column per surrogate pair left of it.
+        start = column - length;
+        start += pairs_left_of(scanner, lexer, start, column);
+      }
+      scanner->type_keyword_column = start < TYPE_KEYWORD_COLUMN_UNKNOWN
+                                         ? (uint16_t)start
+                                         : TYPE_KEYWORD_COLUMN_UNKNOWN;
+    }
+    lexer->result_symbol = symbol;
+    return true;
+  }
 
   if (valid_symbols[ERROR_SENTINEL]) {
     // During error recovery, all valid_symbols are true. Tree-sitter's error
@@ -764,6 +986,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         continue;
       }
       if (lexer->lookahead != '"') {
+        if (lexer->lookahead == '\n') {
+          scanner->line_crossed = true;
+        }
         advance(lexer);
         has_content = true;
       } else {
@@ -823,6 +1048,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       for (;;) {
         if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
           next_indent = 0;
+          if (lexer->lookahead == '\n') {
+            scanner->line_crossed = true;
+          }
           skip(lexer);
         } else if (lexer->lookahead == ' ') {
           next_indent++;
@@ -869,11 +1097,15 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       return false;
     }
     lexer->mark_end(lexer);
+    bool nested_crossed = false;
     while (true) {
       if (lexer->lookahead == '\0') {
         break;
       }
       if (lexer->lookahead != '(' && lexer->lookahead != '*') {
+        if (lexer->lookahead == '\n') {
+          scanner->line_crossed = true;
+        }
         advance(lexer);
       } else if (lexer->lookahead == '*') {
         lexer->mark_end(lexer);
@@ -881,7 +1113,11 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         if (lexer->lookahead == ')') {
           break;
         }
-      } else if (scan_block_comment(lexer)) {
+      } else if (scan_block_comment(lexer, &nested_crossed)) {
+        // A nested comment may span lines too.
+        if (nested_crossed) {
+          scanner->line_crossed = true;
+        }
         lexer->mark_end(lexer);
         advance(lexer);
         if (lexer->lookahead == '*') {
@@ -912,6 +1148,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     if (lexer->lookahead == '\n') {
       found_end_of_line = true;
       indent_length = 0;
+      scanner->line_crossed = true;
       skip(lexer);
     } else if (lexer->lookahead == ' ') {
       indent_length++;
@@ -1450,6 +1687,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         if (lexer->lookahead == '\n') {
           saw_newline = true;
           indent_length = 0;
+          scanner->line_crossed = true;
         } else if (lexer->lookahead == '\r') {
           // CRLF: skip without counting toward indentation.
         } else if (saw_newline) {
@@ -1805,13 +2043,61 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       if (lexer->lookahead == 'd') {
         advance(lexer);
         if (!is_word_char(lexer->lookahead)) {
-          if (valid_symbols[END]) {
+          // Where both are possible, an `end` left of the innermost open
+          // scope closes that scope first (F#'s offside rule) instead of
+          // ending the construct the scope belongs to. In
+          //   class
+          //     interface I with
+          //       member ...
+          //   end
+          // the interface's optional `end` is valid once its members are
+          // closed, but this `end` is left of the class body, so the class
+          // body closes and the `end` is the class's. Not for paren and
+          // brace scopes: their closing bracket ends them, not indentation
+          // (`{ new I with … interface J with … end }`). Not in error
+          // recovery, where every symbol is valid and the grammar position
+          // is unknown. `token_indent_level` is one past the `e`.
+          // A scope that opened left of the current type definition's keyword
+          // (`[<A>] type R …`: the enclosing body opens at the attribute)
+          // does not mark where F# measures the definition's `end`: the
+          // keyword does, so an `end` left of the keyword closes that scope
+          // too. (Where the scope is at or right of the keyword, such an
+          // `end` is left of the scope as well.)
+          // The keyword's column is in F#'s units; the `end`'s is in code
+          // points, like the scopes' (a character outside the BMP left of
+          // the `end` on its line is not counted).
+          uint32_t end_column = (uint32_t)(token_indent_level - 1);
+          bool end_left_of_type_keyword =
+              scanner->type_keyword_column != TYPE_KEYWORD_COLUMN_UNKNOWN &&
+              end_column < (uint32_t)scanner->type_keyword_column;
+          bool end_is_offside =
+              valid_symbols[DEDENT] && !valid_symbols[ERROR_SENTINEL] &&
+              scanner->indents.size > 0 &&
+              !peek_is_paren_indent(scanner) &&
+              !peek_is_brace_indent(scanner) &&
+              (end_column < (uint32_t)peek_indent_length(scanner) ||
+               end_left_of_type_keyword);
+          if (valid_symbols[END] && !end_is_offside) {
             lexer->mark_end(lexer);
             lexer->result_symbol = END;
             return true;
           } else if (valid_symbols[DEDENT] && scanner->indents.size > 0) {
+            // When the rule above closes a scope (a record's body from its
+            // `{`, a union's cases, the type after `and`) whose member block
+            // could have taken the `end`, the grammar accepts the `end` right
+            // after that scope: say so with END_DEDENT. Only if the `end` is
+            // at or right of the type definition's `type` or `and` keyword,
+            // where F# still reads it as the member block's terminator;
+            // further left it ends an enclosing construct, and a plain DEDENT
+            // keeps it from being taken here. Where the grammar has no `end`
+            // after the scope, END_DEDENT is not valid.
+            bool end_follows_scope =
+                end_is_offside && valid_symbols[END] &&
+                valid_symbols[END_DEDENT] &&
+                scanner->type_keyword_column != TYPE_KEYWORD_COLUMN_UNKNOWN &&
+                end_column >= (uint32_t)scanner->type_keyword_column;
             pop_indent(scanner);
-            lexer->result_symbol = DEDENT;
+            lexer->result_symbol = end_follows_scope ? END_DEDENT : DEDENT;
             return true;
           }
         }
@@ -2197,6 +2483,37 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)*array_get(&scanner->preproc_kinds, i);
   }
 
+  // Last, so a truncated buffer loses only this (read back as unknown).
+  if (size + 2 <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+    buffer[size++] = (char)(scanner->type_keyword_column & 0xFF);
+    buffer[size++] = (char)(scanner->type_keyword_column >> 8);
+    // The line record: none, recorded without a pair, or in full.
+    if (scanner->line_recorded) {
+      uint8_t pairs = scanner->line_pair_count;
+      // Kind byte; then pairs, tail length, end, completeness (6).
+      size_t need = pairs == 0 ? 1 : 7 + 2 * (size_t)pairs + 2 * (size_t)scanner->line_tail_length;
+      if (size + need <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+        buffer[size++] = (char)(pairs == 0 ? 0 : 1);
+        if (pairs != 0) {
+          buffer[size++] = (char)pairs;
+          buffer[size++] = (char)scanner->line_tail_length;
+          buffer[size++] = (char)(scanner->line_end & 0xFF);
+          buffer[size++] = (char)(scanner->line_end >> 8);
+          buffer[size++] = (char)(scanner->line_complete_before & 0xFF);
+          buffer[size++] = (char)(scanner->line_complete_before >> 8);
+          for (uint8_t i = 0; i < pairs; i++) {
+            buffer[size++] = (char)(scanner->line_pair_columns[i] & 0xFF);
+            buffer[size++] = (char)(scanner->line_pair_columns[i] >> 8);
+          }
+          for (uint8_t i = 0; i < scanner->line_tail_length; i++) {
+            buffer[size++] = (char)(scanner->line_tail[i] & 0xFF);
+            buffer[size++] = (char)(scanner->line_tail[i] >> 8);
+          }
+        }
+      }
+    }
+  }
+
   return size;
 }
 
@@ -2214,6 +2531,12 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   scanner->multi_dollar_count = 0;
   scanner->stranded_dedent = false;
   scanner->line_stranded = false;
+  scanner->type_keyword_column = TYPE_KEYWORD_COLUMN_UNKNOWN;
+  scanner->line_recorded = false;
+  scanner->line_pair_count = 0;
+  scanner->line_tail_length = 0;
+  scanner->line_end = 0;
+  scanner->line_complete_before = UINT16_MAX;
   if (length > 0) {
     size_t size = 0;
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
@@ -2253,6 +2576,42 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     if (preproc_kind_end > length) preproc_kind_end = length;
     for (; size < preproc_kind_end; size++) {
       array_push(&scanner->preproc_kinds, (unsigned char)buffer[size]);
+    }
+
+    if (size + 2 <= length) {
+      scanner->type_keyword_column =
+          (uint16_t)((uint8_t)buffer[size] | ((uint8_t)buffer[size + 1] << 8));
+      size += 2;
+    }
+    if (size < length) {
+      uint8_t kind = (uint8_t)buffer[size++];
+      if (kind == 0) {
+        scanner->line_recorded = true;
+      } else if (kind == 1 && size + 6 <= length) {
+        uint8_t pairs = (uint8_t)buffer[size];
+        uint8_t tail = (uint8_t)buffer[size + 1];
+        if (pairs >= 1 && pairs <= LINE_PAIRS_MAX && tail <= LINE_TAIL &&
+            size + 6 + 2 * (size_t)pairs + 2 * (size_t)tail <= length) {
+          scanner->line_recorded = true;
+          scanner->line_pair_count = pairs;
+          scanner->line_tail_length = tail;
+          scanner->line_end =
+              (uint16_t)((uint8_t)buffer[size + 2] | ((uint8_t)buffer[size + 3] << 8));
+          scanner->line_complete_before =
+              (uint16_t)((uint8_t)buffer[size + 4] | ((uint8_t)buffer[size + 5] << 8));
+          size += 6;
+          for (uint8_t i = 0; i < pairs; i++) {
+            scanner->line_pair_columns[i] =
+                (uint16_t)((uint8_t)buffer[size] | ((uint8_t)buffer[size + 1] << 8));
+            size += 2;
+          }
+          for (uint8_t i = 0; i < tail; i++) {
+            scanner->line_tail[i] =
+                (uint16_t)((uint8_t)buffer[size] | ((uint8_t)buffer[size + 1] << 8));
+            size += 2;
+          }
+        }
+      }
     }
   }
 }

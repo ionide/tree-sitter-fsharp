@@ -94,7 +94,7 @@ module.exports = grammar({
     $._multi_dollar_interp_end,
     $._multi_dollar_triple_quote_end,
     $._tyapp_open, // type application opening '<' (Section 15.3 lookahead)
-    $._paren_indent, // like _indent but pushes 0 onto indent stack for paren contexts
+    $._paren_indent, // like _indent, for paren contexts: pushes the column of the first token after the bracket, marked as a paren scope
     $._type_app_indent, // like _paren_indent but only fires after a newline; closed by '>' (used for multi-line generic type args)
     $._type_decl_newline, // lookahead token: fires at newline/EOF when the next non-blank line is not more indented, used to match bare type declarations
     $._in, // external 'in' keyword token for let...in expressions; only produced when valid, so 'in' as identifier in query/CE contexts is unaffected
@@ -104,6 +104,10 @@ module.exports = grammar({
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
     $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
 
+    $._after_type_keyword, // zero-width, right after a type definition's `type`: the scanner records the keyword's column, against which F# measures a member block's `end`
+    $._after_and_keyword, // the same, right after a type definition's `and`
+    $._after_exception_keyword, // the same, right after an exception definition's `exception`
+    $._end_dedent, // a DEDENT emitted for an `end` that closes a scope opened mid-line (a record's `{`, the type after `and`) while the member block inside it could also have taken the `end`: the `end` follows the scope
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
 
@@ -771,7 +775,13 @@ module.exports = grammar({
       ),
 
     _object_expression_inner: ($) =>
-      seq($._object_members, repeat($.interface_implementation)),
+      seq(
+        $._object_members,
+        // `{ new I with member … end }`: an explicit `end` may close the
+        // first member block too.
+        optional("end"),
+        repeat($.interface_implementation),
+      ),
 
     object_expression: ($) =>
       prec(
@@ -1709,6 +1719,7 @@ module.exports = grammar({
       seq(
         optional($.attributes),
         "exception",
+        $._after_exception_keyword,
         optional($.access_modifier),
         field("exception_name", $.long_identifier),
         optional(
@@ -1725,6 +1736,7 @@ module.exports = grammar({
         seq(
           optional($.attributes),
           "type",
+          $._after_type_keyword,
           // Attributes may also sit between `type` and the name:
           // `type [<Struct>] R = ...`
           optional($.attributes),
@@ -1732,9 +1744,20 @@ module.exports = grammar({
           repeat(
             seq(
               "and",
+              $._after_and_keyword,
               choice(
                 seq(optional($.attributes), $._type_defn_body),
-                seq($._indent, optional($.attributes), $._type_defn_body, $._dedent),
+                seq(
+                  $._indent,
+                  optional($.attributes),
+                  $._type_defn_body,
+                  choice(
+                    $._dedent,
+                    // The `end` of a `with … end` member block left of the
+                    // type name: this scope closes first (see records).
+                    seq($._end_dedent, "end"),
+                  ),
+                ),
               ),
             ),
           ),
@@ -1781,8 +1804,14 @@ module.exports = grammar({
         alias($._type_extension_with, $.type_extension_elements),
       ),
 
+    // FSC's tyconDefnAugmentation: `with members`, optionally closed by an
+    // explicit `end` (verbose syntax, `with ... end`).
     _type_extension_with: ($) =>
-      seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+      seq(
+        "with",
+        scoped($._type_extension_inner, $._indent, $._dedent),
+        optional("end"),
+      ),
 
     delegate_type_defn: ($) =>
       seq($.type_name, "=", scoped($.delegate_signature, $._indent, $._dedent)),
@@ -1834,7 +1863,16 @@ module.exports = grammar({
         seq(
           $.type_name,
           "=",
-          scoped($._record_type_defn_inner, $._indent, $._dedent),
+          choice(
+            scoped($._record_type_defn_inner, $._indent, $._dedent),
+            // The `end` of a `with … end` member block left of the `{`: the
+            // record's scope closes first (the scanner's offside rule for
+            // `end` signals that with _end_dedent), so the `end` follows it.
+            seq(
+              scoped($._record_type_defn_inner, $._indent, $._end_dedent),
+              "end",
+            ),
+          ),
         ),
       ),
 
@@ -1883,6 +1921,12 @@ module.exports = grammar({
           "=",
           choice(
             scoped($._union_type_defn_inner, $._indent, $._dedent),
+            // As for records: the `end` of a `with … end` member block left
+            // of the cases comes after the cases' scope.
+            seq(
+              scoped($._union_type_defn_inner, $._indent, $._end_dedent),
+              "end",
+            ),
             $._union_type_defn_inner,
             // Cases aligned with the enclosing scope (same column as 'type'),
             // mirroring match_expression's `seq(_newline, rules)` branch:
@@ -1972,7 +2016,11 @@ module.exports = grammar({
     type_extension_elements: ($) =>
       prec.left(
         choice(
-          seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+          seq(
+            "with",
+            scoped($._type_extension_inner, $._indent, $._dedent),
+            optional("end"),
+          ),
           $._type_extension_inner,
         ),
       ),
@@ -1986,7 +2034,15 @@ module.exports = grammar({
       ),
 
     interface_implementation: ($) =>
-      prec.left(seq("interface", $._type, optional($._object_members))),
+      // FSC's opt_interfaceImplDefn: `with members`, optionally closed by an
+      // explicit `end`.
+      prec.left(
+        seq(
+          "interface",
+          $._type,
+          optional(seq($._object_members, optional("end"))),
+        ),
+      ),
 
     _member_defns: ($) =>
       prec.left(

@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 743 with errors; 4417 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -18,7 +18,7 @@
 1	examples/FSharp.Compiler/src/Compiler/Checking/AttributeChecking.fs
 36	examples/FSharp.Compiler/src/Compiler/Checking/CheckComputationExpressions.fs
 15	examples/FSharp.Compiler/src/Compiler/Checking/CheckDeclarations.fs
-128	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
+154	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
 59	examples/FSharp.Compiler/src/Compiler/Checking/CheckIncrementalClasses.fs
 1	examples/FSharp.Compiler/src/Compiler/Checking/MethodOverrides.fs
 2	examples/FSharp.Compiler/src/Compiler/Checking/NameResolution.fs
@@ -63,7 +63,7 @@
 3	examples/FSharp.Compiler/src/FSharp.Core/map.fs
 22	examples/FSharp.Compiler/src/FSharp.Core/nativeptr.fs
 529	examples/FSharp.Compiler/src/FSharp.Core/prim-types-prelude.fs
-228	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
+212	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
 7	examples/FSharp.Compiler/src/FSharp.Core/quotations.fs
 5	examples/FSharp.Compiler/src/FSharp.Core/seqcore.fs
 3	examples/FSharp.Compiler/src/fsi/fsimain.fs
@@ -131,7 +131,7 @@
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/OCamlCompat/W_Hat01.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/OCamlCompat/W_MultiArgumentGenericType.fs
 34	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/ImpliedSignatureHashTests.fs
-45	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/TestCasesForGenerationRoundTrip/members_basics.fs
+22	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/TestCasesForGenerationRoundTrip/members_basics.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/E_star02.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/star03.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals001.fs
@@ -181,7 +181,7 @@
 2	examples/FSharp.Compiler/tests/fsharp/core/fsfromcs/lib.fs
 1	examples/FSharp.Compiler/tests/fsharp/core/large/conditionals/LargeConditionals-maxtested.fs
 8	examples/FSharp.Compiler/tests/fsharp/core/members/absil.fs
-44	examples/FSharp.Compiler/tests/fsharp/core/members/basics/test.fs
+21	examples/FSharp.Compiler/tests/fsharp/core/members/basics/test.fs
 4	examples/FSharp.Compiler/tests/fsharp/core/members/console/console2.fs
 4	examples/FSharp.Compiler/tests/fsharp/core/members/factors-mutrec/test.fs
 4	examples/FSharp.Compiler/tests/fsharp/core/members/ops-mutrec/test.fs
@@ -198,8 +198,7 @@
 5	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg02.fs
 17	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg03.fs
 1	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg08.fs
-3	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg09.fs
-3	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg10.fs
+2	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg10.fs
 15	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg104.fs
 4	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg114.fs
 2	examples/FSharp.Compiler/tests/fsharp/typecheck/sigs/neg115.fs
@@ -286,7 +285,6 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/EnumTypes/E_NoMethodsOnEnums01.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InheritInterface.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InterfaceNotFullyImpl01.fs
-1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InterfaceNotFullyImpl02.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/StructTypes/Overload_Equals.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/StructTypes/Overload_GetHashCode.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/StructTypes/Overload_ToString.fs
