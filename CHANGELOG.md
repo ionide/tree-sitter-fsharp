@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- A layout scope that opens at column 256 or more keeps its column. The
+  scanner saved each scope's column in one byte, so a scope at column 300
+  came back as column 44, and the lines after it were joined or split at the
+  wrong level. A state holding such a column is now saved in a wide form; a
+  state whose columns all fit in a byte is saved exactly as before.
+
 ## [0.3.12] - 2026-09-12
 
 ### Added
