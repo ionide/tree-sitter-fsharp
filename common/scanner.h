@@ -412,35 +412,59 @@ static inline bool scan_n_chars(TSLexer *lexer, char ch, uint8_t count) {
   return true;
 }
 
-static inline bool scan_block_comment(TSLexer *lexer) {
-  lexer->mark_end(lexer);
-  if (lexer->lookahead != '(')
-    return false;
+// String literals inside a block comment, lexed as FSC's stringInComment,
+// tripleQuoteStringInComment and verbatimStringInComment rules (lex.fsl) do,
+// so a quoted "*)" or "(*" is not a comment delimiter. Each is called with the
+// opening quote already consumed and returns after the closing one (or at EOF,
+// which FSC reports as "End of file in string embedded in comment").
 
-  advance(lexer);
-  if (lexer->lookahead != '*')
-    return false;
-
-  advance(lexer);
-
-  while (true) {
-    switch (lexer->lookahead) {
-    case '(':
-      scan_block_comment(lexer);
-      break;
-    case '*':
+// After a '"': `""` is an empty string, `"""` opens a triple-quoted one, and
+// anything else is a regular string, where a backslash escapes the next char.
+static inline void skip_string_in_comment(TSLexer *lexer) {
+  if (lexer->lookahead == '"') {
+    advance(lexer);
+    if (lexer->lookahead != '"') {
+      return;
+    }
+    advance(lexer);
+    uint8_t quotes = 0;
+    while (quotes < 3 && !lexer->eof(lexer)) {
+      quotes = lexer->lookahead == '"' ? quotes + 1 : 0;
       advance(lexer);
-      if (lexer->lookahead == ')') {
-        advance(lexer);
-        return true;
-      }
-      break;
-    case '\0':
-      return true;
-    default:
+    }
+    return;
+  }
+  while (!lexer->eof(lexer)) {
+    int32_t c = lexer->lookahead;
+    advance(lexer);
+    if (c == '"') {
+      return;
+    }
+    if (c == '\\' && !lexer->eof(lexer)) {
       advance(lexer);
     }
   }
+}
+
+// After '@"': backslashes are literal and `""` is an escaped quote.
+static inline void skip_verbatim_string_in_comment(TSLexer *lexer) {
+  while (!lexer->eof(lexer)) {
+    int32_t c = lexer->lookahead;
+    advance(lexer);
+    if (c == '"') {
+      if (lexer->lookahead != '"') {
+        return;
+      }
+      advance(lexer);
+    }
+  }
+}
+
+// The simple escapes a character literal may hold (lex.fsl's escape_char),
+// other than '\"' and '\'' which the caller handles itself.
+static inline bool is_char_escape_letter(int32_t c) {
+  return c == '\\' || c == 'a' || c == 'f' || c == 'v' || c == 'n' ||
+         c == 't' || c == 'b' || c == 'r';
 }
 
 static inline bool is_infix_op_start(TSLexer *lexer) {
@@ -868,27 +892,114 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     if (lexer->lookahead == ')') {
       return false;
     }
+    //
+    // The content runs up to the '*)' that closes the comment, lexed the way
+    // FSC's `comment` rule (lex.fsl) lexes it: '(*' nests and '*)' unnests, but
+    // '(*)' is the operator reference and opens nothing; string literals are
+    // skipped whole (see skip_string_in_comment), so a quoted '*)' or '(*' is
+    // not a delimiter; and a character literal is matched first, so the '"' in
+    // '"' or '\"' does not open a string. The token ends just before the
+    // closing '*', which the grammar matches with token.immediate("*)").
     lexer->mark_end(lexer);
-    while (true) {
-      if (lexer->lookahead == '\0') {
-        break;
-      }
-      if (lexer->lookahead != '(' && lexer->lookahead != '*') {
-        advance(lexer);
-      } else if (lexer->lookahead == '*') {
+    uint32_t depth = 1;
+    // The previous char was a "'" that may open a character literal: if one
+    // char (or escape) and another "'" follow, FSC lexes the three as a char.
+    bool after_apostrophe = false;
+    while (!lexer->eof(lexer)) {
+      int32_t c = lexer->lookahead;
+      bool in_char = after_apostrophe;
+      after_apostrophe = false;
+      if (c == '*') {
         lexer->mark_end(lexer);
         advance(lexer);
         if (lexer->lookahead == ')') {
-          break;
+          if (--depth == 0) {
+            break;
+          }
+          advance(lexer);
+          // The mark just set is right before the '*)' of a nested comment. If
+          // the comment then runs to EOF unclosed, ending the content there
+          // would let the grammar's immediate '*)' take that closer for the
+          // outer one, and the unclosed comment would parse clean. Move it
+          // past. The old scanner also ended such content after the last
+          // nested comment, so a comment left open at depth 1 recovers as it
+          // did (E_ocamlstyle_nested006.fs keeps its one error node).
+          lexer->mark_end(lexer);
+          continue;
         }
-      } else if (scan_block_comment(lexer)) {
-        lexer->mark_end(lexer);
+      } else if (c == '(') {
         advance(lexer);
         if (lexer->lookahead == '*') {
-          break;
+          advance(lexer);
+          if (lexer->lookahead == ')') {
+            advance(lexer);
+          } else {
+            depth++;
+          }
+          continue;
+        }
+      } else if (c == '"') {
+        advance(lexer);
+        if (in_char && lexer->lookahead == '\'') {
+          advance(lexer);
+        } else {
+          skip_string_in_comment(lexer);
+        }
+        continue;
+      } else if (c == '@') {
+        advance(lexer);
+        if (lexer->lookahead == '"') {
+          advance(lexer);
+          skip_verbatim_string_in_comment(lexer);
+          continue;
+        }
+      } else if (c == '\\' && in_char) {
+        advance(lexer);
+        int32_t escaped = lexer->lookahead;
+        if (escaped == '"') {
+          // '\"' is a char literal. Without the closing "'" FSC's `char`
+          // does not match, and the '"' opens a string.
+          advance(lexer);
+          if (lexer->lookahead == '\'') {
+            advance(lexer);
+          } else {
+            skip_string_in_comment(lexer);
+          }
+        } else if (escaped == '\'' || is_char_escape_letter(escaped)) {
+          advance(lexer);
+          if (lexer->lookahead == '\'') {
+            advance(lexer);
+          } else {
+            after_apostrophe = escaped == '\'';
+          }
+        }
+        continue;
+      } else {
+        advance(lexer);
+        if (c == '\n' || c == '\r' || c == '\t' || c == '\b') {
+          // Not allowed unescaped in a char literal.
+          continue;
         }
       }
+      // c was a single char; a "'" right after it closes a char literal
+      // opened before it. Otherwise a "'" may open one. FSC lexes UTF-16 code
+      // units, so a code point above U+FFFF is two of them and cannot be a
+      // char literal's payload: in '😀'"' the char literal is '"'.
+      if (in_char && c <= 0xFFFF && lexer->lookahead == '\'') {
+        advance(lexer);
+      } else if (c == '\'') {
+        after_apostrophe = true;
+      }
     }
+    if (depth > 1) {
+      // EOF inside a nested comment: run the content to EOF, so the tree has
+      // one MISSING '*)' and the comment's text is not re-parsed as code.
+      lexer->mark_end(lexer);
+    }
+    // Otherwise (EOF at depth 1) the content ends at the last mark: a '*' the
+    // loop reached on its own (not one inside a string, an opener or '(*)'),
+    // the end of a nested comment, or else the content start. None of those
+    // is right before a '*)', so the grammar reports the missing closer.
     lexer->result_symbol = BLOCK_COMMENT_CONTENT;
     return true;
   }

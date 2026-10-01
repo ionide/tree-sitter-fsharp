@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Block comments are lexed the way FSC's `comment` rule lexes them (#245). A
+  string literal inside one is skipped whole (regular, verbatim, triple-quoted),
+  so a quoted `*)` or `(*` no longer ends or nests the comment (`(* "*)" *)`);
+  a character literal such as `'"'` does not open a string (one holding a code
+  point above U+FFFF is two UTF-16 units to FSC, so it is no literal); `(*)`
+  inside a comment is the operator, not a nested opener; and a nested comment
+  followed by the outer closer (`(* (* a *) *)`) no longer ends the content
+  early. Five corpus files parse better, four of them FSC's own conformance tests
+  for these cases, and `E_embeddedString005.fs`, which FSC rejects (FS0517, end
+  of file in a string embedded in a comment), now reports the error it
+  previously accepted.
+
 ## [0.3.12] - 2026-09-12
 
 ### Added
