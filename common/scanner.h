@@ -2146,41 +2146,109 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   return false;
 }
 
+// Columns are saved one byte each, as they always were, while every saved
+// column fits in a byte. A single byte would bring a scope at column 256 or
+// more back as its column mod 256, and every later layout decision would
+// compare against the wrong column, so a state holding such a column is saved
+// in the wide form instead, flagged by WIDE_COLUMNS_FLAG in the byte that
+// holds `stranded_dedent` (a boolean, so the bit is otherwise clear): a column
+// below COLUMN_ESCAPE is one byte, and any other column is COLUMN_ESCAPE
+// followed by the column in two bytes, low byte first. A state whose columns
+// all fit in a byte therefore serializes exactly as before, and keeps
+// everything it kept before.
+#define WIDE_COLUMNS_FLAG 0x80
+#define COLUMN_ESCAPE 0xFF
+
+static inline size_t column_size(uint16_t column, bool wide) {
+  return wide && column >= COLUMN_ESCAPE ? 3 : 1;
+}
+
+static inline void put_column(char *buffer, size_t *size, uint16_t column,
+                              bool wide) {
+  if (column_size(column, wide) == 1) {
+    buffer[(*size)++] = (char)column;
+    return;
+  }
+  buffer[(*size)++] = (char)COLUMN_ESCAPE;
+  buffer[(*size)++] = (char)(column & 0xFF);
+  buffer[(*size)++] = (char)(column >> 8);
+}
+
+// Reads one column at *size, advancing past it. False when the buffer ends
+// before the column does.
+static inline bool get_column(const char *buffer, size_t *size, unsigned length,
+                              bool wide, uint16_t *column) {
+  if (*size >= length) return false;
+  unsigned char first = (unsigned char)buffer[(*size)++];
+  if (!wide || first != COLUMN_ESCAPE) {
+    *column = first;
+    return true;
+  }
+  if (*size + 2 > length) {
+    *size = length;
+    return false;
+  }
+  *column = (uint16_t)((unsigned char)buffer[*size] |
+                       ((uint16_t)(unsigned char)buffer[*size + 1] << 8));
+  *size += 2;
+  return true;
+}
+
 static unsigned serialize(Scanner *scanner, char *buffer) {
   size_t size = 0;
-
-  buffer[size++] = (char)scanner->multi_dollar_count;
-  buffer[size++] = (char)scanner->stranded_dedent;
-  buffer[size++] = (char)scanner->line_stranded;
+  const size_t cap = TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
 
   size_t preprocessor_count = scanner->preprocessor_indents.size;
   if (preprocessor_count > UINT8_MAX) {
     preprocessor_count = UINT8_MAX;
   }
-
-  buffer[size++] = (char)preprocessor_count;
-
-  for (size_t iter = 0; iter < preprocessor_count &&
-                        size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE;
-       iter++) {
-    char e = *array_get(&scanner->preprocessor_indents, iter);
-    buffer[size++] = e;
-  }
-
   size_t indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
   if (indent_count > UINT8_MAX) {
     indent_count = UINT8_MAX;
   }
-  buffer[size++] = (char)indent_count;
+  // The mode is chosen from the columns within the count limits, before the
+  // byte budget below: if the budget then drops the only wide column, the
+  // rest is still saved in the wide form (and decodes to the same state).
+  bool wide = false;
+  for (size_t i = 0; i < preprocessor_count; i++) {
+    wide |= *array_get(&scanner->preprocessor_indents, i) > UINT8_MAX;
+  }
+  for (size_t i = 1; i <= indent_count; i++) {
+    wide |= *array_get(&scanner->indents, i) > UINT8_MAX;
+  }
 
-  uint32_t iter = 1;
-  for (; iter <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
-    buffer[size++] = (char)*array_get(&scanner->indents, iter);
+  buffer[size++] = (char)scanner->multi_dollar_count;
+  buffer[size++] =
+      (char)(scanner->stranded_dedent | (wide ? WIDE_COLUMNS_FLAG : 0));
+  buffer[size++] = (char)scanner->line_stranded;
+
+  // At most 255 preprocessor columns of at most 3 bytes each: this section
+  // ends by byte 4 + 765 = 769, so it and the indent count byte always fit.
+  buffer[size++] = (char)preprocessor_count;
+  for (size_t i = 0; i < preprocessor_count; i++) {
+    put_column(buffer, &size, *array_get(&scanner->preprocessor_indents, i),
+               wide);
+  }
+
+  // Keep as many indents as fit with their kind bytes. Unless the state is
+  // wide, the indents and kinds end by byte 770, so the limit binds only on a
+  // wide state.
+  size_t needed = size + 1;
+  for (size_t i = 1; i <= indent_count; i++) {
+    needed += column_size(*array_get(&scanner->indents, i), wide) + 1;
+    if (needed > cap) {
+      indent_count = i - 1;
+      break;
+    }
+  }
+  buffer[size++] = (char)indent_count;
+  for (uint32_t i = 1; i <= indent_count; ++i) {
+    put_column(buffer, &size, *array_get(&scanner->indents, i), wide);
   }
 
   // One byte per indent kind. Stack depth is bounded by source nesting (~10),
   // so the extra bytes vs bit-packing are negligible.
-  for (uint32_t i = 1; i <= indent_count && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++i) {
+  for (uint32_t i = 1; i <= indent_count; ++i) {
     buffer[size++] = (char)*array_get(&scanner->indent_kinds, i);
   }
 
@@ -2219,26 +2287,28 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
 
     if (size >= length) return;
-    scanner->stranded_dedent = (uint8_t)buffer[size++];
+    uint8_t flags = (uint8_t)buffer[size++];
+    scanner->stranded_dedent = (flags & ~WIDE_COLUMNS_FLAG) != 0;
+    bool wide = (flags & WIDE_COLUMNS_FLAG) != 0;
 
     if (size >= length) return;
     scanner->line_stranded = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     size_t preprocessor_count = (uint8_t)buffer[size++];
-
-    size_t preproc_end = size + preprocessor_count;
-    if (preproc_end > length) preproc_end = length;
-    for (; size < preproc_end; size++) {
-      array_push(&scanner->preprocessor_indents, (unsigned char)buffer[size]);
+    uint16_t column;
+    for (size_t i = 0; i < preprocessor_count &&
+                       get_column(buffer, &size, length, wide, &column);
+         i++) {
+      array_push(&scanner->preprocessor_indents, column);
     }
 
     if (size >= length) return;
     size_t indent_count = (uint8_t)buffer[size++];
-    size_t indent_bytes_end = size + indent_count;
-    if (indent_bytes_end > length) indent_bytes_end = length;
-    for (; size < indent_bytes_end; size++) {
-      array_push(&scanner->indents, (unsigned char)buffer[size]);
+    for (size_t i = 0; i < indent_count &&
+                       get_column(buffer, &size, length, wide, &column);
+         i++) {
+      array_push(&scanner->indents, column);
     }
 
     size_t actual_indent_count = scanner->indents.size > 0 ? scanner->indents.size - 1 : 0;
