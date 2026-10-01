@@ -45,6 +45,7 @@ enum TokenType {
   PREPROC_INACTIVE,
   ELEM_SEP,
   BRACE_INDENT,
+  ADJACENT_PREFIX_OP,
   ERROR_SENTINEL
 };
 
@@ -495,6 +496,60 @@ static inline bool is_infix_op_start(TSLexer *lexer) {
   }
 }
 
+static inline bool is_adjacent_prefix_op_start(int32_t c) {
+  return c == '-' || c == '+' || c == '%' || c == '&';
+}
+
+// FSC's LexFilter turns `-` `+` `+.` `-.` `%` `%%` `&` `&&` into an
+// ADJACENT_PREFIX_OP when the next token touches the operator and the
+// operator does not itself touch a preceding atomic expression (LexFilter.fs,
+// the `MINUS | PLUS_MINUS_OP _ | PERCENT_OP _ | AMP | AMP_AMP` case), so
+// `g &v` and `f -x` apply g and f to `&v` and `-x` while `x & y` and `x-y`
+// stay infix. The caller has skipped whitespace on the same line, which is
+// the "not touching" half, and checked is_adjacent_prefix_op_start; this
+// matches the operator and checks that an operand starts right after it.
+// `-`/`+` before a digit is left to the numeric literal tokens, which take
+// the sign (FSC merges it into signed literals). Anything else after the
+// operator -- a space, a bracket closing, another operator char making a
+// longer operator such as `&&&` or `->`, or a block comment (`-(* c *)2` is
+// `- 2`: FSC's adjacency is between tokens) -- declines, leaving the operator
+// to the internal lexer as infix.
+static inline bool scan_adjacent_prefix_op(TSLexer *lexer) {
+  int32_t op = lexer->lookahead;
+  advance(lexer);
+  bool two_chars = false;
+  if ((op == '-' || op == '+') && lexer->lookahead == '.') {
+    advance(lexer);
+    two_chars = true;
+  } else if ((op == '%' || op == '&') && lexer->lookahead == op) {
+    advance(lexer);
+    two_chars = true;
+  }
+  lexer->mark_end(lexer);
+  int32_t next = lexer->lookahead;
+  if ((op == '-' || op == '+') && !two_chars && next >= '0' && next <= '9') {
+    return false;
+  }
+  // An operand starts with an identifier (ASCII or not), a literal, or an
+  // opening bracket of a parenthesised, list, array, record or quoted form.
+  if (!is_word_char(next) && next < 0x80 && next != '(' && next != '[' &&
+      next != '{' && next != '"' && next != '`') {
+    return false;
+  }
+  if (next == '(') {
+    advance(lexer);
+    if (lexer->lookahead == '*') {
+      // `(*` opens a comment, except `(*)`: the multiplication operator.
+      advance(lexer);
+      if (lexer->lookahead != ')') {
+        return false;
+      }
+    }
+  }
+  lexer->result_symbol = ADJACENT_PREFIX_OP;
+  return true;
+}
+
 static inline bool is_bracket_end(TSLexer *lexer) {
   switch (lexer->lookahead) {
   case ')':
@@ -907,6 +962,7 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   bool advanced_in_ws_walk = false;
   bool skipped_open_paren = false;
   uint32_t indent_length = lexer->get_column(lexer);
+  const uint32_t start_column = indent_length;
 
   for (;;) {
     if (lexer->lookahead == '\n') {
@@ -1250,6 +1306,26 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // this line does hang between levels.
   if (found_end_of_line) {
     scanner->line_stranded = false;
+  }
+
+  // `g &v`, `f -x`: an operator after whitespace on the same line, in
+  // application-argument position (see scan_adjacent_prefix_op). A decline
+  // returns false having consumed the operator, so the probe only runs where
+  // the rest of this scan would emit nothing for a same-line operator: no
+  // INDENT-family token valid (those fire mid-line), and no open multi-line
+  // type application, whose DEDENT is checked against the char after a
+  // skipped '-' (the `>` of `->`). (Every argument-position state has some
+  // layout token valid, so the early `!any_structural_valid` exit above never
+  // needs this probe.)
+  if (valid_symbols[ADJACENT_PREFIX_OP] && !valid_symbols[ERROR_SENTINEL] &&
+      !found_end_of_line && !advanced_in_ws_walk &&
+      indent_length > start_column &&
+      is_adjacent_prefix_op_start(lexer->lookahead) &&
+      !valid_symbols[INDENT] && !valid_symbols[TRY_INDENT] &&
+      !valid_symbols[PAREN_INDENT] && !valid_symbols[BRACE_INDENT] &&
+      !valid_symbols[TYPE_APP_INDENT] &&
+      !(scanner->indents.size > 0 && peek_is_type_app_indent(scanner))) {
+    return scan_adjacent_prefix_op(lexer);
   }
 
   // Top-level module-element separator, phase 1 of 2 (arm): a next line at

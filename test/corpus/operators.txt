@@ -467,3 +467,465 @@ let g = f (,)
     (long_identifier_or_op
       (identifier))
     (ERROR)))
+
+================================================================================
+adjacent prefix operator as an application argument
+================================================================================
+
+let a = g &v 2
+let b = g &&v
+let c = g -x 2
+let d = g %x
+let e = g -.x
+let f = g %%x
+let h = g +x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (identifier))))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+adjacent prefix operator takes an atomic operand
+================================================================================
+
+let a = g &v.Field &arr.[0]
+let b = g -(x) 2
+let c = g &v |> h
+let d = g -x + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))))
+        (prefixed_expression
+          (prefix_op)
+          (index_expression
+            (long_identifier_or_op
+              (identifier))
+            index: (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (paren_expression
+              (long_identifier_or_op
+                (identifier)))))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (identifier))))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (identifier))))
+        (infix_op)
+        (const
+          (int))))))
+
+================================================================================
+operator spaced on both sides or on neither is infix
+================================================================================
+
+let a = x & y
+let b = x&y
+let c = x && y
+let d = x&&y
+let e = x - y
+let f = x-y
+let g = x &&&y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+adjacent prefix operator before plus-dot, a record and a non-ASCII name
+================================================================================
+
+let a = g +.x
+let b = g &{ X = 1 }
+let c = g &α
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (brace_expression
+            block: (field_initializers
+              (field_initializer
+                field: (long_identifier
+                  (identifier))
+                value: (const
+                  (int)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+operator followed by a block comment is not adjacent to its operand
+================================================================================
+
+let a = 10 -(* c *)2
+let b = g -((* c *)x)
+let c = g &(*)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (const
+          (int))
+        (infix_op)
+        (block_comment
+          (block_comment_content))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (paren_expression
+            (block_comment
+              (block_comment_content))
+            (long_identifier_or_op
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (prefixed_expression
+          (prefix_op)
+          (long_identifier_or_op
+            (op_identifier)))))))
+
+================================================================================
+negative literal argument and prefix operator at expression start
+================================================================================
+
+let a = g -1
+let b = g -1.5
+let c = &f x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (float)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (prefix_op)
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
