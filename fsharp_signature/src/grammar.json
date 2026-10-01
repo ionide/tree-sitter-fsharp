@@ -3900,6 +3900,42 @@
             "name": "_expression"
           },
           {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_adjacent_prefix_argument"
+                },
+                "named": true,
+                "value": "prefixed_expression"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_adjacent_prefix_argument": {
+      "type": "PREC_RIGHT",
+      "value": 17,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_adjacent_prefix_op"
+            },
+            "named": true,
+            "value": "prefix_op"
+          },
+          {
             "type": "SYMBOL",
             "name": "_expression"
           }
@@ -11867,6 +11903,10 @@
     {
       "type": "SYMBOL",
       "name": "_brace_indent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_adjacent_prefix_op"
     },
     {
       "type": "SYMBOL",

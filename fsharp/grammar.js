@@ -103,6 +103,7 @@ module.exports = grammar({
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
     $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
+    $._adjacent_prefix_op, // `-` `+` `+.` `-.` `%` `%%` `&` `&&` with whitespace before and its operand right after, in application-argument position: `g &v`, `f -x` (FSC's ADJACENT_PREFIX_OP)
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -121,6 +122,7 @@ module.exports = grammar({
     // _newline before the next '|' case vs. reduce), like [$.rules] above.
     [$.union_type_cases],
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
+    [$._adjacent_prefix_argument, $._high_prec_app, $._low_prec_app],
     [$._type, $._argument_type],
     [$._type, $._curried_return_type],
     // A leading _elem_separator (fired after a file-opening extra such as a
@@ -1069,7 +1071,29 @@ module.exports = grammar({
       ),
 
     _low_prec_app: ($) =>
-      prec.left(PREC.APP_EXPR, seq($._expression, $._expression)),
+      prec.left(
+        PREC.APP_EXPR,
+        seq(
+          $._expression,
+          choice(
+            $._expression,
+            alias($._adjacent_prefix_argument, $.prefixed_expression),
+          ),
+        ),
+      ),
+
+    // FSC's argExpr: in argument position an adjacent prefix operator applies
+    // to one atomic expression, so `g &v 2` is `g (&v) 2` while `g &v.F`,
+    // `g &a.[0]` and `g -(x)` keep the dot, index or parens in the operand.
+    // SPECIAL_PREFIX sits above APP_EXPR (reduce before the next argument)
+    // and below DOT/INDEX_EXPR (shift those into the operand). The scanner
+    // emits _adjacent_prefix_op only for an operator with whitespace before
+    // it and its operand right after, so `x & y` and `x&y` stay infix.
+    _adjacent_prefix_argument: ($) =>
+      prec.right(
+        PREC.SPECIAL_PREFIX,
+        seq(alias($._adjacent_prefix_op, $.prefix_op), $._expression),
+      ),
 
     application_expression: ($) => choice($._high_prec_app, $._low_prec_app),
 

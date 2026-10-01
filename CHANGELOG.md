@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- An operator after whitespace and touching its operand in argument position
+  is a prefix on that argument, as FSC's adjacent-prefix rule makes it (#243):
+  `g &v 2` is `g (&v) 2` and `f -x` is `f (-x)`, no longer `(g & v) 2` and
+  `f - x`. This covers `-`, `+`, `-.`, `+.`, `%`, `%%`, `&` and `&&`. The prefix
+  takes one atomic operand, so `g &a.[0]` and `g -(x) 2` keep the index and
+  parens inside it; `x & y`, `x&y` and `g -1` are unchanged. `prim-types.fs`
+  (FSharp.Core) parses with 16 fewer error nodes.
+
 ## [0.3.12] - 2026-09-12
 
 ### Added

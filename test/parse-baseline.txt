@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 745 with errors; 4468 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -18,7 +18,7 @@
 1	examples/FSharp.Compiler/src/Compiler/Checking/AttributeChecking.fs
 36	examples/FSharp.Compiler/src/Compiler/Checking/CheckComputationExpressions.fs
 15	examples/FSharp.Compiler/src/Compiler/Checking/CheckDeclarations.fs
-128	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
+154	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
 59	examples/FSharp.Compiler/src/Compiler/Checking/CheckIncrementalClasses.fs
 1	examples/FSharp.Compiler/src/Compiler/Checking/MethodOverrides.fs
 2	examples/FSharp.Compiler/src/Compiler/Checking/NameResolution.fs
@@ -63,7 +63,7 @@
 3	examples/FSharp.Compiler/src/FSharp.Core/map.fs
 22	examples/FSharp.Compiler/src/FSharp.Core/nativeptr.fs
 529	examples/FSharp.Compiler/src/FSharp.Core/prim-types-prelude.fs
-228	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
+212	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
 7	examples/FSharp.Compiler/src/FSharp.Core/quotations.fs
 5	examples/FSharp.Compiler/src/FSharp.Core/seqcore.fs
 3	examples/FSharp.Compiler/src/fsi/fsimain.fs
