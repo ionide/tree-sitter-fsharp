@@ -412,12 +412,21 @@ module.exports = grammar({
     function_declaration_left: ($) =>
       prec.left(
         3,
-        seq(
-          optional("inline"),
-          optional($.access_modifier),
-          prec(100, $._identifier_or_op),
-          optional($.type_arguments),
-          $.argument_patterns,
+        // `let h (g: int -> int) : int = …` also parses as a value binding
+        // whose pattern swallows the return type (`h (g …) : int` as a typed
+        // constructor pattern), and both GLR versions survive to the `=`. The
+        // static prec cannot rank them, so without a dynamic preference the
+        // winner depended on what followed the binding (#244). Prefer the
+        // function, as every unannotated head already parses.
+        prec.dynamic(
+          1,
+          seq(
+            optional("inline"),
+            optional($.access_modifier),
+            prec(100, $._identifier_or_op),
+            optional($.type_arguments),
+            $.argument_patterns,
+          ),
         ),
       ),
 

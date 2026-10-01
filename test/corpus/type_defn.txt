@@ -3811,27 +3811,24 @@ let f (x: float[,]) : float[,,,] =
 (file
   (declaration_expression
     (function_or_value_defn
-      (value_declaration_left
-        (identifier_pattern
-          (long_identifier_or_op
-            (long_identifier
-              (identifier)))
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
           (typed_pattern
-            (paren_pattern
-              (typed_pattern
-                (identifier_pattern
-                  (long_identifier_or_op
-                    (identifier)))
-                (list_type
-                  (simple_type
-                    (long_identifier
-                      (identifier))))))
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
             (list_type
               (simple_type
                 (long_identifier
                   (identifier)))))))
+      (list_type
+        (simple_type
+          (long_identifier
+            (identifier))))
       (long_identifier_or_op
-        (identifier)))))
+        (long_identifier
+          (identifier))))))
 
 ================================================================================
 Try inside a DU augmentation
