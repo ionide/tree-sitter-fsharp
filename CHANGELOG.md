@@ -87,6 +87,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   form now parse without errors.
 - `^` as an infix operator (`"a" ^ "b"`, `x ^ y`, `f ^ fun x -> x`); a spaced
   `^ y` no longer starts an SRTP trait call.
+- An operator after whitespace on the same line and touching its operand in
+  argument position is a prefix on that argument, as FSC's adjacent-prefix rule
+  makes it (#243): `g &v 2` is `g (&v) 2` and `f -x` is `f (-x)`, no longer
+  `(g & v) 2` and `f - x`. This covers `-`, `+`, `-.`, `+.`, `%`, `%%`, `&` and
+  `&&`. The prefix binds tighter than application but looser than dot and
+  index, so `g &a.[0]` and `g -(x) 2` keep the index and parens inside it;
+  `x & y`, `x&y` and `g -1` are unchanged.
 
 ### Changed
 - `fsharp_signature` no longer produces the implementation-file member nodes
