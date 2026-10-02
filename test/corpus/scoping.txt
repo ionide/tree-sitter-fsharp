@@ -282,3 +282,2228 @@ do
                (infix_op)
                (long_identifier_or_op
                  (identifier)))))))))
+
+================================================================================
+block comment at column 0 between class members
+================================================================================
+
+type T() =
+    member this.A() = 1
+(* commented out
+    member this.B() = 2
+*)
+    member this.C() = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))
+            (block_comment
+              (block_comment_content)))))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))))))))
+
+================================================================================
+block comment at column 0 inside a function body
+================================================================================
+
+let f () =
+    let a = 1
+(* note *)
+    a + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))
+          (block_comment
+            (block_comment_content)))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+block comment at column 0 before a dedented declaration
+================================================================================
+
+let f () =
+    1
+(* note *)
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (const
+        (int))
+      (block_comment
+        (block_comment_content))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+two block comments on a comment-only line at column 0
+================================================================================
+
+let f () =
+    let a = 1
+(* one *) (* two *)
+    a + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))
+          (block_comment
+            (block_comment_content))
+          (block_comment
+            (block_comment_content)))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+nested block comment at column 0
+================================================================================
+
+let f () =
+    let a = 1
+(* outer (* inner *) still outer *)
+    a + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))
+          (block_comment
+            (block_comment_content)))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+block comment then line comment at column 0
+================================================================================
+
+let f () =
+    let a = 1
+(* note *) // and a line comment
+    a + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))
+          (block_comment
+            (block_comment_content))
+          (line_comment))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+block comment with trailing spaces at column 0
+================================================================================
+
+let f () =
+    let a = 1
+(* note *)   
+    a + 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))
+          (block_comment
+            (block_comment_content)))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int)))))))
+
+================================================================================
+block comment at column 0 as the last line
+================================================================================
+
+let f () =
+    let a = 1
+    a + 1
+(* end *)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int)))
+        in: (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (const
+            (int))))
+      (block_comment
+        (block_comment_content)))))
+
+================================================================================
+several comment-only lines at column 0
+================================================================================
+
+type T() =
+    member this.A() = 1
+(* a *)
+(* b *)
+    member this.C() = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))
+            (block_comment
+              (block_comment_content))
+            (block_comment
+              (block_comment_content)))))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))))))))
+
+================================================================================
+block comment at column 0 between match arms
+================================================================================
+
+let f x =
+    match x with
+    | 1 -> 1
+(* c *)
+    | _ -> 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (int))
+            (block_comment
+              (block_comment_content)))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (int))))))))
+
+================================================================================
+block comment at column 0 before else
+================================================================================
+
+let f x =
+    if x then
+        1
+(* c *)
+    else
+        2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (if_expression
+        guard: (long_identifier_or_op
+          (identifier))
+        then: (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        else: (const
+          (int))))))
+
+================================================================================
+block comment at column 0 after #endif and a blank line
+================================================================================
+
+let x = 1
+#if A
+let y = 2
+#endif
+
+(* c *)
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int))))
+  (preproc_if
+    condition: (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int)))))
+  (block_comment
+    (block_comment_content)))
+
+================================================================================
+block comment at column 0 directly after #endif
+================================================================================
+
+let a = 1
+#if A
+let b = 2
+#endif
+(* c *)
+let c = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int))))
+  (preproc_if
+    condition: (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int)))))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+block comment at column 0 after #else
+================================================================================
+
+#if A
+let a = 1
+#else
+(* c *)
+let a = 2
+#endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (preproc_if
+    condition: (identifier)
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))
+    alternative: (preproc_else
+      (block_comment
+        (block_comment_content))
+      (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int)))))))
+
+================================================================================
+block comment at column 0 after #endif between class members
+================================================================================
+
+type T() =
+    member this.A() = 1
+#if A
+    member this.B() = 2
+#endif
+(* c *)
+    member this.C() = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      block: (type_extension_elements
+        (preproc_if
+          condition: (identifier)
+          (type_extension_elements
+            (member_defn
+              (method_or_prop_defn
+                name: (property_or_ident
+                  instance: (identifier)
+                  method: (identifier))
+                args: (const
+                  (unit))
+                (const
+                  (int)))))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))))))))
+
+================================================================================
+block comment at column 0 before a dedent of several levels
+================================================================================
+
+module M =
+    type T() =
+        member this.A() =
+            1
+(* a *)
+(* b *)
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        (primary_constr_args)
+        block: (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))
+              (block_comment
+                (block_comment_content))
+              (block_comment
+                (block_comment_content))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+block comment at column 0 directly after #if in a function body
+================================================================================
+
+let f () =
+    let a = 1
+#if A
+(* c *)
+    let b = 2
+#endif
+    a
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int)))
+        in: (sequential_expression
+          (preproc_if
+            condition: (identifier)
+            (block_comment
+              (block_comment_content))
+            (declaration_expression
+              (function_or_value_defn
+                (value_declaration_left
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))))
+                body: (const
+                  (int)))))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+block comment at column 0 directly after #if at top level
+================================================================================
+
+let a = 1
+#if A
+(* c *)
+let b = 2
+#endif
+let c = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int))))
+  (preproc_if
+    condition: (identifier)
+    (block_comment
+      (block_comment_content))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+block comment at column 4 after an indented #if inside an interface implementation
+================================================================================
+
+type T() =
+    interface I with
+        member this.A = 1
+        #if A
+    (* c *)
+    member this.B = 2
+        #endif
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int)))))
+        (preproc_if
+          condition: (identifier)
+          (block_comment
+            (block_comment_content))
+          (type_extension_elements
+            (member_defn
+              (method_or_prop_defn
+                name: (property_or_ident
+                  instance: (identifier)
+                  method: (identifier))
+                (const
+                  (int))))))))))
+
+================================================================================
+code after a column-0 comment at the class member column
+================================================================================
+
+type T() =
+        member this.A() = 1
+(* c *) member this.C() = 3
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+code after a column-0 comment at the function body column
+================================================================================
+
+let f () =
+        printfn "a"
+(* c *) printfn "b"
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (string)))
+        (block_comment
+          (block_comment_content))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (string))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+match arm after a column-0 comment at the arm column
+================================================================================
+
+let f x =
+        match x with
+        | 1 -> 'a'
+(* c *) | _ -> 'b'
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (char)))
+          (block_comment
+            (block_comment_content))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (char)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+infix operator after a column-0 comment at the body column continues it
+================================================================================
+
+let f () =
+        1
+(* c *) |> string
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (infix_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member on the closing line of a multi-line comment
+================================================================================
+
+type T() =
+    member this.A() = 1
+(* a
+b*) member this.C() = 3
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+statement on the closing line of a multi-line comment
+================================================================================
+
+let f () =
+    printfn "a"
+(* a
+b*) printfn "b"
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (string)))
+        (block_comment
+          (block_comment_content))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (string))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member after two comments at the member column
+================================================================================
+
+type T() =
+            member this.A() = 1
+(*a*) (*b*) member this.C() = 3
+let g = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+code after a comment closes a nested let body
+================================================================================
+
+let f () =
+        let g () =
+                1
+(* c *) g ()
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (function_declaration_left
+            (identifier)
+            (argument_patterns
+              (const
+                (unit))))
+          body: (const
+            (int)))
+        (block_comment
+          (block_comment_content))
+        in: (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (unit)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member after a comment closes the previous member body
+================================================================================
+
+type T() =
+        member this.A() =
+                1
+(* c *) member this.B() = 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+closing paren after a column-0 comment at the item column
+================================================================================
+
+let x = (
+        1
+(* c *) )
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (paren_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+plus operator after a column-0 comment at the body column continues it
+================================================================================
+
+let f () =
+        1
+(* c *) + 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (infix_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+logical or after a column-0 comment at the body column continues it
+================================================================================
+
+let f a b =
+        a
+(* c *) || b
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+division after a column-0 comment at the body column continues it
+================================================================================
+
+let f () =
+        12
+(* c *) / 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (infix_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+unit after a column-0 comment at the body column is a new statement
+================================================================================
+
+let f () =
+        ignore 1
+(* c *) ()
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))
+        (block_comment
+          (block_comment_content))
+        (const
+          (unit)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member after a comment right of the class column is still a member
+================================================================================
+
+type T() =
+        member x.A = 1
+        (* c *) member x.B = 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))
+        (block_comment
+          (block_comment_content))
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+empty comment before a closing bracket at the item column
+================================================================================
+
+let x = [
+        1
+(**)    ]
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end after a comment at the member column closes the class
+================================================================================
+
+type C() =
+    class
+        member this.A = 1
+(* c *) end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+pipe after a comment left of the body column continues it
+================================================================================
+
+let f () =
+        1
+(* c *)|> string
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (infix_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+plus after a comment left of the body column continues it
+================================================================================
+
+let f () =
+        1
+(*c*) + 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (infix_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member keyword after a comment at the previous member body's column
+================================================================================
+
+type T() =
+        member x.A = 1
+        (* c *)      member x.B = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))
+        (block_comment
+          (block_comment_content))
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))))))
+
+================================================================================
+member keyword after a comment right of the previous member body
+================================================================================
+
+type T() =
+        member x.A = 1
+        (* c *)         member x.B = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))
+        (block_comment
+          (block_comment_content))
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))))))
+
+================================================================================
+do after a comment at a mid-line body's column continues that body
+================================================================================
+
+module M =
+        let x = 1
+(* c *)         do ignore x
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (sequential_expression
+          (const
+            (int))
+          (block_comment
+            (block_comment_content))
+          (do_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+identifier and operator after a column-0 comment at the body column
+================================================================================
+
+let f () =
+        ignore 1
+(* c *) foo+bar
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))
+        (block_comment
+          (block_comment_content))
+        (infix_expression
+          (long_identifier_or_op
+            (identifier))
+          (infix_op)
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+word operator or after a column-0 comment at the body column continues it
+================================================================================
+
+let f a b =
+        a
+(* c *) or b
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (block_comment
+          (block_comment_content))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+record field after a comment left of the first field continues it
+================================================================================
+
+let x = {
+            A = 1
+(* c *) B = 2
+        }
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (field_initializers
+          (field_initializer
+            field: (long_identifier
+              (identifier))
+            value: (infix_expression
+              (application_expression
+                (const
+                  (int))
+                (block_comment
+                  (block_comment_content))
+                (long_identifier_or_op
+                  (identifier)))
+              (infix_op)
+              (const
+                (int)))))))))
+
+================================================================================
+member after an empty comment at the class member column
+================================================================================
+
+type T() =
+    member this.A() = 1
+(**)member this.C() = 3
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+identifier with a non-ASCII letter after a column-0 comment at the body column
+================================================================================
+
+let f () =
+        ignore 1
+(* c *) oré 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))
+        (block_comment
+          (block_comment_content))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))))))
+
+================================================================================
+identifier starting with or after a column-0 comment at the body column
+================================================================================
+
+let f () =
+        ignore 1
+(* c *) order 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))
+        (block_comment
+          (block_comment_content))
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (const
+            (int)))))))
+
+================================================================================
+list item after a column-0 comment at the item column
+================================================================================
+
+let xs =
+    [
+        1
+(* c *) 2
+    ]
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (const
+          (int))
+        (block_comment
+          (block_comment_content))
+        (const
+          (int))))))
+
+================================================================================
+match arm with a non-ASCII pattern after a column-0 comment
+================================================================================
+
+let f x =
+    match x with
+        | 1 -> 1
+(* c *) |é -> 2
+let z = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        block: (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (int)))
+          (block_comment
+            (block_comment_content))
+          (rule
+            pattern: (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            block: (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member keyword after a comment at the class member column, at a multi-line body's column
+================================================================================
+
+type T() =
+    member x.A =
+            1
+    (* c *) member x.B = 2
+let z = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))
+        (block_comment
+          (block_comment_content))
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member keyword after a comment between the class member column and a multi-line body
+================================================================================
+
+type T() =
+    member x.A =
+                1
+        (* c *) member x.B = 2
+let z = 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))
+        (block_comment
+          (block_comment_content))
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member keywords after an empty comment at the class member column
+================================================================================
+
+type A() =
+        member x.A = 1
+(**)    abstract B : int
+type D() =
+        member x.A = 1
+(**)    default x.B = 2
+type O() =
+        member x.A = 1
+(**)    override x.ToString() = "O"
+type S() =
+        member x.A = 1
+(**)    static member B = 2
+type V() =
+        member x.A = 1
+(**)    val B : int
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (string)))))))
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              (identifier))
+            (const
+              (int)))))))
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))
+      (block_comment
+        (block_comment_content))
+      block: (type_extension_elements
+        (member_defn
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+leading semicolon after a column-0 comment keeps the comment's column
+================================================================================
+
+type T() =
+    interface System.IComparable with
+        member x.CompareTo(o) = 1
+        member x.Other = 2
+(*c*)   ;
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (paren_pattern
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              (const
+                (int))))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+match arm right of the arms after a comment at the arm column
+================================================================================
+
+let f x =
+    match x with
+    | 1 -> 1
+    (* c *) | 2 -> 2
+    | _ -> 3
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (int)))
+          (block_comment
+            (block_comment_content))
+          (rule
+            pattern: (const
+              (int))
+            block: (const
+              (int)))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (const
+              (int))))))))
