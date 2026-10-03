@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 736 with errors; 4418 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -18,7 +18,7 @@
 1	examples/FSharp.Compiler/src/Compiler/Checking/AttributeChecking.fs
 36	examples/FSharp.Compiler/src/Compiler/Checking/CheckComputationExpressions.fs
 15	examples/FSharp.Compiler/src/Compiler/Checking/CheckDeclarations.fs
-128	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
+154	examples/FSharp.Compiler/src/Compiler/Checking/CheckExpressions.fs
 59	examples/FSharp.Compiler/src/Compiler/Checking/CheckIncrementalClasses.fs
 1	examples/FSharp.Compiler/src/Compiler/Checking/MethodOverrides.fs
 2	examples/FSharp.Compiler/src/Compiler/Checking/NameResolution.fs
@@ -30,12 +30,10 @@
 3	examples/FSharp.Compiler/src/Compiler/CodeGen/IlxGen.fs
 10	examples/FSharp.Compiler/src/Compiler/Driver/CompilerConfig.fs
 16	examples/FSharp.Compiler/src/Compiler/Driver/CompilerImports.fs
-1	examples/FSharp.Compiler/src/Compiler/Driver/FxResolver.fs
 9	examples/FSharp.Compiler/src/Compiler/Driver/GraphChecking/FileContentMapping.fs
 2	examples/FSharp.Compiler/src/Compiler/Driver/ParseAndCheckInputs.fs
 2	examples/FSharp.Compiler/src/Compiler/Facilities/prim-lexing.fs
 2	examples/FSharp.Compiler/src/Compiler/Interactive/fsi.fs
-1	examples/FSharp.Compiler/src/Compiler/Optimize/LowerSequences.fs
 1	examples/FSharp.Compiler/src/Compiler/Service/FSharpCheckerResults.fs
 2	examples/FSharp.Compiler/src/Compiler/Service/FSharpParseFileResults.fs
 4	examples/FSharp.Compiler/src/Compiler/Service/FSharpProjectSnapshot.fs
@@ -54,7 +52,6 @@
 2	examples/FSharp.Compiler/src/Compiler/TypedTree/tainted.fs
 1	examples/FSharp.Compiler/src/Compiler/Utilities/ImmutableArray.fs
 4	examples/FSharp.Compiler/src/Compiler/Utilities/sformat.fs
-1	examples/FSharp.Compiler/src/FSharp.Core/Linq.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/QueryExtensions.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/SI.fs
 1	examples/FSharp.Compiler/src/FSharp.Core/array2.fs
@@ -63,7 +60,7 @@
 3	examples/FSharp.Compiler/src/FSharp.Core/map.fs
 22	examples/FSharp.Compiler/src/FSharp.Core/nativeptr.fs
 529	examples/FSharp.Compiler/src/FSharp.Core/prim-types-prelude.fs
-228	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
+212	examples/FSharp.Compiler/src/FSharp.Core/prim-types.fs
 7	examples/FSharp.Compiler/src/FSharp.Core/quotations.fs
 5	examples/FSharp.Compiler/src/FSharp.Core/seqcore.fs
 3	examples/FSharp.Compiler/src/fsi/fsimain.fs
@@ -130,7 +127,6 @@
 2	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/OCamlCompat/OCamlStyleArrayIndexing.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/OCamlCompat/W_Hat01.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/OCamlCompat/W_MultiArgumentGenericType.fs
-34	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/ImpliedSignatureHashTests.fs
 45	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/TestCasesForGenerationRoundTrip/members_basics.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/E_star02.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/star03.fs
@@ -147,7 +143,6 @@
 2	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/UnitsOfMeasure/Parsing/Quotient.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/UnitsOfMeasure/Parsing/Reciprocal01.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Diagnostics/async/UseBindingWrongForm01.fs
-8	examples/FSharp.Compiler/tests/FSharp.Compiler.Private.Scripting.UnitTests/DependencyManagerInteractiveTests.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/Common.fs
 8	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/EditorTests.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.Service.Tests/ExprTests.fs
@@ -729,12 +724,8 @@
 151	examples/FSharp.Compiler/tests/service/data/TestTP/ProvidedTypes.fs
 2	examples/FSharp.Compiler/vsintegration/ItemTemplates/CodeFile/Template/File.fs
 2	examples/FSharp.Compiler/vsintegration/ProjectTemplates/LibraryProject/Template/Library1.fs
-1	examples/FSharp.Compiler/vsintegration/src/FSharp.Editor/LanguageService/LanguageService.fs
-1	examples/FSharp.Compiler/vsintegration/src/FSharp.Editor/Options/UIHelpers.fs
-1	examples/FSharp.Compiler/vsintegration/src/FSharp.LanguageService/BackgroundRequests.fs
 75	examples/FSharp.Compiler/vsintegration/src/FSharp.ProjectSystem.FSharp/Project.fs
 1	examples/FSharp.Compiler/vsintegration/src/FSharp.ProjectSystem.FSharp/ProjectPrelude.fs
-1	examples/FSharp.Compiler/vsintegration/src/FSharp.VS.FSI/sessions.fs
 2	examples/FSharp.Compiler/vsintegration/tests/FSharp.Editor.Tests/FsxCompletionProviderTests.fs
 7	examples/FSharp.Compiler/vsintegration/tests/FSharp.Editor.Tests/HelpContextServiceTests.fs
 2	examples/FSharp.Compiler/vsintegration/tests/FSharp.Editor.Tests/SignatureHelpProviderTests.fs

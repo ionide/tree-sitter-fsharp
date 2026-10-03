@@ -103,6 +103,7 @@ module.exports = grammar({
     $.preproc_inactive, // extra: an inactive `#else`..`#endif` region (or dangling `#endif`) of a directive whose `#if` line was skipped as trivia because the grammar has no preproc rule at that position
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
     $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
+    $._newline_indent, // like _indent, but only on a new, more-indented line: opens the block after a `lazy`/`assert` that ends its line
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -798,21 +799,33 @@ module.exports = grammar({
       ),
 
     prefixed_expression: ($) =>
-      seq(
-        choice(
-          "return",
-          "return!",
-          "yield",
-          "yield!",
-          "lazy",
-          "assert",
-          "upcast",
-          "downcast",
-          "new",
-          "fixed",
-          $.prefix_op,
+      choice(
+        seq(
+          choice(
+            "return",
+            "return!",
+            "yield",
+            "yield!",
+            "lazy",
+            "assert",
+            "upcast",
+            "downcast",
+            "new",
+            "fixed",
+            $.prefix_op,
+          ),
+          prec.right(PREC.PREFIX_EXPR, $._expression),
         ),
-        prec.right(PREC.PREFIX_EXPR, $._expression),
+        // `lazy` / `assert` ending their line: FSC opens a block for the body
+        // on the following, more-indented lines, so several lines (`let`s and
+        // then a result) form one body. `_newline_indent` only fires after a
+        // newline, so the same-line forms keep the rule above.
+        seq(
+          choice("lazy", "assert"),
+          $._newline_indent,
+          $._expression,
+          $._dedent,
+        ),
       ),
 
     // `new 'T()` / `new 'T(args)`: constructing a value of a generic type
