@@ -6805,3 +6805,78 @@ let q2 = <@
               (int)))
           in: (long_identifier_or_op
             (identifier)))))))
+
+================================================================================
+begin end with end left of the then block
+================================================================================
+
+let f c =
+    if c then begin
+        1
+    end else 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (if_expression
+        guard: (long_identifier_or_op
+          (identifier))
+        then: (begin_end_expression
+          block: (const
+            (int)))
+        else: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+begin end closing before an else at the if column
+================================================================================
+
+let f =
+    if true then
+        begin
+            1
+    end
+    else 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (if_expression
+        guard: (const
+          (bool))
+        then: (begin_end_expression
+          block: (const
+            (int)))
+        else: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))

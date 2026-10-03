@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- The verbose-syntax `end` that closes a member block is parsed: `type C with
+  … end` (an augmentation, also after `and`), `interface I with … end`,
+  `with … end` after a record, union or exception, and
+  `{ new I with … end }` in an object expression. The `end` was parsed as a
+  stray identifier, with no ERROR node, and the declaration after it was
+  often attached to that identifier as an argument. An `end` left of an
+  interface implementation inside a verbose `class … end` still closes the
+  class. Five corpus files parse better; `members/basics/test.fs` and
+  `members_basics.fs` lose more than half their error nodes.
+
 ## [0.3.12] - 2026-09-12
 
 ### Added
