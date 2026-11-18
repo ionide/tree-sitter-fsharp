@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.13] - 2026-11-18
+
 ### Added
 - F# 9 nullable types: `string | null` in annotations, record fields, type
   arguments, member and `val` signatures and parenthesized union fields, as
@@ -315,6 +317,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial `0.3.x` release.
 
+[0.3.13]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.12...0.3.13
+[0.3.12]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.11...0.3.12
+[0.3.11]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.3...0.3.11
 [0.3.3]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.2...0.3.3
 [0.3.2]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/ionide/tree-sitter-fsharp/compare/0.3.0...0.3.1
