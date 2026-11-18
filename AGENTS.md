@@ -90,7 +90,7 @@ Translate the AST into the lisp like format ued by tree-sitter. Refer to the gra
 If the appropiate node names are not present in the grammar, you may need to update grammar.js to add the necessary rules and regenerate the parser before you can write the test.
 
 ```fsi
-#r "nuget: Fantomas.FCS, 7.0.5"
+#r "nuget: Fantomas.FCS, 8.1.1"
 let sample = ""
 Parse.parseFile false (SourceText.ofString sample) []
 ```
@@ -243,11 +243,10 @@ submodules, as CI has: some corpus files get CRLF endings on Windows and a few o
 parse with a different number of error nodes (`git -C examples/FSharp.Compiler config
 core.eol lf`, then `git -C examples/FSharp.Compiler checkout-index -a -f`).
 
-Two fsyacc-generated files parse with a compiler-dependent number of error nodes:
-`buildtools/fsyacc/fsyaccast.fs` and `fsyacclex.fs` give 5 and 20 with MSVC and gcc 15,
-but 6 and 27 on the GitHub runners (gcc 13, Apple clang). The baseline records the larger
-numbers, so both pass; the same input parsing differently per compiler points at
-undefined behaviour in the scanner and is worth a look on its own.
+Error recovery belongs to the tree-sitter runtime inside the CLI, so a CLI upgrade alone
+can change the count of a file that already has errors (0.27.0 to 0.27.2 moved three
+files by one or two nodes). Record the baseline with the CLI version in
+`package-lock.json`, which is the one CI installs.
 
 The tree-sitter CLI caches compiled parsers by grammar *name* under
 `~/.cache/tree-sitter/lib`; another checkout whose grammar is also called `fsharp`

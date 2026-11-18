@@ -79,7 +79,8 @@
 
 ;; Union and enum cases are constructors (`| Circle of ...`, `| A = 1`).
 (union_type_case (identifier) @constructor)
-(enum_type_case . (identifier) @constructor)
+;; Not anchored: a case may carry attributes (`| [<Obsolete>] A = 1`).
+(enum_type_case (identifier) @constructor)
 
 ;; Named union-case fields: `| Circle of radius: float`.
 (union_type_field . (identifier) @variable.member (_))
@@ -426,6 +427,8 @@
 (import_decl (long_identifier (identifier) @module))
 (module_abbrev (long_identifier (identifier) @module))
 (simple_type (long_identifier (identifier) @type))
+;; Exception abbreviation: `exception E = Other.Exn`.
+(exception_definition "=" (long_identifier (identifier) @type))
 (attribute (simple_type (long_identifier (identifier) @attribute)))
 
 ((simple_type

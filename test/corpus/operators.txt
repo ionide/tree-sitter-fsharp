@@ -467,3 +467,56 @@ let g = f (,)
     (long_identifier_or_op
       (identifier))
     (ERROR)))
+
+================================================================================
+caret as an infix operator
+================================================================================
+
+let s = "a" ^ "b"
+let t = x ^ y
+let u = f ^ fun x -> x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (const
+          (string))
+        (infix_op)
+        (const
+          (string)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (fun_expression
+          (argument_patterns
+            (long_identifier
+              (identifier)))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))

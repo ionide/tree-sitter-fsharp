@@ -1,4 +1,4 @@
-#r "nuget: Fantomas.FCS, 7.0.5"
+#r "nuget: Fantomas.FCS, 8.1.1"
 
 open System
 open Fantomas.FCS

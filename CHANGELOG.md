@@ -7,7 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- F# 9 nullable types: `string | null` in annotations, record fields, type
+  arguments, member and `val` signatures and parenthesized union fields, as
+  `nullable_type`.
+- The `'T : not null` constraint.
+- Exception abbreviations: `exception E = Other.Exn`.
+- Attributes on enum cases: `| [<Obsolete>] A = 1`.
+- Attributes after the `module` keyword, on nested and top-level modules, in
+  both grammars: `module [<AutoOpen>] M =`.
+- `for _ = a to b do` loops.
+- A parenthesized pattern after `as`: `:? T as (a & b)`, `p as (x, y)`.
+- Signature files (`fsharp_signature`): members of a type are signatures
+  (`member P: int`, `static member M: x: int -> T`, `new: int -> T`,
+  `override`, `default`, `val x: int`, with `when` constraints and
+  `with get, set`), also after union cases and record fields; `interface I`
+  and `inherit T` in a type; `val f: 'T -> 'T when 'T: equality`; `#if`
+  branches that hold signature elements; `module M = begin ... end`; infix
+  and type-application expressions in attribute arguments. Of the 326 corpus
+  `.fsi` files FSC accepts, 187 had errors and 20 still do.
+- An operator as the name of an abstract member:
+  `static abstract (+) : 'T * 'T -> 'T`.
+
 ### Fixed
+- A type body that starts with `interface IFoo` is no longer read as an
+  `interface ... end` block, so `type T =` / `interface IDisposable with ...`
+  parses without a primary constructor.
+- `#T` binds tighter than `->`, `*` and a type suffix: `#seq<int> -> unit` is
+  a function from a flexible type, and `l: #seq<int> -> unit` parses in a
+  member signature.
+- A curried member signature groups `a -> b * c -> d` as two argument groups;
+  it was a tuple that ended in a function type.
+- A bare type declaration (`type T`) inside an indented namespace, followed by
+  another declaration, no longer swallows that declaration as its body.
+- Signature files: a compiler directive right after the module or namespace
+  header (`module M` / `#nowarn "1178"`).
+- Queries: an enum case that carries attributes is still highlighted as a
+  constructor, and a nested module that carries attributes is tagged and (in
+  signature files) highlighted by its name instead of by its attribute list.
+  The target of an exception abbreviation is highlighted as a type.
 - A layout scope that opens at column 256 or more keeps its column. The
   scanner saved each scope's column in one byte, so a scope at column 300
   came back as column 44, and the lines after it were joined or split at the
@@ -47,6 +85,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not separated, so `let a = 1` / `a + 1` read as `1 a + 1` and `f a` /
   `g b` as `f a g b`, with no ERROR node. Five corpus files that use the
   form now parse without errors.
+- `^` as an infix operator (`"a" ^ "b"`, `x ^ y`, `f ^ fun x -> x`); a spaced
+  `^ y` no longer starts an SRTP trait call.
+
+### Changed
+- `fsharp_signature` no longer produces the implementation-file member nodes
+  (`method_or_prop_defn`, `property_or_ident`, `function_declaration_left`,
+  `argument_patterns`, `fsi_directive_decl`); a member is a `member_defn`
+  holding a `member_signature` or, for `new`, a `curried_spec`. Its parser.c
+  is 19% smaller.
+- `_interface_begin` is a zero-width marker before the `interface` keyword of
+  an `interface ... end` block; the keyword node itself is unchanged.
+- ESLint runs again: flat config in `eslint.config.js`, `npm run lint`.
+- `test/fsc-detected.txt` loses one entry, `SyntaxTree/Member/Interface 02.fs`
+  (`interface I with` whose members sit at the keyword's column). It was
+  listed only because every `interface I` at the start of a type body failed;
+  the same members-at-equal-column form after a primary constructor was
+  already accepted.
+- tree-sitter-cli 0.27.2 (regenerated parsers), eslint 10.15, node-addon-api
+  8.9.2, Rust dev-dependency tree-sitter 0.27.2, Fantomas.FCS 8.1.1 for the
+  corpus scripts. FCS 8 rejects eight more corpus files, now listed in
+  `test/fsc-parse-failures.txt`.
 
 ## [0.3.12] - 2026-09-12
 

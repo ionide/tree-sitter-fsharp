@@ -83,3 +83,12 @@ let describe (this: A) = this.F(1) + base.F(2)
 //                       ^ variable.builtin
 //                            ^ function.call
 //                                   ^ variable.builtin
+
+type Level =
+    | [<System.Obsolete>] Low = 0
+//                        ^ constructor
+    | High = 1
+//    ^ constructor
+
+exception Wrapped = System.ArgumentException
+//                  ^ type

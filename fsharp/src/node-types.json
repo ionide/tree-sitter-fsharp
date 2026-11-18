@@ -320,6 +320,10 @@
         "named": true
       },
       {
+        "type": "nullable_type",
+        "named": true
+      },
+      {
         "type": "paren_type",
         "named": true
       },
@@ -631,6 +635,10 @@
         },
         {
           "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "nullable_type",
           "named": true
         },
         {
@@ -1255,6 +1263,10 @@
           "named": true
         },
         {
+          "type": "nullable_type",
+          "named": true
+        },
+        {
           "type": "paren_type",
           "named": true
         },
@@ -1509,6 +1521,10 @@
       "required": true,
       "types": [
         {
+          "type": "attributes",
+          "named": true
+        },
+        {
           "type": "const",
           "named": true
         },
@@ -1589,6 +1605,10 @@
         },
         {
           "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "long_identifier",
           "named": true
         },
         {
@@ -2679,11 +2699,19 @@
       "required": true,
       "types": [
         {
+          "type": "active_pattern",
+          "named": true
+        },
+        {
           "type": "curried_spec",
           "named": true
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "op_identifier",
           "named": true
         },
         {
@@ -3178,6 +3206,21 @@
         },
         {
           "type": "xint",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "nullable_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_type",
           "named": true
         }
       ]
@@ -4268,6 +4311,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "paren_pattern",
           "named": true
         }
       ]

@@ -27,7 +27,7 @@
 //    listed too. That is intended: what tree-sitter does with inline IL is
 //    unspecified.
 
-#r "nuget: Fantomas.FCS, 7.0.5"
+#r "nuget: Fantomas.FCS, 8.1.1"
 
 open System.IO
 open Fantomas.FCS

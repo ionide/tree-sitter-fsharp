@@ -26,9 +26,6 @@
 (class_as_reference
   (_) @variable.parameter.builtin)
 
-((argument_patterns (long_identifier (identifier) @character.special))
- (#match? @character.special "^_"))
-
 ;; ----------------------------------------------------------------------------
 ;; Types
 
@@ -49,20 +46,21 @@
  (byref_type)
  (paren_type)
  (struct_type)
+ (nullable_type)
 ] @type
 
 (member_signature
   .
   (identifier) @function.member)
 
-(member_signature
-  (curried_spec
-    (arguments_spec
-      "*"* @operator
-      (argument_spec
-        (argument_name_spec
-          "?"? @character.special
-          name: (_) @variable.parameter)))))
+;; Named arguments of a member, a constructor or a `val`. The `*` between
+;; them is coloured by the operator list below.
+(curried_spec
+  (arguments_spec
+    (argument_spec
+      (argument_name_spec
+        "?"? @character.special
+        name: (_) @variable.parameter))))
 
 (union_type_case (identifier) @constant)
 
@@ -77,16 +75,15 @@
 (optional_pattern
   "?" @character.special)
 
-(fsi_directive_decl . (string) @module)
-
 (import_decl . (_) @module)
 (named_module
   name: (_) @module)
 (namespace
   name: (_) @module)
+;; The name is the identifier child, not the first child: a nested module may
+;; carry attributes (`[<AutoOpen>] module Inner = ...`).
 (module_defn
-  .
-  (_) @module)
+  (identifier) @module)
 
 (record_fields
   (record_field
@@ -95,24 +92,8 @@
 
 (value_declaration_left . (_) @variable)
 
-(function_declaration_left
-  . (_) @function)
-
-(argument_patterns) @variable.parameter
 (typed_pattern
   . (_) @variable.parameter)
-
-(member_defn
-  (method_or_prop_defn
-    (property_or_ident . (identifier) @function .)
-    args: (_)* @variable.parameter))
-
-(member_defn
-  (method_or_prop_defn
-    (property_or_ident
-      instance: (identifier) @variable.parameter.builtin
-      method: (identifier) @function.method)
-    args: (_)* @variable.parameter))
 
 [
   (xint)
@@ -205,14 +186,11 @@
 
 [
   "open"
-  "#r"
-  "#load"
 ] @keyword.import
 
 [
   "abstract"
   "delegate"
-  "extern"
   "static"
   "inline"
   "mutable"
@@ -223,7 +201,6 @@
 ] @keyword.modifier
 
 [
-  "let"
   "member"
 ] @keyword.function
 
@@ -243,7 +220,6 @@
   "begin"
   "end"
   "default"
-  "do"
   "get"
   "set"
   "new"
@@ -287,6 +263,8 @@
 (import_decl (long_identifier (identifier) @module))
 (module_abbrev (long_identifier (identifier) @module))
 (simple_type (long_identifier (identifier) @type))
+;; Exception abbreviation: `exception E = Other.Exn`.
+(exception_definition "=" (long_identifier (identifier) @type))
 (attribute (simple_type (long_identifier (identifier) @attribute)))
 
 ((simple_type

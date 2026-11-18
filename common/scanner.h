@@ -752,6 +752,42 @@ static inline bool is_bracket_end(TSLexer *lexer) {
     {'i', "nterface",  INTERFACE},
   };
 
+  // After the `interface` keyword: whether a block of members follows
+  // (`interface ... end`). Otherwise a type follows (`interface IDisposable`),
+  // which declares or implements that interface in a class body.
+  static inline bool interface_opens_block(TSLexer *lexer) {
+    static const char *const member_starts[] = {
+        "end",    "inherit",  "abstract", "member", "static",
+        "override", "default", "val",     "new",
+    };
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      advance(lexer);
+    }
+    if (!is_word_char(lexer->lookahead)) {
+      // The end of the line, a comment or an attribute.
+      return true;
+    }
+    char word[10];
+    size_t length = 0;
+    while (is_word_char(lexer->lookahead)) {
+      if (length < sizeof(word) - 1) {
+        word[length] = (char)lexer->lookahead;
+      }
+      length++;
+      advance(lexer);
+    }
+    if (length >= sizeof(word)) {
+      return false;
+    }
+    word[length] = 0;
+    for (size_t i = 0; i < sizeof(member_starts) / sizeof(member_starts[0]); i++) {
+      if (keyword_equals(word, member_starts[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Check if a preprocessor directive requires emitting DEDENT before itself.
   // Used by both #endif and #else handlers to pop indent when the preprocessor
   // indent is less than the current block indent.
@@ -1040,8 +1076,6 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
       // Peek ahead: skip newlines/whitespace to find indentation of next content.
       // If next content is NOT more indented than current scope, this is a bare
       // type declaration (e.g. [<Measure>] type Dollars).
-      // If next content IS more indented, the type has a body (e.g. type CsvFile
-      //   private (...) = ...) and TYPE_DECL_NEWLINE should not fire.
       uint32_t next_indent = 0;
       for (;;) {
         if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
@@ -1069,8 +1103,60 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         lexer->result_symbol = TYPE_DECL_NEWLINE;
         return true;
       }
-      // else: next line is more indented — type has a body, don't fire
-      return false;
+      // The next line is more indented. A type header goes on there only
+      // with `=`, a primary constructor, an accessibility, `with` or `when`
+      // (e.g. type CsvFile / private (...) = ...). Any other start is the
+      // next declaration of an indented namespace or module body, so this
+      // is a bare declaration too.
+      // Attributes there may be the primary constructor's
+      // (`type T` / `[<ImportingConstructor>]` / `(args) =`) or the next
+      // declaration's: look at what follows them.
+      while (lexer->lookahead == '[') {
+        skip(lexer);
+        if (lexer->lookahead != '<') {
+          break;
+        }
+        int32_t previous = 0;
+        while (!lexer->eof(lexer) &&
+               !(previous == '>' && lexer->lookahead == ']')) {
+          previous = lexer->lookahead;
+          skip(lexer);
+        }
+        if (!lexer->eof(lexer)) {
+          skip(lexer);
+        }
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
+               lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+          skip(lexer);
+        }
+      }
+      if (lexer->lookahead == '=' || lexer->lookahead == '(') {
+        return false;
+      }
+      if (is_word_char(lexer->lookahead)) {
+        static const char *const header_words[] = {
+            "private", "internal", "public", "with", "when",
+        };
+        char word[10];
+        size_t length = 0;
+        while (is_word_char(lexer->lookahead)) {
+          if (length < sizeof(word) - 1) {
+            word[length] = (char)lexer->lookahead;
+          }
+          length++;
+          skip(lexer);
+        }
+        if (length < sizeof(word)) {
+          word[length] = 0;
+          for (size_t i = 0; i < sizeof(header_words) / sizeof(header_words[0]); i++) {
+            if (keyword_equals(word, header_words[i])) {
+              return false;
+            }
+          }
+        }
+      }
+      lexer->result_symbol = TYPE_DECL_NEWLINE;
+      return true;
     }
   }
 
@@ -1715,6 +1801,18 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         indent_length = lexer->get_column(lexer);
         advance(lexer);
         if (match_keyword_rest(lexer, op->rest)) {
+          if (op->token == INTERFACE) {
+            // A zero-width marker: the token end stays at the scan start and
+            // the grammar reads the keyword itself next. Deciding needs the
+            // word after the keyword, and a probe that then fails must not
+            // have moved the token end (see above).
+            if (interface_opens_block(lexer)) {
+              lexer->result_symbol = INTERFACE;
+              return true;
+            }
+            failed_block_opener = true;
+            break;
+          }
           lexer->mark_end(lexer);
           lexer->result_symbol = op->token;
           return true;

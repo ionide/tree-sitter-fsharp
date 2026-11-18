@@ -40,3 +40,20 @@ module Helpers =
     //         ^ variable
     val mutable counter : int
     //          ^ variable
+
+[<Sealed>]
+type Counter =
+    new: start: int -> Counter
+    //   ^ variable.parameter
+    member Value: int
+    //     ^ function.member
+    static member Create: start: int * ?step: int -> Counter
+    //            ^ function.member
+    //                    ^ variable.parameter
+    //                                 ^ character.special
+    interface System.IDisposable
+    // <- keyword.type
+
+val describe: x: int | null -> string
+//            ^ variable.parameter
+//               ^ type.builtin

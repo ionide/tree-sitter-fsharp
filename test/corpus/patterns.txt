@@ -843,3 +843,128 @@ let f x =
             (wildcard_pattern)
             (const
               (int))))))))
+
+================================================================================
+as with a parenthesized pattern on the right
+================================================================================
+
+match x with
+| :? System.Enum as (a & b) -> 1
+| (a, b) as (c, d) -> 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (match_expression
+    (long_identifier_or_op
+      (identifier))
+    block: (rules
+      (rule
+        pattern: (type_check_pattern
+          (atomic_type
+            (long_identifier
+              (identifier)
+              (identifier)))
+          (paren_pattern
+            (conjunct_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        block: (const
+          (int)))
+      (rule
+        pattern: (as_pattern
+          (paren_pattern
+            (repeat_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))))
+          (paren_pattern
+            (repeat_pattern
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))))
+        block: (const
+          (int))))))
+
+================================================================================
+nullable type annotations
+================================================================================
+
+let f (x: string | null) = x
+let g (x: int * string | null) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (nullable_type
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      body: (long_identifier_or_op
+        (identifier))))
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (compound_type
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (nullable_type
+                (simple_type
+                  (long_identifier
+                    (identifier))))))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+nullable annotation with a line break before null
+================================================================================
+
+let f (x: string |
+          null) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (nullable_type
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))

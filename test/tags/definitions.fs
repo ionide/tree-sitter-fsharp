@@ -34,3 +34,9 @@ module Inner =
 //     ^^^^^ definition.module
   let innerVal = 42
   //  ^^^^^^^^ definition.constant
+
+[<AutoOpen>]
+module Marked =
+//     ^^^^^^ definition.module
+  let markedVal = 1
+  //  ^^^^^^^^^ definition.constant

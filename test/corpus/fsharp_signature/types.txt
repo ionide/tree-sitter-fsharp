@@ -1,0 +1,457 @@
+================================================================================
+members of a class signature
+:language(fsharp_signature)
+================================================================================
+
+namespace N
+
+type Service =
+    new: name: string -> Service
+    member Name: string
+    member Count: int with get, set
+    static member Create: name: string * ?retries: int -> Service
+    abstract Run: unit -> unit
+    override ToString: unit -> string
+    static member (+): Service * Service -> Service
+    member Map: f: ('T -> 'U) -> 'U when 'T: equality
+    val mutable count: int
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (type_extension_elements
+          (member_defn
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (argument_name_spec
+                    name: (identifier))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (simple_type
+                (long_identifier
+                  (identifier))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (argument_name_spec
+                      name: (identifier))
+                    (simple_type
+                      (long_identifier
+                        (identifier))))
+                  (argument_spec
+                    (argument_name_spec
+                      name: (identifier))
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (op_identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier))))
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (argument_name_spec
+                      name: (identifier))
+                    (paren_type
+                      (function_type
+                        (type_argument
+                          (identifier))
+                        (type_argument
+                          (identifier))))))
+                (type_argument
+                  (identifier)))
+              (type_argument_constraints
+                (constraint
+                  (type_argument
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+interfaces and inheritance in a class signature
+:language(fsharp_signature)
+================================================================================
+
+namespace N
+
+type Exiter =
+    interface IDisposable
+    interface IComparable<Exiter>
+
+type Derived =
+    inherit Base
+    member P: int
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (type_extension_elements
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          (interface_implementation
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (class_inherits_decl
+          block: (simple_type
+            (long_identifier
+              (identifier))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+opaque types in an indented namespace
+:language(fsharp_signature)
+================================================================================
+
+namespace N
+
+    [<Sealed>]
+    type Async<'T>
+
+    [<Sealed>]
+    type Async =
+        static member Sleep: int -> Async<unit>
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_declaration
+        (type_name
+          type_name: (long_identifier
+            (identifier))
+          (type_arguments
+            (type_argument_defn
+              (type_argument
+                (identifier)))))))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (arguments_spec
+                  (argument_spec
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (generic_type
+                  (long_identifier
+                    (identifier))
+                  (type_attributes
+                    (type_attribute
+                      (simple_type
+                        (long_identifier
+                          (identifier))))))))))))))
+
+================================================================================
+members after union cases and record fields
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+type U =
+    | A
+    | B of int
+    member IsA: bool
+
+type R =
+    { X: int }
+    member Y: int
+    interface IDisposable
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)
+            (union_type_fields
+              (union_type_field
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))
+    (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier))))))
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+member with a literal value
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+type T =
+    member A: int = 10
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (type_extension_elements
+          (member_defn
+            (member_signature
+              (identifier)
+              (curried_spec
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (const
+                (int)))))))))
+
+================================================================================
+attribute arguments
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+[<AttributeUsage(AttributeTargets.Class ||| AttributeTargets.Struct, AllowMultiple = false)>]
+[<Sealed>]
+type A =
+    inherit Attribute
+    new: unit -> A
+
+[<TypeProvider(typeof<int>)>]
+val zero: int
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (paren_expression
+            (tuple_expression
+              (infix_expression
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier)))
+                (infix_op)
+                (long_identifier_or_op
+                  (long_identifier
+                    (identifier)
+                    (identifier))))
+              (infix_expression
+                (long_identifier_or_op
+                  (identifier))
+                (infix_op)
+                (const
+                  (bool))))))
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (class_inherits_decl
+          block: (simple_type
+            (long_identifier
+              (identifier))))
+        block: (type_extension_elements
+          (member_defn
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (simple_type
+                (long_identifier
+                  (identifier))))))))
+    (value_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (paren_expression
+            (typed_expression
+              (long_identifier_or_op
+                (identifier))
+              (types
+                (simple_type
+                  (long_identifier
+                    (identifier))))))))
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (simple_type
+          (long_identifier
+            (identifier)))))))

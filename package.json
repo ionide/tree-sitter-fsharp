@@ -22,10 +22,10 @@
     "*.wasm"
   ],
   "devDependencies": {
-    "eslint": "^10.0.3",
+    "eslint": "^10.15.0",
     "eslint-config-google": "^0.14.0",
     "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.27.0"
+    "tree-sitter-cli": "^0.27.2"
   },
   "peerDependencies": {
     "tree-sitter": "^0.25.0"
@@ -45,10 +45,11 @@
     "check:invalid": "dotnet fsi scripts/check-fsc-detected.fsx",
     "check:baseline": "dotnet fsi scripts/check-parse-baseline.fsx",
     "check:highlights": "bash scripts/highlight-coverage.sh --check",
+    "lint": "eslint fsharp/grammar.js fsharp_signature/grammar.js",
     "test": "node --test bindings/node/*_test.js"
   },
   "dependencies": {
-    "node-addon-api": "^8.3.1",
+    "node-addon-api": "^8.9.2",
     "node-gyp-build": "^4.8.4"
   }
 }

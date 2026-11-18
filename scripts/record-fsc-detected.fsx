@@ -18,7 +18,7 @@
 //
 // Set TREE_SITTER to pick the CLI (default: `tree-sitter` on PATH).
 
-#r "nuget: Fantomas.FCS, 7.0.5"
+#r "nuget: Fantomas.FCS, 8.1.1"
 
 open System
 open System.Diagnostics
