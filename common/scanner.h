@@ -464,7 +464,8 @@ static inline void skip_verbatim_string_in_comment(TSLexer *lexer) {
 // line. Skips that comment and any further block comments on the same line,
 // and reports whether nothing but whitespace or a line comment follows them,
 // i.e. the line holds only comments. Nesting is counted as FSC's lexer counts
-// it: `(*` opens, `*)` closes, and `(*)` is the operator, which opens nothing.
+// it: `(*` opens, `*)` closes, `(*)` is the operator, which opens nothing,
+// and a string literal is skipped whole, as in the BLOCK_COMMENT_CONTENT scan.
 static inline bool comments_fill_rest_of_line(TSLexer *lexer) {
   for (;;) {
     uint32_t depth = 1;
@@ -484,6 +485,11 @@ static inline bool comments_fill_rest_of_line(TSLexer *lexer) {
       } else if (c == '*' && lexer->lookahead == ')') {
         skip(lexer);
         depth--;
+      } else if (c == '"') {
+        skip_string_in_comment(lexer);
+      } else if (c == '@' && lexer->lookahead == '"') {
+        skip(lexer);
+        skip_verbatim_string_in_comment(lexer);
       }
     }
     while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {

@@ -1324,3 +1324,39 @@ type T() =
                   method: (identifier))
                 (const
                   (int))))))))))
+
+================================================================================
+comment-only line whose block comment holds a quoted closer
+================================================================================
+
+type C() =
+    member _.A = 1
+(* a "*)" b *)
+    member _.B = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))
+            (block_comment
+              (block_comment_content)))))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))))))
