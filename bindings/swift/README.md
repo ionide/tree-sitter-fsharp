@@ -18,7 +18,7 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ionide/tree-sitter-fsharp", from: "0.3.12"),
+    .package(url: "https://github.com/ionide/tree-sitter-fsharp", from: "0.3.13"),
     .package(url: "https://github.com/tree-sitter/swift-tree-sitter", from: "0.9.0"),
 ],
 targets: [

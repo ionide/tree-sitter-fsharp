@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-fsharp
-        VERSION "0.3.12"
+        VERSION "0.3.13"
         DESCRIPTION "F# grammars (implementation and signature files) for tree-sitter"
         HOMEPAGE_URL "https://github.com/ionide/tree-sitter-fsharp"
         LANGUAGES C)
