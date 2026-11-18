@@ -5,8 +5,8 @@
 # scripts/check-fsc-detected.fsx. Append-only: an entry that starts
 # failing is a regression to fix, not a line to delete.
 #
-# 346 confirmed of 613 files F#'s parser rejects.
-# 56 more produce an ERROR somewhere else in the file and are not counted.
+# 350 confirmed of 613 files F#'s parser rejects.
+# 53 more produce an ERROR somewhere else in the file and are not counted.
 
 examples/FSharp.Compiler/src/Compiler/Service/ServiceErrorResolutionHints.fs	9
 examples/FSharp.Compiler/src/FSharp.Core/prim-types-prelude.fs	33
@@ -55,10 +55,12 @@ examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/Expressions/Expressio
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/Expressions/ExpressionQuotations/Regressions/E_QuotationOperators01.fs	10
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/Expressions/ExpressionQuotations/Regressions/E_QuotationOperators02.fs	6
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/Expressions/ExpressionQuotations/Regressions/E_QuotationOperators03.fs	6
+examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/Expressions/ExpressionQuotations/Regressions/E_QuotationOperators04.fs	7
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_HashDirectives01.fs	7
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_HashDirectives02.fs	7
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_NamespaceAndModule01.fs	9
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_IncompleteComment01.fs	9
+examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_embeddedString005.fs	9
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_ocamlstyle_nested006.fs	9
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_ocamlstyle_nested007.fs	10
 examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_star02.fs	8
@@ -261,6 +263,7 @@ examples/FSharp.Compiler/tests/service/data/SyntaxTree/ModuleOrNamespace/Nested 
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/ModuleOrNamespace/Nested module 16.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/ModuleOrNamespace/Nested module 17.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/As 04.fs	3
+examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/As 05.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/As 06.fs	3
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/As 07.fs	3
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/As 09.fs	3
@@ -331,6 +334,7 @@ examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record - Access 01.f
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record - Access 02.fs	5
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record - Access 03.fs	5
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record - Access 04.fs	5
+examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record - Mutable 02.fs	7
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record 01.fs	7
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record 03.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Type/Record 04.fs	5
