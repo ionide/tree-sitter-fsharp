@@ -587,3 +587,100 @@ let g<'a when 'a : (new : string -> 'a)> () = new 'a()
         (type_argument
           (identifier))
         (unit)))))
+
+================================================================================
+return-annotated function as the last binding in the file
+================================================================================
+
+let h (g: int -> int) : int = g 42
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (function_type
+              (simple_type
+                (long_identifier
+                  (identifier)))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (const
+          (int))))))
+
+================================================================================
+return-annotated function with two parameters as the last binding
+================================================================================
+
+let h a (b: int) : int = a + b
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      body: (infix_expression
+        (long_identifier_or_op
+          (identifier))
+        (infix_op)
+        (long_identifier_or_op
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+private return-annotated function as the last binding
+================================================================================
+
+let private h (x: int) : int = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (access_modifier)
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      (simple_type
+        (long_identifier
+          (identifier)))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))

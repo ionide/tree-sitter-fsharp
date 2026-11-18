@@ -488,3 +488,265 @@ let f x =
               (block_comment_content))
             block: (const
               (string))))))))
+
+================================================================================
+block comment containing a quoted comment closer
+================================================================================
+
+(* "*)" *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment containing a quoted comment opener
+================================================================================
+
+(* "(*" *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment containing escaped, verbatim, triple-quoted and interpolated strings
+================================================================================
+
+(* "a\"*)" *)
+(* "" *)
+(* @"C:\" *)
+(* @"a""\" *)
+(* xs @ ys *)
+(* """ "*)" """ *)
+(* """a"""" *)" *)
+(* $"{x}*)" *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment containing a string that spans lines
+================================================================================
+
+(* "line one
+*) is still in the string" *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment containing character literals
+================================================================================
+
+(* '"' '\"' *)
+(* 'a'"' *)" *)
+(* '\n'"' *)" *)
+(* '\a'"' *)" *)
+(* '\\'"' *)" *)
+(* 'é'"' *)" *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment containing apostrophes that open no character literal
+================================================================================
+
+(* it's f'(* g *) *)
+(* '\'"' *)
+(* '\"*)" *)
+(* x'
+'"' *)
+(* '	'"' *)
+(* ''"' *)
+(* '😀'"' *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+nested block comment containing a quoted comment closer
+================================================================================
+
+(* (* "*)" *) *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+nested block comment followed by the outer closer
+================================================================================
+
+(* (* a *) *)
+(* (* a *)*)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+multiplication operator reference inside a block comment
+================================================================================
+
+(* (*) multiplies *)
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (int)))))
+
+================================================================================
+block comment left open while nested runs to the end of the file
+================================================================================
+
+(* (* tail
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (block_comment
+    (block_comment_content)
+    (MISSING "*)")))
