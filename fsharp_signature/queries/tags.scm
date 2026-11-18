@@ -6,7 +6,7 @@
   name: (_) @name) @definition.module
 
 (module_defn
-  . (_) @name) @definition.module
+  (identifier) @name) @definition.module
 
 (namespace
   name: (_) @name) @definition.module

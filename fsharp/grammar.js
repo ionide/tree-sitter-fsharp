@@ -111,10 +111,6 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.long_identifier, $._identifier_or_op],
     [$.simple_type, $.type_argument],
-    // `new ^T ...` is ambiguous between an SRTP type arg (^T or ^U ...) and a
-    // plain generic type var; only reachable via generic_new_expression,
-    // resolved dynamically.
-    [$._srtp_type_argument, $._static_type_identifier],
     [$._module_expression, $._expression],
     [$.declaration_expression, $._comp_or_range_expression],
     [$.rules],
@@ -218,6 +214,7 @@ module.exports = grammar({
         optional($._elem_separator),
         optional($.attributes),
         "module",
+        optional($.attributes),
         optional($.access_modifier),
         optional("rec"),
         field("name", $.long_identifier),
@@ -316,6 +313,7 @@ module.exports = grammar({
         seq(
           optional($.attributes),
           "module",
+          optional($.attributes),
           optional($.access_modifier),
           optional("rec"),
           $.identifier,
@@ -513,13 +511,20 @@ module.exports = grammar({
     optional_pattern: ($) => prec.left(3, seq("?", $._pattern)),
 
     type_check_pattern: ($) =>
-      prec.right(seq(":?", $.atomic_type, optional(seq("as", $.identifier)))),
+      prec.right(
+        seq(
+          ":?",
+          $.atomic_type,
+          optional(seq("as", choice($.identifier, $.paren_pattern))),
+        ),
+      ),
 
     attribute_pattern: ($) => prec.left(seq($.attributes, $._pattern)),
 
     paren_pattern: ($) => prec(1, seq("(", $._pattern, ")")),
 
-    as_pattern: ($) => prec.left(0, seq($._pattern, "as", $.identifier)),
+    as_pattern: ($) =>
+      prec.left(0, seq($._pattern, "as", choice($.identifier, $.paren_pattern))),
     cons_pattern: ($) => prec.left(0, seq($._pattern, "::", $._pattern)),
     disjunct_pattern: ($) => prec.left(0, seq($._pattern, "|", $._pattern)),
     conjunct_pattern: ($) => prec.left(0, seq($._pattern, "&", $._pattern)),
@@ -713,15 +718,13 @@ module.exports = grammar({
       ),
 
     // Like type_argument but restricted to ^-prefixed identifiers (not '-prefixed)
-    // to avoid ambiguity with char literals in expression context.
+    // to avoid ambiguity with char literals in expression context. No
+    // precedence: with one, `x ^ y` would read `^ y` as a trait-call head.
     _srtp_type_argument: ($) =>
-      prec(
-        10,
-        seq(
-          "^",
-          $.identifier,
-          repeat(seq("or", "^", $.identifier)),
-        ),
+      seq(
+        "^",
+        $.identifier,
+        repeat(seq("or", "^", $.identifier)),
       ),
 
     long_identifier_or_op: ($) =>
@@ -867,7 +870,7 @@ module.exports = grammar({
           choice(
             seq($._pattern, "in", $._expression_or_range),
             seq(
-              $.identifier,
+              choice($.identifier, alias("_", $.wildcard_pattern)),
               "=",
               $._expression,
               choice("to", "downto"),
@@ -1389,6 +1392,7 @@ module.exports = grammar({
           $.flexible_type,
           $.anon_record_type,
           $.struct_type,
+          $.nullable_type,
         ),
       ),
 
@@ -1434,6 +1438,7 @@ module.exports = grammar({
           $.flexible_type,
           $.anon_record_type,
           $.struct_type,
+          $.nullable_type,
         ),
       ),
 
@@ -1527,6 +1532,16 @@ module.exports = grammar({
       prec.right(seq($._type, repeat1(prec.right(seq("*", $._type))))),
     struct_type: ($) => seq("struct", $.paren_type),
     postfix_type: ($) => prec.left(4, seq($._type, $.long_identifier)),
+    // F# 9 nullness: `string | null`. `| null` is one token, so a union's
+    // case separator never meets it. Binds tighter than `*` and `->`:
+    // `int * string | null` is `int * (string | null)`. Not an
+    // _argument_type: in a union field `|` separates cases, so a nullable
+    // field type needs parentheses there, as in F#.
+    nullable_type: ($) =>
+      prec.left(4, seq($._type, nullSuffix())),
+    // The same in an argument of a member signature, where `*` and `->`
+    // separate arguments instead of building a tuple or function type.
+    _argument_nullable_type: ($) => seq($._argument_type, nullSuffix()),
     // '[]', '[,]', '[,,]', ... — multidimensional array suffixes share the
     // token so 'float[,]' lexes as one postfix rather than index syntax.
     // Interior whitespace is permitted ('int[ ]', 'float[ , ]').
@@ -1617,6 +1632,7 @@ module.exports = grammar({
         choice(
           seq($.type_argument, ":>", $._type),
           seq($.type_argument, ":", "null"),
+          seq($.type_argument, ":", "not", "null"),
           seq(
             // `when (^t or ^u or ^v) : (static member M : string)` — a
             // support constraint over several typars parenthesizes them.
@@ -1708,7 +1724,14 @@ module.exports = grammar({
 
     argument_spec: ($) =>
       prec.left(
-        seq(optional($.attributes), optional($.argument_name_spec), $._argument_type),
+        seq(
+          optional($.attributes),
+          optional($.argument_name_spec),
+          choice(
+            $._argument_type,
+            alias($._argument_nullable_type, $.nullable_type),
+          ),
+        ),
       ),
 
     arguments_spec: ($) =>
@@ -1734,10 +1757,11 @@ module.exports = grammar({
         optional($.access_modifier),
         field("exception_name", $.long_identifier),
         optional(
-          seq(
-            "of",
-            $.union_type_fields,
-          )
+          choice(
+            seq("of", $.union_type_fields),
+            // Exception abbreviation: `exception E = Other.Exn`.
+            seq("=", $.long_identifier),
+          ),
         ),
         optional(alias($._type_extension_with, $.type_extension_elements)),
       ),
@@ -1889,7 +1913,8 @@ module.exports = grammar({
     enum_type_cases: ($) =>
       seq(optional("|"), $.enum_type_case, repeat(seq("|", $.enum_type_case))),
 
-    enum_type_case: ($) => seq($.identifier, "=", $.const),
+    enum_type_case: ($) =>
+      seq(optional($.attributes), $.identifier, "=", $.const),
 
     _union_type_defn_inner: ($) =>
       seq(
@@ -2514,6 +2539,10 @@ module.exports = grammar({
           "!=",
           ":=",
           "::",
+          // OCaml-compatible string concatenation `a ^ b`. The regex above
+          // matches a lone ^ too, but the "^" literal of `^T` type variables
+          // outranks a regex of equal length, so the literal must be accepted.
+          "^",
           "$",
           "?",
           "?<-",
@@ -2751,6 +2780,19 @@ function scoped(rule, indent, dedent) {
  */
 function arrow() {
   return token(prec(2, "->"));
+}
+
+/**
+ * The `| null` suffix of an F# 9 nullable type, as one token: FSC's lexer
+ * also pairs a `|` with the `null` after it, so a union case separator or a
+ * pattern's `|` never meets it. The node is named "null". The lexer cannot
+ * look past the token, so where a type may end, a `|` before a name that
+ * starts with `null` (`| y: string | nullable ->`) is read as this suffix.
+ *
+ * @return {RuleOrLiteral}
+ */
+function nullSuffix() {
+  return alias(token(seq("|", /\s*/, "null")), "null");
 }
 
 /**

@@ -616,3 +616,59 @@ module M
             (identifier))
           (const
             (int)))))))
+
+================================================================================
+attributes after the module keyword
+================================================================================
+
+module [<AutoOpen>] M =
+  let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))
+
+================================================================================
+attributes after the keyword of a top-level module
+================================================================================
+
+module [<AutoOpen>] internal A.B
+
+let x = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (access_modifier)
+    name: (long_identifier
+      (identifier)
+      (identifier))
+    (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))))

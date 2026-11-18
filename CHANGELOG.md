@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- F# 9 nullable types: `string | null` in annotations, record fields, type
+  arguments, member and `val` signatures and parenthesized union fields, as
+  `nullable_type`.
+- The `'T : not null` constraint.
+- Exception abbreviations: `exception E = Other.Exn`.
+- Attributes on enum cases: `| [<Obsolete>] A = 1`.
+- Attributes after the `module` keyword, on nested and top-level modules, in
+  both grammars: `module [<AutoOpen>] M =`.
+- `for _ = a to b do` loops.
+- A parenthesized pattern after `as`: `:? T as (a & b)`, `p as (x, y)`.
+
 ### Fixed
+- Queries: an enum case that carries attributes is still highlighted as a
+  constructor, and a nested module that carries attributes is tagged and (in
+  signature files) highlighted by its name instead of by its attribute list.
+  The target of an exception abbreviation is highlighted as a type.
 - A layout scope that opens at column 256 or more keeps its column. The
   scanner saved each scope's column in one byte, so a scope at column 300
   came back as column 44, and the lines after it were joined or split at the
@@ -47,6 +63,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not separated, so `let a = 1` / `a + 1` read as `1 a + 1` and `f a` /
   `g b` as `f a g b`, with no ERROR node. Five corpus files that use the
   form now parse without errors.
+- `^` as an infix operator (`"a" ^ "b"`, `x ^ y`, `f ^ fun x -> x`); a spaced
+  `^ y` no longer starts an SRTP trait call.
+
+### Changed
+- tree-sitter-cli 0.27.2 (regenerated parsers), eslint 10.15, node-addon-api
+  8.9.2, Rust dev-dependency tree-sitter 0.27.2, Fantomas.FCS 8.1.1 for the
+  corpus scripts. FCS 8 rejects eight more corpus files, now listed in
+  `test/fsc-parse-failures.txt`.
 
 ## [0.3.12] - 2026-09-12
 

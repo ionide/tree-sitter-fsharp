@@ -4568,3 +4568,223 @@ type Foo = delegate of a: A * b: B -> c:C -> D
           (simple_type
             (long_identifier
               (identifier))))))))
+
+================================================================================
+exception abbreviation
+================================================================================
+
+exception Abbrev = System.Exception
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    exception_name: (long_identifier
+      (identifier))
+    (long_identifier
+      (identifier)
+      (identifier))))
+
+================================================================================
+enum cases with attributes
+================================================================================
+
+type E =
+  | [<Obsolete>] A = 1
+  | B = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (enum_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (enum_type_cases
+        (enum_type_case
+          (attributes
+            (attribute
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (identifier)
+          (const
+            (int)))
+        (enum_type_case
+          (identifier)
+          (const
+            (int)))))))
+
+================================================================================
+nullable types in record fields and type arguments
+================================================================================
+
+type T = { X: string | null; Y: Dictionary<string, obj | null> }
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (nullable_type
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (record_field
+          (identifier)
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (type_attribute
+                (nullable_type
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))))))
+
+================================================================================
+parenthesized nullable type in a union field
+================================================================================
+
+type U =
+  | A of (string | null)
+  | B
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier)
+          (union_type_fields
+            (union_type_field
+              (paren_type
+                (nullable_type
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))
+        (union_type_case
+          (identifier))))))
+
+================================================================================
+not null constraint
+================================================================================
+
+let f<'T when 'T: not null> (x: 'T) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))
+          (type_argument_constraints
+            (constraint
+              (type_argument
+                (identifier)))))
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (type_argument
+              (identifier)))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+nullable types in abstract member signatures
+================================================================================
+
+type I =
+  abstract M : x: string | null * y: int -> (int -> string | null) -> int * string | null
+  abstract P : string | null with get, set
+  abstract N : unit -> string | null
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (argument_name_spec
+                    name: (identifier))
+                  (nullable_type
+                    (simple_type
+                      (long_identifier
+                        (identifier)))))
+                (argument_spec
+                  (argument_name_spec
+                    name: (identifier))
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (arguments_spec
+                (argument_spec
+                  (paren_type
+                    (function_type
+                      (simple_type
+                        (long_identifier
+                          (identifier)))
+                      (nullable_type
+                        (simple_type
+                          (long_identifier
+                            (identifier))))))))
+              (compound_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (nullable_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (nullable_type
+                (simple_type
+                  (long_identifier
+                    (identifier))))))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (nullable_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))

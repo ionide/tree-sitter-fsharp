@@ -84,9 +84,10 @@
   name: (_) @module)
 (namespace
   name: (_) @module)
+;; The name is the identifier child, not the first child: a nested module may
+;; carry attributes (`[<AutoOpen>] module Inner = ...`).
 (module_defn
-  .
-  (_) @module)
+  (identifier) @module)
 
 (record_fields
   (record_field
@@ -287,6 +288,8 @@
 (import_decl (long_identifier (identifier) @module))
 (module_abbrev (long_identifier (identifier) @module))
 (simple_type (long_identifier (identifier) @type))
+;; Exception abbreviation: `exception E = Other.Exn`.
+(exception_definition "=" (long_identifier (identifier) @type))
 (attribute (simple_type (long_identifier (identifier) @attribute)))
 
 ((simple_type

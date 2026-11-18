@@ -35,6 +35,7 @@ module.exports = grammar(require("../fsharp/grammar"), {
       seq(
         optional($.attributes),
         "module",
+        optional($.attributes),
         optional($.access_modifier),
         optional("rec"),
         field("name", $.long_identifier),
@@ -56,6 +57,7 @@ module.exports = grammar(require("../fsharp/grammar"), {
         seq(
           optional($.attributes),
           "module",
+          optional($.attributes),
           optional($.access_modifier),
           optional("rec"),
           $.identifier,

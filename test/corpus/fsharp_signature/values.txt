@@ -366,3 +366,74 @@ val speed : float<m/s>
                     (simple_type
                       (long_identifier
                         (identifier)))))))))))))
+
+================================================================================
+nullable types in val signatures
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+val f : x: string | null * y: int -> string | null
+val g : (string | null) list -> Map<string, string | null> | null
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (argument_name_spec
+              name: (identifier))
+            (nullable_type
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (argument_spec
+            (argument_name_spec
+              name: (identifier))
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (nullable_type
+          (simple_type
+            (long_identifier
+              (identifier))))))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (postfix_type
+              (paren_type
+                (nullable_type
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (long_identifier
+                (identifier)))))
+        (nullable_type
+          (generic_type
+            (long_identifier
+              (identifier))
+            (type_attributes
+              (type_attribute
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (type_attribute
+                (nullable_type
+                  (simple_type
+                    (long_identifier
+                      (identifier))))))))))))
