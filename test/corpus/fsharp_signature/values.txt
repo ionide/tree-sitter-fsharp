@@ -437,3 +437,71 @@ val g : (string | null) list -> Map<string, string | null> | null
                   (simple_type
                     (long_identifier
                       (identifier))))))))))))
+
+================================================================================
+val with type constraints
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+val make: seq<'T> -> Set<'T> when 'T: comparison
+val swap: 'a * 'b -> 'b * 'a when 'a: equality and 'b: equality
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (generic_type
+              (long_identifier
+                (identifier))
+              (type_attributes
+                (type_attribute
+                  (type_argument
+                    (identifier)))))))
+        (generic_type
+          (long_identifier
+            (identifier))
+          (type_attributes
+            (type_attribute
+              (type_argument
+                (identifier))))))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier)))))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (arguments_spec
+          (argument_spec
+            (type_argument
+              (identifier)))
+          (argument_spec
+            (type_argument
+              (identifier))))
+        (compound_type
+          (type_argument
+            (identifier))
+          (type_argument
+            (identifier))))
+      (type_argument_constraints
+        (constraint
+          (type_argument
+            (identifier)))
+        (constraint
+          (type_argument
+            (identifier)))))))

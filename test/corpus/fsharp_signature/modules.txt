@@ -117,3 +117,134 @@ type I =
                 (simple_type
                   (long_identifier
                     (identifier)))))))))))
+
+================================================================================
+conditional signature elements
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+#if DEBUG
+val debug: bool ref
+#else
+val release: bool
+#endif
+
+module Inner =
+#if DEBUG
+    val x: int
+#endif
+    val y: int
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (preproc_if
+      condition: (identifier)
+      (value_definition
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (curried_spec
+          (postfix_type
+            (simple_type
+              (long_identifier
+                (identifier)))
+            (long_identifier
+              (identifier)))))
+      alternative: (preproc_else
+        (value_definition
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (curried_spec
+            (simple_type
+              (long_identifier
+                (identifier)))))))
+    (module_defn
+      (identifier)
+      block: (preproc_if
+        condition: (identifier)
+        (value_definition
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          (curried_spec
+            (simple_type
+              (long_identifier
+                (identifier))))))
+      block: (value_definition
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (curried_spec
+          (simple_type
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+compiler directive after the module header
+:language(fsharp_signature)
+================================================================================
+
+module M
+
+#nowarn "1178"
+
+val x: int
+
+--------------------------------------------------------------------------------
+
+(file
+  (named_module
+    name: (long_identifier
+      (identifier))
+    (compiler_directive_decl
+      (string))
+    (value_definition
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (curried_spec
+        (simple_type
+          (long_identifier
+            (identifier)))))))
+
+================================================================================
+module with begin and end
+:language(fsharp_signature)
+================================================================================
+
+namespace N
+
+module Y =
+    begin
+        val a: int
+    end
+
+--------------------------------------------------------------------------------
+
+(file
+  (namespace
+    name: (long_identifier
+      (identifier))
+    (module_defn
+      (identifier)
+      block: (value_definition
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        (curried_spec
+          (simple_type
+            (long_identifier
+              (identifier))))))))

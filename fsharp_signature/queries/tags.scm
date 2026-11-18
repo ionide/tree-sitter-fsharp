@@ -52,17 +52,5 @@
           (_) @name)))) @definition.function
 
 (member_defn
-  (method_or_prop_defn
-    name: (property_or_ident
-      method: (identifier) @name))) @definition.method
-
-; Bare members: the name field holds a property_or_ident whose only child is
-; the identifier.
-(member_defn
-  (method_or_prop_defn
-    name: (property_or_ident
-      . (identifier) @name .))) @definition.method
-
-(member_defn
   (member_signature
     (identifier) @name)) @definition.method

@@ -4788,3 +4788,256 @@ type I =
                 (simple_type
                   (long_identifier
                     (identifier)))))))))))
+
+================================================================================
+interface declaration as the first member of a class
+================================================================================
+
+type T =
+  interface IDisposable with
+    member x.Dispose() = ()
+
+type Marker =
+  interface IMarker
+  abstract M : int
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (unit))))))))
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (simple_type
+                (long_identifier
+                  (identifier))))))))))
+
+================================================================================
+flexible type binds tighter than an arrow or a suffix
+================================================================================
+
+type U =
+  abstract N : l: #seq<int> -> unit
+
+let f (x: #seq<int> -> unit) (y: #A list) = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (argument_name_spec
+                    name: (identifier))
+                  (flexible_type
+                    (generic_type
+                      (long_identifier
+                        (identifier))
+                      (type_attributes
+                        (type_attribute
+                          (simple_type
+                            (long_identifier
+                              (identifier)))))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (function_type
+              (flexible_type
+                (generic_type
+                  (long_identifier
+                    (identifier))
+                  (type_attributes
+                    (type_attribute
+                      (simple_type
+                        (long_identifier
+                          (identifier)))))))
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          (typed_pattern
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier)))
+            (postfix_type
+              (flexible_type
+                (simple_type
+                  (long_identifier
+                    (identifier))))
+              (long_identifier
+                (identifier))))))
+      body: (long_identifier_or_op
+        (long_identifier
+          (identifier))))))
+
+================================================================================
+curried member signature with a tupled argument group
+================================================================================
+
+type I =
+  abstract Q : string -> string * int -> unit
+  abstract R : int -> string * int
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier))))
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (simple_type
+                (long_identifier
+                  (identifier)))))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (simple_type
+                    (long_identifier
+                      (identifier)))))
+              (compound_type
+                (simple_type
+                  (long_identifier
+                    (identifier)))
+                (simple_type
+                  (long_identifier
+                    (identifier)))))))))))
+
+================================================================================
+operator as an abstract member name
+================================================================================
+
+type IAdd<'T> =
+  static abstract (+) : 'T * 'T -> 'T
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (long_identifier
+          (identifier))
+        (type_arguments
+          (type_argument_defn
+            (type_argument
+              (identifier)))))
+      block: (type_extension_elements
+        (member_defn
+          (member_signature
+            (op_identifier)
+            (curried_spec
+              (arguments_spec
+                (argument_spec
+                  (type_argument
+                    (identifier)))
+                (argument_spec
+                  (type_argument
+                    (identifier))))
+              (type_argument
+                (identifier)))))))))
+
+================================================================================
+attributes before a primary constructor on the next line
+================================================================================
+
+type Provider
+  [<ImportingConstructor>]
+  (x: int) =
+  member _.X = x
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args
+        (attributes
+          (attribute
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        (typed_pattern
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier)))
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))))))))

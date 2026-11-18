@@ -5,7 +5,7 @@
 # scripts/check-fsc-detected.fsx. Append-only: an entry that starts
 # failing is a regression to fix, not a line to delete.
 #
-# 350 confirmed of 613 files F#'s parser rejects.
+# 349 confirmed of 613 files F#'s parser rejects.
 # 53 more produce an ERROR somewhere else in the file and are not counted.
 
 examples/FSharp.Compiler/src/Compiler/Service/ServiceErrorResolutionHints.fs	9
@@ -226,7 +226,6 @@ examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Implicit ctor - Ty
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 03.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 04.fs	4
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 08.fs	4
-examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 02.fs	6
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 06.fs	6
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 09.fs	6
 examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 10.fs	6

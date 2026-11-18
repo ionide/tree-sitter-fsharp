@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 725 with errors; 4328 error nodes
+# 5317 files swept; 721 with errors; 4305 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -169,10 +169,10 @@
 12	examples/FSharp.Compiler/tests/fsharp/core/anon/lib.fs
 2	examples/FSharp.Compiler/tests/fsharp/core/fsfromcs/lib.fs
 1	examples/FSharp.Compiler/tests/fsharp/core/large/conditionals/LargeConditionals-maxtested.fs
-8	examples/FSharp.Compiler/tests/fsharp/core/members/absil.fs
+6	examples/FSharp.Compiler/tests/fsharp/core/members/absil.fs
 44	examples/FSharp.Compiler/tests/fsharp/core/members/basics/test.fs
 4	examples/FSharp.Compiler/tests/fsharp/core/members/console/console2.fs
-4	examples/FSharp.Compiler/tests/fsharp/core/members/factors-mutrec/test.fs
+2	examples/FSharp.Compiler/tests/fsharp/core/members/factors-mutrec/test.fs
 6	examples/FSharp.Compiler/tests/fsharp/core/members/ops-mutrec/test.fs
 1	examples/FSharp.Compiler/tests/fsharp/core/members/set-only-property/fs.fs
 1	examples/FSharp.Compiler/tests/fsharp/core/unicode/kanji-unicode-utf7-codepage-65000.fs
@@ -269,7 +269,6 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/ClassTypes/MemberDeclarations/E_PropertyInvalidGetter01.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/ClassTypes/Misc/E_NoNestedTypes.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/EnumTypes/E_NoMethodsOnEnums01.fs
-2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InheritInterface.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InterfaceNotFullyImpl01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/InterfaceTypes/E_InterfaceNotFullyImpl02.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/StructTypes/Overload_Equals.fs
@@ -300,8 +299,8 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/UnitsOfMeasure/TypeChecker/Slash_InMethod01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_AsBindingOnInheritDecl01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_BaseInObjectExpression01.fs
-3	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_IncompleteConstruct01.fs
-3	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_IncompleteConstruct01b.fs
+1	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_IncompleteConstruct01.fs
+1	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_IncompleteConstruct01b.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_IndexedPropertySetter01.fs
 3	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_InvalidObjectExpression01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Diagnostics/General/E_OCamlStylePolymorficRecordFields01.fs
@@ -521,16 +520,13 @@
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 03.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 04.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Inherit 08.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 01.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 02.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 03.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 04.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 05.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 03.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 04.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 05.fs
 2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 06.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 07.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 08.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 09.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 10.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 09.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Interface 10.fs
 2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Let 03.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Let 04.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member - Attributes 01.fs
@@ -539,7 +535,7 @@
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 03.fs
 2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 05.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 07.fs
-3	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 08.fs
+1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 08.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 09.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 10.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Member/Member 11.fs

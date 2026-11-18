@@ -4920,8 +4920,13 @@
             "name": "paren_type"
           },
           {
-            "type": "SYMBOL",
-            "name": "compound_type"
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_curried_return_compound_type"
+            },
+            "named": true,
+            "value": "compound_type"
           },
           {
             "type": "SYMBOL",
@@ -4961,6 +4966,57 @@
           }
         ]
       }
+    },
+    "_curried_return_compound_type": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_curried_tuple_element"
+          },
+          {
+            "type": "REPEAT1",
+            "content": {
+              "type": "PREC_RIGHT",
+              "value": 0,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "*"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_curried_tuple_element"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "_curried_tuple_element": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_argument_type"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_argument_nullable_type"
+          },
+          "named": true,
+          "value": "nullable_type"
+        }
+      ]
     },
     "measure_atom": {
       "type": "CHOICE",
@@ -5531,8 +5587,8 @@
       }
     },
     "flexible_type": {
-      "type": "PREC_RIGHT",
-      "value": 0,
+      "type": "PREC",
+      "value": 5,
       "content": {
         "type": "SEQ",
         "members": [
@@ -6484,7 +6540,7 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "identifier"
+            "name": "_identifier_or_op"
           },
           {
             "type": "CHOICE",
@@ -7930,12 +7986,11 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "_interface_begin"
-                },
-                "named": false,
+                "type": "SYMBOL",
+                "name": "_interface_begin"
+              },
+              {
+                "type": "STRING",
                 "value": "interface"
               },
               {
@@ -12070,6 +12125,10 @@
     [
       "_type",
       "_argument_type"
+    ],
+    [
+      "_curried_tuple_element",
+      "argument_spec"
     ],
     [
       "_type",

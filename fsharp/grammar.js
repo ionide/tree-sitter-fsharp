@@ -119,6 +119,9 @@ module.exports = grammar({
     [$.union_type_cases],
     [$.prefixed_expression, $._low_prec_app, $.infix_expression],
     [$._type, $._argument_type],
+    // `a * b` in a member signature: an argument group if `->` follows, the
+    // returned tuple otherwise.
+    [$._curried_tuple_element, $.argument_spec],
     [$._type, $._curried_return_type],
     // A leading _elem_separator (fired after a file-opening extra such as a
     // doc comment) could belong to the plain module-elements repeat or open
@@ -1429,7 +1432,7 @@ module.exports = grammar({
           $.simple_type,
           $.generic_type,
           $.paren_type,
-          $.compound_type,
+          alias($._curried_return_compound_type, $.compound_type),
           $.postfix_type,
           $.list_type,
           $.static_type,
@@ -1440,6 +1443,23 @@ module.exports = grammar({
           $.struct_type,
           $.nullable_type,
         ),
+      ),
+
+    // A tuple as the return type of a member signature. Its elements exclude
+    // function types, so in `a -> b * c -> d` the `b * c` is an argument
+    // group, not a tuple that ends in a function.
+    _curried_return_compound_type: ($) =>
+      prec.right(
+        seq(
+          $._curried_tuple_element,
+          repeat1(prec.right(seq("*", $._curried_tuple_element))),
+        ),
+      ),
+
+    _curried_tuple_element: ($) =>
+      choice(
+        $._argument_type,
+        alias($._argument_nullable_type, $.nullable_type),
       ),
 
     measure_atom: ($) =>
@@ -1551,7 +1571,9 @@ module.exports = grammar({
     byref_type: ($) => prec.left(4, seq($._type, token.immediate("&"))),
     static_type: ($) => prec(10, seq($._type, $.type_arguments)),
     constrained_type: ($) => prec.right(seq($.type_argument, ":>", $._type)),
-    flexible_type: ($) => prec.right(seq("#", $._type)),
+    // `#T` binds tighter than a suffix, `*` or `->`: `#seq<int> -> unit` is a
+    // function from a flexible type.
+    flexible_type: ($) => prec(5, seq("#", $._type)),
     anon_record_type: ($) =>
       seq(optional("struct"), "{|", scoped($.record_fields, $._indent, $._dedent), "|}"),
     types: ($) =>
@@ -1705,7 +1727,7 @@ module.exports = grammar({
     member_signature: ($) =>
       prec.left(
         seq(
-          $.identifier,
+          $._identifier_or_op,
           optional($.type_arguments),
           ":",
           $.curried_spec,
@@ -1970,7 +1992,9 @@ module.exports = grammar({
           $.type_name,
           "=",
           seq(
-            alias($._interface_begin, "interface"),
+            // A zero-width marker from the scanner: a member block follows.
+            $._interface_begin,
+            "interface",
             // An interface body may open with base interfaces:
             //   type I1 = interface inherit I0 end
             scoped(

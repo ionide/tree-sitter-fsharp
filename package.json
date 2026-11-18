@@ -45,6 +45,7 @@
     "check:invalid": "dotnet fsi scripts/check-fsc-detected.fsx",
     "check:baseline": "dotnet fsi scripts/check-parse-baseline.fsx",
     "check:highlights": "bash scripts/highlight-coverage.sh --check",
+    "lint": "eslint fsharp/grammar.js fsharp_signature/grammar.js",
     "test": "node --test bindings/node/*_test.js"
   },
   "dependencies": {

@@ -2699,11 +2699,19 @@
       "required": true,
       "types": [
         {
+          "type": "active_pattern",
+          "named": true
+        },
+        {
           "type": "curried_spec",
           "named": true
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "op_identifier",
           "named": true
         },
         {
