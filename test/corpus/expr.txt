@@ -1683,9 +1683,9 @@ let x =
               (long_identifier_or_op
                 (identifier))))
           (const
-            (int)))
-        (block_comment
-          (block_comment_content))
+            (int))
+          (block_comment
+            (block_comment_content)))
         (infix_expression
           (long_identifier_or_op
             (identifier))
@@ -6805,3 +6805,1153 @@ let q2 = <@
               (int)))
           in: (long_identifier_or_op
             (identifier)))))))
+
+================================================================================
+lazy with a let block on the following lines
+================================================================================
+
+let r =
+    lazy
+        let a = 1
+        a + 1
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (const
+              (int)))
+          in: (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy with a sequential block on the following lines
+================================================================================
+
+let r =
+    lazy
+        f a
+        g b
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy with a line comment before its block
+================================================================================
+
+let r =
+    lazy // c
+        let a = 1
+        a
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (line_comment)
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (const
+              (int)))
+          in: (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block ending in a record
+================================================================================
+
+let f idx =
+    let rest =
+        lazy
+            let a = g idx
+            { A = a
+              B = 2 }
+    Some rest
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (prefixed_expression
+            (declaration_expression
+              (function_or_value_defn
+                (value_declaration_left
+                  (identifier_pattern
+                    (long_identifier_or_op
+                      (identifier))))
+                body: (application_expression
+                  (long_identifier_or_op
+                    (identifier))
+                  (long_identifier_or_op
+                    (identifier))))
+              in: (brace_expression
+                block: (field_initializers
+                  (field_initializer
+                    field: (long_identifier
+                      (identifier))
+                    value: (long_identifier_or_op
+                      (identifier)))
+                  (field_initializer
+                    field: (long_identifier
+                      (identifier))
+                    value: (const
+                      (int))))))))
+        in: (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+assert with a let block on the following lines
+================================================================================
+
+let f () =
+    assert
+        let a = 1
+        a = 1
+    2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (const
+            (unit))))
+      body: (sequential_expression
+        (prefixed_expression
+          (declaration_expression
+            (function_or_value_defn
+              (value_declaration_left
+                (identifier_pattern
+                  (long_identifier_or_op
+                    (identifier))))
+              body: (const
+                (int)))
+            in: (infix_expression
+              (long_identifier_or_op
+                (identifier))
+              (infix_op)
+              (const
+                (int)))))
+        (const
+          (int))))))
+
+================================================================================
+lazy operand continued on a line left of it
+================================================================================
+
+let r =
+    lazy f
+      x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+lazy with a comment line before its block
+================================================================================
+
+let r =
+    lazy
+      (* c *)
+        let a = 1
+        a
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (block_comment
+          (block_comment_content))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (const
+              (int)))
+          in: (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy with an equal-column body of two statements
+================================================================================
+
+let x =
+    lazy
+    printfn "a"
+    1
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (string)))
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+assert with an equal-column body of two statements
+================================================================================
+
+let f a =
+    assert
+    printfn "a"
+    a > 0
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (const
+              (string)))
+          (infix_expression
+            (long_identifier_or_op
+              (identifier))
+            (infix_op)
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body starting with a prefix operator
+================================================================================
+
+let v x y =
+    lazy
+        -x
+        y
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))
+          (long_identifier
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (prefixed_expression
+            (prefix_op)
+            (long_identifier_or_op
+              (identifier)))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body after a comment on its first line
+================================================================================
+
+let v =
+    lazy
+(* c *)     let a = 1
+            a
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (block_comment
+          (block_comment_content))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (const
+              (int)))
+          in: (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body after a comment-only line
+================================================================================
+
+let v =
+    lazy
+(* c *)
+        let a = 1
+        a
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (block_comment
+          (block_comment_content))
+        (declaration_expression
+          (function_or_value_defn
+            (value_declaration_left
+              (identifier_pattern
+                (long_identifier_or_op
+                  (identifier))))
+            body: (const
+              (int)))
+          in: (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block line after a comment at the block's column
+================================================================================
+
+let v =
+    lazy
+        f ()
+(* c *) g ()
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (unit))
+          (block_comment
+            (block_comment_content))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (unit))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block closed by a paren
+================================================================================
+
+let v = f (lazy
+             g x)
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (paren_expression
+          (prefixed_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block closed by the next match arm
+================================================================================
+
+let v a =
+    match a with
+    | 1 ->
+        lazy
+            g a
+    | _ -> lazy 0
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (match_expression
+        (long_identifier_or_op
+          (identifier))
+        (rules
+          (rule
+            pattern: (const
+              (int))
+            block: (prefixed_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))))
+          (rule
+            pattern: (wildcard_pattern)
+            block: (prefixed_expression
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block closed by else
+================================================================================
+
+let v c =
+    if c then
+        lazy
+            1
+    else
+        lazy 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (function_declaration_left
+        (identifier)
+        (argument_patterns
+          (long_identifier
+            (identifier))))
+      body: (if_expression
+        guard: (long_identifier_or_op
+          (identifier))
+        then: (prefixed_expression
+          (const
+            (int)))
+        else: (prefixed_expression
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy block closed by the next record field
+================================================================================
+
+let r =
+    { A =
+        lazy
+            1
+      B = 2 }
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (field_initializers
+          (field_initializer
+            field: (long_identifier
+              (identifier))
+            value: (prefixed_expression
+              (const
+                (int))))
+          (field_initializer
+            field: (long_identifier
+              (identifier))
+            value: (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body continued after a comment that starts left of the block
+================================================================================
+
+let r =
+    lazy
+        f
+    (*c*) x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (block_comment
+            (block_comment_content))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+assert body continued after a comment that starts left of the enclosing scope
+================================================================================
+
+let r =
+    assert
+        f
+  (* c *) x
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (block_comment
+            (block_comment_content))
+          (long_identifier_or_op
+            (long_identifier
+              (identifier))))))))
+
+================================================================================
+lazy block's second statement after a comment that starts left of the block
+================================================================================
+
+let r =
+    lazy
+        f x
+  (*c*) g y
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (sequential_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (identifier)))
+          (block_comment
+            (block_comment_content))
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)))))))))
+
+================================================================================
+lazy body's else after a comment that starts left of the block
+================================================================================
+
+let r =
+    lazy
+        if c then f
+    (*c*) else g
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (if_expression
+          guard: (long_identifier_or_op
+            (identifier))
+          then: (long_identifier_or_op
+            (identifier))
+          (block_comment
+            (block_comment_content))
+          else: (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body's with after a comment that starts left of the block
+================================================================================
+
+let r =
+    lazy
+        try f ()
+    (*c*)   with _ -> 0
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (try_expression
+          (application_expression
+            (long_identifier_or_op
+              (identifier))
+            (unit))
+          (block_comment
+            (block_comment_content))
+          (rules
+            (rule
+              pattern: (wildcard_pattern)
+              block: (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy body continued after a comment with a quote that starts left of the block
+================================================================================
+
+let r =
+    lazy
+        f
+    (* "s" *) x
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (block_comment
+            (block_comment_content))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+assert body continued after a nested comment that starts left of the block
+================================================================================
+
+let r =
+    assert
+        f
+    (* a (* b *) c *) x
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (prefixed_expression
+        (application_expression
+          (long_identifier_or_op
+            (identifier))
+          (block_comment
+            (block_comment_content))
+          (long_identifier_or_op
+            (identifier))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+parenthesized lazy body's else after a comment that starts left of the block
+================================================================================
+
+let r =
+    (lazy
+        if c then f
+    (*c*) else g
+    )
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (paren_expression
+        (prefixed_expression
+          (if_expression
+            guard: (long_identifier_or_op
+              (identifier))
+            then: (long_identifier_or_op
+              (identifier))
+            (block_comment
+              (block_comment_content))
+            else: (long_identifier_or_op
+              (identifier)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy argument in parentheses with its block left of the parenthesis
+================================================================================
+
+let r = f (lazy
+    f a
+    g b)
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (paren_expression
+          (prefixed_expression
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+assert in a list with its block left of the bracket
+================================================================================
+
+let r = [assert
+    f a
+    g b
+]
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (list_expression
+        (prefixed_expression
+          (sequential_expression
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier)))
+            (application_expression
+              (long_identifier_or_op
+                (identifier))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy yielded in a computation expression with its block left of the brace
+================================================================================
+
+let r = seq { yield lazy
+    f a
+    g b
+  }
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (ce_expression
+        (long_identifier_or_op
+          (identifier))
+        block: (prefixed_expression
+          (prefixed_expression
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+lazy argument in parentheses with a comment-led block left of the parenthesis
+================================================================================
+
+let r = f (lazy
+ (*c*) f a
+       g b)
+let z = 1
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (application_expression
+        (long_identifier_or_op
+          (identifier))
+        (paren_expression
+          (prefixed_expression
+            (block_comment
+              (block_comment_content))
+            (sequential_expression
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))
+              (application_expression
+                (long_identifier_or_op
+                  (identifier))
+                (long_identifier_or_op
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
