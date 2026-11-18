@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 745 with errors; 4458 error nodes
+# 5317 files swept; 742 with errors; 4449 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -27,7 +27,7 @@
 4	examples/FSharp.Compiler/src/Compiler/Checking/QuotationTranslator.fs
 2	examples/FSharp.Compiler/src/Compiler/Checking/SignatureConformance.fs
 2	examples/FSharp.Compiler/src/Compiler/Checking/import.fs
-3	examples/FSharp.Compiler/src/Compiler/CodeGen/IlxGen.fs
+1	examples/FSharp.Compiler/src/Compiler/CodeGen/IlxGen.fs
 10	examples/FSharp.Compiler/src/Compiler/Driver/CompilerConfig.fs
 16	examples/FSharp.Compiler/src/Compiler/Driver/CompilerImports.fs
 1	examples/FSharp.Compiler/src/Compiler/Driver/FxResolver.fs
@@ -133,7 +133,6 @@
 34	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/ImpliedSignatureHashTests.fs
 45	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Signatures/TestCasesForGenerationRoundTrip/members_basics.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/E_star02.fs
-1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/Comments/star03.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals001.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals002.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/resources/tests/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals003.fs
@@ -250,13 +249,12 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_HashDirectives01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_HashDirectives02.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ImplementationFilesAndSignatureFiles/NamespacesFragmentsAndImplementationFiles/basic/E_NamespaceAndModule01.fs
-2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/DontEscapeCommentFromString01.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_IncompleteComment01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_IncompleteComment02.fs
+1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_embeddedString005.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_ocamlstyle_nested006.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_ocamlstyle_nested007.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/E_star02.fs
-1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/Comments/embeddedString002.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/ConditionalCompilation/E_MustBeIdent01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/ConditionalCompilation/E_UnmatchedEndif01.fs
 2	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/ConditionalCompilation/InComment01.fs
@@ -274,7 +272,6 @@
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals006.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/NumericLiterals/E_enumNegativeLiterals007.fs
 4	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/StringsAndCharacters/E_MalformedShortUnicode01.fs
-3	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/StringsAndCharacters/TripleQuoteString01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalAnalysis/SymbolicOperators/E_CantUseDollarSign.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/LexicalFiltering/HashLight/E_UnclosedLetBlock01.fs
 1	examples/FSharp.Compiler/tests/fsharpqa/Source/Conformance/ObjectOrientedTypeDefinitions/ClassTypes/AsDeclarations/SanityCheck02.fs
