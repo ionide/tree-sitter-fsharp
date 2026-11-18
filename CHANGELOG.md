@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- A layout scope that opens at column 256 or more keeps its column. The
+  scanner saved each scope's column in one byte, so a scope at column 300
+  came back as column 44, and the lines after it were joined or split at the
+  wrong level. A state holding such a column is now saved in a wide form; a
+  state whose columns all fit in a byte is saved exactly as before.
 - Block comments are lexed the way FSC's `comment` rule lexes them (#245). A
   string literal inside one is skipped whole (regular, verbatim, triple-quoted),
   so a quoted `*)` or `(*` no longer ends or nests the comment (`(* "*)" *)`);
