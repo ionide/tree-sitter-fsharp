@@ -104,6 +104,10 @@ module.exports = grammar({
     $._elem_separator, // fires at a column-0 line while only the base indent level is open: separates top-level module elements so an application expression cannot absorb the next element
     $._brace_indent, // opens a '{...}' record/CE field block: closed by '}', under-indented lines still emit NEWLINE so items keep separating
     $._newline_indent, // like _indent, but only on a new, more-indented line: opens the block after a `lazy`/`assert` that ends its line
+    $._after_type_keyword, // zero-width, right after a type definition's `type`: the scanner records the keyword's column, against which F# measures a member block's `end`
+    $._after_and_keyword, // the same, right after a type definition's `and`
+    $._after_exception_keyword, // the same, right after an exception definition's `exception`
+    $._with_end, // the `end` of a `with … end` member block (rules at WITH_END in common/scanner.h)
 
     $._error_sentinel, // unused token to detect parser errors in external parser.
   ],
@@ -787,7 +791,7 @@ module.exports = grammar({
       ),
 
     _object_expression_inner: ($) =>
-      seq($._object_members, repeat($.interface_implementation)),
+      seq($._object_members, optional("end"), repeat($.interface_implementation)),
 
     object_expression: ($) =>
       prec(
@@ -1776,6 +1780,7 @@ module.exports = grammar({
       seq(
         optional($.attributes),
         "exception",
+        $._after_exception_keyword,
         optional($.access_modifier),
         field("exception_name", $.long_identifier),
         optional(
@@ -1793,6 +1798,7 @@ module.exports = grammar({
         seq(
           optional($.attributes),
           "type",
+          $._after_type_keyword,
           // Attributes may also sit between `type` and the name:
           // `type [<Struct>] R = ...`
           optional($.attributes),
@@ -1800,6 +1806,7 @@ module.exports = grammar({
           repeat(
             seq(
               "and",
+              $._after_and_keyword,
               choice(
                 seq(optional($.attributes), $._type_defn_body),
                 seq($._indent, optional($.attributes), $._type_defn_body, $._dedent),
@@ -1850,7 +1857,7 @@ module.exports = grammar({
       ),
 
     _type_extension_with: ($) =>
-      seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+      seq("with", scoped($._type_extension_inner, $._indent, $._dedent), optional(alias($._with_end, "end"))),
 
     delegate_type_defn: ($) =>
       seq($.type_name, "=", scoped($.delegate_signature, $._indent, $._dedent)),
@@ -2043,7 +2050,7 @@ module.exports = grammar({
     type_extension_elements: ($) =>
       prec.left(
         choice(
-          seq("with", scoped($._type_extension_inner, $._indent, $._dedent)),
+          seq("with", scoped($._type_extension_inner, $._indent, $._dedent), optional(alias($._with_end, "end"))),
           $._type_extension_inner,
         ),
       ),
@@ -2057,7 +2064,7 @@ module.exports = grammar({
       ),
 
     interface_implementation: ($) =>
-      prec.left(seq("interface", $._type, optional($._object_members))),
+      prec.left(seq("interface", $._type, optional(seq($._object_members, optional("end"))))),
 
     _member_defns: ($) =>
       prec.left(
