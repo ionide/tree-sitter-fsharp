@@ -69,13 +69,43 @@ let loop () =
     //^ keyword.repeat
 
 let compute () = async {
-    //           ^ constant.macro
+    //           ^ keyword
     let! value = async { return 1 }
     //^ keyword.function
     //                   ^ keyword.return
     return value
     //^ keyword.return
 }
+
+let fetch url =
+    task {
+    //^ keyword
+        let! first = get url
+        //   ^ variable
+        and! second = get url
+        //^ keyword.function
+        //   ^ variable
+        use! conn = openAsync url
+        //^ keyword.function
+        //   ^ variable
+        use reader = conn.Reader
+        //  ^ variable
+        do! flush conn
+        //^ keyword
+        while! reader.MoveNext url do
+        //^ keyword.repeat
+            ignore first
+        match! reader.Read url with
+        //^ keyword.conditional
+        | 0 -> return! retry url
+        //     ^ keyword.return
+        | n -> return n + second
+    }
+
+let pinned (arr: int[]) =
+    use ptr = fixed arr
+    //        ^ keyword
+    ()
 
 let safe () =
     try
@@ -118,4 +148,82 @@ let maxSize = 100
 //  ^ constant
 
 let sorted = query { for x in [ 1 ] do sortByDescending x }
-//                                     ^ keyword.operator
+//                                     ^ keyword
+
+let results =
+    query {
+    //^ keyword
+        for x in [ 1 .. 10 ] do
+        where (x % 2 = 0)
+        //^ keyword
+        sortByDescending x
+        //^ keyword
+        select (x * x)
+        //^ keyword
+        distinct
+        //^ keyword
+    }
+
+let joined =
+    query {
+        for c in customers do
+        join o in orders on (c.Id = o.CustomerId)
+        //^ keyword
+        //     ^ keyword
+        //                ^ keyword
+        groupBy c.City into g
+        //^ keyword
+        //             ^ keyword
+        select g.Key
+        //^ keyword
+    }
+
+let grouped =
+    query {
+        for c in customers do
+        groupJoin o in orders on (c.Id = o.CustomerId) into g
+        //                                             ^ keyword
+        select g
+    }
+
+let total = query { for x in xs do count }
+//                                 ^ keyword
+
+let paged = query { for x in xs do sortBy x; skip 2; take 5 }
+//                                 ^ keyword
+//                                           ^ keyword
+//                                                   ^ keyword
+
+let crossLast = query { for x in xs do for y in ys do last }
+//                                                    ^ keyword
+
+let firstFew =
+    query {
+        for x in xs do
+        take 3
+        //^ keyword
+        select x
+        //^ keyword
+        headOrDefault
+        //^ keyword
+    }
+
+let search xs x =
+    printfn "searching"
+    find x
+//  ^ function.call
+
+let lexer () =
+    skip ()
+//  ^ function.call
+    take ()
+//  ^ function.call
+
+let viaModule xs =
+    printfn "sorting"
+    List.sortBy id xs
+//       ^ function.call
+
+let builders = seq { yield task { return 1 } }
+//             ^ keyword
+//                         ^ keyword

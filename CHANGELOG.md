@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Highlights: computation-expression builders (`query`, `async`, `seq`) are
+  `@keyword` instead of `@constant.macro`.
+- Highlights: `query` operations (`where`, `select`, `sortBy`, `count`, ...) are
+  `@keyword` instead of `@function.call`, including `in`/`on`/`into` in `join`
+  and `groupBy`.
+
+### Fixed
+- Highlights: `while!` and `fixed` are keywords, and the names bound by `use`,
+  `use!` and `and!` are `@variable` like `let` names.
+
 ## [0.3.13] - 2026-11-18
 
 ### Added

@@ -113,9 +113,11 @@
 (module_defn
   (identifier) @module)
 
+;; The builder of a computation expression (`async`, `task`, `seq`, `query`)
+;; reads as a keyword, as in the F# compiler's own semantic colouring.
 (ce_expression
   .
-  (_) @constant.macro)
+  (_) @keyword)
 
 (field_initializer
   field: (_) @property)
@@ -126,6 +128,11 @@
     (identifier) @property))
 
 (value_declaration_left . (_) @variable)
+
+;; Names bound in a computation expression: `and! b = ...`, `use c = ...`,
+;; `use! d = ...` (`let!` is a value_declaration_left).
+(and_bang . (_) @variable)
+(declaration_expression . (identifier) @variable)
 
 (function_declaration_left
   . (_) @function)
@@ -309,6 +316,7 @@
 [
   "for"
   "while"
+  "while!"
   "downto"
   "to"
 ] @keyword.repeat
@@ -359,6 +367,7 @@
   "begin"
   "end"
   "done"
+  "fixed"
   "default"
   "in"
   "do"
@@ -593,30 +602,186 @@
 ((long_identifier_or_op (identifier) @keyword.operator)
  (#eq? @keyword.operator "not"))
 
-;; `query { ... }` custom operations whose names are unambiguous (they are not
-;; ordinary F# functions/values). Common-named operations (zip, head, count,
-;; where, select, sortBy, groupBy, ...) are intentionally omitted: they cannot
-;; be scoped to a `query` builder with the current query language without
-;; highlighting the same names everywhere.
+;; `query { ... }` custom operations read as keywords. The grammar parses an
+;; operation as an ordinary application, and a query cannot test for a
+;; `query` ancestor at any depth, so operations are recognised by name and
+;; position. Every rule captures with @keyword only, so rules that capture the
+;; same node agree (rules 1 and 3); the rule that checks the operation before
+;; it must stay after the others, with only the `()` rule behind it.
 
-;; Operations that take an argument: matched only as an application head, so
-;; module-qualified names (List.sortByDescending) and member access on an
-;; expression ((expr).sortByDescending) are left untouched.
+;; Names that are not F# library functions: matched as any unqualified
+;; application head, so List.sortByDescending and (expr).thenBy are left out.
 ((application_expression
    .
-   (long_identifier_or_op (identifier) @keyword.operator))
- (#any-of? @keyword.operator
+   (long_identifier_or_op (identifier) @keyword))
+ (#any-of? @keyword
    "leftOuterJoin" "groupJoin" "groupValBy"
    "sortByDescending" "thenBy" "thenByDescending"
    "sortByNullable" "sortByNullableDescending"
    "thenByNullable" "thenByNullableDescending"
    "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"))
 
-;; Zero-argument terminal operations: matched only as a bare statement inside a
-;; computation-expression body, which likewise excludes member access.
-((sequential_expression (long_identifier_or_op (identifier) @keyword.operator))
- (#any-of? @keyword.operator
+((sequential_expression (long_identifier_or_op (identifier) @keyword))
+ (#any-of? @keyword
    "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"))
+
+;; Names shared with library functions but unlikely as a user's own
+;; (`where`, `select`, `sortBy`): any statement of a sequence. Outside a query
+;; such a statement would discard a value, and List/Seq functions are
+;; qualified.
+((sequential_expression
+   (application_expression
+     .
+     (long_identifier_or_op (identifier) @keyword)
+     .
+     (_)))
+ (#any-of? @keyword
+   "where" "select" "sortBy" "minBy" "maxBy" "sumBy" "averageBy"
+   "skipWhile" "takeWhile"))
+
+;; Every operation that takes an argument, as the first statement of a
+;; `for ... do` body. The likelier user-function names (`find`, `take`, `skip`)
+;; are otherwise only matched after another operation, by the last rule.
+((for_expression
+   [
+     (application_expression
+       .
+       (long_identifier_or_op (identifier) @keyword)
+       .
+       (_))
+     (sequential_expression
+       .
+       (application_expression
+         .
+         (long_identifier_or_op (identifier) @keyword)
+         .
+         (_)))
+   ]
+   .)
+ (#any-of? @keyword
+   "where" "select" "sortBy" "minBy" "maxBy" "sumBy" "averageBy"
+   "exists" "find" "all" "nth" "contains"
+   "skip" "skipWhile" "take" "takeWhile"))
+
+;; `in` is a reserved word, so an identifier `in` is the one inside
+;; `join x in source on (...)`, which the grammar parses as applications.
+((long_identifier_or_op (identifier) @keyword)
+ (#eq? @keyword "in"))
+
+;; `join x in`, `groupBy key into`: the operation applied to two arguments.
+((application_expression
+   .
+   (application_expression
+     .
+     (long_identifier_or_op (identifier) @keyword)
+     .
+     (_)
+     .)
+   .
+   (long_identifier_or_op (identifier) @keyword)
+   .)
+ (#any-of? @keyword "join" "groupJoin" "leftOuterJoin" "groupBy" "in" "into"))
+
+;; `groupValBy value key into`.
+((application_expression
+   .
+   (application_expression
+     .
+     (application_expression
+       .
+       (long_identifier_or_op (identifier) @keyword)
+       .
+       (_)
+       .)
+     .
+     (_)
+     .)
+   .
+   (long_identifier_or_op (identifier) @keyword)
+   .)
+ (#any-of? @keyword "groupValBy" "into"))
+
+;; `... in source on`, `... on (cond) into`: two arguments after a keyword.
+((application_expression
+   .
+   (application_expression
+     .
+     (application_expression
+       .
+       (_)
+       .
+       (long_identifier_or_op (identifier) @keyword)
+       .)
+     .
+     (_)
+     .)
+   .
+   (long_identifier_or_op (identifier) @keyword)
+   .)
+ (#any-of? @keyword "in" "on" "into"))
+
+;; Zero-argument operations whose names are common values (`count`, `head`):
+;; as the whole body of a `query` with one or two `for`s, where the builder is
+;; in reach. A list comprehension `[ for (_, count) in pairs do count ]` keeps
+;; its colour.
+((ce_expression
+   .
+   (long_identifier_or_op (identifier) @keyword)
+   block: (for_expression
+     [
+       (long_identifier_or_op (identifier) @keyword)
+       (for_expression (long_identifier_or_op (identifier) @keyword) .)
+     ]
+     .))
+ (#any-of? @keyword "query" "count" "distinct" "head" "last"))
+
+;; An operation right after another operation: the zero-argument ones and the
+;; likelier user-function names, so a function ending in a `count` variable or
+;; a `find x` call keeps its colour. Not anchored between the two statements:
+;; a comment there is a sibling.
+((sequential_expression
+   [
+     (application_expression . (long_identifier_or_op (identifier) @keyword))
+     (long_identifier_or_op (identifier) @keyword)
+   ]
+   [
+     (long_identifier_or_op (identifier) @keyword)
+     (application_expression
+       .
+       (long_identifier_or_op (identifier) @keyword)
+       .
+       (_))
+     (sequential_expression . (long_identifier_or_op (identifier) @keyword))
+     (sequential_expression
+       .
+       (application_expression
+         .
+         (long_identifier_or_op (identifier) @keyword)
+         .
+         (_)))
+   ])
+ (#any-of? @keyword
+   "count" "distinct" "head" "last"
+   "headOrDefault" "lastOrDefault" "exactlyOne" "exactlyOneOrDefault"
+   "where" "select" "sortBy" "sortByDescending" "thenBy" "thenByDescending"
+   "minBy" "maxBy" "sumBy" "averageBy" "exists" "find" "all" "nth" "contains"
+   "skip" "skipWhile" "take" "takeWhile"
+   "sortByNullable" "sortByNullableDescending"
+   "thenByNullable" "thenByNullableDescending"
+   "sumByNullable" "minByNullable" "maxByNullable" "averageByNullable"))
+
+;; No operation takes `()`: `skip ()` and `take ()` are calls to local
+;; functions (a hand-written lexer has both), so they get the call colour back.
+((application_expression
+   .
+   (long_identifier_or_op (identifier) @function.call)
+   .
+   (unit)
+   .)
+ (#any-of? @function.call
+   "where" "select" "sortBy" "minBy" "maxBy" "sumBy" "averageBy"
+   "exists" "find" "all" "nth" "contains"
+   "skip" "skipWhile" "take" "takeWhile"))
 
 ;; `[<Literal>] let maxSize = 100`: the bound name is a constant. A top-level
 ;; `let` followed by more declarations is a `declaration_expression`; only the
