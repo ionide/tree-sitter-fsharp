@@ -46,6 +46,10 @@ enum TokenType {
   ELEM_SEP,
   BRACE_INDENT,
   NEWLINE_INDENT,
+  AFTER_TYPE_KEYWORD,
+  AFTER_AND_KEYWORD,
+  AFTER_EXCEPTION_KEYWORD,
+  WITH_END,
   ERROR_SENTINEL
 };
 
@@ -113,7 +117,27 @@ typedef struct {
   // next scan to emit the NEWLINE the enclosing block owes as an item
   // separator. See the emit site in the found_end_of_line handling.
   uint8_t stranded_dedent;
+  // Set when a WITH_END closed the scope it was offside of: the next scan
+  // emits that scope's DEDENT if one is valid there.
+  bool owed_dedent;
+  // The column of the current type definition group's `type` keyword (an
+  // `and` keeps it) or of an exception's `exception`, against which F#
+  // measures a member block's `end`; or TYPE_KEYWORD_COLUMN_UNKNOWN. It is
+  // never cleared, so it is read only where WITH_END is valid: only inside a
+  // definition, which records its own keyword first.
+  uint16_t type_keyword_column;
+  // The column of the first `with` after that keyword (or after an `and`),
+  // normally the definition's member-block `with`: F# measures the block's
+  // `end` against it instead when it is left of the keyword. (A `with` in
+  // the definition's header, right of the keyword, would be recorded
+  // instead, leaving the keyword's column as the limit.) Set to
+  // MEMBER_WITH_ARMED where the keyword is recorded; a later `with` (a
+  // `match`, `try` or property `with` inside the members) leaves it alone.
+  uint16_t member_with_column;
 } Scanner;
+
+#define TYPE_KEYWORD_COLUMN_UNKNOWN UINT16_MAX
+#define MEMBER_WITH_ARMED (UINT16_MAX - 1)
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
@@ -812,6 +836,51 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
   // following scan (the NEWLINE emit below) and never leaks further.
   bool prev_stranded_dedent = scanner->stranded_dedent;
   scanner->stranded_dedent = false;
+
+  // A WITH_END that was offside closed the innermost scope when it was taken:
+  // emit the DEDENT the grammar owes for it now, zero-width, right after the
+  // `end`.
+  if (scanner->owed_dedent) {
+    scanner->owed_dedent = false;
+    if (valid_symbols[DEDENT] && !valid_symbols[ERROR_SENTINEL]) {
+      lexer->mark_end(lexer);
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
+  }
+
+  // Right after a type definition's `type` or `and`, or an exception
+  // definition's `exception`: nothing has been skipped yet, so the keyword
+  // ends at the lexer's column. The grammar makes at most one of the three
+  // valid. Not in error recovery, where every symbol is valid and the lexer
+  // is not after any of them.
+  if ((valid_symbols[AFTER_TYPE_KEYWORD] || valid_symbols[AFTER_AND_KEYWORD] ||
+       valid_symbols[AFTER_EXCEPTION_KEYWORD]) &&
+      !valid_symbols[ERROR_SENTINEL]) {
+    enum TokenType symbol =
+        valid_symbols[AFTER_TYPE_KEYWORD]  ? AFTER_TYPE_KEYWORD
+        : valid_symbols[AFTER_AND_KEYWORD] ? AFTER_AND_KEYWORD
+                                           : AFTER_EXCEPTION_KEYWORD;
+    uint32_t length = symbol == AFTER_TYPE_KEYWORD  ? 4
+                      : symbol == AFTER_AND_KEYWORD ? 3
+                                                    : 9;
+    uint32_t column = lexer->get_column(lexer);
+    lexer->mark_end(lexer);
+    // F# measures an `and` definition's `end` against the group's `type`,
+    // which `and` only continues, unless the `and` is left of `type` (not
+    // handled here): keep that column, if known.
+    if (symbol != AFTER_AND_KEYWORD ||
+        scanner->type_keyword_column == TYPE_KEYWORD_COLUMN_UNKNOWN) {
+      uint32_t start =
+          column >= length ? column - length : TYPE_KEYWORD_COLUMN_UNKNOWN;
+      scanner->type_keyword_column = start < TYPE_KEYWORD_COLUMN_UNKNOWN
+                                         ? (uint16_t)start
+                                         : TYPE_KEYWORD_COLUMN_UNKNOWN;
+    }
+    scanner->member_with_column = MEMBER_WITH_ARMED;
+    lexer->result_symbol = symbol;
+    return true;
+  }
 
   if (valid_symbols[ERROR_SENTINEL]) {
     // During error recovery, all valid_symbols are true. Tree-sitter's error
@@ -2057,6 +2126,18 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
             }
             // WITH only valid once the right number of DEDENTs have popped.
             if (valid_symbols[WITH]) {
+              // F# closes a definition at a member-block `with` left of its
+              // keyword and then measures the block's `end` against the
+              // `with`. Only the definition's first `with` is recorded as
+              // that one.
+              if (!valid_symbols[ERROR_SENTINEL] &&
+                  scanner->member_with_column == MEMBER_WITH_ARMED) {
+                uint32_t with_column = lexer->get_column(lexer) - 4;
+                scanner->member_with_column =
+                    with_column < MEMBER_WITH_ARMED
+                        ? (uint16_t)with_column
+                        : TYPE_KEYWORD_COLUMN_UNKNOWN;
+              }
               lexer->mark_end(lexer);
               lexer->result_symbol = WITH;
               return true;
@@ -2127,7 +2208,8 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     }
   } else if (lexer->lookahead == 'e' &&
              (valid_symbols[ELSE] || valid_symbols[ELIF] ||
-              valid_symbols[END] || valid_symbols[DEDENT])) {
+              valid_symbols[END] || valid_symbols[WITH_END] ||
+              valid_symbols[DEDENT])) {
     advance(lexer);
     int16_t token_indent_level = lexer->get_column(lexer);
     if (lexer->lookahead == 'l') {
@@ -2208,12 +2290,60 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         }
       }
     } else if (lexer->lookahead == 'n' &&
-               (valid_symbols[END] || valid_symbols[DEDENT])) {
+               (valid_symbols[END] || valid_symbols[WITH_END] ||
+                valid_symbols[DEDENT])) {
       advance(lexer);
       if (lexer->lookahead == 'd') {
         advance(lexer);
         if (!is_word_char(lexer->lookahead)) {
-          if (valid_symbols[END]) {
+          // Where both are possible, an `end` left of the innermost open
+          // scope closes that scope first, as F#'s offside rule does: in a
+          // verbose `class … end`, an `end` left of an interface
+          // implementation's members is the class's. Not for paren and brace
+          // scopes, which their bracket closes, nor in error recovery. F#
+          // measures a member block's `end` against its definition's keyword,
+          // or against the block's `with` when that is left of the keyword,
+          // so where WITH_END is valid an `end` left of that limit is offside
+          // too (`[<A>] type R …` opens the enclosing scope at the attribute).
+          // `token_indent_level` is one past the `e`.
+          uint32_t end_column = (uint32_t)(token_indent_level - 1);
+          uint32_t end_limit = TYPE_KEYWORD_COLUMN_UNKNOWN;
+          if (valid_symbols[WITH_END] &&
+              scanner->type_keyword_column != TYPE_KEYWORD_COLUMN_UNKNOWN) {
+            end_limit =
+                scanner->member_with_column < scanner->type_keyword_column
+                    ? scanner->member_with_column
+                    : scanner->type_keyword_column;
+          }
+          bool end_left_of_type_keyword =
+              end_limit != TYPE_KEYWORD_COLUMN_UNKNOWN && end_column < end_limit;
+          bool end_is_offside =
+              valid_symbols[DEDENT] && !valid_symbols[ERROR_SENTINEL] &&
+              scanner->indents.size > 0 &&
+              !peek_is_paren_indent(scanner) &&
+              !peek_is_brace_indent(scanner) &&
+              (end_column < (uint32_t)peek_indent_length(scanner) ||
+               end_left_of_type_keyword);
+          // A `with … end` member block takes its `end` when it is not
+          // offside, or when it is at or right of the limit above, which F#
+          // measures it against. The scope it is left of is meant to open
+          // inside the definition (a record's `{`, a union's cases, the type
+          // after `and`); only columns are checked, so an enclosing scope
+          // that opened right of the limit is closed too.
+          if (valid_symbols[WITH_END] && !valid_symbols[ERROR_SENTINEL] &&
+              (!end_is_offside ||
+               (end_limit != TYPE_KEYWORD_COLUMN_UNKNOWN &&
+                end_column >= end_limit))) {
+            lexer->mark_end(lexer);
+            if (end_is_offside) {
+              // The scope the `end` is left of ends with it.
+              pop_indent(scanner);
+              scanner->owed_dedent = true;
+            }
+            lexer->result_symbol = WITH_END;
+            return true;
+          }
+          if (valid_symbols[END] && !end_is_offside) {
             lexer->mark_end(lexer);
             lexer->result_symbol = END;
             return true;
@@ -2766,9 +2896,10 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 // holds `stranded_dedent` (a boolean, so the bit is otherwise clear): a column
 // below COLUMN_ESCAPE is one byte, and any other column is COLUMN_ESCAPE
 // followed by the column in two bytes, low byte first. A state whose columns
-// all fit in a byte therefore serializes exactly as before, and keeps
-// everything it kept before.
+// all fit in a byte therefore saves them exactly as before.
 #define WIDE_COLUMNS_FLAG 0x80
+// In the same byte: Scanner.owed_dedent.
+#define OWED_DEDENT_FLAG 0x40
 #define COLUMN_ESCAPE 0xFF
 
 static inline size_t column_size(uint16_t column, bool wide) {
@@ -2831,7 +2962,8 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
 
   buffer[size++] = (char)scanner->multi_dollar_count;
   buffer[size++] =
-      (char)(scanner->stranded_dedent | (wide ? WIDE_COLUMNS_FLAG : 0));
+      (char)(scanner->stranded_dedent | (wide ? WIDE_COLUMNS_FLAG : 0) |
+             (scanner->owed_dedent ? OWED_DEDENT_FLAG : 0));
   buffer[size++] = (char)scanner->line_stranded;
 
   // At most 255 preprocessor columns of at most 3 bytes each: this section
@@ -2877,6 +3009,16 @@ static unsigned serialize(Scanner *scanner, char *buffer) {
     buffer[size++] = (char)*array_get(&scanner->preproc_kinds, i);
   }
 
+  // Last, so a truncated buffer loses only these (read back as unknown).
+  if (size + 2 <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+    buffer[size++] = (char)(scanner->type_keyword_column & 0xFF);
+    buffer[size++] = (char)(scanner->type_keyword_column >> 8);
+  }
+  if (size + 2 <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) {
+    buffer[size++] = (char)(scanner->member_with_column & 0xFF);
+    buffer[size++] = (char)(scanner->member_with_column >> 8);
+  }
+
   return size;
 }
 
@@ -2893,14 +3035,19 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
   array_clear(&scanner->preproc_kinds);
   scanner->multi_dollar_count = 0;
   scanner->stranded_dedent = false;
+  scanner->owed_dedent = false;
   scanner->line_stranded = false;
+  scanner->type_keyword_column = TYPE_KEYWORD_COLUMN_UNKNOWN;
+  scanner->member_with_column = TYPE_KEYWORD_COLUMN_UNKNOWN;
   if (length > 0) {
     size_t size = 0;
     scanner->multi_dollar_count = (uint8_t)buffer[size++];
 
     if (size >= length) return;
     uint8_t flags = (uint8_t)buffer[size++];
-    scanner->stranded_dedent = (flags & ~WIDE_COLUMNS_FLAG) != 0;
+    scanner->stranded_dedent =
+        (flags & ~(WIDE_COLUMNS_FLAG | OWED_DEDENT_FLAG)) != 0;
+    scanner->owed_dedent = (flags & OWED_DEDENT_FLAG) != 0;
     bool wide = (flags & WIDE_COLUMNS_FLAG) != 0;
 
     if (size >= length) return;
@@ -2935,6 +3082,16 @@ static void deserialize(Scanner *scanner, const char *buffer, unsigned length) {
     if (preproc_kind_end > length) preproc_kind_end = length;
     for (; size < preproc_kind_end; size++) {
       array_push(&scanner->preproc_kinds, (unsigned char)buffer[size]);
+    }
+
+    if (size + 2 <= length) {
+      scanner->type_keyword_column =
+          (uint16_t)((uint8_t)buffer[size] | ((uint8_t)buffer[size + 1] << 8));
+      size += 2;
+    }
+    if (size + 2 <= length) {
+      scanner->member_with_column =
+          (uint16_t)((uint8_t)buffer[size] | ((uint8_t)buffer[size + 1] << 8));
     }
   }
 }

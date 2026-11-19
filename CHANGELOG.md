@@ -17,6 +17,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Highlights: `while!` and `fixed` are keywords, and the names bound by `use`,
   `use!` and `and!` are `@variable` like `let` names.
+- The verbose-syntax `end` that closes a member block is parsed: `type C with
+  … end` (an augmentation, also after `and`), `interface I with … end`,
+  `with … end` after a record, union or exception, and
+  `{ new I with … end }` in an object expression. The `end` was parsed as a
+  stray identifier, with no ERROR node, and the declaration after it was
+  often attached to that identifier as an argument. An `end` left of an
+  interface implementation inside a verbose `class … end` still closes the
+  class. Six corpus files parse better; `members/basics/test.fs` and
+  `members_basics.fs` lose more than half their error nodes.
+  `CheckExpressions.fs` goes from 128 to 154 error nodes in
+  `test/parse-baseline.txt`: a difference in error recovery on a valid file
+  from the regenerated parse tables, not an improvement. An unrelated grammar
+  change moves it by the same amount.
 
 ## [0.3.13] - 2026-11-18
 
