@@ -5041,3 +5041,2462 @@ type Provider
             (long_identifier_or_op
               (long_identifier
                 (identifier)))))))))
+
+================================================================================
+type augmentation closed by end
+================================================================================
+
+type C
+  with
+     member x.M() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_extension
+      (type_name
+        type_name: (identifier))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+one-line type augmentation closed by end
+================================================================================
+
+type C with member x.M() = 1 end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_extension
+      (type_name
+        type_name: (identifier))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+interface implementation closed by end inside a type augmentation
+================================================================================
+
+type C
+  with
+     interface I with
+        member x.M() = 1
+     end
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_extension
+      (type_name
+        type_name: (identifier))
+      (type_extension_elements
+        block: (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+interface implementation closed by end in a class
+================================================================================
+
+type C() =
+  interface I with
+     member x.M() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members closed by end
+================================================================================
+
+type R =
+  { A: int }
+  with
+    member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+exception members closed by end
+================================================================================
+
+exception E of string
+  with
+    member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    exception_name: (long_identifier
+      (identifier))
+    (union_type_fields
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_extension_elements
+      block: (member_defn
+        (method_or_prop_defn
+          name: (property_or_ident
+            instance: (identifier)
+            method: (identifier))
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end left of an interface implementation closes the class
+================================================================================
+
+type T () =
+  class
+    interface I with
+      member x.M i = i
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end one column left of an interface implementation closes the class
+================================================================================
+
+type T () =
+  class
+    interface I with
+      member x.M i = i
+   end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (anon_type_defn
+      (type_name
+        type_name: (identifier))
+      (primary_constr_args)
+      block: (type_extension_elements
+        (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members closed by end left of the record body
+================================================================================
+
+type R =
+    { A: int }
+  with
+    member x.N() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+comment after a member block end left of the record body
+================================================================================
+
+type R =
+    { A: int }
+  with
+    member x.N() = 1
+  end
+// after the type
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (line_comment)
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+union members closed by end left of the cases
+================================================================================
+
+type U =
+    | A
+    | B
+  with
+    member x.N() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier)))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+type augmentation closed by end in a module
+================================================================================
+
+module M =
+    type C
+      with
+        member x.M() = 1
+      end
+    let y = 1
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (type_extension
+        (type_name
+          type_name: (identifier))
+        (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int)))))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+mutually recursive type augmentations closed by end
+================================================================================
+
+type C with
+    member x.M() = 1
+  end
+and D with
+    member x.N() = 2
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (type_extension
+      (type_name
+        type_name: (identifier))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int))))))
+    (type_extension
+      (type_name
+        type_name: (identifier))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+object expression member block closed by end
+================================================================================
+
+let o = { new I with member x.M() = 1 end }
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (object_expression
+          (long_identifier_or_op
+            (identifier))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+object expression member blocks closed by end over several lines
+================================================================================
+
+let o =
+    { new I with
+        member x.M() = 1
+      end
+      interface J with
+        member x.N() = 2
+      end }
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (object_expression
+          (long_identifier_or_op
+            (identifier))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))
+            block: (member_defn
+              (method_or_prop_defn
+                name: (property_or_ident
+                  instance: (identifier)
+                  method: (identifier))
+                args: (const
+                  (unit))
+                (const
+                  (int)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+object expression interface closed by end left of the brace scope
+================================================================================
+
+let o = { new I with
+            member x.M() = 1
+          interface J with
+            member x.N() = 2
+        end
+        }
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (object_expression
+          (long_identifier_or_op
+            (identifier))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))
+          (interface_implementation
+            (simple_type
+              (long_identifier
+                (identifier)))
+            block: (member_defn
+              (method_or_prop_defn
+                name: (property_or_ident
+                  instance: (identifier)
+                  method: (identifier))
+                args: (const
+                  (unit))
+                (const
+                  (int)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module after a one-line record
+================================================================================
+
+module M = begin type R = { A: int } end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module after an and type with a class body
+================================================================================
+
+module M = begin
+  type A = int
+  and
+    B = class end
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))))
+      (anon_type_defn
+        (type_name
+          type_name: (identifier)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member block end then module end after a one-line record
+================================================================================
+
+module M = begin type R = { A: int } with member x.M = 1 end end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members after and closed by end left of the record body
+================================================================================
+
+type t0 = int
+and t2 = { t1: int }
+   with
+     member t2.M1() = 2
+   end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end left of the type keyword closes the verbose module
+================================================================================
+
+module M = begin
+  type R = { A: int }
+    with member x.M = 1
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members after and closed by end at the and column
+================================================================================
+
+type t0 = int
+and t2 = { t1: int }
+   with
+     member t2.M1() = 2
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of a record opened on the begin line
+================================================================================
+
+module M = begin type R = { A: int } with member x.M = 1
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of a union opened on the begin line
+================================================================================
+
+module M = begin type U = A | B with member x.M = 1
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))
+          (union_type_case
+            (identifier)))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members after and on its own line closed by end at the and column
+================================================================================
+
+type A = int
+and
+    R = { A: int }
+        with
+            member x.M = 1
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of the nearest verbose module after a record in nested modules
+================================================================================
+
+module Outer = begin
+  module M = begin
+    type R = { A: int } with
+      member x.M = 1
+  end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (module_defn
+      (identifier)
+      block: (type_definition
+        (record_type_defn
+          (type_name
+            type_name: (identifier))
+          block: (record_fields
+            (record_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))
+          block: (type_extension_elements
+            block: (member_defn
+              (method_or_prop_defn
+                name: (property_or_ident
+                  instance: (identifier)
+                  method: (identifier))
+                (const
+                  (int)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module between an attribute and type on the begin line
+================================================================================
+
+module M = begin [<Struct>] type R = { A: int } with member x.M = 1
+                 end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of a type under an attribute line
+================================================================================
+
+module M = begin
+  [<Struct>]
+    type R = { X: int } with member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of an attributed type after a let
+================================================================================
+
+module M = begin
+  let y = 1
+  [<Struct>] type R = { X: int } with member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int))))
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members of an attributed type closed by end right of type
+================================================================================
+
+[<Struct>] type R = { X: int }
+             with
+               member x.M = 1
+             end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record interface closed by end at the type column after a with left of it
+================================================================================
+
+[<A>] type R = { X: int }
+  with
+    interface I with
+      member x.M() = 1
+    end
+      end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record interface closed by end at the column of a with left of the type
+================================================================================
+
+[<A>] type R = { X: int }
+  with
+    interface I with
+      member x.M() = 1
+    end
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+union interface closed by end at the column of a with left of the type
+================================================================================
+
+[<A>] type U = A | B
+  with
+    interface I with
+      member x.M() = 1
+    end
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (union_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (union_type_cases
+        (union_type_case
+          (identifier))
+        (union_type_case
+          (identifier)))
+      block: (type_extension_elements
+        block: (interface_implementation
+          (simple_type
+            (long_identifier
+              (identifier)))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members closed by end at the column of an indented with left of the type
+================================================================================
+
+[<A>] type R = { X: int }
+    with
+      member x.M() = 1
+    end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            args: (const
+              (unit))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of a with left of an attributed type
+================================================================================
+
+module M = begin
+  [<A>]  type R = { X: int }
+    with
+      member x.M() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+exception members closed by end at the column of a with left of the keyword
+================================================================================
+
+[<A>] exception E of int
+  with
+    member x.M() = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (exception_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    exception_name: (long_identifier
+      (identifier))
+    (union_type_fields
+      (union_type_field
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (type_extension_elements
+      block: (member_defn
+        (method_or_prop_defn
+          name: (property_or_ident
+            instance: (identifier)
+            method: (identifier))
+          args: (const
+            (unit))
+          (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of a member-block with, after a try with left of it
+================================================================================
+
+module M = begin
+  [<AbstractClass>]  type R = { X: int }
+        with
+      member x.M y =
+       try y
+       with _ -> 1
+       end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (identifier_pattern
+                (long_identifier_or_op
+                  (identifier)))
+              (try_expression
+                (long_identifier_or_op
+                  (identifier))
+                (rules
+                  (rule
+                    pattern: (wildcard_pattern)
+                    block: (const
+                      (int)))))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module after an and that follows a with left of the type
+================================================================================
+
+module M = begin
+  [<AbstractClass>] type R = { X: int }
+        with
+          member x.M = 1
+        end
+  and S = { Y: int } with
+          member x.N = 1
+          end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+and members closed by end at the column of their with after a with in the type
+================================================================================
+
+[<AbstractClass>] type C = { A: int } with member x.M = 1 end
+and S = { Y: int }
+    with
+      member x.N = 1
+    end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (type_definition
+    (attributes
+      (attribute
+        (simple_type
+          (long_identifier
+            (identifier)))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int))))))
+    (record_type_defn
+      (type_name
+        type_name: (identifier))
+      block: (record_fields
+        (record_field
+          (identifier)
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      block: (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module between an attribute and type with on the begin line
+================================================================================
+
+module M = begin [<A>] type R with member x.M = 1
+                 end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension
+        (type_name
+          type_name: (identifier))
+        (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module between an attribute and exception on the begin line
+================================================================================
+
+module M = begin [<A>] exception E of int with member x.M = 1
+                 end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (exception_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      exception_name: (long_identifier
+        (identifier))
+      (union_type_fields
+        (union_type_field
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of an attributed type with on the line
+================================================================================
+
+module M = begin
+  [<A>] type R with member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension
+        (type_name
+          type_name: (identifier))
+        (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+end of a verbose module left of an attributed exception on the line
+================================================================================
+
+module M = begin
+  [<A>] exception E of int with member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (exception_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      exception_name: (long_identifier
+        (identifier))
+      (union_type_fields
+        (union_type_field
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+record members closed by end at the type column
+================================================================================
+
+module M =
+  type R = { X: int }
+    with
+      member x.M = 1
+  end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+type with members closed by end at the type column after an attribute
+================================================================================
+
+module M = begin [<A>] type R with member x.M = 1
+                       end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension
+        (type_name
+          type_name: (identifier))
+        (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+exception members closed by end at the exception column after an attribute
+================================================================================
+
+module M = begin [<A>] exception E of int with member x.M = 1
+                       end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (exception_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      exception_name: (long_identifier
+        (identifier))
+      (union_type_fields
+        (union_type_field
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (type_extension_elements
+        block: (member_defn
+          (method_or_prop_defn
+            name: (property_or_ident
+              instance: (identifier)
+              method: (identifier))
+            (const
+              (int)))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+begin end in a verbose module after an attributed type on the begin line
+================================================================================
+
+module M = begin [<A>] type R = int
+                 do
+                   begin
+                     ()
+                   end
+                 let y = 1
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier)))))
+    block: (declaration_expression
+      (do
+        (begin_end_expression
+          block: (const
+            (unit)))))
+    block: (declaration_expression
+      (function_or_value_defn
+        (value_declaration_left
+          (identifier_pattern
+            (long_identifier_or_op
+              (identifier))))
+        body: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+class end in a verbose module after an attributed type on the begin line
+================================================================================
+
+module M = begin [<A>] type R = int
+                 type C() =
+                   class
+                     member x.M = 1
+                   end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier)))))
+    block: (type_definition
+      (anon_type_defn
+        (type_name
+          type_name: (identifier))
+        (primary_constr_args)
+        block: (type_extension_elements
+          (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+nested verbose module end after an attributed type on the begin line
+================================================================================
+
+module M = begin [<A>] type R = int
+                 module N = begin
+                   let x = 1
+                 end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))))
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier)))))
+    block: (module_defn
+      (identifier)
+      block: (declaration_expression
+        (function_or_value_defn
+          (value_declaration_left
+            (identifier_pattern
+              (long_identifier_or_op
+                (identifier))))
+          body: (const
+            (int))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+augmentation end at the keyword's column after a non-ASCII character in the basic plane
+================================================================================
+
+let a = 1
+module M = begin [<A("é")>] type R with member x.M = 1
+                            end
+           end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int))))
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (attributes
+        (attribute
+          (simple_type
+            (long_identifier
+              (identifier)))
+          (paren_expression
+            (const
+              (string)))))
+      (type_extension
+        (type_name
+          type_name: (identifier))
+        (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+member block end of an and definition at the type keyword's column
+================================================================================
+
+module M = begin
+  type A = int
+     and B = { X: int } with member x.M = 1
+  end
+end
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (type_definition
+      (union_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (union_type_cases
+          (union_type_case
+            (identifier))))
+      (record_type_defn
+        (type_name
+          type_name: (identifier))
+        block: (record_fields
+          (record_field
+            (identifier)
+            (simple_type
+              (long_identifier
+                (identifier)))))
+        block: (type_extension_elements
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              (const
+                (int))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+object expression end after a type in a deeper nested module
+================================================================================
+
+module M =
+    module N =
+        type R = { X: int }
+let o =
+  { new System.Object() with
+      member x.ToString() = "a"
+    end }
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (module_defn
+      (identifier)
+      block: (type_definition
+        (record_type_defn
+          (type_name
+            type_name: (identifier))
+          block: (record_fields
+            (record_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (brace_expression
+        block: (object_expression
+          (application_expression
+            (long_identifier_or_op
+              (long_identifier
+                (identifier)
+                (identifier)))
+            (unit))
+          block: (member_defn
+            (method_or_prop_defn
+              name: (property_or_ident
+                instance: (identifier)
+                method: (identifier))
+              args: (const
+                (unit))
+              (const
+                (string))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
+
+================================================================================
+begin end at the if column after a type in a deeper nested module
+================================================================================
+
+module M =
+    module N =
+        type R = { X: int }
+let f =
+    if true then
+        begin
+            1
+    end
+    else 2
+let z = 2
+
+--------------------------------------------------------------------------------
+
+(file
+  (module_defn
+    (identifier)
+    block: (module_defn
+      (identifier)
+      block: (type_definition
+        (record_type_defn
+          (type_name
+            type_name: (identifier))
+          block: (record_fields
+            (record_field
+              (identifier)
+              (simple_type
+                (long_identifier
+                  (identifier)))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (if_expression
+        guard: (const
+          (bool))
+        then: (begin_end_expression
+          block: (const
+            (int)))
+        else: (const
+          (int)))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      body: (const
+        (int)))))
