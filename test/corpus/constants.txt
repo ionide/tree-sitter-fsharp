@@ -1016,6 +1016,110 @@ let y = $"{{literal}} and {hole} end}}"
                 (identifier)))))))))
 
 ================================================================================
+interpolated string with a backslash before a hole
+================================================================================
+
+let a = $"{d}\{f}.txt"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+verbatim interpolated string with a backslash before a hole
+================================================================================
+
+let b = $@"C:\{d}\file"
+let c = @$"C:\{d}\file"
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier))))))))
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (string
+          (format_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+multi-dollar triple quoted format string with literal braces
+================================================================================
+
+let j = $$"""{"k": {{n}}} and {b}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
+multi-dollar triple quoted format string with extra opening braces
+================================================================================
+
+let k = $$"""{{{n}}}"""
+
+--------------------------------------------------------------------------------
+
+(file
+  (declaration_expression
+    (function_or_value_defn
+      (value_declaration_left
+        (identifier_pattern
+          (long_identifier_or_op
+            (identifier))))
+      (const
+        (triple_quoted_string
+          (format_triple_quoted_string
+            (format_string_eval
+              (long_identifier_or_op
+                (identifier)))))))))
+
+================================================================================
 ieee32 uppercase suffix
 ================================================================================
 

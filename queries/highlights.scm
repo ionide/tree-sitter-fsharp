@@ -809,3 +809,14 @@
        .
        (identifier_pattern (long_identifier_or_op (identifier) @constant)))))
  (#eq? @attribute "Literal"))
+
+;; In a hole a top-level `:` starts a format (`{price:N2}`), not a type: FSC needs
+;; parentheses for a type annotation there. The parser reads it as a type cast,
+;; so the colon and the "type" are coloured as part of the string. Last in the
+;; file so it overrides the `simple_type` rule above.
+(format_string_eval
+  (typecast_expression
+    ":" @string
+    (simple_type
+      (long_identifier
+        (identifier) @string))))
