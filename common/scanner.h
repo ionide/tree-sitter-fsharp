@@ -1019,7 +1019,14 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
 
   if (!valid_symbols[ERROR_SENTINEL] && scanner->multi_dollar_count > 1) {
     if (valid_symbols[MULTI_DOLLAR_INTERP_START] && lexer->lookahead == '{') {
+      // A hole opens with the LAST N braces of a run: in `$$"""{{{x}}}"""` the
+      // first brace is literal. Take the whole run, so the hole is not opened
+      // early and its expression does not start with a stray `{`.
       if (scan_n_chars(lexer, '{', scanner->multi_dollar_count)) {
+        while (lexer->lookahead == '{') {
+          advance(lexer);
+        }
+        lexer->mark_end(lexer);
         lexer->result_symbol = MULTI_DOLLAR_INTERP_START;
         return true;
       }
@@ -1096,6 +1103,9 @@ static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
         has_content = true;
       } else {
         if (is_multi_dollar) {
+          // Plain characters above advance without marking, so mark here: the
+          // content ends before a closing `"""`, not at the last `{` marked.
+          lexer->mark_end(lexer);
           advance(lexer);
           if (lexer->lookahead == '"') {
             advance(lexer);

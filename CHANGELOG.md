@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `groupBy`.
 
 ### Fixed
+- Interpolated strings: `\{` is a backslash followed by a hole (`$"{d}\{f}.txt"`,
+  `$@"C:\{n}"`); the backslash swallowed the brace and the hole was lost.
+- `$$"""…"""`: single braces are literal text, so JSON-style bodies parse, and extra
+  opening braces before a hole (`{{{n}}}`) are literal. `ModuleInitialization.fs` and
+  `SynExprInterpolatedStringWithTripleQuoteMultipleDollars.fs` parse cleanly.
+- Highlights: a format in a hole (`{price:N2}`) is part of the string, not a type.
 - Highlights: `while!` and `fixed` are keywords, and the names bound by `use`,
   `use!` and `and!` are `@variable` like `let` names.
 - The verbose-syntax `end` that closes a member block is parsed: `type C with

@@ -4,3 +4,9 @@ let str = $"2 + 2 = {2 + 2}"
 //                   ^ number
 //                       ^ number
 //                         ^ string
+
+let fmt = $"{price:N2}"
+//                ^ string
+//                 ^ string
+let up = $"{x :> obj}"
+//                ^ type

@@ -2348,7 +2348,10 @@ module.exports = grammar({
     // Constants (BEGIN)
     //
     _escape_char: (_) => token.immediate(prec(100, /\\["\'ntbrafv]/)),
-    _non_escape_char: (_) => token.immediate(prec(100, /\\[^"\'ntbrafv]/)),
+    // `\` and the next character, or a lone `\` before `{`: in an interpolated
+    // string `\{` is a backslash followed by a hole (FSC), and the backslash
+    // must not take the brace. Plain strings get the same tree either way.
+    _non_escape_char: (_) => token.immediate(prec(100, /\\[^"\'ntbrafv{]?/)),
     // using \u0008 to model \b
     _simple_char_char: (_) => token.immediate(/[^\n\t\r\u0008\a\f\v'\\]/),
     _unicodegraph_short: (_) => /\\u[0-9a-fA-F]{4}/,

@@ -9397,7 +9397,7 @@
         "value": 100,
         "content": {
           "type": "PATTERN",
-          "value": "\\\\[^\"\\'ntbrafv]"
+          "value": "\\\\[^\"\\'ntbrafv{]?"
         }
       }
     },

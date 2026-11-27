@@ -4,7 +4,7 @@
 # or one not listed at all, fails CI. Regenerate with
 #     dotnet fsi scripts/check-parse-baseline.fsx --update
 # after a change that makes files parse better.
-# 5317 files swept; 719 with errors; 4269 error nodes
+# 5317 files swept; 717 with errors; 4262 error nodes
 1	examples/FSharp.Compiler/buildtools/fslex/Arg.fs
 1	examples/FSharp.Compiler/buildtools/fslex/Parsing.fs
 3	examples/FSharp.Compiler/buildtools/fslex/fslexast.fs
@@ -117,7 +117,6 @@
 16	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Conformance/Types/TypeConstraints/IWSAMsAndSRTPs/testFiles/CheckSelfConstrainedIWSAM.fs
 3	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Conformance/Types/TypeConstraints/IWSAMsAndSRTPs/testFiles/CheckSelfConstrainedSRTP.fs
 2	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Conformance/Types/TypeConstraints/IWSAMsAndSRTPs/testFiles/TestLegacyThingsThatRegressedDuringRFC.fs
-5	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/EmittedIL/RealInternalSignature/ModuleInitialization.fs
 1	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/EmittedIL/Structure/DoNotInlineX.fs
 90	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/ErrorMessages/TailCallAttribute.fs
 7	examples/FSharp.Compiler/tests/FSharp.Compiler.ComponentTests/Language/StaticClassTests.fs
@@ -613,7 +612,6 @@
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/Typed - Missing type 11.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/Pattern/Typed - Missing type 12.fs
 2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/SimplePats/SimplePats - Recover 01.fs
-2	examples/FSharp.Compiler/tests/service/data/SyntaxTree/String/SynExprInterpolatedStringWithTripleQuoteMultipleDollars.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/SynIdent/IncompleteLongIdent 01.fs
 1	examples/FSharp.Compiler/tests/service/data/SyntaxTree/SynIdent/IncompleteLongIdent 02.fs
 6	examples/FSharp.Compiler/tests/service/data/SyntaxTree/SynTyparDecl/Constraint intersection 01.fs

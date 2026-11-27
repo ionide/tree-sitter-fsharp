@@ -1,5 +1,5 @@
 # Byte size of each generated parser.c. scripts/check-parse-baseline.fsx fails
 # when one grows more than 15% over this; regenerate with --update after a
 # grammar change whose growth you have looked at and accept.
-58488685	fsharp/src/parser.c
-16989379	fsharp_signature/src/parser.c
+58488775	fsharp/src/parser.c
+16989469	fsharp_signature/src/parser.c
